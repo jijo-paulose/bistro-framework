@@ -106,6 +106,8 @@
     <Compile Include="Http\StatusCodes.cs" />
     <Compile Include="Http\WebException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Validation\IValidatable.cs" />
+    <Compile Include="Validation\IValidator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

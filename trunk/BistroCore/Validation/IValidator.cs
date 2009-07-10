@@ -21,6 +21,12 @@ namespace Bistro.Validation
         bool IsValid(object target, out List<string> messages);
 
         /// <summary>
+        /// Gets the child validators of this instance
+        /// </summary>
+        /// <value>The children.</value>
+        IEnumerable<IValidator> Children { get; }
+
+        /// <summary>
         /// Gets the name of the validation rule defined by this validator.
         /// </summary>
         /// <value>The name.</value>

@@ -57,7 +57,7 @@ namespace Bistro.Controllers
         /// <summary>
         /// Empty object array for no-parameter method signatures
         /// </summary>
-        private object[] EmptyParams = new object[] { };
+        protected object[] EmptyParams = new object[] { };
 
         /// <summary>
         /// Constructor for our controller

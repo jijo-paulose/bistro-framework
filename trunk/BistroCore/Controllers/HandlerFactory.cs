@@ -33,7 +33,7 @@ namespace Bistro.Controllers
     /// </summary>
     public class HandlerFactory: IControllerHandlerFactory
     {
-        private Application application;
+        protected Application application;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HandlerFactory"/> class.
@@ -49,7 +49,7 @@ namespace Bistro.Controllers
         /// </summary>
         /// <param name="descriptor">The descriptor.</param>
         /// <returns></returns>
-        public IControllerHandler CreateControllerHandler(ControllerDescriptor descriptor)
+        public virtual IControllerHandler CreateControllerHandler(ControllerDescriptor descriptor)
         {
             return new ControllerHandler(descriptor, application.LoggerFactory.GetLogger(typeof(ControllerHandler)));
         }

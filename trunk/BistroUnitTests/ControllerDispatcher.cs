@@ -26,6 +26,7 @@ namespace Bistro.UnitTests
                 application = Application.Instance;
                 manager = application.ManagerFactory.GetManagerInstance();
                 dispatcher = application.DispatcherFactory.GetDispatcherInstance();
+                handler = new TestingHandler();
             }
         }
 
@@ -35,6 +36,7 @@ namespace Bistro.UnitTests
         private IControllerDispatcher dispatcher;
         private Application application;
         private IControllerManager manager;
+        private TestingHandler handler;
 
         [Test]
         public void ApplicationCreated()
@@ -116,24 +118,36 @@ namespace Bistro.UnitTests
             List<string> ctrs = new List<string>();
             foreach (ControllerInvocationInfo ctr in controllers)
             {
-                 ctrs.Add(ctr.BindPoint.Controller.ControllerType.ToString().Substring(32));
+                ctrs.Add(ctr.BindPoint.Controller.ControllerType.ToString().Substring(32));
             }
-            int i=0;
+            int i = 0;
             string controllerSequence = "";
             foreach (string ctrNum in ctrs)
             {
-                if (ctrNum == ctrs[ctrs.Count - 1] && ctrNum.Substring(ctrNum.LastIndexOf(".")+1) == "ReturnTypesController")
+                if (ctrNum == ctrs[ctrs.Count - 1] && ctrNum.Substring(ctrNum.LastIndexOf(".") + 1) == "ReturnTypesController")
                     continue;
 
                 if (ctrNum == "7")
                     Assert.That(i < 6, "Seventh controller will be invoked too late, causing chaos, panic and destruction");
                 else
                     controllerSequence += ctrNum;
-                
+
                 i++;
             }
             Assert.That(controllerSequence == "521436", "Controllers will be invoked in wrong order (" + controllerSequence + " instead of \"521436\"), causing chaos, panic and destruction");
-         }
+        }
 
+        [Test]
+        public void Validation()
+        {
+            var resp = handler.RunForTest("GET/validationTest");
+            var contexts = handler.AllContents;
+
+            var messages = contexts["request"]["Messages"] as List<string>;
+
+            Assert.That(messages != null, "The list of messages is missing");
+            Assert.That(messages.Count == 1, String.Format("The list of messages has {0} elements instead of 1", messages.Count));
+            Assert.AreEqual(messages[0], "someField is required");
+        }
     }
 }

@@ -13,14 +13,14 @@ namespace Bistro.Extensions.Validation
     /// <typeparam name="T"></typeparam>
     public class Validator<T>: IValidator
     {
-        List<IValidator> children = new List<IValidator>();
+        protected List<IValidator> children = new List<IValidator>();
 
         /// <summary>
         /// Sets a validation namespace for this, and all child validations.
         /// </summary>
         /// <param name="name">The name.</param>
         /// <returns></returns>
-        public Validator<T> As(string name)
+        public virtual Validator<T> As(string name)
         {
             Name = name;
 
@@ -33,9 +33,12 @@ namespace Bistro.Extensions.Validation
         /// <typeparam name="K">the type of the member</typeparam>
         /// <param name="expr">The expression tree for the member.</param>
         /// <returns></returns>
-        public ValidationSite<T,K> For<K>(Expression<Func<T, K>> expr)
+        public ValidationSite<T,K> Value<K>(Expression<Func<T, K>> expr)
         {
-            return new ValidationSite<T, K>(expr);
+            var site = new ValidationSite<T, K>(expr);
+            children.Add(site);
+
+            return site;
         }
 
         /// <summary>
@@ -53,17 +56,17 @@ namespace Bistro.Extensions.Validation
         }
 
         /// <summary>
-        /// Determines whether the specified target is valid.
+        /// Determines whether the specified target, and all of its children, is valid.
         /// </summary>
         /// <param name="target">The target.</param>
         /// <param name="messages">The messages.</param>
         /// <returns>
         /// 	<c>true</c> if the specified target is valid; otherwise, <c>false</c>.
         /// </returns>
-        public bool IsValid(object target, out List<string> messages)
+        public virtual bool IsValid(object target, out List<string> messages)
         {
-            var valid = true;
             messages = new List<string>();
+            var valid = DoValidate(target, out messages);
 
             foreach (IValidator child in children)
             {
@@ -74,6 +77,18 @@ namespace Bistro.Extensions.Validation
             }
 
             return valid;
+        }
+
+        /// <summary>
+        /// Evaluates this validator only.
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <param name="messages">The messages.</param>
+        /// <returns></returns>
+        public virtual bool DoValidate(object target, out List<string> messages)
+        {
+            messages = new List<string>();
+            return true;
         }
 
         /// <summary>
@@ -93,6 +108,20 @@ namespace Bistro.Extensions.Validation
         public IEnumerable<IValidator> Children
         {
             get { return children; }
+        }
+
+        /// <summary>
+        /// Merges the validator with the specified target.
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns></returns>
+        public IValidator Merge(IValidator target)
+        {
+            var validator = new Validator<T>();
+            validator.children.AddRange(children);
+            validator.children.AddRange(target.Children);
+
+            return validator;
         }
     }
 }

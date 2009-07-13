@@ -78,7 +78,7 @@ namespace Bistro.Configuration
         /// Gets or sets the controller handler factory.
         /// </summary>
         /// <value>The controller handler factory.</value>
-        [ConfigurationProperty("handler-factory", DefaultValue = "Bistro.Controllers.HandlerFactory")]
+        [ConfigurationProperty("handler-factory", DefaultValue = "Bistro.Validation.ValidatingHandlerFactory")]
         public string ControllerHandlerFactory
         {
             get { return (string)this["handler-factory"]; }

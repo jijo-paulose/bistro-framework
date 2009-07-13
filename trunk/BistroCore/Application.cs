@@ -30,6 +30,7 @@ using Bistro.Configuration;
 using System.Web;
 using System.IO;
 using System.Reflection;
+using Bistro.Validation;
 
 namespace Bistro
 {
@@ -105,7 +106,7 @@ namespace Bistro
             // may rely on that stuff being there.
             application.PreLoadAssemblies();
 
-            application.HandlerFactory = LoadComponent<IControllerHandlerFactory>(logger, configuration.ControllerHandlerFactory, typeof(HandlerFactory), new object[] { application });
+            application.HandlerFactory = LoadComponent<IControllerHandlerFactory>(logger, configuration.ControllerHandlerFactory, typeof(ValidatingHandlerFactory), new object[] { application });
             application.DispatcherFactory = LoadComponent<IDispatcherFactory>(logger, configuration.DispatcherFactory, typeof(DispatcherFactory), new object[] { application });
 
             // manager factory requires handler and dispatcher factories to be in place

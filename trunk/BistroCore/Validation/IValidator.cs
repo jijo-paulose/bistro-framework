@@ -27,6 +27,13 @@ namespace Bistro.Validation
         IEnumerable<IValidator> Children { get; }
 
         /// <summary>
+        /// Merges the validator with the specified target.
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns></returns>
+        IValidator Merge(IValidator target);
+
+        /// <summary>
         /// Gets the name of the validation rule defined by this validator.
         /// </summary>
         /// <value>The name.</value>

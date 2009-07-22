@@ -27,7 +27,9 @@ namespace Bistro.Validation
         IEnumerable<IValidator> Children { get; }
 
         /// <summary>
-        /// Merges the validator with the specified target.
+        /// Merges the validator with the specified target. This method is required to be an
+        /// idempotent factory method. It should produce a new instance of a validator which
+        /// serves as a combination of all
         /// </summary>
         /// <param name="target">The target.</param>
         /// <returns></returns>

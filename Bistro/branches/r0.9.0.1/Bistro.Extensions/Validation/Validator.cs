@@ -11,9 +11,17 @@ namespace Bistro.Extensions.Validation
     /// Build class for validation rules
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Validator<T>: IValidator
+    public class Validator<T>: IValidator where T : IValidatable
     {
         protected List<IValidator> children = new List<IValidator>();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Validator&lt;T&gt;"/> class.
+        /// </summary>
+        public Validator()
+        {
+            Define();
+        }
 
         /// <summary>
         /// Sets a validation namespace for this, and all child validations.
@@ -47,11 +55,13 @@ namespace Bistro.Extensions.Validation
         /// instance. Given a rule on the target with a name of "a.b", and a validator with a name of
         /// "c", a.b will become "c.a.b".
         /// </summary>
-        /// <param name="target">The target.</param>
-        /// <returns>a validator which is the composition of the instance with the target</returns>
-        public Validator<T> WithRulesFrom(IValidatable target)
+        /// <param name="t">The t.</param>
+        /// <returns>
+        /// a validator which is the composition of the instance with the target
+        /// </returns>
+        public Validator<T> WithRulesFrom(Type target)
         {
-            children.Add(target.Validator);
+            children.Add(ValidationRepository.Instance.GetValidatorForType(target));
             return this;
         }
 
@@ -123,5 +133,7 @@ namespace Bistro.Extensions.Validation
 
             return validator;
         }
+
+        protected virtual void Define() { }
     }
 }

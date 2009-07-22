@@ -13,7 +13,7 @@ namespace Bistro.Extensions.Validation
     /// </summary>
     /// <typeparam name="T">the type of the owner class</typeparam>
     /// <typeparam name="K">the type of the member to be validated</typeparam>
-    public class ValidationSite<T,K>: Validator<T>
+    public class ValidationSite<T,K>: Validator<T> where T: IValidatable
     {
         /// <summary>
         /// The member represented by this validation site
@@ -30,6 +30,18 @@ namespace Bistro.Extensions.Validation
             member = body.Member;
 
             this.Name = body.Member.Name;
+        }
+
+        /// <summary>
+        /// Aliases this validation site as the supplied name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
+        public ValidationSite<T, K> AliasedAs(string name)
+        {
+            this.Name = name;
+
+            return this;
         }
 
         //public override Validator<T> As(string name)

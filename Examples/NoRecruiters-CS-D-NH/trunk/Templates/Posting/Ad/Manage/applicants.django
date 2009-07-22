@@ -1,0 +1,47 @@
+﻿{% extends "Templates\base.django" %}
+
+{% block title %}
+NoRecruiters :: All Applicants
+{% endblock %}
+
+{% block content %}
+
+<h2 class="smallHeading">
+    All Applicants</h2>
+<div class="content">
+{% for posting in postings %}
+    {% for row in posting.applications %}
+	<div class="listItemHeader">
+		<h3>
+			<a href="{{root}}/{{row.SubmittedPosting.ContentType|ascontenttype}}/{{row.SubmittedPosting.ShortName}}">
+				{{row.SubmittedPosting.Heading}}
+			</a>by
+			{{row.SubmittedBy.UserName}}
+			on
+			{{row.SubmittedOn}}
+			{% if not adId %}
+			in response to <a href="{{root}}/ad/{{posting.ShortName}}">{{posting.Heading}}</a>
+			{% endif %}
+		</h3>
+	</div>
+	<div class="listItem">
+	    {% if row.Comment %}
+	        {{row.SubmittedBy.UserName}} says "{{row.Comment}}"<br /><br />
+	    {% endif %}
+		<span ID="lblContents" class="contentsExcerpt">{{row.SubmittedPosting.ShortText}}</span>
+			<a href="{{root}}/{{row.SubmittedPosting.ContentType|ascontenttype}}/{{row.SubmittedPosting.ShortName}}">
+			more...</a>
+	</div>
+    {% empty %}
+	<div class="listItemHeader">
+		<h3>
+			No applicants for <a href="{{root}}/ad/{{posting.ShortName}}">{{posting.Heading}}</a>
+		</h3>
+	</div>
+    {% endfor %}
+{% empty %}
+<center>There are no postings to apply for</center>
+{% endfor %}
+</div>
+
+{% endblock %}

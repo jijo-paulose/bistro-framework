@@ -1,0 +1,36 @@
+{% extends "Templates\base.django" %}
+
+{% block title %}
+NoRecruiters :: {{posting.Heading}}
+{% endblock %}
+
+{% block content %}
+
+<h2 class="smallHeading">
+    <span class="messageStart">{{ posting.Heading }}</span>
+        <span class="messageContents">
+        {% for tag in posting.tags %}
+            {% if forloop.first %}({% endif %}<a href="{{root}}/postings/{{posting.ContentType|ascontenttype}}/with-tag/{{tag.SafeText|urlencode}}">{{tag.TagText}}</a>{% if not forloop.last %},&nbsp;{% else %}){% endif %}
+        {% endfor %}
+        </span>
+    </h2>
+<div class="content">
+    {% ifnotequal posting.User.LocalID BistroUser.LocalID %}
+    <div class="viewPostingHeader" >
+        <a href="{{root}}/posting/apply/{{contentType}}/{{posting.ShortName}}">
+            {% ifequal contentType "resume" %}
+            <img alt="apply" id="applyButton" src="{{root}}/Support/style/btnContact.jpg" />
+            {% else %}
+            <img alt="apply" id="applyButton" src="{{root}}/Support/style/btnApply2.jpg" />
+            {% endifequal %}
+        </a>
+    </div>
+    {% endifnotequal %}
+    <div class="standardContent" >
+    {% autoescape off %}
+        {{ posting.Contents.ContentsText }}
+    {% endautoescape %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<class-loader>
+
+	<!-- Global aliases -->
+	<alias name="Factory" type="WorkflowServer.Foundation.Documents.FactoryEnvelope`1" />
+	<alias name="SprocFactory" type="WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1" />
+	<alias name="Document" type="WorkflowServer.Foundation.Documents.Document" />
+	<alias name="Activity" type="WorkflowServer.Foundation.Activity" />
+	<alias name="Container" type="WorkflowServer.Foundation.Activities.Container" />
+
+	<!-- Caching manager aliases -->
+	<base-type type="WorkflowServer.Foundation.Documents.Caching.CacheManager">
+		<alias name="Application" type="WorkflowServer.Foundation.Documents.Caching.ApplicationCacheManager" />
+	</base-type>
+
+</class-loader>

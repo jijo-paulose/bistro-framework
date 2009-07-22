@@ -1,0 +1,39 @@
+﻿{% extends "Templates\base.django" %}
+
+{% block title %}
+NoRecruiters :: All Applicants
+{% endblock %}
+
+{% block content %}
+
+<h2 class="smallHeading">
+    All Applicants</h2>
+<div class="content">
+{% for row in applicants %}
+	<div class="listItemHeader">
+		<h3>
+			<a href="{{root}}/{{row.ContentType|ascontenttype}}/{{row.ShortName}}">
+				{{row.Heading}}
+			</a>by
+			{{row.UserName}}
+			on
+			{{row.SubmittedOn}}
+			{% if not adId %}
+			in response to <a href="{{root}}/ad/{{row.SourceShortName}}">{{row.SourceHeading}}</a>
+			{% endif %}
+		</h3>
+	</div>
+	<div class="listItem">
+	    {% if row.Comment %}
+	        {{row.UserName}} says "{{row.Comment}}"<br /><br />
+	    {% endif %}
+		<span ID="lblContents" class="contentsExcerpt">{{row.ShortText}}</span>
+			<a href="{{root}}/{{row.ContentType|ascontenttype}}/{{row.ShortName}}">
+			more...</a>
+	</div>
+{% empty %}
+No Applicants
+{% endfor %}
+</div>
+
+{% endblock %}

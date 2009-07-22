@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+  <!--
+		Document userProfile contains user profile information used for athentication and authorization.
+		It can also carry user preferences and other user-specific information. It MUST have 
+		WorkflowServer.Foundation.Documents.UserProfile as its type and its schema MUST match the schema
+		of the WorkflowServer.Foundation.Documents.UserProfile document (see below)
+		This factory is required if user authentication is performed.
+	-->
+<document name="Tags" type="Document"
+		  factory="SprocFactory"
+		  datastore="Primary"
+		  caching="Application;timeout=100"
+			>
+
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:wdf="http://schemas.hill30.com/workflow/documents">
+
+		<xs:element name="document"
+					wdf:transient="true"
+					wdf:skip-extra="true"
+				  >
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element maxOccurs="unbounded" name="data" wdf:read="s_tag_list(count)">
+						<xs:complexType>
+							<xs:attribute name="TagText" type="xs:string" />
+							<xs:attribute name="SafeText" type="xs:string" />
+							<xs:attribute name="Count" type="xs:int" wdf:param-name="Cnt" />
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="docID" type="xs:ID" wdf:transient="true" />
+			</xs:complexType>
+		</xs:element>
+
+	</xs:schema>
+</document>

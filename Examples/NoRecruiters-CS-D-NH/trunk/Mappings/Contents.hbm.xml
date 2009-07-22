@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="NoRecruiters"
+    namespace="NoRecruiters">
+
+	<class name="Contents" table="PostingContents">
+		<id name="Id" column="ContentsId" type="String">
+      <generator class="uuid.hex" >
+        <param name="format">D</param>
+      </generator>
+    </id>
+
+		<property name="ContentsText" column="Contents" />
+	</class>
+</hibernate-mapping>

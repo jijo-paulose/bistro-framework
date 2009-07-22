@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="NoRecruiters"
+    namespace="NoRecruiters">
+
+	<class name="UserAction" table="UserActions">
+		<id name="Id" column="UserActionId" type="Int32">
+			<generator class="identity" />
+		</id>
+
+		<many-to-one name="User" column="UserId" />
+		<property name="Action" />
+		<property name="Comment" />
+		<property name="CreatedOn" />
+		<many-to-one name="Posting" column="PostingId" />
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+{% spaceless %}
+<fibonacci count="{{ fibNbrs|length }}" >
+    {% for number in fibNbrs %}
+    <number idx="{{ forloop.counter0 }}">{{ number }}</number>
+    {% endfor %}
+</fibonacci>
+{% endspaceless %}

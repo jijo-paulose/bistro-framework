@@ -1,0 +1,10 @@
+﻿{% extends "Templates\Posting\apply.django" %}
+
+{% block profileMessage %}
+    create a <a href='{{root}}/posting/ad/byname/profile'>profile</a> before you contact someone.
+{% endblock %}
+
+{% block message %}
+    Dear NoRecruiters user. We are very interested in your resume and would like to speak with you. 
+    Please contact us at your earliest convinience
+{% endblock %}

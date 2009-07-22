@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+  <!--
+		Document userProfile contains user profile information used for athentication and authorization.
+		It can also carry user preferences and other user-specific information. It MUST have 
+		WorkflowServer.Foundation.Documents.UserProfile as its type and its schema MUST match the schema
+		of the WorkflowServer.Foundation.Documents.UserProfile document (see below)
+		This factory is required if user authentication is performed.
+	-->
+<document name="ContentType" type="Document"
+		  factory="SprocFactory"
+		  datastore="Primary"
+		  caching="Application"
+			>
+
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:wdf="http://schemas.hill30.com/workflow/documents">
+
+		<xs:element name="document"
+					wdf:read="s_content_type"
+				  >
+			<xs:complexType>
+				<xs:attribute name="docID" type="xs:ID" wdf:param-name="ContentTypeId" />
+				<xs:attribute name="Description" type="xs:string" />
+
+				<!--xs:attribute name="context" type="xs:IDREF" wdf:refers-to="context" sql:field="[Context]" /-->
+			</xs:complexType>
+		</xs:element>
+
+	</xs:schema>
+</document>

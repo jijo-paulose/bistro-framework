@@ -1,0 +1,40 @@
+{% extends "Templates\Posting\view.django" %}
+
+{% block title %}
+NoRecruiters :: My Resume
+{% endblock %}
+
+{% block content %}
+<h2 class="smallHeading">
+    My Resume</h2>
+
+<div class="content" style="padding: 5px;">
+    <br />
+    <span class="messageStart">Your resume has been viewed {{resume.Views|default:"0"}} times.</span> 
+    <span class="messageContents">&nbsp;It is currently
+    {% if posting.Published%}
+        published.
+    {% else %}
+        unpublished.
+    {% endif %}
+    </span>
+    <br /><br />
+    <form name="frmPublish" action="{{root}}/posting/resume/byname/{{posting.ShortName}}" method="post">
+    You can
+    <a href="{{root}}/posting/resume/byname/{{posting.ShortName}}">edit</a>
+    or
+        <a href="javascript:document.frmPublish.submit()">
+        {% if resume.Published %}
+        <input type="hidden" name="published" value="true" /> suspend
+        {% else %}
+        <input type="hidden" name="published" value="true" /> publish
+        {% endif %}
+        </a>
+    it.
+    </form>
+</div>
+<br />
+
+{{ block.super }}
+
+{% endblock %}

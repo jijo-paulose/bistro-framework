@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+  <!--
+		message-queue represents queue document. This document factory is used by activities to access
+		message queues. The name of the default messsage queue document factory is provided by the queue-file
+		attribute of the server root tag. a specific factory different from the default one can be assigned to
+		an activity by setting queue=file attribute on such activity.
+		A message queue document MUST have WorkflowServer.Foundation.Documents.DocumentMessageQueue as its type.
+		The schema of a message queue document must match the schema of the DocumentMessageQueue document (see below)
+		This factory is mandatory
+	-->
+  <document name="message-queue" type="WorkflowServer.Foundation.Documents.DocumentMessageQueue"/>
+

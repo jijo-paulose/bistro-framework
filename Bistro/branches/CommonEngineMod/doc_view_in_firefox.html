@@ -1,0 +1,507 @@
+<html>
+	<head>
+		<style type="text/css">
+			body, h1, h2, h3, h4, p, div {
+				margin: 0 0 0 0;
+				padding: 0 0 0 0;
+			}
+			body {
+				font-family: arial, "lucida console", sans-serif;
+				margin: 8 8 8 20;
+			}
+			.note {
+				background-color: #FAFA8C;
+				padding: 2 4 2 4;
+				font-size: 83%;
+			}
+			.note p{
+				margin: 0 0 4 0;
+			}
+			.note h3{
+				text-align: center;
+				font-size: 100%;
+			}
+		</style>
+		<script type="application/x-javascript">
+			var _ctx = null;
+			var _nodeDraw = null;
+			var _x = 10;
+			var _y = 30;
+			var _colorGreen = "#E0FCE0";
+			var _colorTan = "#FAF0D7";
+			var _colorYellow = "#F8F859";
+			var _colorBlue = "#E1F4FA";
+			var _colorGray = "#F5F0F0";
+			var _colorDarkGray = "#ABABAB";
+			var _textStyle = "12px Arial";
+			
+			function draw() {
+				construction();
+				outline();
+				
+				//Create an object to hold class nodes.
+				var main = new Object();
+				
+				//Draw class nodes
+				drawHttpModule(main);
+				drawHttpHandler(main);
+				drawBEngine(main);
+				drawBListNode(main);
+				drawBControllerInfo(main);
+				drawBBinding(main);
+				
+				//Draw arrows
+				main.httphandler.dispatcher.burl.arrowTo(main.bengine, "pass in", "a URL");
+				main.httphandler.dispatcher.bmethod.arrowFrom(main.bengine, "get back","a method");
+				main.httpmodule.loader.arrowTo(main.httpmodule.bcontrollerinfo, "  loads", "  all");
+				main.httpmodule.bcontrollerinfo.arrowTo(main.httpmodule.dispatcher, "  registers", "  with");
+				main.httpmodule.dispatcher.arrowTo(main.bengine, "  adds", "  to");
+				
+				//Draw connectors
+				main.bengine.btreenode.blistnodeset.blistnode.connectTo(main.blistnode,2,0);
+				main.httphandler.dispatcher.bmethod.blistnode.connectTo(main.blistnode,2,3);
+				main.blistnode.bcontrollerinfo.connectTo(main.bcontrollerinfo,2,0);
+				main.blistnode.bbinding.connectTo(main.bbinding,2,0);
+				main.httpmodule.bcontrollerinfo.connectTo(main.bengine.bbinding, 2, 3);
+				main.httpmodule.bcontrollerinfo.connectTo(main.bengine.bcontrollerinfo, 2, 3);
+			}
+			function outline(){
+				_ctx.fillStyle = _colorDarkGray;
+				_ctx.fillRect(0,0,900,750);
+				_ctx.strokeRect(0,0,900,750);
+			}
+			function drawHttpHandler(main){
+				main.httphandler = new Node(0, 0, 220, 230, "HttpHandler", _colorDarkGray);
+				main.httphandler.drawUnder(main.httpmodule);
+				
+				main.httphandler.dispatcher = new Node(0, 0, 200, 190, "Dispatcher", _colorDarkGray);
+				main.httphandler.dispatcher.drawInside(main.httphandler);
+				
+				main.httphandler.dispatcher.burl = new Node(0, 0, 180, 40, "BUrl", _colorGray, "GET /Sample/Url");
+				main.httphandler.dispatcher.burl.drawInside(main.httphandler.dispatcher);
+				
+				main.httphandler.dispatcher.bmethod = new Node(0, 0, 180, 70, "BMethod", _colorGray);
+				main.httphandler.dispatcher.bmethod.drawUnder(main.httphandler.dispatcher.burl);
+				
+				main.httphandler.dispatcher.bmethod.blistnode = new Node(0, 0, 155, 30, "BListNode", _colorGreen, "A Set == Controller Chain");
+				main.httphandler.dispatcher.bmethod.blistnode.drawSetInside(main.httphandler.dispatcher.bmethod);
+			}
+			function drawHttpModule(main){
+				main.httpmodule = new Node(_x, _y, 430, 100, "HttpModule", _colorDarkGray);
+				main.httpmodule.draw(main.httphandler);
+				
+				main.httpmodule.loader = new Node(0, 0, 70, 50, "Loader", _colorGray, "IControllers");
+				main.httpmodule.loader.drawInside(main.httpmodule);
+				
+				main.httpmodule.bcontrollerinfo = new Node(30, 0, 135, 50, "BControllerInfo(s)", _colorGray, "(with bindings)");
+				main.httpmodule.bcontrollerinfo.drawSetNextTo(main.httpmodule.loader);
+				
+				main.httpmodule.dispatcher = new Node(55, 0, 90, 50, "Dispatcher", _colorGray, "(pass thru)");
+				main.httpmodule.dispatcher.drawNextTo(main.httpmodule.bcontrollerinfo);
+			}
+			function drawBEngine(main){
+				//create
+				main.bengine = new Node(_x + 500, _y, 370, 340, "BEngine", _colorGreen);
+				main.bengine.btreenode = new Node(0, 0, 340, 170, "BTreeNode - root node of a tree structure", _colorTan);
+				
+				main.bengine.btreenode.bbinding = new Node(0, 0, 125, 40, "BBinding", _colorBlue, "One - identifies this node");
+				main.bengine.btreenode.bcontrollerinfo = new Node(0, 0, 125, 40, "BControllerInfo", _colorBlue, "A Set");
+				main.bengine.btreenode.blistnodeset = new Node(0, 0, 180, 85, "BListNodeSet (a method)", _colorBlue);
+				
+				main.bengine.btreenode.blistnodeset.blistnode = new Node(0, 0, 150, 40, "BListNode", _colorGray, "A Set == Controller Chain");
+				main.bengine.bbinding = new Node(0, 0, 160, 80, "BBinding", _colorTan, "All registered bindings");
+				main.bengine.bcontrollerinfo = new Node(0, 0, 160, 80, "BControllerInfo", _colorTan, "All registered infos");
+				
+				//draw
+				main.bengine.draw();
+				main.bengine.btreenode.drawSetInside(main.bengine);
+				main.bengine.btreenode.bbinding.drawInside(main.bengine.btreenode);
+				
+				main.bengine.btreenode.blistnodeset.drawNextTo(main.bengine.btreenode.bbinding);
+				main.bengine.btreenode.bcontrollerinfo.drawSetUnder(main.bengine.btreenode.bbinding);
+				
+				main.bengine.btreenode.blistnodeset.blistnode.drawSetInside(main.bengine.btreenode.blistnodeset);
+				main.bengine.bbinding.drawSetUnder(main.bengine.btreenode);
+				main.bengine.bcontrollerinfo.drawSetNextTo(main.bengine.bbinding);
+			}
+			function drawBListNode(main){
+				//create
+				main.blistnode = new Node(80, 0, 240, 160, "BListNode", _colorGray);
+				main.blistnode.bcontrollerinfo = new Node(-70,0, 140, 40, "BControllerInfo", _colorGreen, "One");
+				main.blistnode.bbinding = new Node(70,0, 140, 40, "BBinding", _colorGreen, "One");
+				//draw
+				main.blistnode.drawUnder(main.bengine);
+				main.blistnode.bbinding.drawInside(main.blistnode);
+				main.blistnode.bcontrollerinfo.drawUnder(main.blistnode.bbinding);
+				
+			}
+			function drawBControllerInfo(main){
+				//create
+				main.bcontrollerinfo = new Node(-40, 0, 150, 115, "BControllerInfo", _colorGreen);
+				main.bcontrollerinfo.bresources = new Node(0, 0, 130, 75, "BResources", _colorTan);
+				main.bcontrollerinfo.bresources.bresource = new Node(0,0,100,30,"BResource",_colorBlue, "A Set");
+				//draw
+				main.bcontrollerinfo.drawUnder(main.blistnode);
+				main.bcontrollerinfo.bresources.drawInside(main.bcontrollerinfo);
+				main.bcontrollerinfo.bresources.bresource.drawSetInside(main.bcontrollerinfo.bresources);
+			}
+			function drawBBinding(main){
+				//create
+				main.bbinding = new Node(20, 0, 150, 115, "BBinding(BUrl)", _colorGreen);
+				main.bbinding.bcontrollerinfo = new Node(0, 0, 120, 65, "BControllerInfo", _colorTan, "A Set");
+				//draw
+				main.bbinding.drawNextTo(main.bcontrollerinfo);
+				main.bbinding.bcontrollerinfo.drawSetInside(main.bbinding);
+			}
+			
+			function Node(xpos, ypos, width, height, label, color, note){
+				this.construction = function(arguments){
+					this.x = xpos;
+					this.y = ypos;
+					this.width = width;
+					this.height = height;
+					this.label = label;
+					this.color = color;
+					if(arguments.length == 7)
+						this.note = note;
+					else
+						this.note = null;
+					
+					this.tabWidth = 0;
+					this.tabOffset = 0;
+				}
+				this.draw = function(){
+					var info = _nodeDraw.boxT(this.x, this.y, this.width, this.height, this.label, this.color, this.note);
+					this.width = info.width;
+					this.tabWidth = info.tabWidth;
+					this.tabOffset = info.tabOffset;
+				}
+				this.drawSet = function(){
+					var info = _nodeDraw.boxL(this.x, this.y, this.width, this.height, this.label, this.color, this.note);
+					this.width = info.width;
+					this.tabWidth = info.tabWidth;
+					this.tabOffset = info.tabOffset;
+				}
+				this.drawInside = function(node){
+					this.x = this.x + node.x + _x;
+					this.y = this.y + node.y + _y;
+					this.draw();
+				}
+				this.drawSetInside = function(node){
+					this.x = this.x + node.x + _x;
+					this.y = this.y + node.y + _y;
+					this.drawSet();
+				}
+				this.drawUnder = function(node){
+					this.x = this.x + node.x;
+					this.y = (_y + 10) + this.y + node.y + node.height;
+					this.draw();
+				}
+				this.drawSetUnder = function(node){
+					this.x = this.x + node.x;
+					this.y = (_y + 10) + this.y + node.y + node.height;
+					this.drawSet();
+				}
+				this.drawNextTo = function(node){
+					this.x = this.x + node.x + node.width + _x + 5;
+					this.y = node.y;
+					this.draw();
+				}
+				this.drawSetNextTo = function(node){
+					this.x = this.x + node.x + node.width + _x +5;
+					this.y = this.y + node.y;
+					this.drawSet();
+				}
+				this.copy = function(){
+					var acopy = new Node(this.x, this.y, this.width, this.height, this.label, this.color, this.note);
+					return acopy;
+				}
+				this.arrowTo = function(node, textAbove, textBelow){
+					_ctx.save();
+					var sx = this.x + this.width;
+					var sy = this.y + (this.height/2);
+					var ex = node.x;
+					var ey = sy;
+					
+					//line
+					_ctx.beginPath();
+					_ctx.moveTo(sx, sy);
+					_ctx.strokeStyle = "black"
+					_ctx.lineTo(ex, ey);
+					_ctx.stroke();
+					
+					//arrowhead
+					var size = 7;
+					_ctx.beginPath();
+					_ctx.moveTo(ex, ey);
+					_ctx.lineTo(ex-size, ey-size);
+					_ctx.moveTo(ex, ey);
+					_ctx.lineTo(ex-size, ey+size);
+					_ctx.stroke();
+					
+					//text above
+					if(arguments.length > 1)
+						_nodeDraw.writeTextCentered(sx, sy - 5, ex - sx, textAbove);
+					//text below
+					if(arguments.length > 2)
+						_nodeDraw.writeTextCentered(sx, sy + 13, ex - sx, textBelow);
+					
+					_ctx.restore();
+				}
+				this.arrowFrom = function(node, textAbove, textBelow){
+					_ctx.save();
+					var sx = this.x + this.width;
+					var sy = this.y + (this.height/2);
+					var ex = node.x;
+					var ey = sy;
+					
+					//line
+					_ctx.beginPath();
+					_ctx.moveTo(sx, sy);
+					_ctx.strokeStyle = "black"
+					_ctx.lineTo(ex, ey);
+					_ctx.stroke();
+					
+					//arrowhead
+					var size = 7;
+					_ctx.beginPath();
+					_ctx.moveTo(sx, sy);
+					_ctx.lineTo(sx+size, sy-size);
+					_ctx.moveTo(sx, sy);
+					_ctx.lineTo(sx+size, sy+size);
+					_ctx.stroke();
+					
+					//text above
+					if(arguments.length > 1)
+						_nodeDraw.writeTextCentered(sx, sy - 5, ex - sx, textAbove);
+					//text below
+					if(arguments.length > 2)
+						_nodeDraw.writeTextCentered(sx, sy + 13, ex - sx, textBelow);
+					
+					_ctx.restore();
+				}
+				this.connectTo = function(node, fromSide, toSide){
+					_ctx.save();
+					var bPoint = this.midPoint(fromSide);
+					var ePoint = node.midPoint(toSide);
+					
+					
+					//line
+					_ctx.beginPath();
+					_ctx.moveTo(bPoint.x, bPoint.y);
+					_ctx.strokeStyle = "white"
+					_ctx.lineTo(ePoint.x, ePoint.y);
+					_ctx.stroke();
+					
+					var degrees = 360;
+					var radians = (Math.PI/180)*degrees
+					//alert("radians " + radians);
+					
+					//endpoints
+					//begin
+					_ctx.beginPath();
+					_ctx.fillStyle = "white";
+					_ctx.arc(bPoint.x, bPoint.y, 5, 1, radians, false);
+					_ctx.fill();
+					//end
+					_ctx.beginPath();
+					_ctx.fillStyle = "white";
+					_ctx.arc(ePoint.x, ePoint.y, 5, 1, radians, false);
+					_ctx.fill();
+					
+					_ctx.restore();
+				}
+				this.midPoint = function(side){
+					if(side == 0)
+						return this.midPointTop();
+					if(side == 1)
+						return this.midPointRight();
+					if(side == 2)
+						return this.midPointBottom();
+					return this.midPointLeft();
+				}
+				this.midPointTop = function(){
+					var point = new Object();
+					point.x = this.x + (this.width/2);
+					point.y = this.y;
+					//in tab?
+					if((point.x - this.x) <= this.tabWidth)
+						point.y = point.y - this.tabOffset;
+					return point;
+				}
+				this.midPointBottom = function(){
+					var point = new Object();
+					point.x = this.x + (this.width/2);
+					point.y = this.y + this.height;
+					return point;
+				}
+				this.midPointLeft = function(){
+					var point = new Object();
+					point.x = this.x;
+					point.y = this.y + (this.height/2);
+					return point;
+				}
+				this.midPointRight = function(){
+					var point = new Object();
+					point.x = this.x + this.width;
+					point.y = this.y + (this.height/2);
+					return point;
+				}
+				this.construction(arguments);
+			}
+			Node.prototype = new Node;
+			
+			function NodeDraw(){
+				this.tabOffset = 15;
+				this.tabHeight = 20;
+				this.boxT = function(x, y, width, height, label, color, note){
+					var info = new Object();
+					info.width = this.adjustWidth(width, label);
+					
+					_ctx.fillStyle = color;
+					info.tabWidth = this.tab1(x, y, label);
+					
+					_ctx.fillRect(x, y, info.width, height);
+					_ctx.strokeRect(x, y, info.width, height);
+					this.tab2(x, y, label);
+					info.tabOffset = this.tabOffset;
+					this.labelT(x, y, label);
+					if(arguments.length == 7 && note != null)
+						this.writeNote(x, y, info.width, height, note);
+					return info;
+				}
+				this.writeNote = function(boxX, boxY, boxWidth, boxHeight, text){
+					_ctx.save();
+					_ctx.mozTextStyle = _textStyle;
+					var len = _ctx.mozMeasureText(text);
+					var x = ((boxWidth - len)/2) + boxX;
+					var y = ((boxHeight)/2) + 5 + boxY;
+					_ctx.fillStyle = "Red";
+					_ctx.translate(x, y);
+					_ctx.mozDrawText(text);
+					_ctx.restore();
+				}
+				this.labelT = function(x, y, text){
+					_ctx.fillStyle = "Black";
+					this.writeText(x+5,y-1, text);
+				}
+				this.writeTextCentered = function(x, y, width, text){
+					var textWidth = this.setTextStyle(text);
+					var offset;
+					if(textWidth < width)
+						offset = (width - textWidth)/2;
+					else
+						offset = (textWidth - width)/-2;
+					this.writeText(x + offset, y, text);
+				}
+				this.writeText = function(x, y, text){
+					_ctx.save();
+					_ctx.translate(x, y);
+					_ctx.mozTextStyle = _textStyle;
+					_ctx.mozDrawText(text);
+					_ctx.restore();
+				}
+				this.tab1 = function(x, y, text){
+					var width = this.setTextStyle(text);
+					_ctx.strokeRect(x, y - this.tabOffset, width, this.tabHeight);
+					return width;
+				}
+				this.tab2 = function(x, y, text){
+					var width = this.setTextStyle(text);
+					_ctx.fillRect(x + 1, y - this.tabOffset + 1, width - 2, this.tabHeight);
+					_ctx.fillRect(x + 1, y, width - 2, 2);
+				}
+				this.setTextStyle = function(text){
+					_ctx.mozTextStyle = _textStyle;
+					var width = _ctx.mozMeasureText(text) + 12;
+					return width;
+				}
+				this.adjustWidth = function(width, label){
+					var labelWidth = this.setTextStyle(label);
+					if(width < (labelWidth + 20))
+						width = labelWidth + 20;
+					return width;
+				}
+				this.boxL = function(x, y, width, height, label, color, note){
+					width = this.adjustWidth(width, label);
+					var offset = 5;
+					_ctx.fillStyle = color;
+					_ctx.fillRect(x + offset, y + offset, width, height);
+					_ctx.strokeRect(x + offset, y + offset, width, height);
+					return this.boxT(x, y, width, height, label, color, note);
+				}
+			}
+			NodeDraw.prototype = new NodeDraw;
+			
+			function construction(){
+				if(_ctx == null){
+					var canvas = document.getElementById("canvas");
+					var ctx = canvas.getContext("2d");
+					_ctx = ctx;
+				}
+				if(_nodeDraw == null)
+					_nodeDraw = new NodeDraw();
+			}
+		</script>
+	</head>
+	<body style="background-color: #E5E5E5" onload="draw();">
+		<h1>Bistro Common Engine Design</h1>
+		<div>
+			<canvas id="canvas" width="900" height="750"></canvas>
+			<div class="note" style="position: relative; top: -330; left: 20; height: 75px; width: 320px;">
+				<h3>Loader</h3>
+				<p>
+					Loads IControllers from assemblies. Dispatcher is passed to BControllerInfo constructor to allow registration of bindings and controllers with BEngine.
+				</p>
+			</div>
+			<div class="note" style="position: relative; top: -320; left: 30; height: 120px; width: 465px;">
+				<h3>BEngine</h3>
+				<p>
+					Builds a tree structure based on binding (URL like) paths for all registered bindings and controllers. Each node of this tree is a BTreeNode. Each BTreeNode contains its binding plus associated controllers.
+				</p>
+				<p>
+					At creation of methods, the tree is examined and for each node in the tree a set of BControllerInfos is gathered into a set of BListNodes. This list (contained in a BListNodeSet) is what defines a method at a particular node of the tree.
+				</p>
+			</div>
+			<div class="note" style="position: relative; top: -310; left: 40; height: 70px; width: 475px;">
+				<h3>Dispatcher</h3>
+				<p>
+					Receives an HTTP Request from the HttpHandler. The URL is passed to the BEngine which walks the tree to find the matching node. The BListNodeSet at this node is returned as a BMethod (IMethod) which the dispatcher then executes.
+				</p>
+			</div>
+		</div>
+		<div class="note" style="position: relative; top: -1000; left: 920; height: 80px; width: 300px;">
+			<h3>Runtime Steps</h3>
+			<p>1. Register controllers as IControllerInfos.</p>
+			<p>2. Build methods.</p>
+			<p>3. Get Method (from given URL) and execute.</p>
+		</div>
+		<div class="note" style="position: relative; top: -980; left: 920; height: 80px; width: 300px;">	
+			<h3>Designer Steps</h3>
+			<p>1. Register IControllerInfos.</p>
+			<p>2. Build methods.</p>
+			<p>3. Get method tree. (Entire tree of all methods.)</p>
+		</div>
+		<div class="note" style="position: relative; top: -960; left: 920; height: 455px; width: 300px;">
+			<h3>Notes</h3>
+			<p>
+				The Loader (implements ILoader) is a replacement for the ControllerManager.
+			</p>
+			<p>
+				The ControllerHandler (implements IControllerHander) remains, but is not shown in this diagram.
+			</p>
+			<p>
+				BControllerInfo (implements IControllerInfo) provides an explicit interface for defining controller information and uses BResourses (implements IResources) and BResource (implements IResource).
+			</p>
+			<p>
+				IResourceAttribute (not shown) is an interface used to mark all resource attributes and allows new resource types to be defined without breaking the IResources interface.
+			</p>
+			<p>
+				BBinding (implements IBinding) represents the binding of a URL or pseudo URL (which may contain binding wildcards and parameters) to a set of controllers represented by IControllerInfos.
+			</p>
+			<p>
+				BUrl (implements IUrl) represents a URL or pseudo URL and encapsulates validation and also some useful methods for working with the different parts of a URL/pseudo URL. Is used by BBinding and was added to IContext for use in dispatching and can also be used by controller logic anywhere that IContext is available. (For example in a security controller.)
+			</p>
+		</div>
+	</body>
+</html>

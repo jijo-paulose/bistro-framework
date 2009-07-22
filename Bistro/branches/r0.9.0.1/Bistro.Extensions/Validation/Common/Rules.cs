@@ -20,7 +20,7 @@ namespace Bistro.Extensions.Validation.Common
         /// <param name="site">The site.</param>
         /// <param name="message">The message.</param>
         /// <returns></returns>
-        public static Validator<T> IsRequired<T,K>(this ValidationSite<T,K> site, string message)
+        public static Validator<T> IsRequired<T, K>(this ValidationSite<T, K> site, string message) where T : IValidatable
         {
             site.AddValidation(new RequiredValidator<T>(message));
 
@@ -34,7 +34,7 @@ namespace Bistro.Extensions.Validation.Common
         /// <param name="regex">The regex.</param>
         /// <param name="message">The message.</param>
         /// <returns></returns>
-        public static Validator<T> MatchesRegex<T, K>(this ValidationSite<T, K> site, string regex, string message)
+        public static Validator<T> MatchesRegex<T, K>(this ValidationSite<T, K> site, string regex, string message) where T : IValidatable
         {
             throw new NotImplementedException();
         }
@@ -46,7 +46,7 @@ namespace Bistro.Extensions.Validation.Common
         /// <param name="maxLength">Length of the max.</param>
         /// <param name="message">The message.</param>
         /// <returns></returns>
-        public static Validator<T> IsShorterThan<T, K>(this ValidationSite<T, K> site, int maxLength, string message)
+        public static Validator<T> IsShorterThan<T, K>(this ValidationSite<T, K> site, int maxLength, string message) where T : IValidatable
         {
             throw new NotImplementedException();
         }
@@ -58,7 +58,7 @@ namespace Bistro.Extensions.Validation.Common
         /// <param name="minLength">Length of the min.</param>
         /// <param name="message">The message.</param>
         /// <returns></returns>
-        public static Validator<T> IsLongerThan<T, K>(this ValidationSite<T, K> site, int minLength, string message)
+        public static Validator<T> IsLongerThan<T, K>(this ValidationSite<T, K> site, int minLength, string message) where T : IValidatable
         {
             throw new NotImplementedException();
         }
@@ -71,7 +71,7 @@ namespace Bistro.Extensions.Validation.Common
         /// <param name="max">The max.</param>
         /// <param name="message">The message.</param>
         /// <returns></returns>
-        public static Validator<T> IsInRange<T, K>(this ValidationSite<T, K> site, int min, int max, string message)
+        public static Validator<T> IsInRange<T, K>(this ValidationSite<T, K> site, int min, int max, string message) where T : IValidatable
         {
             throw new NotImplementedException();
         }

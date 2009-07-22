@@ -21,6 +21,8 @@ namespace Bistro.Validation
             RuntimeError
         }
 
+        List<IValidator> validators = new List<IValidator>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidatingControllerHandler"/> class.
         /// </summary>
@@ -31,8 +33,14 @@ namespace Bistro.Validation
         {
             try
             {
-                var instance = this.controllerConstructor.Invoke(EmptyParams) as IValidatable;
-                ValidationRepository.Instance.RegisterValidator(instance.Validator);
+                var attribs = descriptor.ControllerType.GetCustomAttributes(typeof(ValidateWithAttribute), false);
+
+                foreach (ValidateWithAttribute attrib in attribs)
+                {
+                    var v = (IValidator)Activator.CreateInstance(attrib.TargetType);
+                    ValidationRepository.Instance.RegisterValidator(descriptor.ControllerType as Type, v);
+                    validators.Add(v);
+                }
             }
             catch (InvalidCastException)
             {
@@ -54,13 +62,18 @@ namespace Bistro.Validation
         public override IController GetControllerInstance(ControllerInvocationInfo info, System.Web.HttpContextBase context, IContext requestContext)
         {
             var instance = base.GetControllerInstance(info, context, requestContext);
-
             var validatable = (IValidatable)instance;
-            var validator = validatable.Validator;
 
-            var messages = new List<string>();
-            validatable.IsValid = validator.IsValid(instance, out messages);
-            validatable.Messages = messages;
+            validatable.Messages = new List<string>();
+            validatable.IsValid = true;
+
+            foreach (IValidator validator in validators)
+            {
+                var messages = new List<string>();
+                validatable.IsValid = validatable.IsValid && validator.IsValid(instance, out messages);
+                validatable.Messages.InsertRange(0, messages);
+
+            }
 
             return instance;
         }

@@ -21,19 +21,26 @@ namespace Bistro.Validation
         /// <summary>
         /// Map of validators by namespace
         /// </summary>
-        private Dictionary<string, IValidator> validators = new Dictionary<string, IValidator>();
+        private Dictionary<string, IValidator> validatorsByNamespace = new Dictionary<string, IValidator>();
+
+        private Dictionary<Type, IValidator> validatorsByType = new Dictionary<Type, IValidator>();
 
         /// <summary>
         /// Registers the validator.
         /// </summary>
         /// <param name="validator">The validator.</param>
-        public void RegisterValidator(IValidator validator)
+        public void RegisterValidator(Type target, IValidator validator)
         {
             IValidator current = null;
-            if (validators.TryGetValue(validator.Name, out current))
-                validators[validator.Name] = current.Merge(validator);
+            if (validatorsByNamespace.TryGetValue(validator.Name, out current))
+                validatorsByNamespace[validator.Name] = validator.Merge(current);
             else
-                validators.Add(validator.Name, current);
+                validatorsByNamespace.Add(validator.Name, validator);
+
+            if (validatorsByType.TryGetValue(target, out current))
+                validatorsByType[target] = validator.Merge(current);
+            else
+                validatorsByType.Add(target, validator);
         }
 
         /// <summary>
@@ -44,7 +51,16 @@ namespace Bistro.Validation
         public IValidator GetValidatorForNamespace(string name)
         {
             IValidator validator = null;
-            if (!validators.TryGetValue(name, out validator))
+            if (!validatorsByNamespace.TryGetValue(name, out validator))
+                return null;
+
+            return validator;
+        }
+
+        public IValidator GetValidatorForType(Type type)
+        {
+            IValidator validator = null;
+            if (!validatorsByType.TryGetValue(type, out validator))
                 return null;
 
             return validator;

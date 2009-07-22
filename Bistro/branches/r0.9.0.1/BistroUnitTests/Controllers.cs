@@ -11,67 +11,30 @@ using Bistro.Extensions.Validation;
 
 namespace Bistro.UnitTests
 {
-    //public class Member: IValidatable
-    //{
-    //    public string firstName;
-
-    //    public IValidator Validator
-    //    {
-    //        get { 
-    //            //return new Validator<Member>()
-    //            //                .Value(c => c.firstName)
-    //            //                    .IsLongerThan(3, "minimum of 3 characters required");
-
-    //            return new Validator<Entity.member>();
-    //        }
-    //    }
-
-    //    public List<string> Messages
-    //    {
-    //        get;
-    //        set;
-    //    }
-
-    //    public bool IsValid
-    //    {
-    //        get;
-    //        set;
-    //    }
-    //}
+    class ControllerValidator : Validator<ValidatingController>
+    {
+        protected override void Define()
+        {
+            this
+                .As("validationTest")
+                .Value(c => c.someField)
+                    .AliasedAs("otherField")
+                    .IsRequired("someField is required");
+        }
+    }
 
     [Bind("/validationTest")]
+    [ValidateWith(typeof(ControllerValidator))]
     public class ValidatingController : AbstractController, IValidatable
     {
         public string someField;
-
-        public string firstName;
 
         [Request]
         public List<string> Messages { get; set; }
         public bool IsValid { get; set; }
 
-        public IValidator Validator
-        {
-            get
-            {
-                var v = new Validator<ValidatingController>();
-
-                v
-                    .As("validationTest")
-                    .Value(c => c.someField)
-                        .IsRequired("someField is required");
-                    //.WithRulesFrom(new Member());
-
-                return v;
-            }
-        }
-
         public override void DoProcessRequest(IExecutionContext context)
         {
-            //var member = new Member();
-            //member.firstName = firstName;
-
-            //member.Validator.IsValid(member, ...);
         }
     }
 

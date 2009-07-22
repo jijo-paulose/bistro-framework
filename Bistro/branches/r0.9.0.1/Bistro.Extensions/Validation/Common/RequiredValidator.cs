@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Bistro.Validation;
 
 namespace Bistro.Extensions.Validation.Common
 {
-    public class RequiredValidator<T> : Validator<T>
+    public class RequiredValidator<T> : Validator<T> where T : IValidatable
     {
         string message;
 

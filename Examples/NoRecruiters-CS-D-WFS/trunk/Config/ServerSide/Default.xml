@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<activity name="ContactNotification" type="WorkflowServer.Foundation.Activities.EmailWriter" host="localhost"  server="orpheus:25">
+	<message
+	  from="no-reply@kolosy.com"
+	  to="{%=context.DocumentNode.ToAddress%}"
+	  subject="{%=context.DocumentNode.CompanyName%} has contacted you on NoRecruiters.com" >
+You can view the company's profile at http://www.no-recruiters.com{%=context.DocumentNode.CompanyUrl%}
+
+{%=context.DocumentNode.ContactText%}
+	</message>
+</activity>

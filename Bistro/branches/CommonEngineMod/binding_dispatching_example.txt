@@ -1,0 +1,161 @@
+All bindings except HomeUrlControllers... and ReturnTypesController:
+
+  [Bind("GET/hi/new/world/a")]
+  public class hiController1 : MyAbstractBase { }
+  
+  [Bind("GET/hi/new/*/*/now")]
+  public class hiController2 : MyAbstractBase { }
+  
+  [Bind("GET/hi/*/world/?/now")]
+  public class hiController3 : MyAbstractBase { }
+  
+  [Bind("GET/hi/*/world/*/now")]
+  public class hiController4 : MyAbstractBase { }
+  
+  [Bind("GET/hi/*/world/a/now")]
+  public class hiController5 : MyAbstractBase { }
+  
+  [Bind("GET/hi/*/world/a")]
+  public class hiController6 : MyAbstractBase { }
+  
+  [Bind("GET/hi/*/world/a/*")]
+  public class hiController7 : MyAbstractBase { }
+  
+
+Binding tree:
+
+GET..............GET/                   [HomeUrlController1, HomeUrlController2, ReturnTypesController]
+  hi.............GET/hi
+    *............GET/hi/*
+      world......GET/hi/*/world
+        ?........GET/hi/*/world/?
+          now....GET/hi/*/world/?/now   [hiController3]
+        *........GET/hi/*/world/*
+          now....GET/hi/*/world/*/now   [hiController4]
+        a........GET/hi/*/world/a       [hiController6]
+          *......GET/hi/*/world/a/*     [hiController7]
+          now....GET/hi/*/world/a/now   [hiController5]
+    new..........GET/hi/new
+      *..........GET/hi/new/*
+        *........GET/hi/new/*/*
+          now....GET/hi/new/*/*/now     [hiController2]
+      world......GET/hi/new/world
+        a........GET/hi/new/world/a     [hiController1]
+
+
+|Method tree:                           |Controller names - using abbreviations: |Original bindings:
+
+GET..............GET/                   [H1, H2, RT]                             [HomeUrlController1, HomeUrlController2, ReturnTypesController]
+  hi.............GET/hi                 [H1, H2, RT]
+    *............GET/hi/*               [H1, H2, RT]
+      world......GET/hi/*/world         [H1, H2, RT]
+        ?........GET/hi/*/world/?       [H1, H2, RT]
+          now....GET/hi/*/world/?/now   [H1, H2, RT, hi3]                        [hiController3]
+        *........GET/hi/*/world/*       [H1, H2, RT]
+          now....GET/hi/*/world/*/now   [H1, H2, RT, hi3, hi4]                   [hiController4]
+        a........GET/hi/*/world/a       [H1, H2, RT, hi6]                        [hiController6]
+          *......GET/hi/*/world/a/*     [H1, H2, RT, hi6, hi7]                   [hiController7]
+          now....GET/hi/*/world/a/now   [H1, H2, RT, hi3, hi4, hi5, hi6, hi7]    [hiController5]
+    new..........GET/hi/new             [H1, H2, RT]
+      *..........GET/hi/new/*           [H1, H2, RT]
+        *........GET/hi/new/*/*         [H1, H2, RT]
+          now....GET/hi/new/*/*/now     [H1, H2, RT, hi2]                        [hiController2]
+      world......GET/hi/new/world       [H1, H2, RT]
+        a........GET/hi/new/world/a     [H1, H2, RT, hi1, hi6]                   [hiController1]
+
+
+Dispatch Tests:
+
+***** ModBistroUnitTests.DispatcherTests.Dispatch1
+  Found method at: GET/hi/new/world/a/now with a length of 5.
+  
+    001 ModBistroUnitTests.hiController1 is in chain of execution at binding      GET/hi/new/world/a.
+    002 ModBistroUnitTests.HomeUrlController2 is in chain of execution at binding GET/.
+    003 ModBistroUnitTests.HomeUrlController1 is in chain of execution at binding GET/.
+    004 ModBistroUnitTests.hiController6 is in chain of execution at binding      GET/hi/*/world/a.
+    005 BistroModel.ReturnTypesController is in chain of execution at binding     GET/.
+    
+    GET/hi/new/world/a/now dispatched to GET/hi/new/world/a
+
+
+***** ModBistroUnitTests.DispatcherTests.Dispatch2
+
+  Found method at: GET/hi/new/world/now with a length of 3.
+    001 ModBistroUnitTests.HomeUrlController1 is in chain of execution at binding GET/.
+    002 ModBistroUnitTests.HomeUrlController2 is in chain of execution at binding GET/.
+    003 BistroModel.ReturnTypesController is in chain of execution at binding     GET/.
+    
+    GET/hi/new/world/now dispatched to GET/hi/new/world
+
+
+***** ModBistroUnitTests.DispatcherTests.Dispatch3
+
+  Found method at: GET/hi/some/world/now with a length of 3.
+    001 ModBistroUnitTests.HomeUrlController1 is in chain of execution at binding GET/.
+    002 ModBistroUnitTests.HomeUrlController2 is in chain of execution at binding GET/.
+    003 BistroModel.ReturnTypesController is in chain of execution at binding     GET/.
+    
+    GET/hi/some/world/now dispatched to GET/hi/*/world/*
+
+
+***** ModBistroUnitTests.DispatcherTests.Dispatch4
+
+  Found method at: GET/hi/some/world/right/now with a length of 5.
+    001 ModBistroUnitTests.hiController3 is in chain of execution at binding      GET/hi/*/world/?/now.
+    002 ModBistroUnitTests.HomeUrlController2 is in chain of execution at binding GET/.
+    003 ModBistroUnitTests.HomeUrlController1 is in chain of execution at binding GET/.
+    004 ModBistroUnitTests.hiController4 is in chain of execution at binding      GET/hi/*/world/*/now.
+    005 BistroModel.ReturnTypesController is in chain of execution at binding     GET/.
+    
+    GET/hi/some/world/right/now dispatched to GET/hi/*/world/*/now
+
+
+***** ModBistroUnitTests.DispatcherTests.Dispatch5
+
+  Found method at: GET/hi/some/world/right/right/now with a length of 4.
+    001 ModBistroUnitTests.hiController3 is in chain of execution at binding      GET/hi/*/world/?/now.
+    002 ModBistroUnitTests.HomeUrlController1 is in chain of execution at binding GET/.
+    003 ModBistroUnitTests.HomeUrlController2 is in chain of execution at binding GET/.
+    004 BistroModel.ReturnTypesController is in chain of execution at binding     GET/.
+    
+    GET/hi/some/world/right/right/now dispatched to GET/hi/*/world/?/now
+
+
+***** ModBistroUnitTests.DispatcherTests.Dispatch6
+
+  Found method at: GET/hi/new/world/a with a length of 5.
+    001 ModBistroUnitTests.hiController1 is in chain of execution at binding      GET/hi/new/world/a.
+    002 ModBistroUnitTests.HomeUrlController2 is in chain of execution at binding GET/.
+    003 ModBistroUnitTests.HomeUrlController1 is in chain of execution at binding GET/.
+    004 ModBistroUnitTests.hiController6 is in chain of execution at binding      GET/hi/*/world/a.
+    005 BistroModel.ReturnTypesController is in chain of execution at binding     GET/.
+    
+    GET/hi/new/world/a dispatched to GET/hi/new/world/a
+
+
+***** ModBistroUnitTests.DispatcherTests.Dispatch7
+
+  Found method at: GET/hi/new/world/a/now with a length of 5.
+    001 ModBistroUnitTests.hiController1 is in chain of execution at binding      GET/hi/new/world/a.
+    002 ModBistroUnitTests.HomeUrlController2 is in chain of execution at binding GET/.
+    003 ModBistroUnitTests.HomeUrlController1 is in chain of execution at binding GET/.
+    004 ModBistroUnitTests.hiController6 is in chain of execution at binding      GET/hi/*/world/a.
+    005 BistroModel.ReturnTypesController is in chain of execution at binding     GET/.
+    
+    GET/hi/new/world/a/now dispatched to GET/hi/new/world/a
+
+
+***** ModBistroUnitTests.DispatcherTests.Dispatch8
+
+  Found method at: GET/hi/old/world/a/now with a length of 8.
+    001 ModBistroUnitTests.hiController3 is in chain of execution at binding      GET/hi/*/world/?/now.
+    002 ModBistroUnitTests.hiController4 is in chain of execution at binding      GET/hi/*/world/*/now.
+    003 ModBistroUnitTests.HomeUrlController1 is in chain of execution at binding GET/.
+    004 ModBistroUnitTests.HomeUrlController2 is in chain of execution at binding GET/.
+    005 ModBistroUnitTests.hiController5 is in chain of execution at binding      GET/hi/*/world/a/now.
+    006 ModBistroUnitTests.hiController7 is in chain of execution at binding      GET/hi/*/world/a/*.
+    007 ModBistroUnitTests.hiController6 is in chain of execution at binding      GET/hi/*/world/a.
+    008 BistroModel.ReturnTypesController is in chain of execution at binding     GET/.
+    
+    GET/hi/old/world/a/now dispatched to GET/hi/*/world/a/now
+

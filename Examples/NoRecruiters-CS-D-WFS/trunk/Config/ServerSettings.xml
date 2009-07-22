@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE server [
+	<!ENTITY SYSClassLoader SYSTEM "ClassLoader.xml">
+]>
+<configuration version="4.6">
+  &SYSClassLoader;
+
+    <!-- System handlers -->
+    <section-handler name="import" load="starting" type="WorkflowServer.Foundation.Configuration.ImportTagHandler" />
+  <!--
+		server tag controls server restart and location of configuration files. 
+		
+		Attribute restart can have one of 3 values "auto", "manual", or "disabled"
+		"auto" means that every time when a watcher reports that a config file is updated, the server 
+		reloads the workflow definition and restarts the application.
+		"manual" means that every time when this configuration file is updated the server reloads the
+		workflow definition and restarts the application.
+		"disabled" means that the server reloads the workflow definition and checks it for errors but 
+		does not start the application. An attempt to access any page of the application produces a page
+		with the text specified in the inactive subtag of the server tag
+		When this configuration file is updated the value of the restart attribute affects the server 
+		status as follows:
+		  
+		  Old       New      Action
+		 value     value     
+		 auto      auto       None 
+		 auto      manual     Disables watchers
+		 auto      disabled   Stops the server and disables the watchers
+		 manual    auto       Enables the watchers
+		 manual    manual     None
+		 manual    disabled   Stops the server.
+		 disabled  auto       Loads the workflow definition, starts the server and enables the watchers
+		 disabled  manual     Loads the workflow definition and starts the server
+		 disabled  disabled   None
+	-->
+  <server restart="auto" root="Config/ServerConfig.xml" document-namespace="NoRecruiters3">
+    <watch file="*"/>
+    <inactive>
+      The application has been stopped for maintenance. Please try again later
+    </inactive>
+    <mail from="Workflow Server Application" smtp-server="localhost" port="25" />
+  </server>
+
+
+</configuration>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<document name="ContactRequest"  type="WorkflowServer.Foundation.Documents.Message" factory="Factory" >
+
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:wdf="http://schemas.hill30.com/workflow/documents" 
+			xmlns:wdfext="http://schemas.hill30.com/workflow/documents">
+
+		<xs:element name="document" >
+			<xs:complexType>
+				<xs:sequence minOccurs="1">
+					<xs:element name="messageNode" >
+						<xs:complexType>
+							<xs:attribute name="activity" type="xs:string" wdfext:param-name="activity"/>
+							<xs:attribute name="suspended" type="xs:boolean" wdfext:param-name="suspended"/>
+							<xs:attribute name="postedAt" type="xs:dateTime" wdfext:param-name="posted_at"/>
+							<xs:attribute name="escalateAt" type="xs:dateTime" wdfext:param-name="escalate_at"/>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				
+				<xs:attribute name="docID" type="xs:ID"/>
+
+				<xs:attribute name="ToAddress" type="xs:string" />
+				<xs:attribute name="CompanyName" type="xs:string" />
+				<xs:attribute name="CompanyUrl" type="xs:string" />
+				<xs:attribute name="ContactText" type="xs:string" />
+			</xs:complexType>
+		</xs:element>
+	</xs:schema>
+</document>

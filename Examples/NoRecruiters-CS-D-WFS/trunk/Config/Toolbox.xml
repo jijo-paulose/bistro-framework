@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<toolbox>
+  <tool>
+    <key>formHelper</key>
+    <scope>application</scope>
+    <class>Bistro.NVelocityIntegration.Tools.FormHelper,WorkflowServer.Bistro.NVelocityIntegration</class>
+  </tool>
+  <tool>
+    <key>bistro</key>
+    <scope>application</scope>
+    <class>Bistro.NVelocityIntegration.Tools.SystemHelper,WorkflowServer.Bistro.NVelocityIntegration</class>
+  </tool>
+</toolbox>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+  <!--
+		Document userProfile contains user profile information used for athentication and authorization.
+		It can also carry user preferences and other user-specific information. It MUST have 
+		WorkflowServer.Foundation.Documents.UserProfile as its type and its schema MUST match the schema
+		of the WorkflowServer.Foundation.Documents.UserProfile document (see below)
+		This factory is required if user authentication is performed.
+	-->
+<document name="userProfile" type="WorkflowServer.Foundation.Documents.UserProfile"
+		  factory="SprocFactory" datastore="Primary"
+			>
+
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:wdf="http://schemas.hill30.com/workflow/documents">
+
+		<xs:element name="document"
+					wdf:read="s_user"
+					wdf:save="iu_user" >
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element name="role" minOccurs="0" maxOccurs="unbounded" wdf:transient="true" >
+						<xs:complexType>
+							<xs:attribute name="name" type="xs:string" />
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+
+				<xs:attribute name="docID" type="xs:ID" wdf:param-name="UserId" wdf:param-index="0" />
+
+				<xs:attribute name="name" type="xs:string" wdf:param-name="UserName" />
+				<xs:attribute name="password" type="xs:string" wdf:param-name="Password" />
+				<xs:attribute name="Email" type="xs:string" />
+				<xs:attribute name="FirstName" type="xs:string" />
+				<xs:attribute name="LastName" type="xs:string" />
+				<xs:attribute name="Posting" type="xs:IDREF" wdf:refers-to="Posting" wdf:param-name="PostingId" />
+				<xs:attribute name="UserType" type="xs:IDREF" wdf:refers-to="UserType" wdf:param-name="UserTypeId" />
+
+				<!--xs:attribute name="context" type="xs:IDREF" wdf:refers-to="context" sql:field="[Context]" /-->
+			</xs:complexType>
+		</xs:element>
+
+	</xs:schema>
+</document>

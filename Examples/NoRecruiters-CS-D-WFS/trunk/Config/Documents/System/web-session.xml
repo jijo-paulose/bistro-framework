@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+		web-session factory controls UI session documents. Whenever an end user accesses a web application, a new 
+		session document is created to maintain the session state. This document MUST have WorkflowServer.Web.Session
+		as its type.
+		There is no specific requirements to the document schema. It can be empty (no explicit schema) or custom schema 
+		can be defined. Usually session documents are not persisted.
+		This factory is mandatory
+	-->
+<document name="web-session" type="WorkflowServer.Foundation.Documents.Session">
+  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:wdf="http://schemas.hill30.com/workflow/documents"
+			xmlns:sql="urn:schemas-microsoft-com:mapping-schema">
+    <xs:element name="document">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="currentTags" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:attribute name="tag" type="xs:string" />
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <!--
+						UserProfile field is a reference to the user profile document describing the user
+						associated with the session. If no authetication is necessary, this field can be omitted.
+					-->
+        <xs:attribute name="UserProfile" type="xs:IDREF" wdf:refers-to="userProfile" />
+
+        <xs:attribute name="SearchByTag" type="xs:string" />
+        <xs:attribute name="SearchByQuery" type="xs:string" />
+
+        <xs:attribute name="RequestedStaticContent" type="xs:string" />
+        <xs:attribute name="ContentType" type="xs:IDREF" wdf:refers-to="ContentType" />
+
+        <!--
+						context field is a reference to the context document describing the current context
+						associated with the session. If no multitenancy support is required, this field can be omitted.
+					-->
+        <!-- xs:attribute name="context" type="xs:IDREF" wdf:refers-to="context" /-->
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+</document>

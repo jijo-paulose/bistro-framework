@@ -1,0 +1,94 @@
+-1 5/4/2009 4:19:37 PM: [Information] Startup Log started on 5/4/2009 4:19:37 PM
+0 5/4/2009 4:19:36 PM: [Information] Host information:
+	Root Directory="C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\"
+	Host Name=ISMVANZANTDXP
+	IP Address=172.16.10.46
+1 5/4/2009 4:19:36 PM: [Information] Assemblies loaded into the application domain:
+	mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	System.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	Microsoft.JScript, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=8.0.50727.3053, Loaded from: Global Assembly Cache
+	VJSharpCodeProvider, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=2.0.50727.42, Loaded from: Global Assembly Cache
+	CppCodeProvider, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=8.0.50727.813, Loaded from: Global Assembly Cache
+	System.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	System.Web.Services, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	System.EnterpriseServices, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	System.Web.Mobile, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	DjangoParser, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null, Loaded from: "file:///C:/Projects/hill30/WorkflowServer/ReleaseManagement/r5.0.0.0/Source/Runtime/Bistro/WebModBistroTest/bin/DjangoParser.DLL"
+	DjangoParser.Filters, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null, File Version=1.0.0.0, Loaded from: "file:///C:/Projects/hill30/WorkflowServer/ReleaseManagement/r5.0.0.0/Source/Runtime/Bistro/WebModBistroTest/bin/DjangoParser.Filters.DLL"
+	WebModBistroTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null, File Version=1.0.0.0, Loaded from: "file:///C:/Projects/hill30/WorkflowServer/ReleaseManagement/r5.0.0.0/Source/Runtime/Bistro/WebModBistroTest/bin/WebModBistroTest.DLL"
+	WorkflowServer.Bistro, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null, File Version=1.0.0.0, Loaded from: "file:///C:/Projects/hill30/WorkflowServer/ReleaseManagement/r5.0.0.0/Source/Runtime/Bistro/WebModBistroTest/bin/WorkflowServer.Bistro.DLL"
+	WorkflowServer.Bistro.MixedIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null, File Version=1.0.0.0, Loaded from: "file:///C:/Projects/hill30/WorkflowServer/ReleaseManagement/r5.0.0.0/Source/Runtime/Bistro/WebModBistroTest/bin/WorkflowServer.Bistro.MixedIntegration.DLL"
+	System.Runtime.Serialization, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=3.0.4506.2152, Loaded from: Global Assembly Cache
+	System.IdentityModel, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=3.0.4506.2152, Loaded from: Global Assembly Cache
+	System.ServiceModel, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=3.0.4506.2152, Loaded from: Global Assembly Cache
+	System.ServiceModel.Web, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, File Version=3.5.594.1152, Loaded from: Global Assembly Cache
+	System.WorkflowServices, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, File Version=3.5.594.1152, Loaded from: Global Assembly Cache
+	WorkflowServer.Foundation, Version=5.0.0.0, Culture=neutral, PublicKeyToken=8fd7371059dbf1de, File Version=5.0.0.2, Loaded from: Global Assembly Cache
+	System.Runtime.Remoting, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=2.0.50727.3053, Loaded from: Global Assembly Cache
+	Microsoft.Data.SqlXml, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, File Version=9.00.1399.00, Loaded from: Global Assembly Cache
+	System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=3.5.30729.1, Loaded from: Global Assembly Cache
+	System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, File Version=3.5.30729.1, Loaded from: Global Assembly Cache
+	System.Web.Abstractions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, File Version=3.5.30729.1, Loaded from: Global Assembly Cache
+	System.Xml.Linq, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=3.5.30729.1, Loaded from: Global Assembly Cache
+	System.Data.DataSetExtensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, File Version=3.5.30729.1, Loaded from: Global Assembly Cache
+	App_Code.zenjluwx, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null, Loaded from: "file:///C:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/Temporary ASP.NET Files/root/d30bac1f/4bd0d831/App_Code.zenjluwx.DLL"
+	WebDev.WebHost, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, File Version=9.0.30729.1, Loaded from: Global Assembly Cache
+2 5/4/2009 4:19:37 PM: [Message] ConfigManager loaded.
+3 5/4/2009 4:19:37 PM: [Message] ServiceManager created.
+4 5/4/2009 4:19:37 PM: [Message] ServiceManager definition loaded.
+5 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'datastore' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\DataStores\Primary.xml
+6 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'datastore' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\DataStores\Sybase.xml
+7 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Entities\Contents.xml
+8 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Entities\Posting.xml
+9 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Entities\UserAction.xml
+10 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Messages\ContactRequest.xml
+11 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Reference\Action.xml
+12 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Reference\ContentType.xml
+13 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Reference\UserType.xml
+14 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Searches\AllApplicants.xml
+15 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Searches\Applicants.xml
+16 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Searches\Postings.xml
+17 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Searches\SearchPostings.xml
+18 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Searches\Tags.xml
+19 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\Searches\UserPostings.xml
+20 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\System\message-queue.xml
+21 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\System\userProfile.xml
+22 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'document' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\Documents\System\web-session.xml
+23 5/4/2009 4:19:37 PM: [Message] Attempting to import tag 'activity' from C:\Projects\hill30\WorkflowServer\ReleaseManagement\r5.0.0.0\Source\Runtime\Bistro\WebModBistroTest\Config\ServerSide\Default.xml
+24 5/4/2009 4:19:37 PM: [Message] Section Handlers 'start' loaded and processed.
+25 5/4/2009 4:19:37 PM: [Message] Scripts namespaces imported from script-host.
+26 5/4/2009 4:19:37 PM: [Message] Datastores loaded.
+27 5/4/2009 4:19:37 PM: [Message] Loggers loaded.
+28 5/4/2009 4:19:37 PM: [Message] Factory 'web-session' created. Factory type 'WorkflowServer.Foundation.Documents.FactoryEnvelope`1'
+29 5/4/2009 4:19:37 PM: [Message] Factory 'userProfile' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+30 5/4/2009 4:19:37 PM: [Message] Factory 'message-queue' created. Factory type 'WorkflowServer.Foundation.Documents.FactoryEnvelope`1'
+31 5/4/2009 4:19:37 PM: [Message] Factory 'UserPostings' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+32 5/4/2009 4:19:37 PM: [Message] Factory 'Tags' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+33 5/4/2009 4:19:37 PM: [Message] Factory 'SearchPostings' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+34 5/4/2009 4:19:37 PM: [Message] Factory 'Postings' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+35 5/4/2009 4:19:37 PM: [Message] Factory 'Applicants' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+36 5/4/2009 4:19:37 PM: [Message] Factory 'AllApplicants' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+37 5/4/2009 4:19:37 PM: [Message] Factory 'UserType' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+38 5/4/2009 4:19:37 PM: [Message] Factory 'ContentType' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+39 5/4/2009 4:19:37 PM: [Message] Factory 'Action' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+40 5/4/2009 4:19:37 PM: [Message] Factory 'ContactRequest' created. Factory type 'WorkflowServer.Foundation.Documents.FactoryEnvelope`1'
+41 5/4/2009 4:19:37 PM: [Message] Factory 'UserAction' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+42 5/4/2009 4:19:37 PM: [Message] Factory 'Posting' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+43 5/4/2009 4:19:37 PM: [Message] Factory 'Contents' created. Factory type 'WorkflowServer.Foundation.Documents.Factories.StoredProcedure.Factory`1'
+44 5/4/2009 4:19:37 PM: [Message] Factories loaded.
+45 5/4/2009 4:19:37 PM: [Message] Factories references resolved.
+46 5/4/2009 4:19:37 PM: [Message] Activities loaded.
+47 5/4/2009 4:19:37 PM: [Message] Dynamic changes loaded.
+48 5/4/2009 4:19:37 PM: [Message] Section Handlers 'finish' loaded and processed.
+49 5/4/2009 4:19:37 PM: [Message] Section Handlers references resolved.
+50 5/4/2009 4:19:37 PM: [Message] Inheritance built.
+51 5/4/2009 4:19:37 PM: [Message] No stubs left - activities tree is ok
+52 5/4/2009 4:19:37 PM: [Message] ContextManager loaded.
+53 5/4/2009 4:19:37 PM: [Message] Activities references resolved.
+54 5/4/2009 4:19:37 PM: [Message] Application "webServer" has been configured.
+-1 5/4/2009 4:19:37 PM: [Information] Startup Log stopped on 5/4/2009 4:19:37 PM
+

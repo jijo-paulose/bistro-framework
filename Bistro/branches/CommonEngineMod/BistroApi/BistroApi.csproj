@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A0949AC5-17B8-4CFA-B0F6-32F163356DE9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BistroApi</RootNamespace>
+    <AssemblyName>BistroApi</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Abstract\ApplicationBase.cs" />
+    <Compile Include="Abstract\ControllerBase.cs" />
+    <Compile Include="Abstract\ControllerHandlerBase.cs" />
+    <Compile Include="Abstract\DispatcherBase.cs" />
+    <Compile Include="Abstract\LoaderBase.cs" />
+    <Compile Include="Abstract\LoggerBase.cs" />
+    <Compile Include="Abstract\SecurityControllerBase.cs" />
+    <Compile Include="Enum\BindType.cs" />
+    <Compile Include="Enum\FailAction.cs" />
+    <Compile Include="Enum\HttpAction.cs" />
+    <Compile Include="Enum\ReturnType.cs" />
+    <Compile Include="Enum\StatusCodes.cs" />
+    <Compile Include="Interface\IApplication.cs" />
+    <Compile Include="Interface\IBinding.cs" />
+    <Compile Include="Interface\IContext.cs" />
+    <Compile Include="Interface\IController.cs" />
+    <Compile Include="Interface\IControllerHandler.cs" />
+    <Compile Include="Interface\IControllerInfo.cs" />
+    <Compile Include="Interface\IDispatcher.cs" />
+    <Compile Include="Interface\IEngine.cs" />
+    <Compile Include="Interface\IExecutionContext.cs" />
+    <Compile Include="Interface\ILoader.cs" />
+    <Compile Include="Interface\ILogger.cs" />
+    <Compile Include="Interface\IMethod.cs" />
+    <Compile Include="Interface\IMethodPart.cs" />
+    <Compile Include="Interface\IQueryStringItem.cs" />
+    <Compile Include="Interface\IResource.cs" />
+    <Compile Include="Interface\IResourceAttribute.cs" />
+    <Compile Include="Interface\IResources.cs" />
+    <Compile Include="Interface\IResourceScopeAttribute.cs" />
+    <Compile Include="Interface\IResponse.cs" />
+    <Compile Include="Interface\ISecurityController.cs" />
+    <Compile Include="Interface\ISession.cs" />
+    <Compile Include="Interface\IMethodTreeNode.cs" />
+    <Compile Include="Interface\IUrl.cs" />
+    <Compile Include="Interface\IUserProfile.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Abstract\_notes.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

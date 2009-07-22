@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="NoRecruiters"
+    namespace="NoRecruiters">
+
+	<class name="UserProfile" table="Users" lazy="false" >
+		<id name="Id" column="UserId" type="String">
+			<generator class="uuid.hex" >
+				<param name="format">D</param>
+			</generator>
+		</id>
+
+		<property name="UserName" />
+		<property name="Password" />
+		<property name="FirstName" />
+		<property name="LastName" />
+		<many-to-one name="Posting" column="PostingId" />
+		<property name="UserType" column="UserTypeId" />
+		<property name="Email" />
+
+		<bag name="roles" cascade="all" table="UserRoles" lazy="false" >
+			<key column="UserId" />
+			<composite-element class="NoRecruiters.UserProfile+role, NoRecruiters" >
+				<property name="Name" column="RoleName" />
+			</composite-element>
+		</bag>
+	</class>
+</hibernate-mapping>

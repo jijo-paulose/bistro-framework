@@ -1,0 +1,19 @@
+﻿<form action="{{root}}/logon" method="post">
+    <div>
+        <fieldset>
+            <legend>Account Information</legend>
+            <p>
+                <label for="username">Username:</label>
+                <input name="username" value="{{username}}" />
+            </p>
+            <p>
+                <label for="password">Password:</label>
+                <input type="password" name="password" />
+            </p>
+            <p>
+                <input type="submit" value="Log On" />
+            </p>
+        </fieldset>
+    </div>
+</form>
+

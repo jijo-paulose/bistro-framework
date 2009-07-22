@@ -1,0 +1,64 @@
+﻿{% extends "Templates\base.django" %}
+
+{% block title %}
+NoRecruiters :: My Ads
+{% endblock %}
+
+{% block content %}
+
+<h2 class="smallHeading">
+    Unpublished Ads
+</h2>
+<div class="content" >
+    <table class="contentGrid">
+		<tr class="sectionHeader">
+			<th scope="col">Ad</th><th scope="col">Created On</th><th scope="col">&nbsp;</th>
+		</tr>
+    {% for row in unpublished %}
+         <tr>
+            <td>{{row.Heading}}</td>
+            <td>{{row.CreatedOn}}</td>
+            <td>
+                <form action="{{root}}/posting/ad/byname/{{row.ShortName}}" name="frmup{{forloop.counter}}" method="post">
+                    <input type="hidden" name="published" value="true" />
+                    <a href="{{root}}/posting/ad/byname/{{row.ShortName}}">edit</a>&nbsp;
+                    <a href="javascript:document.frmup{{forloop.counter}}.submit()">publish</a>&nbsp;
+                </form>
+            </td>
+         </tr>
+    {% empty %}
+		<tr><td colspan="4">You currently don't have any unpublished ads.</td></tr>
+    {% endfor %}
+	</table>
+</div>
+
+<br />
+<h2 class="smallHeading">
+    Published Ads <a href="{{root}}/posting/ad/applicants/byId">(show all applicants)</a>
+</h2>
+<div class="content">
+    <table class="contentGrid">
+		<tr class="sectionHeader">
+			<th scope="col">Ad</th><th scope="col">Created On</th><th scope="col">Views</th><th scope="col">Applications</th><th scope="col">&nbsp;</th>
+		</tr>
+    {% for row in published %}
+         <tr>
+            <td>{{row.Heading}}</td>
+            <td>{{row.CreatedOn}}</td>
+            <td>{{row.Views}}</td>
+            <td><a href="{{root}}/posting/ad/applicants/byId/{{row.PostingId}}">{{row.ApplicantCount}}</a></td>
+            <td>
+                <form action="{{root}}/posting/ad/byname/{{row.ShortName}}" name="frm{{forloop.counter}}" method="post">
+                    <input type="hidden" name="published" value="false" />
+                    <a href="{{root}}/posting/ad/byname/{{row.ShortName}}">edit</a>&nbsp;
+                    <a href="javascript:document.frm{{forloop.counter}}.submit()">suspend</a>&nbsp;
+                </form>
+            </td>
+         </tr>
+    {% empty %}
+		<tr><td colspan="5">You currently don't have any published ads.</td></tr>
+    {% endfor %}
+	</table>
+</div>
+
+{% endblock %}

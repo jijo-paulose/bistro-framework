@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+  <!--
+		Document userProfile contains user profile information used for athentication and authorization.
+		It can also carry user preferences and other user-specific information. It MUST have 
+		WorkflowServer.Foundation.Documents.UserProfile as its type and its schema MUST match the schema
+		of the WorkflowServer.Foundation.Documents.UserProfile document (see below)
+		This factory is required if user authentication is performed.
+	-->
+<document name="Posting" type="Document"
+		  factory="SprocFactory"
+		  datastore="Primary"
+		  caching="Application;timeout=60000"
+			>
+
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:wdf="http://schemas.hill30.com/workflow/documents">
+
+		<xs:element name="document"
+					wdf:read="s_posting([opt]ShortName)"
+					wdf:save="iu_posting"
+					wdf:delete="d_posting"
+					wdf:true-value="1"
+					wdf:false-value="0"
+				  >
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element maxOccurs="unbounded" name="tags"
+								wdf:read="s_tags"
+								wdf:save="iu_tags"
+								wdf:delete="d_tags">
+						<xs:complexType>
+							<xs:attribute name="TagId" type="xs:int" wdf:key-index="0" />
+							<xs:attribute name="TagText" type="xs:string" wdf:key-index="1" />
+							<xs:attribute name="SafeText" type="xs:string" wdf:key-index="2" />
+						</xs:complexType>
+					</xs:element>
+					<xs:element maxOccurs="unbounded" name="applications"
+								wdf:read="s_application"
+								wdf:save="iu_application" >
+						<xs:complexType>
+							<xs:attribute name="SubmittedPosting" type="xs:IDREF" wdf:refers-to="Posting" wdf:key-index="0" wdf:param-name="SubmittedPostingId" />
+							<xs:attribute name="SubmittedOn" type="xs:dateTime" />
+							<xs:attribute name="SubmittedBy" type="xs:IDREF" wdf:refers-to="userProfile" wdf:key-index="1" wdf:param-name="SubmittedByUserId" />
+							<xs:attribute name="Comment" type="xs:string" />
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+		
+				<xs:attribute name="docID" type="xs:ID" wdf:param-name="PostingId" wdf:key-index="0" />
+
+				<xs:attribute name="User" type="xs:IDREF" wdf:refers-to="userProfile" wdf:param-name="UserId" />
+				<xs:attribute name="CreatedOn" type="xs:dateTime" />
+				<xs:attribute name="LastModifiedOn" type="xs:dateTime" />
+				<xs:attribute name="ContentType" type="xs:IDREF" wdf:refers-to="ContentType" wdf:param-name="ContentTypeId" wdf:target-type="int" />
+				<xs:attribute name="Heading" type="xs:string" />
+				<xs:attribute name="ShortName" type="xs:string" />
+				<xs:attribute name="ShortText" type="xs:string" />
+				<xs:attribute name="Views" type="xs:int" default="0" />
+				<xs:attribute name="Deleted" type="xs:boolean" default="false" />
+				<xs:attribute name="Flagged" type="xs:boolean" default="false" />
+				<xs:attribute name="Published" type="xs:boolean" default="false" />
+				<xs:attribute name="Active" type="xs:boolean" default="false" />
+				<xs:attribute name="Contents" type="xs:IDREF" wdf:refers-to="Contents" wdf:param-name="ContentsId" />
+			</xs:complexType>
+		</xs:element>
+
+	</xs:schema>
+</document>

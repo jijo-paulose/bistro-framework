@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="NoRecruiters"
+    namespace="NoRecruiters">
+
+	<class name="Posting" table="Postings">
+		<id name="Id" column="PostingId" type="String">
+      <generator class="uuid.hex" >
+        <param name="format">D</param>
+      </generator>
+		</id>
+
+		<many-to-one name="User" column="UserId" />
+		<property name="CreatedOn" />
+		<property name="LastModifiedOn" />
+		<property name="ContentType" column="ContentTypeId" />
+		<property name="Heading" />
+		<property name="ShortName" />
+		<property name="ShortText" />
+		<property name="Views" />
+		<property name="Deleted" />
+		<property name="Flagged" />
+		<property name="Published" />
+		<property name="Active" />
+		<many-to-one name="Contents" column="ContentsId" />
+
+		<bag name="tags" cascade="all-delete-orphan" inverse="true" >
+			<key column="PostingId" />
+			<one-to-many class="NoRecruiters.Posting+tag, NoRecruiters"/>
+		</bag>
+
+		<bag name="applications" cascade="all-delete-orphan" inverse="true" >
+			<key column="TargetPostingId" />
+			<one-to-many class="NoRecruiters.Posting+application, NoRecruiters"/>
+		</bag>
+	</class>
+
+	<class name="Posting+tag" table="PostingTags" >
+		<id name="Id" column="TagId">
+			<generator class="identity" />
+		</id>
+
+		<property name="TagText" />
+		<property name="SafeText" />
+
+		<many-to-one name="Posting" column="PostingId" />
+	</class>
+
+	<class name="Posting+application" table="PostingApplications" >
+		<id name="Id" column="PostingApplicationId" >
+			<generator class="identity" />
+		</id>
+
+		<many-to-one name="SubmittedPosting" column="SubmittedPostingId" />
+		<property name="SubmittedOn" />
+		<many-to-one name="SubmittedBy" column="SubmittedByUserId" />
+		<property name="Comment" />
+
+		<many-to-one name="Posting" column="TargetPostingId" />
+	</class>
+
+	<sql-query name="advanced_posting_search">
+		<return alias="postings" class="Posting" >
+			<return-property name="Id" column="PostingId" />
+			<return-property name="CreatedOn" column="CreatedOn" />
+			<return-property name="LastModifiedOn" column="LastModifiedOn" />
+			<return-property name="ContentType" column="ContentType"/>
+			<return-property name="Heading" column="Heading" />
+			<return-property name="ShortName" column="ShortName" />
+			<return-property name="ShortText" column="ShortText" />
+			<return-property name="Views" column="Views" />
+			<return-property name="Deleted" column="Deleted" />
+			<return-property name="Flagged" column="Flagged" />
+			<return-property name="Published" column="Published" />
+			<return-property name="Active" column="Active" />
+			<return-property name="User">
+				<return-column name="UserId"/>
+			</return-property>
+			<return-property name="Contents" >
+				<return-column name="ContentsId"/>
+			</return-property>
+		</return>
+		exec s_postings_by_query :content_type, :tag_list, :query, :precision
+	</sql-query>
+</hibernate-mapping>

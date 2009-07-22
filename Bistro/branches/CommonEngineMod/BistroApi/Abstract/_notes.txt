@@ -1,0 +1,1 @@
+﻿Corresponding interface changes will be reflected in these abstract classes. If you subclass these classes or the BistroModel concrete classes, your code is less likely to break from interface changes and you *may* not have to recompile.

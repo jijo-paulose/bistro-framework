@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+		Document userProfile contains user profile information used for athentication and authorization.
+		It can also carry user preferences and other user-specific information. It MUST have 
+		WorkflowServer.Foundation.Documents.UserProfile as its type and its schema MUST match the schema
+		of the WorkflowServer.Foundation.Documents.UserProfile document (see below)
+		This factory is required if user authentication is performed.
+	-->
+<document name="Applicants" type="Document"
+		  factory="SprocFactory"
+		  datastore="Primary"
+		  caching="Application"
+			>
+
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:wdf="http://schemas.hill30.com/workflow/documents">
+
+		<xs:element name="document"
+					wdf:transient="true"
+					wdf:skip-extra="true"
+				  >
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element maxOccurs="unbounded" name="data" wdf:read="s_postings_by_application(posting_id)">
+						<xs:complexType>
+							<xs:attribute name="PostingId" type="xs:string" />
+							<xs:attribute name="CreatedOn" type="xs:dateTime" />
+							<xs:attribute name="LastModifiedOn" type="xs:dateTime" />
+							<xs:attribute name="ContentType" type="xs:string" />
+							<xs:attribute name="Heading" type="xs:string" />
+							<xs:attribute name="Views" type="xs:int" />
+							<xs:attribute name="Deleted" type="xs:boolean" />
+							<xs:attribute name="Flagged" type="xs:boolean" />
+							<xs:attribute name="Published" type="xs:boolean" />
+							<xs:attribute name="Active" type="xs:boolean" />
+							<xs:attribute name="SubmittedOn" type="xs:dateTime" />
+							<xs:attribute name="UserName" type="xs:string" />
+							<xs:attribute name="ShortText" type="xs:string" />
+							<xs:attribute name="ShortName" type="xs:string" />
+							<xs:attribute name="Comment" type="xs:string" />
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="docID" type="xs:ID" wdf:transient="true" />
+			</xs:complexType>
+		</xs:element>
+
+	</xs:schema>
+</document>

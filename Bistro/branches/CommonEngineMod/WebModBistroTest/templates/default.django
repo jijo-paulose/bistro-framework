@@ -1,0 +1,18 @@
+﻿<html>
+	<body>
+		<form id="Form1" method="post" action="/A/PutFile" enctype="multipart/form-data">
+		<!-- form id="Form1" method="post" action="/PutFile" -->
+			<p>django!</p>
+			<p>This is a test.</p>
+			<p>Add this...</p>
+			<!-- input id="myText" type="text"></input -->
+			<input name="myFileA" type="file"/></br>
+			<input name="myFileB" type="file"/></br>
+			<input name="myFileC" type="file"/></br>
+			<input name="myFileD" type="file"/></br>
+			<input name="myTextA" type="text"></input>
+			<input name="myTextB" type="text"></input></br>
+			<input type="submit" value="Send">
+		</form>
+	</body>
+</html>

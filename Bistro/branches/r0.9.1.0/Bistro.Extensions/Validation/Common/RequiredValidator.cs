@@ -6,23 +6,28 @@ using Bistro.Validation;
 
 namespace Bistro.Extensions.Validation.Common
 {
-    public class RequiredValidator<T> : Validator<T> where T : IValidatable
+    public class RequiredValidator<T> : DefaultValidator<T> where T : IValidatable
     {
-        string message;
-
-        public RequiredValidator(string message)
-        {
-            this.message = message;
-        }
+        public RequiredValidator(string message) : base(message) { }
 
         public override bool DoValidate(object target, out List<string> messages)
         {
             messages = new List<string>();
+            bool fail = false;
 
             if (target == null)
-                messages.Add(message);
+                fail = true;
+            else
+            {
+                var stringTarget = target as string;
+                if (stringTarget != null && String.IsNullOrEmpty(stringTarget))
+                    fail = true;
+            }
 
-            return messages.Count == 0;
+            if (fail)
+                messages.Add(Message);
+ 
+            return !fail;
         }
     }
 }

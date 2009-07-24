@@ -70,7 +70,7 @@ namespace Bistro.Validation
             foreach (IValidator validator in validators)
             {
                 var messages = new List<string>();
-                validatable.IsValid = validatable.IsValid && validator.IsValid(instance, out messages);
+                validatable.IsValid = validator.IsValid(instance, out messages) && validatable.IsValid;
                 validatable.Messages.InsertRange(0, messages);
 
             }

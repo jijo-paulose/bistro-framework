@@ -60,8 +60,6 @@ namespace Bistro.Controllers.OutputHandling
             var contentType = response.ContentType;
             var returnValue = response.ExplicitResult;
 
-            context.Response.Clear();
-
             context.Response.AppendHeader("content-type", contentType);
             context.Response.StatusCode = Convert.ToInt32(response.Code);
 
@@ -70,7 +68,6 @@ namespace Bistro.Controllers.OutputHandling
                 case ReturnType.XML:
                 case ReturnType.JSON:
                 case ReturnType.Other:
-                    context.Response.AppendHeader("Content-Length", returnValue.ToString().Length.ToString());
                     context.Response.Write(returnValue.ToString());
                     break;
                 case ReturnType.File:
@@ -88,7 +85,6 @@ namespace Bistro.Controllers.OutputHandling
                         // since we were given a stream, we'll have to encode it somehow
                         using (stream)
                         {
-                            context.Response.AppendHeader("Content-Length", stream.Length.ToString());
                             Encoding encoding =
                                 response.Encoding != null ? response.Encoding : new UTF8Encoding();
 

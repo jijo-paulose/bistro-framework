@@ -2,9 +2,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files\NUnit 2.5\bin\net-2.0\nunit.exe</StartProgram>
-    <StartArguments>Bistro.Core.UnitTests.dll /run</StartArguments>
+    <StartArguments>Bistro.Core.UnitTestsNew.dll /run</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
 </Project>

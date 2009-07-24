@@ -71,11 +71,20 @@ namespace Bistro.Controllers.Dispatch
         public ControllerDispatcher(Application application) { logger = application.LoggerFactory.GetLogger(GetType()); }
 
         /// <summary>
+        /// Clear dispatcher contents to reload items;
+        /// </summary>
+        public void ClearAll()
+        {
+            map.Clear();
+        }
+
+
+        /// <summary>
         /// Our logger
         /// </summary>
         private readonly ILogger logger;
 
-        /// <summary>
+        /// <summary> 
         /// Registers the controller with the dispatcher.
         /// </summary>
         /// <param name="info">The controller info.</param>

@@ -113,9 +113,10 @@ namespace Bistro.Controllers
                 StringBuilder sb = new StringBuilder();
                 foreach (ControllerInvocationInfo info in finalDependencies.Keys)
                 {
-                    sb.Append("\r\n").Append(info.BindPoint.Controller.ControllerType.Name).Append(" is a required/requested resource for");
+#warning - FullName used in StringBuilder instead of Name. It shouldn't break anything.
+                    sb.Append("\r\n").Append(info.BindPoint.Controller.ControllerType.FullName).Append(" is a required/requested resource for");
                     foreach (ControllerInvocationInfo dep in finalDependencies[info])
-                        sb.Append("\r\n\t").Append(dep.BindPoint.Controller.ControllerType.Name);
+                        sb.Append("\r\n\t").Append(dep.BindPoint.Controller.ControllerType.FullName);
                 }
 
                 sb.Insert(0, "Possible cyclical dependency detected:\r\n");

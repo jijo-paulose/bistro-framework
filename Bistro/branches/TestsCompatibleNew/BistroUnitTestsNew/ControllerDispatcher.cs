@@ -8,6 +8,8 @@ using Bistro.Controllers.Descriptor.Data;
 using Bistro.Configuration;
 using Bistro.Controllers;
 using Bistro.Controllers.Dispatch;
+using Bistro.Special.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Bistro.UnitTestsNew
 {
@@ -207,6 +209,20 @@ namespace Bistro.UnitTestsNew
             realTest(test);
         }
 
+        private class UrlTuple
+        {
+
+            internal UrlTuple(string verb, string url)
+            {
+                Url = url;
+                Verb = verb;
+            }
+
+            internal string Verb { get; set; }
+            internal string Url { get; set; }
+        
+        }
+
 
         
         // The NUnit will not run a test for a method which is not public 
@@ -214,7 +230,57 @@ namespace Bistro.UnitTestsNew
         void realTest(object test)
         {
 
+
             TestDescriptor descriptor = (TestDescriptor)test;
+
+            List<IAttributeInfo> list = new List<IAttributeInfo>();
+
+            ///
+            foreach (TestTypeInfo testType in descriptor.Controllers)
+            {
+                IEnumerable<IAttributeInfo> attrList = testType.Attributes.Where(attr => { return attr.Type == typeof(BindAttribute).FullName; });
+                list.AddRange(attrList);
+            }
+
+            List<UrlTuple> urlsList = new List<UrlTuple>();
+
+
+            foreach (IAttributeInfo item in list)
+            {
+                string url = item.Parameters[0].AsString();
+                string verb = "";
+                foreach (string verbItem in BindPointUtilities.HttpVerbs)
+                {
+                    if (!url.StartsWith(verbItem, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    string remainder = url.Substring(verbItem.Length);
+                    url = remainder;
+                    verb = verbItem;
+                    break;
+                }
+                if (verb == "")
+                {
+                    foreach (var vrb in BindPointUtilities.HttpVerbs)
+                    {
+                        AddItems(urlsList, vrb, url);
+                    }
+                }
+                else
+                {
+                    AddItems(urlsList, verb, url);
+                }
+
+            }
+            
+
+
+            ///
+
+            
+            
+            
+            
             var mgr = manager as ControllerManager;
             var dsp = dispatcher as ControllerDispatcher;
 
@@ -226,6 +292,17 @@ namespace Bistro.UnitTestsNew
                 urlTest.Validate(dispatcher);
             }
         }
+
+        #region Generate stuff. We'll move it to some other place
+        private Regex rgx = new Regex(@"/(\*|\?|\{\w+})", RegexOptions.Compiled | RegexOptions.Singleline);
+
+        private void AddItems(List<UrlTuple> urlsList, string vrb, string url)
+        {
+            MatchCollection mCol = rgx.Matches(url);
+//            foreach( 
+//            urlsList.Add(new UrlTuple(vrb, url));
+        }
+        #endregion
 
         internal IList<TestDescriptor> TestSource()
         {

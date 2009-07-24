@@ -81,7 +81,7 @@ namespace Bistro.Extensions.Validation
             foreach (IValidator child in children)
             {
                 var newMessages = new List<string>();
-                valid = valid && child.IsValid(target, out newMessages);
+                valid = child.IsValid(target, out newMessages) && valid;
 
                 messages.AddRange(newMessages);
             }

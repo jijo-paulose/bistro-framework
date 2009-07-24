@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using System.Reflection;
+using Bistro.Special.Reflection;
 
 namespace Bistro.Controllers
 {

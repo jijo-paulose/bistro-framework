@@ -28,6 +28,7 @@ using Bistro.Controllers.Descriptor;
 using System.Xml;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers.Dispatch;
+using Bistro.Special.Reflection;
 
 namespace Bistro.Controllers
 {
@@ -74,7 +75,7 @@ namespace Bistro.Controllers
         /// <summary>
         /// A mapping of controller type to handler instance
         /// </summary>
-        private Dictionary<MemberInfo, IControllerHandler> handlers = new Dictionary<MemberInfo, IControllerHandler>();
+        private Dictionary<ITypeInfo, IControllerHandler> handlers = new Dictionary<ITypeInfo, IControllerHandler>();
 
         /// <summary>
         /// The full listing of all controller descriptors known to the sysetm
@@ -126,9 +127,10 @@ namespace Bistro.Controllers
         {
             try
             {
-                foreach (Type t in assm.GetTypes())
-                    if (t.GetInterface(typeof(IController).Name) != null)
-                        LoadType(t);
+#warning LoadType disabled here - temporary. We have no mechanism to translate IController to ITypeInfo yet.
+//                foreach (Type t in assm.GetTypes())
+//                    if (t.GetInterface(typeof(IController).Name) != null)
+//                        LoadType(t);
             }
             catch (ReflectionTypeLoadException ex)
             {
@@ -148,14 +150,31 @@ namespace Bistro.Controllers
             }
         }
 
+        public void SpecialLoadForTest(IEnumerable<ITypeInfo> types)
+        {
+            foreach(ITypeInfo typeInfo in types)
+            {
+                LoadType(typeInfo);
+            }
+        }
+
+        /// <summary>
+        /// Clear manager contents to reload items
+        /// </summary>
+        public void ClearAll()
+        {
+            controllers.Clear();
+            handlers.Clear();
+        }
+
         /// <summary>
         /// Loads the type.
         /// </summary>
         /// <param name="t">The t.</param>
-        protected virtual void LoadType(Type t)
+        protected virtual void LoadType(ITypeInfo t)
         {
-            if (t.IsAbstract)
-                return;
+            //if (t.IsAbstract)
+            //    return;
 
             ControllerDescriptor descriptor = ControllerDescriptor.CreateDescriptor(t, logger);
             RegisterController(descriptor);
@@ -179,7 +198,9 @@ namespace Bistro.Controllers
         /// <returns></returns>
         public IController GetController(ControllerInvocationInfo invocation, HttpContextBase context, IContext requestContext)
         {
-            return handlers[invocation.BindPoint.Controller.ControllerType].GetControllerInstance(invocation, context, requestContext);
+#warning - handlers disabled here. Returning null instead;
+            return null;
+//            return handlers[invocation.BindPoint.Controller.ControllerType].GetControllerInstance(invocation, context, requestContext);
         }
 
         /// <summary>
@@ -188,7 +209,8 @@ namespace Bistro.Controllers
         /// <param name="controller">The controller.</param>
         public void ReturnController(IController controller, HttpContextBase context, IContext requestContext)
         {
-            handlers[controller.GlobalHandle].ReturnController(controller, context, requestContext);
+#warning - handlers disabled here. Returning null instead;
+//            handlers[controller.GlobalHandle].ReturnController(controller, context, requestContext);
         }
 
         /// <summary>

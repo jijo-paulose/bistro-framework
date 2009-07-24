@@ -77,10 +77,10 @@ namespace Bistro.Controllers
         /// </summary>
         private Dictionary<ITypeInfo, IControllerHandler> handlers = new Dictionary<ITypeInfo, IControllerHandler>();
 
-        /// <summary>
-        /// The full listing of all controller descriptors known to the sysetm
-        /// </summary>
-        private List<ControllerDescriptor> controllers = new List<ControllerDescriptor>();
+        ///// <summary>
+        ///// The full listing of all controller descriptors known to the sysetm
+        ///// </summary>
+        //private List<ControllerDescriptor> controllers = new List<ControllerDescriptor>();
 
         /// <summary>
         /// Indicates whether loading has finished
@@ -163,7 +163,6 @@ namespace Bistro.Controllers
         /// </summary>
         public void ClearAll()
         {
-            controllers.Clear();
             handlers.Clear();
         }
 

@@ -256,7 +256,7 @@ namespace Bistro.UnitTestsNew
                         continue;
 
                     string remainder = url.Substring(verbItem.Length);
-                    url = remainder;
+                    url = remainder.TrimStart();
                     verb = verbItem;
                     break;
                 }
@@ -366,6 +366,7 @@ namespace Bistro.UnitTestsNew
 
         internal IList<TestDescriptor> TestSource()
         {
+            #region ValidUrls1 test
             NewTestWithUrl("ValidUrls",
                 Types(
                     Type(
@@ -396,7 +397,9 @@ namespace Bistro.UnitTestsNew
                     UrlTest("DELETE /postings/123412423","DELETE /postings/123412423" ,"TestController"),
                     UrlTest("DELETE /postings/testvalue","DELETE /postings/testvalue" ,"TestController")
                     );
+            #endregion
 
+            #region ValidUrls2 test
             NewTestWithUrl("ValidUrls2",
                 Types(
                     Type(
@@ -431,8 +434,9 @@ namespace Bistro.UnitTestsNew
                     UrlTest("DELETE /A/abcde","DELETE /A/abcde" ,"CommonController"),
                     UrlTest("DELETE /A/testvalue","DELETE /A/testvalue" ,"CommonController")
                     );
+            #endregion
 
-
+            #region SRxPortal - Big Test
             NewTestWithUrl("SRxPortal - Big Test",
                 Types(
                     Type("Pageable",
@@ -822,8 +826,377 @@ namespace Bistro.UnitTestsNew
                         Field("Root", "string", ProvidesAttribute, RequestAttribute)
                         )
                     ),
-                    UrlTest("test1", "GET /A/B", "CommonController","TestController")
+                    UrlTest("GET /Pageable?{PageNumber}&{PageSize}","GET /Pageable?{PageNumber}&{PageSize}" ,"Messenger","Fake","DefaultController","QueryStringDeterminer","Authenticator","Pageable","AntiForgeryRequestSetter","AjaxDeterminer"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124/Pageable?{PageNumber}&{PageSize}","GET /abcde/edcba/aaaa123/bbb124/Pageable?{PageNumber}&{PageSize}" ,"Messenger","Fake","DefaultController","QueryStringDeterminer","Authenticator","Pageable","AntiForgeryRequestSetter","AjaxDeterminer"),
+                    UrlTest("GET /bbb124/Pageable?{PageNumber}&{PageSize}","GET /bbb124/Pageable?{PageNumber}&{PageSize}" ,"Messenger","Fake","DefaultController","QueryStringDeterminer","Authenticator","Pageable","AntiForgeryRequestSetter","AjaxDeterminer"),
+                    UrlTest("GET /aaaa123/bbb124/Pageable?{PageNumber}&{PageSize}","GET /aaaa123/bbb124/Pageable?{PageNumber}&{PageSize}" ,"Messenger","Fake","DefaultController","QueryStringDeterminer","Authenticator","Pageable","AntiForgeryRequestSetter","AjaxDeterminer"),
+                    UrlTest("GET /Sortable?{OrderBy}&{Direction}","GET /Sortable?{OrderBy}&{Direction}" ,"Messenger","Fake","DefaultController","QueryStringDeterminer","Authenticator","Sortable","AntiForgeryRequestSetter","AjaxDeterminer"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124/Sortable?{OrderBy}&{Direction}","GET /abcde/edcba/aaaa123/bbb124/Sortable?{OrderBy}&{Direction}" ,"Messenger","Fake","DefaultController","QueryStringDeterminer","Authenticator","Sortable","AntiForgeryRequestSetter","AjaxDeterminer"),
+                    UrlTest("GET /bbb124/Sortable?{OrderBy}&{Direction}","GET /bbb124/Sortable?{OrderBy}&{Direction}" ,"Messenger","Fake","DefaultController","QueryStringDeterminer","Authenticator","Sortable","AntiForgeryRequestSetter","AjaxDeterminer"),
+                    UrlTest("GET /aaaa123/bbb124/Sortable?{OrderBy}&{Direction}","GET /aaaa123/bbb124/Sortable?{OrderBy}&{Direction}" ,"Messenger","Fake","DefaultController","QueryStringDeterminer","Authenticator","Sortable","AntiForgeryRequestSetter","AjaxDeterminer"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /bbb124","GET /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /bbb124","POST /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /bbb124","PUT /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /bbb124","DELETE /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("GET /Case/","GET /Case/" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","Case"),
+                    UrlTest("GET /Case/variablevalue1","GET /Case/variablevalue1" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","Case"),
+                    UrlTest("GET /Case/123412423","GET /Case/123412423" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","Case"),
+                    UrlTest("GET /Case/testvalue","GET /Case/testvalue" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","Case"),
+                    UrlTest("DELETE /Case/","DELETE /Case/" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake","CaseDelete"),
+                    UrlTest("DELETE /Case/variablevalue1","DELETE /Case/variablevalue1" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake","CaseDelete"),
+                    UrlTest("DELETE /Case/123412423","DELETE /Case/123412423" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake","CaseDelete"),
+                    UrlTest("DELETE /Case/testvalue","DELETE /Case/testvalue" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake","CaseDelete"),
+                    UrlTest("GET /Cases","GET /Cases" ,"QueryStringDeterminer","Messenger","DefaultController","AjaxDeterminer","Authenticator","Fake","Cases","AntiForgeryRequestSetter"),
+                    UrlTest("GET /Clinical/GetNextStep?{TransactionId}&{DiagnosisId}","GET /Clinical/GetNextStep?{TransactionId}&{DiagnosisId}" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","GetNextStep"),
+                    UrlTest("GET /Clinical/Initialize","GET /Clinical/Initialize" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","InitializeClinical"),
+                    UrlTest("GET /Comments","GET /Comments" ,"QueryStringDeterminer","Messenger","DefaultController","Comments","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /Comments/Get","GET /Comments/Get" ,"QueryStringDeterminer","Messenger","DefaultController","Comments","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter","CommentsSend"),
+                    UrlTest("GET /DrugCategories","GET /DrugCategories" ,"QueryStringDeterminer","Messenger","DrugCategories","DefaultController","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /Drugs","GET /Drugs" ,"QueryStringDeterminer","Messenger","Drugs","DefaultController","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /Enrollments","GET /Enrollments" ,"QueryStringDeterminer","Messenger","DefaultController","Enrollments","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /default","GET /default" ,"QueryStringDeterminer","Messenger","DefaultController","AjaxDeterminer","Authenticator","HomeController","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /EligibilityRouter","GET /EligibilityRouter" ,"DefaultController","QueryStringDeterminer","EligibilityRouter","Member","Messenger","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /Members","GET /Members" ,"QueryStringDeterminer","Messenger","DefaultController","AjaxDeterminer","Authenticator","Members","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /OrderManager/OrderInquiry","GET /OrderManager/OrderInquiry" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","OrderInquiry"),
+                    UrlTest("GET /OrderManager/OrderInquiry/OrderListBySite","GET /OrderManager/OrderInquiry/OrderListBySite" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","OrderInquiry","OrderInquiryListBySite"),
+                    UrlTest("GET /OrderManager/OrderRequest/DeleteCase","GET /OrderManager/OrderRequest/DeleteCase" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","OrderRequest","StepWizard","DeleteCase"),
+                    UrlTest("GET /OrderManager/OrderRequest/ProcessCaseDeletion","GET /OrderManager/OrderRequest/ProcessCaseDeletion" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","OrderRequest","StepWizard","ProcessCaseDeletion"),
+                    UrlTest("GET /DrugSelector?{CategoryId}&{DrugId}","GET /DrugSelector?{CategoryId}&{DrugId}" ,"QueryStringDeterminer","Messenger","DefaultController","AjaxDeterminer","Authenticator","DrugSelector","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /EligibilityRouter","GET /EligibilityRouter" ,"DefaultController","QueryStringDeterminer","EligibilityRouter","Member","Messenger","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /OrderManager/OrderRequest/MemberHistoryList","GET /OrderManager/OrderRequest/MemberHistoryList" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","OrderRequest","MemberHistoryList","StepWizard"),
+                    UrlTest("GET /OrderManager/OrderRequest/MemberInformation","GET /OrderManager/OrderRequest/MemberInformation" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","OrderRequest","StepWizard","MemberInformation"),
+                    UrlTest("GET /OrderManager/OrderRequest","GET /OrderManager/OrderRequest" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","StepWizard","OrderRequest"),
+                    UrlTest("GET /OrderRequestQueue","GET /OrderRequestQueue" ,"QueryStringDeterminer","Messenger","DefaultController","AjaxDeterminer","Authenticator","OrderRequestQueue","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /OrderManager/OrderRequest/PhysicianSelector?{PhysicianId}","GET /OrderManager/OrderRequest/PhysicianSelector?{PhysicianId}" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","OrderRequest","PhysicianSelector","StepWizard"),
+                    UrlTest("GET /OrderManager/OrderRequest","GET /OrderManager/OrderRequest" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter","StepWizard","OrderRequest"),
+                    UrlTest("GET /Physicians","GET /Physicians" ,"QueryStringDeterminer","Messenger","DefaultController","AjaxDeterminer","Authenticator","Physicians","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /Providers","GET /Providers" ,"QueryStringDeterminer","Messenger","DefaultController","AjaxDeterminer","Authenticator","Fake","Members","AntiForgeryRequestSetter"),
+                    UrlTest("GET /QUnit","GET /QUnit" ,"QueryStringDeterminer","Messenger","QUnit","DefaultController","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /RequestItems","GET /RequestItems" ,"QueryStringDeterminer","Messenger","RequestItems","DefaultController","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /bbb124","GET /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /bbb124","POST /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /bbb124","PUT /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /bbb124","DELETE /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /bbb124","POST /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /bbb124","GET /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /bbb124","GET /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /bbb124","POST /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /bbb124","PUT /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /bbb124","DELETE /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /bbb124","GET /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /bbb124","POST /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /bbb124","PUT /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /bbb124","DELETE /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /bbb124","GET /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /bbb124","POST /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /bbb124","PUT /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /bbb124","DELETE /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("GET /","GET /" ,"QueryStringDeterminer","Messenger","RootRedirect","DefaultController","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestSetter"),
+                    UrlTest("POST /","POST /" ,"QueryStringDeterminer","Messenger","RootRedirect","DefaultController","AjaxDeterminer","Authenticator","Fake","AntiForgeryRequestHandler"),
+                    UrlTest("PUT /","PUT /" ,"QueryStringDeterminer","DefaultController","RootRedirect","Messenger","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /","DELETE /" ,"QueryStringDeterminer","DefaultController","RootRedirect","Messenger","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /bbb124","GET /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestSetter"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /bbb124","POST /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Fake","Authenticator","AjaxDeterminer","AntiForgeryRequestHandler"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /bbb124","PUT /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /bbb124","DELETE /bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake"),
+                    UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"Messenger","QueryStringDeterminer","DefaultController","Authenticator","AjaxDeterminer","Fake")
+
                     );
+            #endregion
+
+            #region NoRecruiters-WFS - Big Test
+            NewTestWithUrl("NoRecruiters-WFS",
+                Types(
+                    Type(
+                        "RegisterDisplay",
+                        BindAttribute("GET /auth/register")
+                        ),
+                    Type(
+                        "Register",
+                        Attributes(
+                            BindAttribute("POST /auth/register")
+                        ),
+                        Field("username", "string", FormFieldAttribute, RequestAttribute),
+                        Field("email", "string", FormFieldAttribute, RequestAttribute),
+                        Field("firstname", "string", FormFieldAttribute, RequestAttribute),
+                        Field("lastname", "string", FormFieldAttribute, RequestAttribute),
+                        Field("password", "string", FormFieldAttribute, RequestAttribute),
+
+                        Field("defaultContentType", "string", RequestAttribute, RequiresAttribute),
+
+                        Field("errors", "Dictionary<string,string>", RequestAttribute)//Inherited
+
+                        ),
+                    Type(
+                        "SignInDisplay",
+                        BindAttribute("GET /auth/signin?{originalRequest}")
+                        ),
+                    Type(
+                        "SignIn",
+                        Attributes(
+                            BindAttribute("POST /auth/signin")
+                        ),
+                        Field("username", "string", FormFieldAttribute, RequestAttribute),
+                        Field("originalRequest", "string", FormFieldAttribute, RequestAttribute),
+
+                        Field("password", "string", FormFieldAttribute),
+                        Field("defaultContentType", "string", RequestAttribute),
+
+                        Field("errors", "Dictionary<string,string>", RequestAttribute)//Inherited
+                        ),
+                    Type(
+                        "SignOut",
+                        BindAttribute("GET /auth/signout")
+                        ),
+                    Type(
+                        "DataAccessControl",
+                        Attributes(
+                            BindAttribute("/?/byname/{shortName}"),
+                            BindAttribute("/?/byId/{postingId}")
+                        ),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute)
+                        ),
+                    Type(
+                        "CompanyFunctionAccessControl",
+                        BindAttribute("GET /posting/manage"),
+                        BindAttribute("GET /posting/ad/applicants/byId/{adId}")
+                        ),
+                    Type("GeneralFunctionAccessControl",
+                        Attributes(
+                            BindAttribute("/posting")
+                        ),
+                        Field("currentUser", "UserProfileStub", RequestAttribute)
+                        ),
+
+                    Type("DefaultController",
+                        Attributes(
+                            BindAttribute("/?")
+                        ),
+                        Field("userType", "string", RequestAttribute),
+                        Field("root", "string", RequestAttribute),
+                        Field("defaultContentType", "string", RequestAttribute)
+                        ),
+
+                    Type("ClearPreferences",
+                        Attributes(
+                            BindAttribute("/default/{preferenceReset}")
+                        ),
+                        Field("preferenceReset", "bool", RequestAttribute),
+                        Field("defaultContentType", "string", RequestAttribute, RequiresAttribute)
+                        ),
+
+                    Type("Home",
+                        Attributes(
+                            BindAttribute("/default")
+                        ),
+                        Field("preferenceReset", "bool", RequestAttribute, DependsOnAttribute),
+                        Field("defaultContentType", "string", RequestAttribute, RequiresAttribute)
+                        ),
+
+                    Type("Static",
+                        Attributes(
+                            BindAttribute("/static/{contentId}")
+                        ),
+                        Field("contentId", "string")
+                        ),
+
+                    Type("View",
+                        Attributes(
+                            BindAttribute("GET /ad/{shortName}"),
+                            BindAttribute("GET /resume/{shortName}")
+                        ),
+                        Field("contentType", "string", RequestAttribute, DependsOnAttribute),
+                        Field("posting", "PostingStub", RequestAttribute),
+                        Field("defaultContentType", "string", RequestAttribute, RequiresAttribute),
+                        Field("shortName", "string")
+                        ),
+
+                    Type("Untag",
+                        Attributes(
+                            BindAttribute("GET /?/without-tag/{tag}")
+                        ),
+                        Field("tag", "string"),
+                        Field("currentTags", "List<string>", SessionAttribute)
+                        ),
+
+                    Type("Tag",
+                        Attributes(
+                            BindAttribute("GET /?/with-tag/{tagList}")
+                        ),
+                        Field("currentTags", "List<string>", SessionAttribute),
+                        Field("tagList", "string")
+                        ),
+                    Type("FirstTimeSearch",
+                        Attributes(
+                            BindAttribute("GET /postings/{contentType}?{firstTime}")
+                        ),
+                        Field("contentType", "string"),
+                        Field("firstTime", "bool"),
+                        Field("defaultContentType", "string", RequestAttribute, RequiresAttribute)
+                        ),
+                    Type("Search",
+                        Attributes(
+                            BindAttribute("/postings/{contentType}")
+                        ),
+                        Field("txtQuery", "string", FormFieldAttribute),
+                        Field("currentTags", "List<string>", SessionAttribute, DependsOnAttribute),
+                        Field("popularTags", "List<string>", RequestAttribute),
+                        Field("searchResults", "List<string>", RequestAttribute),
+                        Field("contentType", "string", RequestAttribute)
+                        ),
+
+                    Type("Flag",
+                        Attributes(
+                            BindAttribute("/posting/flag/{contentType}/{flagType}/{shortName}")
+                        ),
+                        Field("flagType", "string"),
+                        Field("contentType", "string"),
+                        Field("shortName", "string"),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute)
+                        ),
+
+                    Type("ApplyDisplay",
+                        Attributes(
+                            BindAttribute("GET /posting/apply/{appContentType}/{shortName}")
+                        ),
+                        Field("appContentType", "string", RequestAttribute),
+                        Field("shortName", "string", RequestAttribute)
+                        ),
+
+                    Type("ApplyController",
+                        Attributes(
+                            BindAttribute("POST /posting/apply/{appContentType}/{shortName}")
+                        ),
+                        Field("appContentType", "string", RequestAttribute),
+                        Field("shortName", "string", RequestAttribute),
+                        Field("comment", "string", RequestAttribute, FormFieldAttribute),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute)
+                        ),
+
+                    Type("ResumeDisplay",
+                        Attributes(
+                            BindAttribute("GET /posting/resume/byname/{shortName}")
+                        ),
+                        Field("shortName", "string"),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute),
+                        Field("posting", "PostingStub", RequestAttribute, RequiresAttribute)
+                        ),
+                    Type("ResumeUpdate",
+                        Attributes(
+                            BindAttribute("POST /posting/resume/byname/{shortName}")
+                        ),
+                        Field("shortName", "string"),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute),
+                        Field("posting", "PostingStub", RequestAttribute, RequiresAttribute),
+
+                        Field("heading", "string", FormFieldAttribute, RequestAttribute),
+                        Field("tags", "string", FormFieldAttribute, RequestAttribute),
+                        Field("detail", "string", FormFieldAttribute, RequestAttribute),
+                        Field("published", "string", FormFieldAttribute, RequestAttribute)
+                        ),
+                    Type("PreviewDisplay",
+                        Attributes(
+                            BindAttribute("GET /posting/resume/preview/byname/{shortName}")
+                        ),
+                        Field("shortName", "string"),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute),
+                        Field("posting", "PostingStub", RequestAttribute, RequiresAttribute)
+                        ),
+                    Type("Manage",
+                        Attributes(
+                            BindAttribute("GET /posting/manage")
+                        ),
+                        Field("unpublished", "List<string>", RequestAttribute),
+                        Field("published", "List<string>", RequestAttribute),
+
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute)
+                        ),
+                    Type("ViewAllApplicatints",
+                        Attributes(
+                            BindAttribute("GET /posting/ad/applicants/byId/{adId}")
+                        ),
+                        Field("adId", "string", RequestAttribute),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute),
+                        Field("applicants", "List<string>", RequestAttribute)
+                        ),
+                    Type("AdDisplay",
+                        Attributes(
+                            BindAttribute("GET /posting/ad/byname/{shortName}")
+                        ),
+                        Field("shortName", "string"),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute),
+                        Field("posting", "PostingStub", RequestAttribute, RequiresAttribute)
+                        ),
+                    Type("AdUpdate",
+                        Attributes(
+                            BindAttribute("POST /posting/ad/byname/{shortName}")
+                        ),
+                        Field("shortName", "string"),
+                        Field("currentUser", "UserProfileStub", RequestAttribute, RequiresAttribute),
+                        Field("posting", "PostingStub", RequestAttribute, RequiresAttribute),
+
+                        Field("heading", "string", FormFieldAttribute, RequestAttribute),
+                        Field("tags", "string", FormFieldAttribute, RequestAttribute),
+                        Field("detail", "string", FormFieldAttribute, RequestAttribute),
+                        Field("published", "string", FormFieldAttribute, RequestAttribute)
+                        )
+
+                    )
+                    );
+
+
+            #endregion
 
 
             return tests;

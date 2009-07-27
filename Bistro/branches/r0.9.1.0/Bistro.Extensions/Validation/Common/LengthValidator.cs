@@ -15,11 +15,14 @@ namespace Bistro.Extensions.Validation.Common
         {
             this.min = min;
             this.max = max;
+
+            DefiningParams.Add("min", min);
+            DefiningParams.Add("max", max);
         }
 
-        public override bool DoValidate(object target, out List<string> messages)
+        public override bool DoValidate(object target, out List<IValidationResult> messages)
         {
-            messages = new List<string>();
+            messages = new List<IValidationResult>();
             bool fail = false;
 
             string stringTarget = target as string;
@@ -32,7 +35,7 @@ namespace Bistro.Extensions.Validation.Common
                 fail = true;
 
             if (fail)
-                messages.Add(Message);
+                messages.Add(new CommonValidationResult(this, target as IValidatable, Message, !fail));
 
             return !fail;
         }

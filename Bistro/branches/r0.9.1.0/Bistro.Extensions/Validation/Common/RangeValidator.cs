@@ -8,8 +8,8 @@ using System.Globalization;
 namespace Bistro.Extensions.Validation.Common
 {
     /// <summary>
-    /// Validates that the target falls within the specified range. If the supplied value is not
-    /// <see cref="System.IConvertible"/>, the validation fails. If the supplied value is IConvertible
+    /// Validates that the target falls within the specified range. If the supplied value is null, the validation passes.
+    /// If the supplied value is not <see cref="System.IConvertible"/>, the validation fails. If the supplied value is IConvertible
     /// but does not convert to type <c>K</c>, the validation fails
     /// </summary>
     /// <typeparam name="T">The type of the target element</typeparam>
@@ -31,6 +31,9 @@ namespace Bistro.Extensions.Validation.Common
         {
             this.min = min;
             this.max = max;
+
+            DefiningParams.Add("min", min);
+            DefiningParams.Add("max", max);
         }
 
         /// <summary>
@@ -39,13 +42,15 @@ namespace Bistro.Extensions.Validation.Common
         /// <param name="target">The target.</param>
         /// <param name="messages">The messages.</param>
         /// <returns></returns>
-        public override bool DoValidate(object target, out List<string> messages)
+        public override bool DoValidate(object target, out List<IValidationResult> messages)
         {
-            messages = new List<string>();
+            messages = new List<IValidationResult>();
             bool fail = false;
 
             IConvertible convertible = target as IConvertible;
-            if (convertible == null)
+            if (target == null)
+                fail = false;
+            else if (convertible == null)
                 fail = true;
             else
                 try
@@ -59,7 +64,7 @@ namespace Bistro.Extensions.Validation.Common
                 }
 
             if (fail)
-                messages.Add(Message);
+                messages.Add(new CommonValidationResult(this, target as IValidatable, Message, !fail));
 
             return !fail;
         }

@@ -13,6 +13,8 @@ namespace Bistro.Extensions.Validation.Common
         public DefaultValidator(string message)
         {
             Message = message;
+
+            DefiningParams.Add("message", message);
         }
     }
 }

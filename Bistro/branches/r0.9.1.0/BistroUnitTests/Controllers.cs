@@ -8,6 +8,7 @@ using Bistro.Controllers.Descriptor.Data;
 using Bistro.Validation;
 using Bistro.Extensions.Validation.Common;
 using Bistro.Extensions.Validation;
+using System.Text.RegularExpressions;
 
 namespace Bistro.UnitTests
 {
@@ -19,18 +20,21 @@ namespace Bistro.UnitTests
                 .As("validationTest")
                 .Value(c => c.someField)
                     .AliasedAs("otherField")
-                    .IsRequired("someField is required");
+                    .IsRequired("someField is required")
+                    .IsInRange("a", "zzzzzzzzzzzzzzzzzz", "someField must be alpha")
+                    .IsLongerThan(2, "someField must be at least two characters in length")
+                    .MatchesRegex("ab", RegexOptions.None, "someField must be 'ab'");
         }
     }
 
-    [Bind("/validationTest")]
+    [Bind("/validationTest/{someField}")]
     [ValidateWith(typeof(ControllerValidator))]
     public class ValidatingController : AbstractController, IValidatable
     {
         public string someField;
 
         [Request]
-        public List<string> Messages { get; set; }
+        public List<IValidationResult> Messages { get; set; }
         public bool IsValid { get; set; }
 
         public override void DoProcessRequest(IExecutionContext context)

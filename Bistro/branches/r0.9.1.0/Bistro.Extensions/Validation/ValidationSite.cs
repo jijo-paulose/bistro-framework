@@ -59,7 +59,7 @@ namespace Bistro.Extensions.Validation
         /// <returns>
         /// 	<c>true</c> if the specified target is valid; otherwise, <c>false</c>.
         /// </returns>
-        public override bool IsValid(object target, out List<string> messages)
+        public override bool IsValid(object target, out List<IValidationResult> messages)
         {
             return base.IsValid(Evaluate(target), out messages);
         }

@@ -64,14 +64,17 @@ namespace Bistro.Validation
             var instance = base.GetControllerInstance(info, context, requestContext);
             var validatable = (IValidatable)instance;
 
-            validatable.Messages = new List<string>();
+            validatable.Messages = new List<IValidationResult>();
             validatable.IsValid = true;
 
             foreach (IValidator validator in validators)
             {
-                var messages = new List<string>();
+                var messages = new List<IValidationResult>();
                 validatable.IsValid = validator.IsValid(instance, out messages) && validatable.IsValid;
                 validatable.Messages.InsertRange(0, messages);
+
+                //validatable.IsValid = validator.IsValid(instance, out messages) && validatable.IsValid;
+                //validatable.Messages.InsertRange(0, messages);
 
             }
 

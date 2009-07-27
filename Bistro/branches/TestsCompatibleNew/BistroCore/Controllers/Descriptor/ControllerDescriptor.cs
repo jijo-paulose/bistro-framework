@@ -586,16 +586,16 @@ namespace Bistro.Controllers.Descriptor
                             (attribute) => { var name = member.Name; if (!Provides.Contains(name)) Provides.Add(name); }, null);
 
                         IterateAttributes<CookieFieldAttribute>(member,
-                            (attribute) => { CookieFields.Add((attribute.Parameters["Name"].AsObject() as string) ?? member.Name, new CookieFieldDescriptor(member, (bool)(attribute.Parameters["Outbound"].AsObject()))); }, null);
+                            (attribute) => { CookieFields.Add((attribute.Parameters["Name"] == null) ? member.Name : attribute.Parameters["Name"].AsString(), new CookieFieldDescriptor(member, (bool)(attribute.Parameters["Outbound"].AsObject()))); }, null);
 
                         IterateAttributes<FormFieldAttribute>(member,
-                            (attribute) => { FormFields.Add((attribute.Parameters["Name"].AsObject() as string) ?? member.Name, member); }, null);
+                            (attribute) => { FormFields.Add((attribute.Parameters["Name"] == null) ? member.Name : attribute.Parameters["Name"].AsString(), member); }, null);
 
                         IterateAttributes<RequestAttribute>(member,
-                            (attribute) => { RequestFields.Add((attribute.Parameters["Name"].AsObject() as string) ?? member.Name, member); }, null);
+                            (attribute) => { RequestFields.Add((attribute.Parameters["Name"] == null) ? member.Name : attribute.Parameters["Name"].AsString(), member); }, null);
 
                         IterateAttributes<SessionAttribute>(member,
-                            (attribute) => { SessionFields.Add((attribute.Parameters["Name"].AsObject() as string) ?? member.Name, member); }, null);
+                            (attribute) => { SessionFields.Add((attribute.Parameters["Name"] == null) ? member.Name : attribute.Parameters["Name"].AsString(), member); }, null);
                     }
                     catch (ArgumentException ex)
                     {

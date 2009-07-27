@@ -10,9 +10,9 @@ namespace Bistro.Extensions.Validation.Common
     {
         public RequiredValidator(string message) : base(message) { }
 
-        public override bool DoValidate(object target, out List<string> messages)
+        public override bool DoValidate(object target, out List<IValidationResult> messages)
         {
-            messages = new List<string>();
+            messages = new List<IValidationResult>();
             bool fail = false;
 
             if (target == null)
@@ -25,7 +25,7 @@ namespace Bistro.Extensions.Validation.Common
             }
 
             if (fail)
-                messages.Add(Message);
+                messages.Add(new CommonValidationResult(this, target as IValidatable, Message, !fail));
  
             return !fail;
         }

@@ -18,7 +18,7 @@ namespace Bistro.Validation
         /// <returns>
         /// 	<c>true</c> if the specified target is valid; otherwise, <c>false</c>.
         /// </returns>
-        bool IsValid(object target, out List<string> messages);
+        bool IsValid(object target, out List<IValidationResult> messages);
 
         /// <summary>
         /// Gets the child validators of this instance
@@ -34,6 +34,12 @@ namespace Bistro.Validation
         /// <param name="target">The target.</param>
         /// <returns></returns>
         IValidator Merge(IValidator target);
+
+        /// <summary>
+        /// Gets the parameters that define this validator
+        /// </summary>
+        /// <value>The defining params.</value>
+        Dictionary<string, object> DefiningParams { get; }
 
         /// <summary>
         /// Gets the name of the validation rule defined by this validator.

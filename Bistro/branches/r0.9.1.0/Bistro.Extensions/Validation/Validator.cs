@@ -20,6 +20,8 @@ namespace Bistro.Extensions.Validation
         /// </summary>
         public Validator()
         {
+            DefiningParams = new Dictionary<string, object>();
+
             Define();
         }
 
@@ -73,14 +75,14 @@ namespace Bistro.Extensions.Validation
         /// <returns>
         /// 	<c>true</c> if the specified target is valid; otherwise, <c>false</c>.
         /// </returns>
-        public virtual bool IsValid(object target, out List<string> messages)
+        public virtual bool IsValid(object target, out List<IValidationResult> messages)
         {
-            messages = new List<string>();
+            messages = new List<IValidationResult>();
             var valid = DoValidate(target, out messages);
 
             foreach (IValidator child in children)
             {
-                var newMessages = new List<string>();
+                var newMessages = new List<IValidationResult>();
                 valid = child.IsValid(target, out newMessages) && valid;
 
                 messages.AddRange(newMessages);
@@ -95,9 +97,9 @@ namespace Bistro.Extensions.Validation
         /// <param name="target">The target.</param>
         /// <param name="messages">The messages.</param>
         /// <returns></returns>
-        public virtual bool DoValidate(object target, out List<string> messages)
+        public virtual bool DoValidate(object target, out List<IValidationResult> messages)
         {
-            messages = new List<string>();
+            messages = new List<IValidationResult>();
             return true;
         }
 
@@ -135,5 +137,11 @@ namespace Bistro.Extensions.Validation
         }
 
         protected virtual void Define() { }
+
+        public virtual Dictionary<string, object> DefiningParams
+        {
+            get;
+            protected set;
+        }
     }
 }

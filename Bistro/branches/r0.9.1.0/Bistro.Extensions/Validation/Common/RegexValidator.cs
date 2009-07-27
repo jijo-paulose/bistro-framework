@@ -20,11 +20,13 @@ namespace Bistro.Extensions.Validation.Common
             : base(message)
         {
             re = new Regex(regex, options);
+
+            DefiningParams.Add("regex", regex);
         }
 
-        public override bool DoValidate(object target, out List<string> messages)
+        public override bool DoValidate(object target, out List<IValidationResult> messages)
         {
-            messages = new List<string>();
+            messages = new List<IValidationResult>();
             bool fail = false;
 
             string stringTarget = target as string;
@@ -34,7 +36,7 @@ namespace Bistro.Extensions.Validation.Common
             fail = !re.IsMatch(stringTarget);
 
             if (fail)
-                messages.Add(Message);
+                messages.Add(new CommonValidationResult(this, target as IValidatable, Message, !fail));
 
             return !fail;
         }

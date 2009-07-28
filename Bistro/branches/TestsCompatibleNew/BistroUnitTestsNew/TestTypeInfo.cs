@@ -33,7 +33,11 @@ namespace Bistro.UnitTestsNew
 
                 public string AsString()
                 {
-                    return value.ToString();
+                    //return value.ToString();
+                    if (value == null)
+                        return null;
+                    else
+                        return value.ToString();
                 }
 
                 public bool? AsNBoolean() { return AsNBoolean(null); }
@@ -101,8 +105,11 @@ namespace Bistro.UnitTestsNew
                 {
                     get 
                     {
-                        Parameter result = new Parameter(null);
-                        d.TryGetValue(name, out result);
+                        Parameter result = null;
+                        if (!d.TryGetValue(name, out result))
+                        {
+                            result = new Parameter(null);
+                        }
                         return result;
                     }
                 }

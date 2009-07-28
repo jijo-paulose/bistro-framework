@@ -56,6 +56,14 @@ namespace Bistro.UnitTestsNew
                     return @default;
                 }
 
+                public Enum AsEnum() { return AsEnum(null); }
+                public Enum AsEnum(Enum @default)
+                {
+                    if (value != null)
+                        if (value is Enum)
+                            return (Enum)value;
+                    return @default;
+                }
 
                 #endregion
             }

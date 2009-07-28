@@ -430,7 +430,7 @@ namespace Bistro.Controllers.Descriptor
             IterateAttributes<BindAttribute>(t, false,
                 (attribute) => 
                     {
-                        BindType bndType = (attribute.Parameters["ControllerBindType"] == null) ? BindType.Before : (BindType)(attribute.Parameters["ControllerBindType"].AsNInt32());
+                        BindType bndType = (attribute.Parameters["ControllerBindType"] == null) ? BindType.Before : (BindType)(attribute.Parameters["ControllerBindType"].AsEnum());
                         int priority = (attribute.Parameters["Priority"] == null) ? -1 : (int)(attribute.Parameters["Priority"].AsNInt32());
                             
 

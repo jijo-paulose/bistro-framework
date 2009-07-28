@@ -430,8 +430,8 @@ namespace Bistro.Controllers.Descriptor
             IterateAttributes<BindAttribute>(t, false,
                 (attribute) => 
                     {
-                        BindType bndType = (attribute.Parameters["ControllerBindType"] == null) ? BindType.Before : (BindType)(attribute.Parameters["ControllerBindType"].AsEnum());
-                        int priority = (attribute.Parameters["Priority"] == null) ? -1 : (int)(attribute.Parameters["Priority"].AsNInt32());
+                        BindType bndType = (BindType)(attribute.Parameters["ControllerBindType"].AsEnum());
+                        int priority = (int)(attribute.Parameters["Priority"].AsNInt32());
                             
 
                         if (BindPointUtilities.IsVerbQualified(attribute.Parameters["Target"].AsString()))
@@ -599,8 +599,8 @@ namespace Bistro.Controllers.Descriptor
                 {
                     try
                     {
-
-                        Func<IAttributeInfo, IMemberInfo, string> getName = (attr, membr) => { return (attr.Parameters["Name"] == null) ? membr.Name : attr.Parameters["Name"].AsString(); };
+#warning Check this and write a test!!!
+                        Func<IAttributeInfo, IMemberInfo, string> getName = (attr, membr) => { return (attr.Parameters["Name"].AsString()) ?? membr.Name; };
                         
                         // all fields that are not marked as required or depends-on are defaulted to "provided"
                         if ((!IsMarked(member, typeof(RequiresAttribute), true) &&

@@ -172,8 +172,8 @@ namespace Bistro.Controllers
         /// <param name="t">The t.</param>
         protected virtual void LoadType(ITypeInfo t)
         {
-            //if (t.IsAbstract)
-            //    return;
+            if (t.IsAbstract)
+                return;
 
             ControllerDescriptor descriptor = ControllerDescriptor.CreateDescriptor(t, logger);
             RegisterController(descriptor);

@@ -142,6 +142,7 @@ namespace Bistro.UnitTestsNew
                 this.type = type;
                 this.attributes = attributes;
             }
+
             string name;
             string type;
             TestAttributeInfo[] attributes;
@@ -157,6 +158,7 @@ namespace Bistro.UnitTestsNew
             {
                 return new EnumProxy<TestAttributeInfo, IAttributeInfo>(attributes.Where(attrInfo => { return attrInfo.Type == attributeType.FullName; }));
             }
+
 
 
             public string Name
@@ -230,6 +232,11 @@ namespace Bistro.UnitTestsNew
         TestPropertyInfo[] properties;
 
         #region ITypeInfo Members
+
+        public bool IsAbstract
+        {
+            get { return false; }
+        }
 
         public string FullName
         {

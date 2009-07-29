@@ -95,7 +95,7 @@ namespace Bistro.UnitTestsNew
 
         private TestTypeInfo.TestAttributeInfo BindAttribute(string binding)
         {
-            return new TestTypeInfo.TestAttributeInfo(typeof(BindAttribute), new TestTypeInfo.TestAttributeInfo.Parameter("Target", binding), new TestTypeInfo.TestAttributeInfo.Parameter("ControllerBindType", BindType.Before),new TestTypeInfo.TestAttributeInfo.Parameter("Priority",-1));
+            return new TestTypeInfo.TestAttributeInfo(typeof(BindAttribute), new Bistro.Reflection.IControllerInfo.Parameter("Target", binding), new Bistro.Reflection.IControllerInfo.Parameter("ControllerBindType", BindType.Before),new Bistro.Reflection.IControllerInfo.Parameter("Priority",-1));
         }
 
         private TestTypeInfo.TestAttributeInfo RequestAttribute { get { return new TestTypeInfo.TestAttributeInfo(typeof(RequestAttribute)); } }

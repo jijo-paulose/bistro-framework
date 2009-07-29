@@ -29,6 +29,7 @@ using System.Xml;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers.Dispatch;
 using Bistro.Special.Reflection;
+using Bistro.Reflection.IControllerInfo;
 
 namespace Bistro.Controllers
 {
@@ -127,10 +128,9 @@ namespace Bistro.Controllers
         {
             try
             {
-#warning LoadType disabled here - temporary. We have no mechanism to translate IController to ITypeInfo yet.
-//                foreach (Type t in assm.GetTypes())
-//                    if (t.GetInterface(typeof(IController).Name) != null)
-//                        LoadType(t);
+                foreach (Type t in assm.GetTypes())
+                    if (t.GetInterface(typeof(IController).Name) != null)
+                        LoadType(new ControllerTypeInfo(t));
             }
             catch (ReflectionTypeLoadException ex)
             {

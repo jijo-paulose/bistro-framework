@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Bistro.Special.Reflection;
 using System.Reflection;
+using Bistro.Reflection.IControllerInfo;
 
 namespace Bistro.UnitTestsNew
 {
@@ -12,110 +13,8 @@ namespace Bistro.UnitTestsNew
     {
         public class TestAttributeInfo : IAttributeInfo
         {
-            public class Parameter : IAttributeParameter
-            {
-                public Parameter(object value)
-                    : this (null, value)
-                {
-                }
 
-                public Parameter(string name, object value)
-                {
-                    this.name = name;
-                    this.value = value;
-                }
-                string name;
-                object value;
 
-                public string Name { get { return name; } }
-
-                #region IAttributeParameter Members
-
-                public string AsString()
-                {
-                    //return value.ToString();
-                    if (value == null)
-                        return null;
-                    else
-                        return value.ToString();
-                }
-
-                public bool? AsNBoolean() { return AsNBoolean(null); }
-
-                public bool? AsNBoolean(bool? @default)
-                {
-                    if (value != null)
-                        if (value is bool)
-                            return (bool)value;
-                    return @default;
-                }
-
-                public int? AsNInt32() { return AsNInt32(null); }
-
-                public int? AsNInt32(int? @default)
-                {
-                    if (value != null)
-                        if (value is int)
-                            return (int)value;
-                    return @default;
-                }
-
-                public Enum AsEnum() { return AsEnum(null); }
-                public Enum AsEnum(Enum @default)
-                {
-                    if (value != null)
-                        if (value is Enum)
-                            return (Enum)value;
-                    return @default;
-                }
-
-                #endregion
-            }
-
-            class ParameterCollection : IAttributeParameters
-            {
-                public ParameterCollection()
-                    : this(new Parameter[] { })
-                {
-                }
-
-                public ParameterCollection(Parameter[] parameters)
-                {
-                    this.parameters = parameters;
-                    foreach (Parameter p in parameters)
-                        if (p.Name != null)
-                            d.Add(p.Name, p);
-                }
-                Parameter[] parameters;
-                Dictionary<string, Parameter> d = new Dictionary<string, Parameter>();
-
-                #region IAttributeParameters Members
-
-                public int Count
-                {
-                    get { return parameters.Length; }
-                }
-
-                public IAttributeParameter this[int index]
-                {
-                    get { return parameters[index]; }
-                }
-
-                public IAttributeParameter this[string name]
-                {
-                    get 
-                    {
-                        Parameter result = null;
-                        if (!d.TryGetValue(name, out result))
-                        {
-                            result = new Parameter(null);
-                        }
-                        return result;
-                    }
-                }
-
-                #endregion
-            }
 
             public TestAttributeInfo(Type type)
             {

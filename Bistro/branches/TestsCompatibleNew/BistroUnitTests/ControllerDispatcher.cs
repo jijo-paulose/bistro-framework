@@ -53,8 +53,8 @@ namespace Bistro.UnitTests
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/");
             Assert.AreEqual(3, controllers.Length);
-            Assert.AreEqual(typeof(HomeUrlController1), controllers[1].BindPoint.Controller.ControllerType);
-            Assert.AreEqual(typeof(HomeUrlController2), controllers[0].BindPoint.Controller.ControllerType);
+            Assert.AreEqual(typeof(HomeUrlController1).FullName, controllers[1].BindPoint.Controller.ControllerType.FullName);
+            Assert.AreEqual(typeof(HomeUrlController2).FullName, controllers[0].BindPoint.Controller.ControllerType.FullName);
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace Bistro.UnitTests
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/hello/how/are/you");
             Assert.AreEqual(2, controllers.Length);
-            Assert.AreEqual(typeof(HelloYouController1), controllers[0].BindPoint.Controller.ControllerType);
+            Assert.AreEqual(typeof(HelloYouController1).FullName, controllers[0].BindPoint.Controller.ControllerTypeName);
         }
 
         [Test]
@@ -77,8 +77,8 @@ namespace Bistro.UnitTests
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/hello/howAre/you");
             Assert.AreEqual(3, controllers.Length);
-            Assert.AreEqual(typeof(HelloYouController1), controllers[0].BindPoint.Controller.ControllerType);
-            Assert.AreEqual(typeof(HelloYouController2), controllers[1].BindPoint.Controller.ControllerType);
+            Assert.AreEqual(typeof(HelloYouController1).FullName, controllers[0].BindPoint.Controller.ControllerTypeName);
+            Assert.AreEqual(typeof(HelloYouController2).FullName, controllers[1].BindPoint.Controller.ControllerTypeName);
         }
 
         //This test checks the correct binding and order of 2 related controllers
@@ -87,9 +87,9 @@ namespace Bistro.UnitTests
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/one_little_url");
             Assert.That(controllers.Length == 3, "We have " + controllers.Length + "controllers bound to the URL \"/one_little_url\" instead of 3");
-            Assert.That(controllers[0].BindPoint.Controller.ControllerType == typeof(littleController2), "Wrong order, problems with littleController1");
-            Assert.That(controllers[1].BindPoint.Controller.ControllerType == typeof(littleController1), "Wrong order, problems with littleController2");
-            Assert.That(controllers[2].BindPoint.Controller.ControllerType == typeof(ReturnTypesController), "Wrong order, problems with ReturnTypesController");
+            Assert.That(controllers[0].BindPoint.Controller.ControllerTypeName == typeof(littleController2).FullName, "Wrong order, problems with littleController1");
+            Assert.That(controllers[1].BindPoint.Controller.ControllerTypeName == typeof(littleController1).FullName, "Wrong order, problems with littleController2");
+            Assert.That(controllers[2].BindPoint.Controller.ControllerTypeName == typeof(ReturnTypesController).FullName, "Wrong order, problems with ReturnTypesController");
         }
 
         //This test checks the correct binding and order of 3 related controllers
@@ -98,10 +98,10 @@ namespace Bistro.UnitTests
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/little_url/more");
             Assert.That(controllers.Length == 4, "We have " + controllers.Length + "controllers bound to the URL \"/little_url/more\" instead of 4");
-            Assert.That(controllers[0].BindPoint.Controller.ControllerType == typeof(littleController3), "Wrong order, problems with littleController3");
-            Assert.That(controllers[1].BindPoint.Controller.ControllerType == typeof(littleController5), "Wrong order, problems with littleController5");
-            Assert.That(controllers[2].BindPoint.Controller.ControllerType == typeof(littleController4), "Wrong order, problems with littleController4");
-            Assert.That(controllers[3].BindPoint.Controller.ControllerType == typeof(ReturnTypesController), "Wrong order, problems with ReturnTypesController");
+            Assert.That(controllers[0].BindPoint.Controller.ControllerTypeName == typeof(littleController3).FullName, "Wrong order, problems with littleController3");
+            Assert.That(controllers[1].BindPoint.Controller.ControllerTypeName == typeof(littleController5).FullName, "Wrong order, problems with littleController5");
+            Assert.That(controllers[2].BindPoint.Controller.ControllerTypeName == typeof(littleController4).FullName, "Wrong order, problems with littleController4");
+            Assert.That(controllers[3].BindPoint.Controller.ControllerTypeName == typeof(ReturnTypesController).FullName, "Wrong order, problems with ReturnTypesController");
         }
 
         //This test checks that rather complicated graph of controllers will be invoked in correct order
@@ -116,7 +116,7 @@ namespace Bistro.UnitTests
             List<string> ctrs = new List<string>();
             foreach (ControllerInvocationInfo ctr in controllers)
             {
-                 ctrs.Add(ctr.BindPoint.Controller.ControllerType.ToString().Substring(32));
+                 ctrs.Add(ctr.BindPoint.Controller.ControllerTypeName.Substring(32));
             }
             int i=0;
             string controllerSequence = "";

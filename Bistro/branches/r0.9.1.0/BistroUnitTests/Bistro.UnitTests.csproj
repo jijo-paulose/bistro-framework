@@ -59,9 +59,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ControllerDispatcher.cs" />
-    <Compile Include="Controllers.cs" />
-    <Compile Include="TestingHandler.cs" />
+    <Compile Include="Tests\DataPipelineTests.cs" />
+    <Compile Include="Tests\Data\ValidationControllers.cs" />
+    <Compile Include="Tests\DispatchTests.cs" />
+    <Compile Include="Support\TestingBase.cs" />
+    <Compile Include="Tests\RuntimeTests.cs" />
+    <Compile Include="Tests\ValidationTests.cs" />
+    <Compile Include="Tests\Data\DispatchControllers.cs" />
+    <Compile Include="Tests\Data\DataPipelineControllers.cs" />
+    <Compile Include="Support\TestingHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

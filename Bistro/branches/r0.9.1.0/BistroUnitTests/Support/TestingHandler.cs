@@ -8,7 +8,7 @@ using System.IO;
 using Bistro.Controllers;
 using System.Collections.Specialized;
 
-namespace Bistro.UnitTests
+namespace Bistro.UnitTests.Support
 {
     /// <summary>
     /// HTTP session mockup.
@@ -58,6 +58,10 @@ namespace Bistro.UnitTests
         public override void Clear() { objects.Clear(); }
     }
 
+    /// <summary>
+    /// Implementation of http module capable of processing a bistro request without loading
+    /// the ASP.NET runtime.
+    /// </summary>
     public class TestingHandler: Bistro.Http.Module
     {
         private readonly HttpSessionMock sessionMock = new HttpSessionMock();
@@ -67,6 +71,9 @@ namespace Bistro.UnitTests
         protected readonly Mock<HttpContextBase> Context = new Mock<HttpContextBase>();
         //protected readonly Mock<HttpSessionStateBase> Session = new Mock<HttpSessionStateBase>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestingHandler"/> class.
+        /// </summary>
         public TestingHandler()
             : base()
         {
@@ -79,6 +86,11 @@ namespace Bistro.UnitTests
             LoadFactories(null);
         }
 
+        /// <summary>
+        /// Retrieves the string response of executing the given url
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
         public virtual string RunForTest(string path)
         {
             var httpContext = Context.Object;
@@ -91,6 +103,11 @@ namespace Bistro.UnitTests
             return new StreamReader(stream).ReadToEnd();
         }
 
+        /// <summary>
+        /// Gets all contents as it would be at the end of chain execution. The session values are available
+        /// under <c>"session"</c>, and the request contens is available under <c>"request"</c>
+        /// </summary>
+        /// <value>All contents.</value>
         public virtual Dictionary<string, Dictionary<string, object>> AllContents
         {
             get

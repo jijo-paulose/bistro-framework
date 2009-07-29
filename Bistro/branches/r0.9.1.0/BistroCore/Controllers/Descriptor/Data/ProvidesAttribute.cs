@@ -28,19 +28,28 @@ namespace Bistro.Controllers.Descriptor.Data
     /// <summary>
     /// Marks the controller as a supplier of the marked value onto the context
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public class ProvidesAttribute : Attribute, IDataFieldMarker
     {
         /// <summary>
         /// Gets or sets the element.
         /// </summary>
         /// <value>The element.</value>
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProvidesAttribute"/> class.
         /// </summary>
         /// <param name="element">The element.</param>
         public ProvidesAttribute() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProvidesAttribute"/> class.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        public ProvidesAttribute(string name)
+        {
+            Name = name;
+        }
     }
 }

@@ -12,45 +12,13 @@ using Bistro.Controllers.OutputHandling;
 using Bistro.Configuration.Logging;
 using Bistro.Configuration;
 using Bistro.Validation;
+using Bistro.UnitTests.Support;
 
-namespace Bistro.UnitTests
+namespace Bistro.UnitTests.Tests
 {
     [TestFixture]
-    public class ControllerDispatcherTest
+    public class DispatchTests: TestingBase
     {
-        [TestFixtureSetUp]
-        public void Init()
-        {
-            if (Application.Instance == null)
-            {
-                Application.Initialize(new SectionHandler());
-                application = Application.Instance;
-                manager = application.ManagerFactory.GetManagerInstance();
-                dispatcher = application.DispatcherFactory.GetDispatcherInstance();
-                handler = new TestingHandler();
-            }
-        }
-
-        [TestFixtureTearDown]
-        public void Cleanup() { }
-
-        private IControllerDispatcher dispatcher;
-        private Application application;
-        private IControllerManager manager;
-        private TestingHandler handler;
-
-        [Test]
-        public void ApplicationCreated()
-        {
-            Assert.IsNotNull(Application.Instance, "Application not created.");
-        }
-
-        [Test]
-        public void DispatcherCreated()
-        {
-            Assert.IsNotNull(dispatcher);
-        }
-
         [Test]
         public void HomeURL()
         {
@@ -136,105 +104,6 @@ namespace Bistro.UnitTests
                 i++;
             }
             Assert.That(controllerSequence == "521436", "Controllers will be invoked in wrong order (" + controllerSequence + " instead of \"521436\"), causing chaos, panic and destruction");
-        }
-
-        [Test]
-        public void PassedValidation()
-        {
-            var resp = handler.RunForTest("GET/validationTest/ab");
-            var contexts = handler.AllContents;
-
-            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
-
-            Assert.That(messages.Count == 0, String.Format("The list of messages has {0} elements instead of 0", messages.Count));
-        }
-
-        [Test]
-        public void RequiredFieldValidation()
-        {
-            var resp = handler.RunForTest("GET/validationTest");
-            var contexts = handler.AllContents;
-
-            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
-
-            Assert.That(messages != null, "The list of messages is missing");
-            Assert.That(messages.Count == 1, String.Format("The list of messages has {0} elements instead of 1", messages.Count));
-            Assert.AreEqual(messages[0].Message, "someField is required");
-        }
-
-        private bool containsValidation(string message, List<IValidationResult> messages)
-        {
-            foreach (IValidationResult res in messages)
-                if (message.Equals(res.Message))
-                    return true;
-
-            return false;
-        }
-
-        [Test]
-        public void FieldLengthFailsValidation()
-        {
-            var resp = handler.RunForTest("GET/validationTest/a");
-            var contexts = handler.AllContents;
-
-            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
-
-            Assert.That(containsValidation("someField must be at least two characters in length", messages), "Field length validation didn't fire");
-        }
-
-        [Test]
-        public void FieldLengthPassesValidation()
-        {
-            var resp = handler.RunForTest("GET/validationTest/ab");
-            var contexts = handler.AllContents;
-
-            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
-
-            Assert.That(!containsValidation("someField must be at least two characters in length", messages), "Field length shouldn't have fired");
-        }
-
-        [Test]
-        public void RegexFailsValidation()
-        {
-            var resp = handler.RunForTest("GET/validationTest/de");
-            var contexts = handler.AllContents;
-
-            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
-
-            Assert.That(containsValidation("someField must be 'ab'", messages), "Regex validation didn't fire");
-        }
-
-        [Test]
-        public void RegexPassesValidation()
-        {
-            var resp = handler.RunForTest("GET/validationTest/ab");
-            var contexts = handler.AllContents;
-
-            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
-
-            Assert.That(!containsValidation("someField must be 'ab'", messages), "Regex shouldn't have fired");
-        }
-
-        [Test]
-        public void RangeValidationFailsValidation()
-        {
-            var resp = handler.RunForTest("GET/validationTest/123");
-            var contexts = handler.AllContents;
-
-            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
-
-            Assert.That(containsValidation("someField must be alpha", messages), "Range validation didn't fire");
-        }
-
-        [Test]
-        public void RangeValidationPassesValidation()
-        {
-            var resp = handler.RunForTest("GET/validationTest/ab");
-            var contexts = handler.AllContents;
-
-            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
-
-            Assert.That(!containsValidation("someField must be alpha", messages), "Range validation shouldn't have fired");
         }
     }
 }

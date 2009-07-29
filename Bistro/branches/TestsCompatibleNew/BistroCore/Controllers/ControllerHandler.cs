@@ -28,6 +28,7 @@ using System.Web;
 using System.Collections;
 using Bistro.Controllers.Descriptor;
 using Bistro.Configuration.Logging;
+using Bistro.Special.Reflection;
 
 namespace Bistro.Controllers
 {
@@ -52,7 +53,7 @@ namespace Bistro.Controllers
 		/// <summary>
 		/// A list of all fields modified by the system
 		/// </summary>
-		List<MemberInfo> manipulatedFields = new List<MemberInfo>();
+		List<IMemberInfo> manipulatedFields = new List<IMemberInfo>();
 
         /// <summary>
         /// Empty object array for no-parameter method signatures
@@ -78,7 +79,7 @@ namespace Bistro.Controllers
 			this.descriptor = descriptor;
             this.logger = logger;
 
-            controllerConstructor = ((Type)descriptor.ControllerType).GetConstructor(Type.EmptyTypes);
+            controllerConstructor = descriptor.ControllerType.GetConstructor(Type.EmptyTypes);
 
 			foreach (ControllerDescriptor.BindPointDescriptor bindPoint in descriptor.Targets)
 				manipulatedFields.AddRange(bindPoint.ParameterFields.Values);
@@ -98,8 +99,13 @@ namespace Bistro.Controllers
 		/// <returns></returns>
 		public virtual IController GetControllerInstance(ControllerInvocationInfo info, HttpContextBase context, IContext requestContext)
 		{
+            if (controllerConstructor == null)
+                return null;
 			IController instance = controllerConstructor.Invoke(EmptyParams) as IController;
+#warning GlobalHandle is set here!
+            instance.GlobalHandle = info.BindPoint.Controller.ControllerType;
 			instance.Initialize();
+            
 
 			// the order here matters. we may have something that's both a session field
 			// and a request field. want to make sure that it gets set in a consistent fashion
@@ -174,41 +180,54 @@ namespace Bistro.Controllers
 
 			controller.Recycle();
 
-			foreach (MemberInfo info in manipulatedFields)
+			foreach (IMemberInfo info in manipulatedFields)
 				SetValue(controller, info, null);
 		}
 
-		protected void SetFileValue(object instance, MemberInfo member, HttpPostedFileBase file) 
+		protected void SetFileValue(object instance, IMemberInfo member, HttpPostedFileBase file) 
 		{
-			PropertyInfo pInfo = member as PropertyInfo;
-			if (pInfo == null) {
-				FieldInfo fInfo = (FieldInfo)member;
-				if (file == null || string.IsNullOrEmpty(file.FileName))
-					fInfo.SetValue(instance, null);
-				else if (fInfo.FieldType == typeof(HttpPostedFile))
-					fInfo.SetValue(instance, file);
-				else if (fInfo.FieldType == typeof(String))
-					fInfo.SetValue(instance, ReadFileText(file));
-				else if (fInfo.FieldType == typeof(Stream))
-					fInfo.SetValue(instance, file.InputStream);
-				else if (fInfo.FieldType == typeof(byte[]))
-					fInfo.SetValue(instance, ReadFileBytes(file));
-				else
-					throw new ApplicationException(Messages.InvalidFormFieldFileType.ToString());
-			}
-			else
-				if (file == null || string.IsNullOrEmpty(file.FileName))
-					pInfo.SetValue(instance, null, null);
-				else if (pInfo.PropertyType == typeof(HttpPostedFile))
-					pInfo.SetValue(instance, file, null);
-				else if (pInfo.PropertyType == typeof(String))
-					pInfo.SetValue(instance, ReadFileText(file), null);
-				else if (pInfo.PropertyType == typeof(Stream))
-					pInfo.SetValue(instance, file.InputStream, null);
-				else if (pInfo.PropertyType == typeof(byte[]))
-					pInfo.SetValue(instance, ReadFileBytes(file), null);
-				else
-					throw new ApplicationException(Messages.InvalidFormFieldFileType.ToString());
+                if (file == null || string.IsNullOrEmpty(file.FileName))
+                    member.SetValue(instance, null);
+                else if (member.Type == typeof(HttpPostedFile).FullName)
+                    member.SetValue(instance, file);
+                else if (member.Type == typeof(String).FullName)
+                    member.SetValue(instance, ReadFileText(file));
+                else if (member.Type == typeof(Stream).FullName)
+                    member.SetValue(instance, file.InputStream);
+                else if (member.Type == typeof(byte[]).FullName)
+                    member.SetValue(instance, ReadFileBytes(file));
+                else
+                    throw new ApplicationException(Messages.InvalidFormFieldFileType.ToString());
+
+            //PropertyInfo pInfo = member as PropertyInfo;
+            //if (pInfo == null) {
+            //    FieldInfo fInfo = (FieldInfo)member;
+            //    if (file == null || string.IsNullOrEmpty(file.FileName))
+            //        fInfo.SetValue(instance, null);
+            //    else if (fInfo.FieldType == typeof(HttpPostedFile))
+            //        fInfo.SetValue(instance, file);
+            //    else if (fInfo.FieldType == typeof(String))
+            //        fInfo.SetValue(instance, ReadFileText(file));
+            //    else if (fInfo.FieldType == typeof(Stream))
+            //        fInfo.SetValue(instance, file.InputStream);
+            //    else if (fInfo.FieldType == typeof(byte[]))
+            //        fInfo.SetValue(instance, ReadFileBytes(file));
+            //    else
+            //        throw new ApplicationException(Messages.InvalidFormFieldFileType.ToString());
+            //}
+            //else
+            //    if (file == null || string.IsNullOrEmpty(file.FileName))
+            //        pInfo.SetValue(instance, null, null);
+            //    else if (pInfo.PropertyType == typeof(HttpPostedFile))
+            //        pInfo.SetValue(instance, file, null);
+            //    else if (pInfo.PropertyType == typeof(String))
+            //        pInfo.SetValue(instance, ReadFileText(file), null);
+            //    else if (pInfo.PropertyType == typeof(Stream))
+            //        pInfo.SetValue(instance, file.InputStream, null);
+            //    else if (pInfo.PropertyType == typeof(byte[]))
+            //        pInfo.SetValue(instance, ReadFileBytes(file), null);
+            //    else
+            //        throw new ApplicationException(Messages.InvalidFormFieldFileType.ToString());
 		}
 		byte[] ReadFileBytes(HttpPostedFileBase file) {
 			byte[] bytes = new byte[file.ContentLength];
@@ -228,7 +247,7 @@ namespace Bistro.Controllers
 		/// <param name="instance">The instance.</param>
 		/// <param name="member">The member.</param>
 		/// <param name="value">The value.</param>
-		protected void SetValue(object instance, MemberInfo member, object value)
+		protected void SetValue(object instance, IMemberInfo member, object value)
 		{
             // potentially valid - bind parameter with no corresponding field
             if (member == null)
@@ -236,22 +255,23 @@ namespace Bistro.Controllers
 
             try
             {
-                PropertyInfo pInfo = member as PropertyInfo;
-                if (pInfo == null)
-                {
-                    FieldInfo fInfo = (FieldInfo)member;
-                    fInfo.SetValue(instance, value == null ? null : Coerce(value, fInfo.FieldType));
-                }
-                else
-                {
-                    if (pInfo.CanWrite)
-                        pInfo.SetValue(instance, value == null ? null : Coerce(value, pInfo.PropertyType), null);
-                }
+                //PropertyInfo pInfo = member as PropertyInfo;
+                //if (pInfo == null)
+                //{
+                //    FieldInfo fInfo = (FieldInfo)member;
+                //    fInfo.SetValue(instance, value == null ? null : Coerce(value, fInfo.FieldType));
+                //}
+                //else
+                //{
+                //    if (pInfo.CanWrite)
+                //        pInfo.SetValue(instance, value == null ? null : Coerce(value, pInfo.PropertyType), null);
+                //}
+                member.SetValue(instance, value == null ? null : Coerce(value, member));
             }
             catch (Exception ex)
             {
                 // we should never crash here. handle it and move on.
-                logger.Report(Messages.UnableToSetValue, member.DeclaringType.Name, member.Name, Convert.ToString(value), ex.Message);
+                logger.Report(Messages.UnableToSetValue, member.Type, member.Name, Convert.ToString(value), ex.Message);
             }
 		}
 
@@ -260,14 +280,18 @@ namespace Bistro.Controllers
         /// Otherwise, an attempt is made to invoke Convert.ChangeType().
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <param name="type">The type.</param>
+        /// <param name="member">IMember</param>
         /// <returns></returns>
-        private object Coerce(object value, Type type)
-        {
-            if (type.IsAssignableFrom(value.GetType()))
-                return value;
+        //private object Coerce(object value, Type type)
+        //{
+        //    if (type.IsAssignableFrom(value.GetType()))
+        //        return value;
 
-            return Convert.ChangeType(value, type);
+        //    return Convert.ChangeType(value, type);
+        //}
+        private object Coerce(object value, IMemberInfo member)
+        {
+            return member.Coerce(value);
         }
 
 		/// <summary>
@@ -276,21 +300,10 @@ namespace Bistro.Controllers
 		/// <param name="instance">The instance.</param>
 		/// <param name="member">The member.</param>
 		/// <returns></returns>
-		protected object GetValue(object instance, MemberInfo member)
+		protected object GetValue(object instance, IMemberInfo member)
 		{
-			PropertyInfo pInfo = member as PropertyInfo;
-            if (pInfo == null)
-            {
-                FieldInfo fInfo = (FieldInfo)member;
-                return fInfo.GetValue(instance);
-            }
-            else
-            {
-                if (!pInfo.CanRead)
-                    return null;
-                else
-                    return pInfo.GetValue(instance, null);
-            }
+            return member.GetValue(instance);
+
 		}
 	}
 }

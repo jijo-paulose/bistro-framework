@@ -198,8 +198,8 @@ namespace Bistro.Controllers
         public IController GetController(ControllerInvocationInfo invocation, HttpContextBase context, IContext requestContext)
         {
 #warning - handlers disabled here. Returning null instead;
-            return null;
-//            return handlers[invocation.BindPoint.Controller.ControllerType].GetControllerInstance(invocation, context, requestContext);
+//            return null;
+            return handlers[invocation.BindPoint.Controller.ControllerType].GetControllerInstance(invocation, context, requestContext);
         }
 
         /// <summary>
@@ -208,8 +208,8 @@ namespace Bistro.Controllers
         /// <param name="controller">The controller.</param>
         public void ReturnController(IController controller, HttpContextBase context, IContext requestContext)
         {
-#warning - handlers disabled here. Returning null instead;
-//            handlers[controller.GlobalHandle].ReturnController(controller, context, requestContext);
+//#warning - handlers disabled here. Returning null instead;
+            handlers[controller.GlobalHandle].ReturnController(controller, context, requestContext);
         }
 
         /// <summary>

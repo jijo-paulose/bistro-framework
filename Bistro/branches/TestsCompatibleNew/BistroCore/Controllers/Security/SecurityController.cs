@@ -26,6 +26,7 @@ using System.Threading;
 using System.Security;
 using System.Web;
 using System.Reflection;
+using Bistro.Special.Reflection;
 
 namespace Bistro.Controllers.Security
 {
@@ -135,6 +136,8 @@ namespace Bistro.Controllers.Security
         /// the controller class.
         /// </summary>
         /// <returns></returns>
-        public MemberInfo GlobalHandle { get { return GetType(); } }
+//        public MemberInfo GlobalHandle { get { return GetType(); } }
+        public ITypeInfo GlobalHandle { get; set; }
+
     }
 }

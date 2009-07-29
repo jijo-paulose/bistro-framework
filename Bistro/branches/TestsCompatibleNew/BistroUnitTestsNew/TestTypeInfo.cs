@@ -86,6 +86,26 @@ namespace Bistro.UnitTestsNew
             }
 
             #endregion
+
+            #region IMemberInfo Members
+
+
+            public object Coerce(object value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetValue(object instance, object value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object GetValue(object instance)
+            {
+                throw new NotImplementedException();
+            }
+
+            #endregion
         }
 
         public class TestPropertyInfo : IPropertyInfo
@@ -124,6 +144,26 @@ namespace Bistro.UnitTestsNew
             public string Type
             {
                 get { return type; }
+            }
+
+            #endregion
+
+            #region IMemberInfo Members
+
+
+            public object Coerce(object value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetValue(object instance, object value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object GetValue(object instance)
+            {
+                throw new NotImplementedException();
             }
 
             #endregion
@@ -259,6 +299,16 @@ namespace Bistro.UnitTestsNew
         public IEnumerable<IPropertyInfo> Properties
         {
             get { return new EnumProxy<TestPropertyInfo, IPropertyInfo>(properties); }
+        }
+
+        #endregion
+
+        #region ITypeInfo Members
+
+
+        public ConstructorInfo GetConstructor(Type[] types)
+        {
+            return null;
         }
 
         #endregion

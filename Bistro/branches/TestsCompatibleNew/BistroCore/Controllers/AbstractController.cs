@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using System.Reflection;
+using Bistro.Special.Reflection;
 
 namespace Bistro.Controllers
 {
@@ -77,6 +78,6 @@ namespace Bistro.Controllers
         /// the controller class.
         /// </summary>
         /// <returns></returns>
-        public MemberInfo GlobalHandle { get { return GetType(); } }
+        public ITypeInfo GlobalHandle { get; set; }
     }
 }

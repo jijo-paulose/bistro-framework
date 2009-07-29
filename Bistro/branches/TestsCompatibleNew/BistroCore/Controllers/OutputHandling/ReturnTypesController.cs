@@ -27,6 +27,7 @@ using System.Web;
 using System.Xml;
 using System.IO;
 using Bistro.Controllers.Descriptor;
+using Bistro.Special.Reflection;
 
 namespace Bistro.Controllers.OutputHandling
 {
@@ -144,9 +145,10 @@ namespace Bistro.Controllers.OutputHandling
         /// </summary>
         /// <value></value>
         /// <returns></returns>
-        public System.Reflection.MemberInfo GlobalHandle
-        {
-            get { return GetType(); }
-        }
+        //public System.Reflection.MemberInfo GlobalHandle
+        //{
+        //    get { return GetType(); }
+        //}
+        public ITypeInfo GlobalHandle { get; set; }
     }
 }

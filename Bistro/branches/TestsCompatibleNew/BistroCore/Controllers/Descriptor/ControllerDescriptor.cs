@@ -599,7 +599,6 @@ namespace Bistro.Controllers.Descriptor
                 {
                     try
                     {
-#warning Check this and write a test!!!
                         Func<IAttributeInfo, IMemberInfo, string> getName = (attr, membr) => { return (attr.Parameters["Name"].AsString()) ?? membr.Name; };
                         
                         // all fields that are not marked as required or depends-on are defaulted to "provided"

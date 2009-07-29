@@ -58,6 +58,9 @@
     <Compile Include="Configuration\Logging\SeverityLevelAttribute.cs" />
     <Compile Include="Configuration\SectionHandler.cs" />
     <Compile Include="Controllers\AbstractController.cs" />
+    <Compile Include="Controllers\ControllerHandler.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Controllers\ControllerInvocationInfo.cs" />
     <Compile Include="Controllers\ControllerManagerFactory.cs" />
     <Compile Include="Controllers\Descriptor\ControllerDescriptor.cs" />

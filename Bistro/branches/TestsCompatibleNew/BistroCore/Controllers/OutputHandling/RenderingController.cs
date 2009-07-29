@@ -27,6 +27,7 @@ using System.Web;
 
 using Bistro.Controllers.Descriptor;
 using System.Reflection;
+using Bistro.Special.Reflection;
 
 namespace Bistro.Controllers.OutputHandling
 {
@@ -92,7 +93,8 @@ namespace Bistro.Controllers.OutputHandling
         /// <value><c>true</c> if stateful; otherwise, <c>false</c>.</value>
         public bool Stateful { get { return false; } }
 
-        public MemberInfo GlobalHandle { get { return GetType(); } }
+//        public MemberInfo GlobalHandle { get { return GetType(); } }
+        public ITypeInfo GlobalHandle { get; set; }
 
     }
 }

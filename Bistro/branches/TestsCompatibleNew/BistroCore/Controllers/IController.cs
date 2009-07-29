@@ -66,6 +66,6 @@ namespace Bistro.Controllers
         /// the controller class.
         /// </summary>
         /// <returns></returns>
-        MemberInfo GlobalHandle { get; }
+        ITypeInfo GlobalHandle { get; set; }
     }
 }

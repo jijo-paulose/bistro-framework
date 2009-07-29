@@ -51,9 +51,9 @@ namespace Bistro.Controllers
         /// <returns></returns>
         public IControllerHandler CreateControllerHandler(ControllerDescriptor descriptor)
         {
-#warning Trying to remove ControllerHandler
-//            return new ControllerHandler(descriptor, application.LoggerFactory.GetLogger(typeof(ControllerHandler)));
-            return null;
+//#warning Trying to remove ControllerHandler
+            return new ControllerHandler(descriptor, application.LoggerFactory.GetLogger(typeof(ControllerHandler)));
+//            return null;
         }
     }
 }

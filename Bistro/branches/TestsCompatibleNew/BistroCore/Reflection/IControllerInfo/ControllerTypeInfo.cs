@@ -235,6 +235,14 @@ namespace Bistro.Reflection.IControllerInfo
             return systemType.GetConstructor(types);
         }
 
+        public ITypeInfo GetInterface(string name)
+        {
+            Type retInterface = systemType.GetInterface(name);
+            if (retInterface != null)
+                return new ControllerTypeInfo(retInterface);
+            return null;
+        }
+
         #endregion
 
         #region IHasAttributes Members

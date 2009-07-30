@@ -146,7 +146,11 @@ namespace Bistro.Controllers.Dispatch
 
             int i = 0;
             while (i < controllers.Count)
-                if (typeof(ISecurityController).IsAssignableFrom(controllers[i].BindPoint.Controller.ControllerType as Type))
+
+                
+                
+//                if (typeof(ISecurityController).IsAssignableFrom(controllers[i].BindPoint.Controller.ControllerType as Type))
+                if (controllers[i].BindPoint.Controller.ControllerType.GetInterface(typeof(ISecurityController).FullName)!=null)
                 {
                     securityControllers.Add(controllers[i]);
                     controllers.RemoveAt(i);

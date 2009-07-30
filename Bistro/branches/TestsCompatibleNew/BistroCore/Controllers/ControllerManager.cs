@@ -129,7 +129,7 @@ namespace Bistro.Controllers
             try
             {
                 foreach (Type t in assm.GetTypes())
-                    if (t.GetInterface(typeof(IController).Name) != null)
+                    if (t.GetInterface(typeof(IController).FullName) != null)
                         LoadType(new ControllerTypeInfo(t));
             }
             catch (ReflectionTypeLoadException ex)
@@ -197,8 +197,6 @@ namespace Bistro.Controllers
         /// <returns></returns>
         public IController GetController(ControllerInvocationInfo invocation, HttpContextBase context, IContext requestContext)
         {
-#warning - handlers disabled here. Returning null instead;
-//            return null;
             return handlers[invocation.BindPoint.Controller.ControllerType].GetControllerInstance(invocation, context, requestContext);
         }
 
@@ -208,7 +206,6 @@ namespace Bistro.Controllers
         /// <param name="controller">The controller.</param>
         public void ReturnController(IController controller, HttpContextBase context, IContext requestContext)
         {
-//#warning - handlers disabled here. Returning null instead;
             handlers[controller.GlobalHandle].ReturnController(controller, context, requestContext);
         }
 

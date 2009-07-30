@@ -247,41 +247,6 @@ namespace Bistro.Controllers.Descriptor
                             // if not found, still add it, maybe someone can make use of it later.
                             ParameterFields.Add(tokenName, null);
                     }
-//                        string tokenName = token.Substring(1, token.Length - 2);
-//                        if (type != null)
-//                        {
-//                            var firstMember = type.Fields.OfType<IMemberInfo>().Union(type.Properties.OfType<IMemberInfo>()).FirstOrDefault(member => { return member.Name == tokenName; });
-                            
-//                                //type.GetMember(
-//                                //    tokenName,
-//                                //    MemberTypes.Property | MemberTypes.Field,
-//                                //    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-//                            ParameterFields.Add(tokenName, firstMember);
-
-//                            //if (members.Length >= 1)
-//                            //    ParameterFields.Add(tokenName, members[0]);
-//                            //else
-//                            //{
-//                            //    // F# members are mangled by appending an @ followed by an address
-//                            //    var mangledToken = tokenName + '@';
-//                            //    foreach (MemberInfo member in
-//                            //        type.GetMembers(
-//                            //            BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
-//                            //    {
-//                            //        if (member.Name.StartsWith(mangledToken))
-//                            //        {
-//                            //            ParameterFields.Add(tokenName, member);
-//                            //            break;
-//                            //        }
-//                            //    }
-
-//                            //}
-//                        }
-//                        else
-//                            // if not found, still add it, maybe someone can make use of it later.
-//#warning Pay attention during debugging - when ControllerType is null?
-//                            ParameterFields.Add(tokenName, null);
-//                    }
                 }
             }
         }
@@ -371,7 +336,6 @@ namespace Bistro.Controllers.Descriptor
         /// <summary>
         /// The controller type
         /// </summary>
-//        public MemberInfo ControllerType { get; private set; }
         public ITypeInfo ControllerType { get; private set; }
 
 
@@ -380,7 +344,6 @@ namespace Bistro.Controllers.Descriptor
         /// </summary>
         /// <value>The name of the controller type.</value>
         #warning What to do with ControllerType.Name?
-//        public string ControllerTypeName { get { var tp = ControllerType as Type; if (tp == null) return ControllerType.Name; else return tp.FullName; } }
         public string ControllerTypeName { get { return ControllerType.FullName; } }
 
         /// <summary>
@@ -469,19 +432,8 @@ namespace Bistro.Controllers.Descriptor
         /// <param name="inherit">if set to <c>true</c> [inherit].</param>
         /// <param name="nonEmpty">The statement to invoke on the elements of a non-empty result set.</param>
         /// <param name="empty">The statement to invoke on an empty result set.</param>
-        //static private void IterateAttributes<T>(ITypeInfo targetType, bool inherit, Action<T> nonEmpty, Action empty)
-        //{
-        //    T[] attribs = targetType.GetCustomAttributes(typeof(T), inherit) as T[];
-
-        //    if (attribs.Length > 0)
-        //        foreach (T attribute in attribs)
-        //            nonEmpty(attribute);
-        //    else if (empty != null)
-        //        empty();
-        //}
         static private void IterateAttributes<T>(IHasAttributes targetType, bool inherit, Action<IAttributeInfo> nonEmpty, Action empty)
         {
-//            var filteredAttrs = targetType.Attributes.Where(attrInfo => {return attrInfo.Type == typeof(T).FullName; });
             IEnumerable<IAttributeInfo> attribs = targetType.GetCustomAttributes(typeof(T), inherit);
             bool isEmpty = true;
             foreach(IAttributeInfo attribute in attribs)
@@ -507,7 +459,6 @@ namespace Bistro.Controllers.Descriptor
         static private bool IsMarked(IHasAttributes targetType, Type markerAttribute, bool inherit)
         {
             return targetType.GetCustomAttributes(markerAttribute, inherit).Count() > 0;
-//            return targetType.Attributes.Any(attrInfo => { return attrInfo.Type == markerAttribute; });
         }
 
         /// <summary>
@@ -521,75 +472,13 @@ namespace Bistro.Controllers.Descriptor
             foreach (IMemberInfo info in targetClass.GetMembers(flags))
                 nonEmpty(info);
         }
-        //static private void IterateMembers(ITypeInfo targetClass, Action<IMemberInfo> nonEmpty)
-        //{
-        //    foreach (IMemberInfo info in targetClass.Properties)
-        //        nonEmpty(info);
-        //    foreach (IMemberInfo info in targetClass.Fields)
-        //        nonEmpty(info);
-        //}
-
 
         /// <summary>
         /// Populates the descriptor. This method will load all available data off of the 
         /// metadata placed onto the given controller type.
         /// </summary>
-        /// <param name="t">The t.</param>
-//        public void PopulateDescriptor()
-//        {
-////            var type = ControllerType as Type;
-//            ITypeInfo type = ControllerType;
-//            if (type == null)
-//                throw new ApplicationException("This method should not be called for non-class controllers.");
-
-//                IterateMembers(type, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-//                    (member) =>
-//                    {
-//                        try
-//                        {
-//                            // all fields that are not marked as required or depends-on are defaulted to "provided"
-//                            if ((!IsMarked(member, typeof(RequiresAttribute), true) &&
-//                                !IsMarked(member, typeof(DependsOnAttribute), true)) &&
-//                                (IsMarked(member, typeof(SessionAttribute), true) ||
-//                                IsMarked(member, typeof(RequestAttribute), true)))
-//                                Provides.Add(member.Name);
-
-//                            IterateAttributes<DependsOnAttribute>(member, true,
-//                                (attribute) => { DependsOn.Add(attribute.Name ?? member.Name); }, null);
-
-//                            IterateAttributes<RequiresAttribute>(member, true,
-//                                (attribute) => { Requires.Add(attribute.Name ?? member.Name); }, null);
-
-//                            IterateAttributes<ProvidesAttribute>(member, true,
-//                                (attribute) => { var name = attribute.Name ?? member.Name; if (!Provides.Contains(name)) Provides.Add(name); }, null);
-
-//                            IterateAttributes<CookieFieldAttribute>(member, true,
-//                                (attribute) => { CookieFields.Add(attribute.Name ?? member.Name, new CookieFieldDescriptor(member, attribute.Outbound)); }, null);
-
-//                            IterateAttributes<FormFieldAttribute>(member, true,
-//                                (attribute) => { FormFields.Add(attribute.Name ?? member.Name, member); }, null);
-
-//                            IterateAttributes<RequestAttribute>(member, true,
-//                                (attribute) => { RequestFields.Add(attribute.Name ?? member.Name, member); }, null);
-
-//                            IterateAttributes<SessionAttribute>(member, true,
-//                                (attribute) => { SessionFields.Add(attribute.Name ?? member.Name, member); }, null);
-//                        }
-//                        catch (ArgumentException ex)
-//                        {
-//                            logger.Report(Exceptions.DuplicateField, type.Name, member.Name);
-
-//                            throw ex;
-//                        }
-//                    });
-
-//            SetDefaultResourceScope(Provides, "Provided");
-//            SetDefaultResourceScope(DependsOn, "Optional");
-//            SetDefaultResourceScope(Requires, "Required");
-//        }
         public void PopulateDescriptor()
         {
-            //            var type = ControllerType as Type;
             ITypeInfo typeInfo = ControllerType;
             if (typeInfo == null)
                 throw new ApplicationException("This method should not be called for non-class controllers.");
@@ -648,24 +537,6 @@ namespace Bistro.Controllers.Descriptor
         /// <summary>
         /// Sets the default resource scope for resources without one
         /// </summary>
-        //private void SetDefaultResourceScope(List<string> resourceList, string resourceType)
-        //{
-        //    foreach (string resource in resourceList)
-        //        if (!RequestFields.ContainsKey(resource) &&
-        //            !SessionFields.ContainsKey(resource) &&
-        //            !FormFields.ContainsKey(resource) &&
-        //            !CookieFields.ContainsKey(resource))
-        //        {
-        //            MemberInfo[] member = ((Type)ControllerType).GetMember(resource, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-        //            // it's an aliased field, nothing to do here.
-        //            if (member == null || member.Length != 1)
-        //                continue;
-
-        //            logger.Report(Messages.UnspecifiedScope, resourceType, ControllerTypeName, resource);
-        //            RequestFields.Add(resource, member[0]);
-        //        }
-        //}
         private void SetDefaultResourceScope(List<string> resourceList, string resourceType)
         {
             foreach (string resource in resourceList)
@@ -688,7 +559,7 @@ namespace Bistro.Controllers.Descriptor
         /// <summary>
         /// Creates the descriptor.
         /// </summary>
-        /// <param name="t">The t.</param>
+        /// <param name="t">The ITypeInfo to create descriptor from</param>
         /// <returns></returns>
         public static ControllerDescriptor CreateDescriptor(ITypeInfo t, ILogger logger)
         {

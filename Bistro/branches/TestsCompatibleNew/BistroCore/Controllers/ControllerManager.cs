@@ -130,7 +130,7 @@ namespace Bistro.Controllers
             {
                 foreach (Type t in assm.GetTypes())
                     if (t.GetInterface(typeof(IController).FullName) != null)
-                        LoadType(new ControllerTypeInfo(t));
+                        LoadType(new CLRTypeInfo(t));
             }
             catch (ReflectionTypeLoadException ex)
             {

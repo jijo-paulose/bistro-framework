@@ -10,9 +10,9 @@ namespace Bistro.Reflection.IControllerInfo
 {
 
 
-    internal class ControllerTypeInfo : ITypeInfo
+    internal class CLRTypeInfo : ITypeInfo
     {
-        public ControllerTypeInfo(Type controllerType)
+        public CLRTypeInfo(Type controllerType)
         {
             systemType = controllerType;
             attributes = controllerType.GetCustomAttributes(false);
@@ -108,8 +108,6 @@ namespace Bistro.Reflection.IControllerInfo
 
             public string Type
             {
-                // This method must return the same type for Member, Property and Field
-//                get { return systemMember.ReflectedType.FullName; }
                 get
                 {
 
@@ -214,19 +212,16 @@ namespace Bistro.Reflection.IControllerInfo
 
         public IEnumerable<IMemberInfo> GetMember(string name, System.Reflection.BindingFlags bindingAttr)
         {
-//            throw new NotImplementedException();
             return new EnumProxy<MemberInfo, IMemberInfo, ControllerMemberInfo>(systemType.GetMember(name, bindingAttr));
         }
 
         public IEnumerable<IMemberInfo> GetMember(string name, System.Reflection.MemberTypes type, System.Reflection.BindingFlags bindingAttr)
         {
-//            throw new NotImplementedException();
             return new EnumProxy<MemberInfo, IMemberInfo, ControllerMemberInfo>(systemType.GetMember(name, type, bindingAttr));
         }
 
         public IEnumerable<IMemberInfo> GetMembers(System.Reflection.BindingFlags bindingAttr)
         {
-//            throw new NotImplementedException();
             return new EnumProxy<MemberInfo, IMemberInfo, ControllerMemberInfo>(systemType.GetMembers(bindingAttr));
         }
 
@@ -239,7 +234,7 @@ namespace Bistro.Reflection.IControllerInfo
         {
             Type retInterface = systemType.GetInterface(name);
             if (retInterface != null)
-                return new ControllerTypeInfo(retInterface);
+                return new CLRTypeInfo(retInterface);
             return null;
         }
 

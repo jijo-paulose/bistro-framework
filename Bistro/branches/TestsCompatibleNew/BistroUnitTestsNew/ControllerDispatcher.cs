@@ -248,7 +248,7 @@ namespace Bistro.UnitTestsNew
 
             foreach (IAttributeInfo item in list)
             {
-                string url = item.Parameters[0].AsString();
+                string url = item.Properties[0].AsString();
                 string verb = "";
                 foreach (string verbItem in BindPointUtilities.HttpVerbs)
                 {

@@ -72,5 +72,6 @@ namespace Bistro.Special.Reflection
 
         ConstructorInfo GetConstructor(Type[] types);
 
+        ITypeInfo GetInterface(string p);
     }
 }

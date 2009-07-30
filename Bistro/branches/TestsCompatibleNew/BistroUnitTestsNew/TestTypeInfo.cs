@@ -19,16 +19,16 @@ namespace Bistro.UnitTestsNew
             public TestAttributeInfo(Type type)
             {
                 this.type = type.FullName;
-                this.parameters = new ParameterCollection();
+                this.properties = new ParameterCollection();
             }
 
             public TestAttributeInfo(Type type, params Parameter[] parameters)
             {
                 this.type = type.FullName;
-                this.parameters = new ParameterCollection(parameters);
+                this.properties = new ParameterCollection(parameters);
             }
             string type;
-            ParameterCollection parameters;
+            ParameterCollection properties;
 
             #region IAttributeInfo Members
 
@@ -37,9 +37,9 @@ namespace Bistro.UnitTestsNew
                 get { return type; }
             }
 
-            public IAttributeParameters Parameters
+            public IAttributeParameters Properties
             {
-                get { return parameters; }
+                get { return properties; }
             }
 
             #endregion
@@ -301,6 +301,11 @@ namespace Bistro.UnitTestsNew
             get { return new EnumProxy<TestPropertyInfo, IPropertyInfo>(properties); }
         }
 
+        public ITypeInfo GetInterface(string p)
+        {
+            return null;
+        }
+
         #endregion
 
         #region ITypeInfo Members
@@ -312,5 +317,6 @@ namespace Bistro.UnitTestsNew
         }
 
         #endregion
+
     }
 }

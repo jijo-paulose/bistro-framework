@@ -29,9 +29,9 @@ namespace Bistro.Reflection.IControllerInfo
 
         #region SubObjects Interfaces implementation
 
-        internal class ControllerAttributeInfo : IAttributeInfo
+        internal class CLRAttributeInfo : IAttributeInfo
         {
-            public ControllerAttributeInfo(object attrObj)
+            public CLRAttributeInfo(object attrObj)
             {
                 Type ot = attrObj.GetType();
                 type = ot.FullName;
@@ -62,7 +62,7 @@ namespace Bistro.Reflection.IControllerInfo
                 get { return type; }
             }
 
-            public IAttributeParameters Parameters
+            public IAttributeParameters Properties
             {
                 get { return parameters; }
             }
@@ -76,6 +76,18 @@ namespace Bistro.Reflection.IControllerInfo
             public ControllerMemberInfo(MemberInfo memberItem)
             {
                 systemMember = memberItem;
+
+                FieldInfo field = (systemMember as FieldInfo);
+                PropertyInfo property = (systemMember as PropertyInfo);
+                if (field != null)
+                {
+                    systemType = field.FieldType;
+                }
+                else if (property != null)
+                {
+                    systemType = property.PropertyType;
+                }
+
                 attributes = systemMember.GetCustomAttributes(false);
 
             }
@@ -83,6 +95,7 @@ namespace Bistro.Reflection.IControllerInfo
 
             protected object[] attributes;
             protected MemberInfo systemMember;
+            protected Type systemType;
 
             #endregion
 
@@ -96,15 +109,21 @@ namespace Bistro.Reflection.IControllerInfo
             public string Type
             {
                 // This method must return the same type for Member, Property and Field
-                get { return systemMember.ReflectedType.FullName; }
+//                get { return systemMember.ReflectedType.FullName; }
+                get
+                {
+
+                    return systemType.FullName;
+
+                }
             }
 
             public object Coerce(object value)
             {
-                if (systemMember.ReflectedType.IsAssignableFrom(value.GetType()))
+                if (systemType.IsAssignableFrom(value.GetType()))
                     return value;
 
-                return Convert.ChangeType(value, systemMember.ReflectedType);
+                return Convert.ChangeType(value, systemType);
             }
 
             #endregion
@@ -113,12 +132,12 @@ namespace Bistro.Reflection.IControllerInfo
 
             public IEnumerable<IAttributeInfo> Attributes
             {
-                get { return new EnumProxy<object,IAttributeInfo,ControllerAttributeInfo>(attributes); }
+                get { return new EnumProxy<object,IAttributeInfo,CLRAttributeInfo>(attributes); }
             }
 
             public IEnumerable<IAttributeInfo> GetCustomAttributes(Type attributeType, bool inherit)
             {
-                return new EnumProxy<object, IAttributeInfo, ControllerAttributeInfo>(systemMember.GetCustomAttributes(attributeType,inherit));
+                return new EnumProxy<object, IAttributeInfo, CLRAttributeInfo>(systemMember.GetCustomAttributes(attributeType,inherit));
             }
 
             #endregion
@@ -211,31 +230,27 @@ namespace Bistro.Reflection.IControllerInfo
             return new EnumProxy<MemberInfo, IMemberInfo, ControllerMemberInfo>(systemType.GetMembers(bindingAttr));
         }
 
-        #endregion
-
-        #region IHasAttributes Members
-
-        public IEnumerable<IAttributeInfo> Attributes
-        {
-            get { return new EnumProxy<object,IAttributeInfo,ControllerAttributeInfo>(attributes); }
-        }
-
-        public IEnumerable<IAttributeInfo> GetCustomAttributes(Type attributeType, bool inherit)
-        {
-            return new EnumProxy<object, IAttributeInfo, ControllerAttributeInfo>(systemType.GetCustomAttributes(attributeType,inherit));
-        }
-
-        #endregion
-
-        #region ITypeInfo Members
-
-
         public ConstructorInfo GetConstructor(Type[] types)
         {
             return systemType.GetConstructor(types);
         }
 
         #endregion
+
+        #region IHasAttributes Members
+
+        public IEnumerable<IAttributeInfo> Attributes
+        {
+            get { return new EnumProxy<object,IAttributeInfo,CLRAttributeInfo>(attributes); }
+        }
+
+        public IEnumerable<IAttributeInfo> GetCustomAttributes(Type attributeType, bool inherit)
+        {
+            return new EnumProxy<object, IAttributeInfo, CLRAttributeInfo>(systemType.GetCustomAttributes(attributeType,inherit));
+        }
+
+        #endregion
+
     }
 
     #region Proxies

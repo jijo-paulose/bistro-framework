@@ -424,19 +424,19 @@ namespace Bistro.Controllers.Descriptor
 
             // load the renderwith attribute
             IterateAttributes<RenderWithAttribute>(t,false,
-                (attrib) => { DefaultTemplate = attrib.Parameters["RenderWith"].AsString(); }, null);
+                (attrib) => { DefaultTemplate = attrib.Properties["Template"].AsString(); }, null);
 
             // load all of the Bind attributes
             IterateAttributes<BindAttribute>(t, false,
                 (attribute) => 
                     {
-                        BindType bndType = (BindType)(attribute.Parameters["ControllerBindType"].AsEnum());
-                        int priority = (int)(attribute.Parameters["Priority"].AsNInt32());
+                        BindType bndType = (BindType)(attribute.Properties["ControllerBindType"].AsEnum());
+                        int priority = (int)(attribute.Properties["Priority"].AsNInt32());
                             
 
-                        if (BindPointUtilities.IsVerbQualified(attribute.Parameters["Target"].AsString()))
+                        if (BindPointUtilities.IsVerbQualified(attribute.Properties["Target"].AsString()))
                             Targets.Add(new BindPointDescriptor(
-                                            BindPointUtilities.VerbNormalize(attribute.Parameters["Target"].AsString()),
+                                            BindPointUtilities.VerbNormalize(attribute.Properties["Target"].AsString()),
                                                 bndType,
                                                 priority,
                                             this)); 
@@ -444,7 +444,7 @@ namespace Bistro.Controllers.Descriptor
                             // if not verb qualified, make it work for all verbs
                             foreach (string verb in BindPointUtilities.HttpVerbs)
                                 Targets.Add(new BindPointDescriptor(
-                                                BindPointUtilities.Combine(verb, attribute.Parameters["Target"].AsString()),
+                                                BindPointUtilities.Combine(verb, attribute.Properties["Target"].AsString()),
                                                 bndType,
                                                 priority,
                                                 this));
@@ -599,7 +599,7 @@ namespace Bistro.Controllers.Descriptor
                 {
                     try
                     {
-                        Func<IAttributeInfo, IMemberInfo, string> getName = (attr, membr) => { return (attr.Parameters["Name"].AsString()) ?? membr.Name; };
+                        Func<IAttributeInfo, IMemberInfo, string> getName = (attr, membr) => { return (attr.Properties["Name"].AsString()) ?? membr.Name; };
                         
                         // all fields that are not marked as required or depends-on are defaulted to "provided"
                         if ((!IsMarked(member, typeof(RequiresAttribute), true) &&
@@ -618,7 +618,7 @@ namespace Bistro.Controllers.Descriptor
                             (attribute) => { var name = (getName(attribute,member)); if (!Provides.Contains(name)) Provides.Add(name); }, null);
 
                         IterateAttributes<CookieFieldAttribute>(member,true,
-                            (attribute) => { CookieFields.Add(getName(attribute,member), new CookieFieldDescriptor(member, (bool)(attribute.Parameters["Outbound"].AsNBoolean()))); }, null);
+                            (attribute) => { CookieFields.Add(getName(attribute,member), new CookieFieldDescriptor(member, (bool)(attribute.Properties["Outbound"].AsNBoolean()))); }, null);
 
                         IterateAttributes<FormFieldAttribute>(member,true,
                             (attribute) => { FormFields.Add(getName(attribute,member), member); }, null);

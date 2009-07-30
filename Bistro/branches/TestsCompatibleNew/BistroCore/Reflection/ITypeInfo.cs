@@ -9,7 +9,7 @@ namespace Bistro.Special.Reflection
     public interface IAttributeInfo
     {
         string Type { get; }
-        IAttributeParameters Parameters { get; }
+        IAttributeParameters Properties { get; } 
     }
 
     public interface IAttributeParameters

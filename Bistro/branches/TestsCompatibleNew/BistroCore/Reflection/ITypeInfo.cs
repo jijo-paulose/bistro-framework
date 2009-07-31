@@ -9,17 +9,17 @@ namespace Bistro.Special.Reflection
     public interface IAttributeInfo
     {
         string Type { get; }
-        IAttributeParameters Properties { get; } 
+        IAttributeProperties Properties { get; } 
     }
 
-    public interface IAttributeParameters
+    public interface IAttributeProperties
     {
         int Count { get; }
-        IAttributeParameter this[int index] { get; }
-        IAttributeParameter this[string name] { get; }
+        IAttributeProperty this[int index] { get; }
+        IAttributeProperty this[string name] { get; }
     }
 
-    public interface IAttributeParameter
+    public interface IAttributeProperty
     {
         string AsString();
         bool? AsNBoolean();
@@ -37,7 +37,7 @@ namespace Bistro.Special.Reflection
 
     public interface IHasAttributes
     {
-        IEnumerable<IAttributeInfo> Attributes { get; }
+        //IEnumerable<IAttributeInfo> Attributes { get; }
         IEnumerable<IAttributeInfo> GetCustomAttributes(Type attributeType, bool inherit);
     }
 

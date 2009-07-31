@@ -37,7 +37,7 @@ namespace Bistro.UnitTestsNew
                 get { return type; }
             }
 
-            public IAttributeParameters Properties
+            public IAttributeProperties Properties
             {
                 get { return properties; }
             }

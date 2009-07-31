@@ -15,7 +15,6 @@ namespace Bistro.Reflection.CLRTypeInfo
         public CLRTypeInfo(Type clrType)
         {
             systemType = clrType;
-            attributes = clrType.GetCustomAttributes(false);
 
 
         }
@@ -23,7 +22,6 @@ namespace Bistro.Reflection.CLRTypeInfo
         #region Private members
         private Type systemType;
 
-        private object[] attributes;
 
         #endregion
 
@@ -37,6 +35,7 @@ namespace Bistro.Reflection.CLRTypeInfo
                 type = ot.FullName;
                 List<Parameter> plist = new List<Parameter>();
                 // Using object here for purpose of Enums usage
+#warning This code should be changed to ot.GetProperty(string name) and should be placed to the enumerator. Probably [int] option for ParameterCollection should be removed at all.
                 System.Reflection.PropertyInfo[] pis = ot.GetProperties();
                 foreach (System.Reflection.PropertyInfo pi in pis)
                 {
@@ -62,7 +61,7 @@ namespace Bistro.Reflection.CLRTypeInfo
                 get { return type; }
             }
 
-            public IAttributeParameters Properties
+            public IAttributeProperties Properties
             {
                 get { return parameters; }
             }
@@ -88,12 +87,10 @@ namespace Bistro.Reflection.CLRTypeInfo
                     systemType = property.PropertyType;
                 }
 
-                attributes = systemMember.GetCustomAttributes(false);
 
             }
             #region Private members
 
-            protected object[] attributes;
             protected MemberInfo systemMember;
             protected Type systemType;
 
@@ -128,10 +125,10 @@ namespace Bistro.Reflection.CLRTypeInfo
 
             #region IHasAttributes Members
 
-            public IEnumerable<IAttributeInfo> Attributes
-            {
-                get { return new EnumProxy<object,IAttributeInfo,CLRAttributeInfo>(attributes); }
-            }
+            //public IEnumerable<IAttributeInfo> Attributes
+            //{
+            //    get { return new EnumProxy<object,IAttributeInfo,CLRAttributeInfo>(attributes); }
+            //}
 
             public IEnumerable<IAttributeInfo> GetCustomAttributes(Type attributeType, bool inherit)
             {
@@ -242,10 +239,10 @@ namespace Bistro.Reflection.CLRTypeInfo
 
         #region IHasAttributes Members
 
-        public IEnumerable<IAttributeInfo> Attributes
-        {
-            get { return new EnumProxy<object,IAttributeInfo,CLRAttributeInfo>(attributes); }
-        }
+        //public IEnumerable<IAttributeInfo> Attributes
+        //{
+        //    get { return new EnumProxy<object,IAttributeInfo,CLRAttributeInfo>(attributes); }
+        //}
 
         public IEnumerable<IAttributeInfo> GetCustomAttributes(Type attributeType, bool inherit)
         {
@@ -325,7 +322,7 @@ namespace Bistro.Reflection.CLRTypeInfo
 
 
     #region Attribute Parameters
-    public class Parameter : IAttributeParameter
+    public class Parameter : IAttributeProperty
     {
         public Parameter(object value)
             : this(null, value)
@@ -385,7 +382,7 @@ namespace Bistro.Reflection.CLRTypeInfo
         #endregion
     }
 
-    public class ParameterCollection : IAttributeParameters
+    public class ParameterCollection : IAttributeProperties
     {
         public ParameterCollection()
             : this(new Parameter[] { })
@@ -418,12 +415,12 @@ namespace Bistro.Reflection.CLRTypeInfo
             get { return parameters.Length; }
         }
 
-        public IAttributeParameter this[int index]
+        public IAttributeProperty this[int index]
         {
             get { return parameters[index]; }
         }
 
-        public IAttributeParameter this[string name]
+        public IAttributeProperty this[string name]
         {
             get
             {

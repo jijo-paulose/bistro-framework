@@ -6,16 +6,16 @@ using Bistro.Controllers;
 using Bistro.Special.Reflection;
 using System.Reflection;
 
-namespace Bistro.Reflection.IControllerInfo
+namespace Bistro.Reflection.CLRTypeInfo
 {
 
 
     internal class CLRTypeInfo : ITypeInfo
     {
-        public CLRTypeInfo(Type controllerType)
+        public CLRTypeInfo(Type clrType)
         {
-            systemType = controllerType;
-            attributes = controllerType.GetCustomAttributes(false);
+            systemType = clrType;
+            attributes = clrType.GetCustomAttributes(false);
 
 
         }
@@ -70,10 +70,10 @@ namespace Bistro.Reflection.IControllerInfo
             #endregion
         }
 
-        internal class ControllerMemberInfo : IMemberInfo
+        internal class CLRMemberInfo : IMemberInfo
         {
 
-            public ControllerMemberInfo(MemberInfo memberItem)
+            public CLRMemberInfo(MemberInfo memberItem)
             {
                 systemMember = memberItem;
 
@@ -178,13 +178,13 @@ namespace Bistro.Reflection.IControllerInfo
             #endregion
         }
 
-        internal class ControllerPropertyInfo: ControllerMemberInfo, IPropertyInfo
+        internal class CLRPropertyInfo: CLRMemberInfo, IPropertyInfo
         {
-            public ControllerPropertyInfo(MemberInfo memberItem) : base(memberItem) { }
+            public CLRPropertyInfo(MemberInfo memberItem) : base(memberItem) { }
         }
-        internal class ControllerFieldInfo : ControllerMemberInfo, IFieldInfo
+        internal class CLRFieldInfo : CLRMemberInfo, IFieldInfo
         {
-            public ControllerFieldInfo(MemberInfo memberItem) : base(memberItem) { }
+            public CLRFieldInfo(MemberInfo memberItem) : base(memberItem) { }
         }
         #endregion
 
@@ -202,27 +202,27 @@ namespace Bistro.Reflection.IControllerInfo
 
         public IEnumerable<IFieldInfo> Fields
         {
-            get { return new EnumProxy<MemberInfo,IFieldInfo,ControllerFieldInfo>(systemType.GetFields()); }
+            get { return new EnumProxy<MemberInfo,IFieldInfo,CLRFieldInfo>(systemType.GetFields()); }
         }
 
         public IEnumerable<IPropertyInfo> Properties
         {
-            get { return new EnumProxy<MemberInfo, IPropertyInfo, ControllerPropertyInfo>(systemType.GetProperties()); }
+            get { return new EnumProxy<MemberInfo, IPropertyInfo, CLRPropertyInfo>(systemType.GetProperties()); }
         }
 
         public IEnumerable<IMemberInfo> GetMember(string name, System.Reflection.BindingFlags bindingAttr)
         {
-            return new EnumProxy<MemberInfo, IMemberInfo, ControllerMemberInfo>(systemType.GetMember(name, bindingAttr));
+            return new EnumProxy<MemberInfo, IMemberInfo, CLRMemberInfo>(systemType.GetMember(name, bindingAttr));
         }
 
         public IEnumerable<IMemberInfo> GetMember(string name, System.Reflection.MemberTypes type, System.Reflection.BindingFlags bindingAttr)
         {
-            return new EnumProxy<MemberInfo, IMemberInfo, ControllerMemberInfo>(systemType.GetMember(name, type, bindingAttr));
+            return new EnumProxy<MemberInfo, IMemberInfo, CLRMemberInfo>(systemType.GetMember(name, type, bindingAttr));
         }
 
         public IEnumerable<IMemberInfo> GetMembers(System.Reflection.BindingFlags bindingAttr)
         {
-            return new EnumProxy<MemberInfo, IMemberInfo, ControllerMemberInfo>(systemType.GetMembers(bindingAttr));
+            return new EnumProxy<MemberInfo, IMemberInfo, CLRMemberInfo>(systemType.GetMembers(bindingAttr));
         }
 
         public ConstructorInfo GetConstructor(Type[] types)

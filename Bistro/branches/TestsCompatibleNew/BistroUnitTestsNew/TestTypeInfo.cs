@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Bistro.Special.Reflection;
 using System.Reflection;
-using Bistro.Reflection.IControllerInfo;
+using Bistro.Reflection.CLRTypeInfo;
 
 namespace Bistro.UnitTestsNew
 {

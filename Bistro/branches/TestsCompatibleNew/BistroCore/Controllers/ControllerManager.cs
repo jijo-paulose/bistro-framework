@@ -29,7 +29,7 @@ using System.Xml;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers.Dispatch;
 using Bistro.Special.Reflection;
-using Bistro.Reflection.IControllerInfo;
+using Bistro.Reflection.CLRTypeInfo;
 
 namespace Bistro.Controllers
 {

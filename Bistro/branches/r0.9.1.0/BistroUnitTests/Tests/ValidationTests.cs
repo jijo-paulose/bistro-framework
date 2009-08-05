@@ -22,7 +22,7 @@ namespace Bistro.UnitTests.Tests
         [Test]
         public void PassedValidation()
         {
-            var resp = handler.RunForTest("GET/validationTest/ab");
+            var resp = handler.RunForTest("GET/validationTest/ab?thirdField=de");
             var contexts = handler.AllContents;
 
             var messages = contexts["request"]["Messages"] as List<IValidationResult>;
@@ -39,8 +39,10 @@ namespace Bistro.UnitTests.Tests
             var messages = contexts["request"]["Messages"] as List<IValidationResult>;
 
             Assert.That(messages != null, "The list of messages is missing");
-            Assert.That(messages.Count == 1, String.Format("The list of messages has {0} elements instead of 1", messages.Count));
-            Assert.AreEqual(messages[0].Message, "someField is required");
+
+            // all validations except the regex should complain about a missing field
+            Assert.That(messages.Count == 4, String.Format("The list of messages has {0} elements instead of 4", messages.Count));
+            Assert.That(containsValidation("someField is required", messages), "Field length validation didn't fire");
         }
 
         private bool containsValidation(string message, List<IValidationResult> messages)
@@ -116,6 +118,17 @@ namespace Bistro.UnitTests.Tests
             var messages = contexts["request"]["Messages"] as List<IValidationResult>;
 
             Assert.That(!containsValidation("someField must be alpha", messages), "Range validation shouldn't have fired");
+        }
+
+        [Test]
+        public void SecondFieldFailsValidation()
+        {
+            var resp = handler.RunForTest("GET/validationTest");
+            var contexts = handler.AllContents;
+
+            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
+
+            Assert.That(containsValidation("thirdField is required", messages), "Validation on second field did not fire.");
         }
     }
 }

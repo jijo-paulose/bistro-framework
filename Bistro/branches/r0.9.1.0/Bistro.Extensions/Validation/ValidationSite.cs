@@ -44,13 +44,6 @@ namespace Bistro.Extensions.Validation
             return this;
         }
 
-        //public override Validator<T> As(string name)
-        //{
-        //    this.Name = name;
-
-        //    return this;
-        //}
-
         /// <summary>
         /// Determines whether the specified target is valid.
         /// </summary>

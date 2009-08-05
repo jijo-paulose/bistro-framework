@@ -16,22 +16,27 @@ namespace Bistro.UnitTests.Tests.Data
     {
         protected override void Define()
         {
-            this
-                .As("validationTest")
-                .Value(c => c.someField)
-                    .AliasedAs("otherField")
-                    .IsRequired("someField is required")
-                    .IsInRange("a", "zzzzzzzzzzzzzzzzzz", "someField must be alpha")
-                    .IsLongerThan(2, "someField must be at least two characters in length")
-                    .MatchesRegex("ab", RegexOptions.None, "someField must be 'ab'");
+            this.As("validationTest")
+                .Define(
+                    Value(c => c.someField)
+                        .AliasedAs("otherField")
+                        .IsRequired("someField is required")
+                        .IsInRange("a", "zzzzzzzzzzzzzzzzzz", "someField must be alpha")
+                        .IsLongerThan(2, "someField must be at least two characters in length")
+                        .MatchesRegex("ab", RegexOptions.None, "someField must be 'ab'"))
+                .And(
+                    Value(c => c.thirdField)
+                        .IsRequired("thirdField is required"));
         }
     }
 
-    [Bind("/validationTest/{someField}")]
+    [Bind("/validationTest/{someField}?{thirdField}")]
     [ValidateWith(typeof(ControllerValidator))]
     public class ValidatingController : AbstractController, IValidatable
     {
         public string someField;
+
+        public string thirdField;
 
         [Request]
         public List<IValidationResult> Messages { get; set; }

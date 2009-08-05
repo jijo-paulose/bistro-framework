@@ -38,6 +38,28 @@ namespace Bistro.Extensions.Validation
         }
 
         /// <summary>
+        /// Adds the specified rule to the rule set
+        /// </summary>
+        /// <param name="rule">The rule.</param>
+        /// <returns></returns>
+        public virtual Validator<T> Define(Validator<T> rule)
+        {
+            children.Add(rule);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the specified rule to the rule set
+        /// </summary>
+        /// <param name="rule">The rule.</param>
+        /// <returns></returns>
+        public virtual Validator<T> And(Validator<T> rule)
+        {
+            children.Add(rule);
+            return this;
+        }
+
+        /// <summary>
         /// Generates a <see cref="ValidationSite"/> validation site for the specified member
         /// </summary>
         /// <typeparam name="K">the type of the member</typeparam>

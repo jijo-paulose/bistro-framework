@@ -23,7 +23,13 @@ namespace Bistro.UnitTests.Tests.Data
                         .IsRequired("someField is required")
                         .IsInRange("a", "zzzzzzzzzzzzzzzzzz", "someField must be alpha")
                         .IsLongerThan(2, "someField must be at least two characters in length")
-                        .MatchesRegex("ab", RegexOptions.None, "someField must be 'ab'"))
+                        .IsOfType(ValidatableTypes.date, "someField must be type of date")
+                        .IsOfType(ValidatableTypes.email, "someField must be type of email")
+                        .IsOfType(ValidatableTypes.dateISO, "someField must be type of dateISO")
+                        .IsOfType(ValidatableTypes.number, "someField must be type of number")
+                        .IsOfType(ValidatableTypes.digits, "someField must be type of digits")
+                        .IsOfType(ValidatableTypes.url, "someField must be type of url")
+                        .MatchesRegex("ab", RegexOptions.None, "someField must be 'ab'"))                       
                 .And(
                     Value(c => c.thirdField)
                         .IsRequired("thirdField is required"));

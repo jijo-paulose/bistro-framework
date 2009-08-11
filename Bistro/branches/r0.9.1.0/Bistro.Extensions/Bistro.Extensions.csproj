@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\Common\CommonValidationResult.cs" />
+    <Compile Include="Validation\Common\TypeValidator.cs" />
     <Compile Include="Validation\Common\DefaultValidator.cs" />
     <Compile Include="Validation\Common\LengthValidator.cs" />
     <Compile Include="Validation\Common\RangeValidator.cs" />

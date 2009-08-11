@@ -85,5 +85,22 @@ namespace Bistro.Extensions.Validation.Common
 
             return site;
         }
+
+
+        /// <summary>
+        /// Marks the specified site as needing to have a value of present type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="K"></typeparam>
+        /// <param name="site">The site.</param>
+        /// <param name="type">The type.</param>
+        /// <param name="message">The message.</param>
+        /// <returns></returns>
+        public static ValidationSite<T, K> IsOfType<T, K>(this ValidationSite<T, K> site, ValidatableTypes type, string message) where T : IValidatable
+        {
+            site.AddValidation(new TypeValidator<T>(message,type));
+
+            return site;
+        }
     }
 }

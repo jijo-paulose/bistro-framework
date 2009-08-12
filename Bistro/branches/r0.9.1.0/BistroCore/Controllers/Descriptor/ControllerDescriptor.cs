@@ -36,14 +36,19 @@ namespace Bistro.Controllers.Descriptor
     public static class BindPointUtilities
     {
         /// <summary>
-        /// Regular expression for Bind structure
+        /// Regular expression for splitting a bind expression into its components. This experssion
+        /// will match a slash (/), an ampersand (&), or a question mark when it is not followed by
+        /// a slash, the EOF, or another question mark. This effectively splits the bind expression
+        /// into path components, and query string components.
         /// </summary>
-        private static Regex bindExpr = new Regex(@"/|\?(?!$|/)|&", RegexOptions.Compiled);
+        private static Regex bindExpr = new Regex(@"/|\?(?!$|/|\?)|&", RegexOptions.Compiled);
 
         /// <summary>
-        /// Regular expression for the path-part of a bind point
+        /// Regular expression for the path-part of a bind point. The structure is any character, except for a question mark.
+        /// For question marks, only question marks not followed by either EOF, a slash (/) or another question mark (?) 
+        /// are considered not part of the bind expression.
         /// </summary>
-        private static Regex bindPathExpr = new Regex(@"\?(?!$|/).*", RegexOptions.Compiled);
+        private static Regex bindPathExpr = new Regex(@"\?(?!$|/|\?).*", RegexOptions.Compiled);
 
         /// <summary>
         /// A list of accepted http verbs

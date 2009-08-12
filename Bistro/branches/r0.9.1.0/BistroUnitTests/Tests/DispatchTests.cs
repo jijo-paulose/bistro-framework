@@ -105,5 +105,86 @@ namespace Bistro.UnitTests.Tests
             }
             Assert.That(controllerSequence == "521436", "Controllers will be invoked in wrong order (" + controllerSequence + " instead of \"521436\"), causing chaos, panic and destruction");
         }
+
+        /// <summary>
+        /// Test for tracker issue 6: http://code.google.com/p/bistro-framework/issues/detail?id=6
+        /// query-string parameters do not work when prefixed by another parameter
+        /// </summary>
+        [Test]
+        public void TwoParameters()
+        {
+            var resp = handler.RunForTest("GET/parameters?parm1=a&parm2=b");
+            var contexts = handler.AllContents;
+
+            Assert.That(
+                "a:b".Equals(contexts["request"]["output"]),
+                String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
+        }
+
+        /// <summary>
+        /// Test for tracker issue 6: http://code.google.com/p/bistro-framework/issues/detail?id=6
+        /// query-string parameters do not work when prefixed by another parameter
+        /// </summary>
+        [Test]
+        public void ThreeParameters()
+        {
+            var resp = handler.RunForTest("GET/parameters?foo=bar&parm1=a&parm2=b");
+            var contexts = handler.AllContents;
+
+            Assert.That(
+                "a:b".Equals(contexts["request"]["output"]),
+                String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
+        }
+
+        /// <summary>
+        /// Test for tracker issue 6: http://code.google.com/p/bistro-framework/issues/detail?id=6
+        /// query-string parameters do not work when prefixed by another parameter
+        /// </summary>
+        [Test]
+        public void ThreeAltOrderParameters()
+        {
+            var resp = handler.RunForTest("GET/parameters?parm1=a&foo=bar&parm2=b");
+            var contexts = handler.AllContents;
+
+            Assert.That(
+                "a:b".Equals(contexts["request"]["output"]),
+                String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
+        }
+
+        [Test]
+        public void PositionalAndQueryParameters()
+        {
+            var resp = handler.RunForTest("GET/parameters2/a?foo=bar&parm2=b");
+            var contexts = handler.AllContents;
+
+            Assert.That(
+                "a:b".Equals(contexts["request"]["output"]),
+                String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
+        }
+
+        [Test]
+        public void PositionalAndQueryParameters2()
+        {
+            var resp = handler.RunForTest("GET/parameters3/d/e/f/g?parm1=a&parm2=b");
+            var contexts = handler.AllContents;
+
+            Assert.That(
+                "a:b".Equals(contexts["request"]["output"]),
+                String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
+        }
+        //
+        // This test will invalidate other tests by appending another global controller
+        // to the execution chain. uncomment only when necessary
+        //
+        //[Test]
+        //public void PositionalAndQueryParameters3()
+        //{
+        //    var resp = handler.RunForTest("GET/foo/bar?parm1=a&parm2=b");
+        //    var contexts = handler.AllContents;
+
+        //    Assert.That(
+        //        "a:b".Equals(contexts["request"]["outputForRoot"]),
+        //        String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["outputForRoot"]));
+        //}
     }
 }

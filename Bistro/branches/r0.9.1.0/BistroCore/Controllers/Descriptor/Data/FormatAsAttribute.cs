@@ -23,48 +23,50 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Bistro.Controllers;
-using Bistro.Controllers.Dispatch;
-using Bistro.Configuration;
 
-namespace Bistro.Controllers
+namespace Bistro.Controllers.Descriptor.Data
 {
     /// <summary>
-    /// Default implementation of a controller handler
+    /// List of standard formats
     /// </summary>
-    public class ControllerManagerFactory: IControllerManagerFactory
+    public enum Format {
+        /// <summary>
+        /// Specifies that the format should be provided by the default "Json" provider
+        /// </summary>
+        Json,
+        /// <summary>
+        /// Specifies that the format should be provided by the default "Xml" provider
+        /// </summary>
+        Xml
+    }
+
+    /// <summary>
+    /// Specifies formatting for the object graph through an enum or a string literal.
+    /// </summary>
+    public class FormatAsAttribute: Attribute
     {
-        IControllerManager instance;
-        Application application;
+        /// <summary>
+        /// Gets or sets the name of the format.
+        /// </summary>
+        /// <value>The name of the format.</value>
+        public string FormatName { get; set; }
 
-        public ControllerManagerFactory(Application application, SectionHandler configuration)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FormatAsAttribute"/> class.
+        /// </summary>
+        /// <param name="format">The format.</param>
+        public FormatAsAttribute(Format format)
         {
-            this.application = application;
-
-            instance = GetInstanceImpl(application);
+            FormatName = format.ToString();
         }
 
         /// <summary>
-        /// Retrieves an instance of the manager.
+        /// Initializes a new instance of the <see cref="FormatAsAttribute"/> class.
         /// </summary>
-        /// <param name="application"></param>
-        /// <returns></returns>
-        public IControllerManager GetManagerInstance()
+        /// <param name="formatName">Name of the format.</param>
+        public FormatAsAttribute(string formatName)
         {
-            return instance;
-        }
-
-        /// <summary>
-        /// Gets the instance impl.
-        /// </summary>
-        /// <param name="application">The application.</param>
-        /// <returns></returns>
-        public virtual IControllerManager GetInstanceImpl(Application application)
-        {
-            var mgr = new ControllerManager(application);
-            mgr.Load();
-
-            return mgr;
+            FormatName = formatName;
         }
     }
 }

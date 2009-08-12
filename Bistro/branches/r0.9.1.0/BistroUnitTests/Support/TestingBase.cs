@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Bistro.Configuration;
 using Bistro.Controllers.Dispatch;
 using Bistro.Controllers;
+using System.Configuration;
 
 namespace Bistro.UnitTests.Support
 {
@@ -20,8 +21,13 @@ namespace Bistro.UnitTests.Support
         [TestFixtureSetUp]
         public virtual void Init()
         {
+            SectionHandler sh = new SectionHandler();
+
+            sh.DefaultFormatter = "Json";
+            sh.WebFormatters.Add(new NameValueConfigurationElement("Json", "Bistro.Extensions.Format.Json.JsonFormatter, Bistro.Extensions"));
+
             if (Application.Instance == null)
-                Application.Initialize(new SectionHandler());
+                Application.Initialize(sh);
          
             application = Application.Instance;
             manager = application.ManagerFactory.GetManagerInstance();

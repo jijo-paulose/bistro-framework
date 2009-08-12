@@ -24,52 +24,67 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Bistro.Configuration;
+using Bistro.Configuration.Logging;
 
-namespace Bistro.Controllers.Dispatch
+namespace Bistro.Controllers.OutputHandling
 {
     /// <summary>
-    /// Default <see cref="IDispatcherFactory"/> implementation
+    /// Default format manager implementation
     /// </summary>
-    public class DispatcherFactory : IDispatcherFactory
+    public class DefaultFormatManagerFactory: IFormatManagerFactory
     {
-        /// <summary>
-        /// Instance pointer
-        /// </summary>
-        private IControllerDispatcher instance;
+        enum Messages
+        {
+            [DefaultMessage("{0} is not a known formatter")]
+            UnknownFormatter
+        }
 
         /// <summary>
-        /// Application object pointer
+        /// The format manager instance
         /// </summary>
-        private Application application;
+        IFormatManager instance;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DispatcherFactory"/> class.
+        /// The application class
+        /// </summary>
+        Application application;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultFormatManagerFactory"/> class.
         /// </summary>
         /// <param name="application">The application.</param>
-        public DispatcherFactory(Application application, SectionHandler configuration)
+        /// <param name="configuration">The configuration.</param>
+        public DefaultFormatManagerFactory(Application application, SectionHandler configuration)
         {
             this.application = application;
-            instance = GetDispatcherImpl(application);
+            instance = new DefaultFormatManager(application);
+
+            foreach (string type in configuration.WebFormatters.AllKeys)
+                instance.RegisterFormatter(Instantiate(configuration.WebFormatters[type].Value), type == configuration.DefaultFormatter);
         }
 
         /// <summary>
-        /// Creates the dispatcher.
+        /// Instantiates the specified type name.
+        /// </summary>
+        /// <param name="typeName">Name of the type.</param>
+        /// <returns></returns>
+        private IWebFormatter Instantiate(string typeName)
+        {
+            var formatter = Activator.CreateInstance(Type.GetType(typeName)) as IWebFormatter;
+
+            if (formatter == null)
+                application.LoggerFactory.GetLogger(GetType()).Report(Messages.UnknownFormatter, typeName);
+
+            return formatter;
+        }
+
+        /// <summary>
+        /// Gets the manager instance.
         /// </summary>
         /// <returns></returns>
-        public IControllerDispatcher GetDispatcherInstance()
+        public IFormatManager GetManagerInstance()
         {
             return instance;
-        }
-
-        /// <summary>
-        /// Gets a dispatcher implementation. Users wishing to just change the Dispatcher 
-        /// and not the lifecycle thereof, should override this method.
-        /// </summary>
-        /// <param name="application">The application.</param>
-        /// <returns></returns>
-        public virtual IControllerDispatcher GetDispatcherImpl(Application application)
-        {
-            return new ControllerDispatcher(application);
         }
     }
 }

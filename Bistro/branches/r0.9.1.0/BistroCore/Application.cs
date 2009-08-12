@@ -31,6 +31,7 @@ using System.Web;
 using System.IO;
 using System.Reflection;
 using Bistro.Validation;
+using Bistro.Controllers.OutputHandling;
 
 namespace Bistro
 {
@@ -106,11 +107,13 @@ namespace Bistro
             // may rely on that stuff being there.
             application.PreLoadAssemblies();
 
-            application.HandlerFactory = LoadComponent<IControllerHandlerFactory>(logger, configuration.ControllerHandlerFactory, typeof(ValidatingHandlerFactory), new object[] { application });
-            application.DispatcherFactory = LoadComponent<IDispatcherFactory>(logger, configuration.DispatcherFactory, typeof(DispatcherFactory), new object[] { application });
+            application.HandlerFactory = LoadComponent<IControllerHandlerFactory>(logger, configuration.ControllerHandlerFactory, typeof(ValidatingHandlerFactory), new object[] { application, configuration });
+            application.DispatcherFactory = LoadComponent<IDispatcherFactory>(logger, configuration.DispatcherFactory, typeof(DispatcherFactory), new object[] { application, configuration });
 
             // manager factory requires handler and dispatcher factories to be in place
-            application.ManagerFactory = LoadComponent<IControllerManagerFactory>(logger, configuration.ControllerManagerFactory, typeof(ControllerManagerFactory), new object[] { application });
+            application.ManagerFactory = LoadComponent<IControllerManagerFactory>(logger, configuration.ControllerManagerFactory, typeof(ControllerManagerFactory), new object[] { application, configuration });
+
+            application.FormatManagerFactory = LoadComponent<IFormatManagerFactory>(logger, configuration.FormatManager, typeof(DefaultFormatManagerFactory), new object[] { application, configuration });
 
             application.Initialized = true;
         }
@@ -201,5 +204,11 @@ namespace Bistro
         /// </summary>
         /// <value>The handler factory.</value>
         public IControllerHandlerFactory HandlerFactory { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the format manager.
+        /// </summary>
+        /// <value>The format manager.</value>
+        public IFormatManagerFactory FormatManagerFactory { get; private set; }
     }
 }

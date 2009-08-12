@@ -67,6 +67,7 @@ namespace Bistro.UnitTests.Support
         private readonly HttpSessionMock sessionMock = new HttpSessionMock();
         private readonly MemoryStream stream = new MemoryStream();
         private IContext requestContext = null;
+        private NameValueCollection formCollection = new NameValueCollection();
 
         protected readonly Mock<HttpContextBase> Context = new Mock<HttpContextBase>();
         //protected readonly Mock<HttpSessionStateBase> Session = new Mock<HttpSessionStateBase>();
@@ -80,7 +81,7 @@ namespace Bistro.UnitTests.Support
             Context.Setup(ctx => ctx.Session).Returns(sessionMock);
             Context.Setup(ctx => ctx.Response.OutputStream).Returns(stream);
             Context.Setup(ctx => ctx.Request.Cookies).Returns(new HttpCookieCollection());
-            Context.Setup(ctx => ctx.Request.Form).Returns(new NameValueCollection());
+            Context.Setup(ctx => ctx.Request.Form).Returns(formCollection);
             Context.Setup(ctx => ctx.Request.Files.AllKeys).Returns(new string[] { });
 
             LoadFactories(null);
@@ -93,8 +94,21 @@ namespace Bistro.UnitTests.Support
         /// <returns></returns>
         public virtual string RunForTest(string path)
         {
+            return RunForTest(path, new NameValueCollection());
+        }
+
+        /// <summary>
+        /// Retrieves the string response of executing the given url with the given form data
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="formData">The form data.</param>
+        /// <returns></returns>
+        public virtual string RunForTest(string path, NameValueCollection formData)
+        {
             var httpContext = Context.Object;
             httpContext.Session.Clear();
+            formCollection.Clear();
+            formCollection.Add(formData);
 
             requestContext = CreateRequestContext(httpContext);
 

@@ -108,6 +108,17 @@ namespace Bistro.Configuration
         }
 
         /// <summary>
+        /// Gets or sets the controller manager factory.
+        /// </summary>
+        /// <value>The controller manager factory.</value>
+        [ConfigurationProperty("format-manager-factory", DefaultValue = "Bistro.OutputHandling.DefaultFormatManagerFactory")]
+        public string FormatManager
+        {
+            get { return (string)this["format-manager-factory"]; }
+            set { this["format-manager-factory"] = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the extensions that will be processed by bistro.
         /// </summary>
         /// <value>The allowed extensions.</value>
@@ -130,9 +141,9 @@ namespace Bistro.Configuration
         }
 
         /// <summary>
-        /// Gets or sets the directories that will be ignored by bistro.
+        /// Gets or sets the formatters supported by bistro.
         /// </summary>
-        /// <value>The ignored directories.</value>
+        /// <value>The formatters.</value>
         [ConfigurationProperty("web-formatters")]
         public NameValueConfigurationCollection WebFormatters
         {
@@ -141,9 +152,9 @@ namespace Bistro.Configuration
         }
 
         /// <summary>
-        /// Gets or sets the controller manager factory.
+        /// Gets or sets the default formatter for bistro.
         /// </summary>
-        /// <value>The controller manager factory.</value>
+        /// <value>The default formatter.</value>
         [ConfigurationProperty("default-formatter")]
         public string DefaultFormatter
         {

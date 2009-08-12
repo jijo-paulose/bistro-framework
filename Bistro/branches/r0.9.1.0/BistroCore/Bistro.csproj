@@ -62,6 +62,7 @@
     <Compile Include="Controllers\ControllerManagerFactory.cs" />
     <Compile Include="Controllers\Descriptor\BindVerb.cs" />
     <Compile Include="Controllers\Descriptor\ControllerDescriptor.cs" />
+    <Compile Include="Controllers\Descriptor\Data\FormatAsAttribute.cs" />
     <Compile Include="Controllers\Descriptor\Data\RenderWithAttribute.cs" />
     <Compile Include="Controllers\Dispatch\ControllerDispatcher.cs" />
     <Compile Include="Controllers\ControllerHandler.cs" />
@@ -91,6 +92,10 @@
     <Compile Include="Controllers\IControllerManagerFactory.cs" />
     <Compile Include="Controllers\IExecutionContext.cs" />
     <Compile Include="Controllers\IResponse.cs" />
+    <Compile Include="Controllers\OutputHandling\DefaultFormatManagerFactory.cs" />
+    <Compile Include="Controllers\OutputHandling\IFormatManagerFactory.cs" />
+    <Compile Include="Controllers\OutputHandling\DefaultFormatManager.cs" />
+    <Compile Include="Controllers\OutputHandling\IFormatManager.cs" />
     <Compile Include="Controllers\OutputHandling\IWebFormatter.cs" />
     <Compile Include="Controllers\OutputHandling\ReturnTypesController.cs" />
     <Compile Include="Controllers\OutputHandling\RenderingController.cs" />

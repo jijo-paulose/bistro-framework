@@ -40,8 +40,8 @@ namespace Bistro.UnitTests.Tests
 
             Assert.That(messages != null, "The list of messages is missing");
 
-            // all validations except the regex should complain about a missing field
-            Assert.That(messages.Count == 4, String.Format("The list of messages has {0} elements instead of 4", messages.Count));
+            // only the two required field rules should be complaining
+            Assert.That(messages.Count == 2, String.Format("The list of messages has {0} elements instead of 2", messages.Count));
             Assert.That(containsValidation("someField is required", messages), "Field length validation didn't fire");
         }
 

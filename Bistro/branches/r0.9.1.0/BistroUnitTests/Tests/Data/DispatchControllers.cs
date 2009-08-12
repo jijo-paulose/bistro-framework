@@ -21,6 +21,65 @@ namespace Bistro.UnitTests
         }
     }
 
+    [Bind("?/parameters?{parm1}&{parm2}")]
+    public class ParameterTest : AbstractController
+    {
+        public string parm1, parm2;
+
+        [Request]
+        public string output;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            output = parm1 + ":" + parm2;
+        }
+    }
+
+    [Bind("?/parameters2/{parm1}?{parm2}")]
+    public class ParameterTest2 : AbstractController
+    {
+        public string parm1, parm2;
+
+        [Request]
+        public string output;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            output = parm1 + ":" + parm2;
+        }
+    }
+
+    [Bind("/parameters3/??{parm1}&{parm2}")]
+    public class ParameterTest3 : AbstractController
+    {
+        public string parm1, parm2;
+
+        [Request]
+        public string output;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            output = parm1 + ":" + parm2;
+        }
+    }
+    //
+    // This test will invalidate other tests by appending another global controller
+    // to the execution chain. uncomment only when necessary
+    //
+    //[Bind("??{parm1}&{parm2}")]
+    //public class ParameterTest4 : AbstractController
+    //{
+    //    public string parm1, parm2;
+
+    //    [Request]
+    //    public string outputForRoot;
+
+    //    public override void DoProcessRequest(IExecutionContext context)
+    //    {
+    //        outputForRoot = parm1 + ":" + parm2;
+    //    }
+    //}
+
     [Bind("/")]
     public class HomeUrlController2 : AbstractController
     {

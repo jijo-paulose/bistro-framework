@@ -67,10 +67,7 @@ namespace Bistro.Extensions.Validation
         /// <returns></returns>
         public ValidationSite<T,K> Value<K>(Expression<Func<T, K>> expr)
         {
-            var site = new ValidationSite<T, K>(expr);
-            children.Add(site);
-
-            return site;
+            return new ValidationSite<T, K>(expr);
         }
 
         /// <summary>

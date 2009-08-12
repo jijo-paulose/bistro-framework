@@ -28,12 +28,14 @@ using System.Web;
 using System.Collections;
 using Bistro.Controllers.Descriptor;
 using Bistro.Configuration.Logging;
+using Bistro.Controllers.OutputHandling;
+using Bistro.Controllers.Descriptor.Data;
 
 namespace Bistro.Controllers
 {
-	/// <summary>
-	/// Manages the state of a controller pre and post processing.
-	/// </summary>
+    /// <summary>
+    /// Manages the state of a controller pre and post processing.
+    /// </summary>
 	public class ControllerHandler : Bistro.Controllers.IControllerHandler
 	{
 		enum Messages 
@@ -55,6 +57,11 @@ namespace Bistro.Controllers
 		List<MemberInfo> manipulatedFields = new List<MemberInfo>();
 
         /// <summary>
+        /// A mapping of members to formatters used to serialize their input data
+        /// </summary>
+        Dictionary<MemberInfo, IWebFormatter> formatters = new Dictionary<MemberInfo, IWebFormatter>();
+
+        /// <summary>
         /// Empty object array for no-parameter method signatures
         /// </summary>
         protected object[] EmptyParams = new object[] { };
@@ -69,25 +76,42 @@ namespace Bistro.Controllers
         /// </summary>
         private ILogger logger;
 
+        /// <summary>
+        /// The application object
+        /// </summary>
+        private Application application;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ControllerHandler"/> class.
 		/// </summary>
 		/// <param name="controllerType">Type of the controller.</param>
-		protected internal ControllerHandler(ControllerDescriptor descriptor, ILogger logger)
-		{
-			this.descriptor = descriptor;
+        protected internal ControllerHandler(Application application, ControllerDescriptor descriptor, ILogger logger)
+        {
+            this.descriptor = descriptor;
             this.logger = logger;
+            this.application = application;
 
             controllerConstructor = ((Type)descriptor.ControllerType).GetConstructor(Type.EmptyTypes);
 
-			foreach (ControllerDescriptor.BindPointDescriptor bindPoint in descriptor.Targets)
-				manipulatedFields.AddRange(bindPoint.ParameterFields.Values);
-			manipulatedFields.AddRange(descriptor.FormFields.Values);
-			manipulatedFields.AddRange(descriptor.RequestFields.Values);
-			manipulatedFields.AddRange(descriptor.SessionFields.Values);
-			foreach (ControllerDescriptor.CookieFieldDescriptor cookieField in descriptor.CookieFields.Values)
-				manipulatedFields.Add(cookieField.Field);
-		}
+            foreach (ControllerDescriptor.BindPointDescriptor bindPoint in descriptor.Targets)
+                manipulatedFields.AddRange(bindPoint.ParameterFields.Values);
+            manipulatedFields.AddRange(descriptor.FormFields.Values);
+            manipulatedFields.AddRange(descriptor.RequestFields.Values);
+            manipulatedFields.AddRange(descriptor.SessionFields.Values);
+            foreach (ControllerDescriptor.CookieFieldDescriptor cookieField in descriptor.CookieFields.Values)
+                manipulatedFields.Add(cookieField.Field);
+
+            manipulatedFields.ForEach(
+                (mbr) => 
+                {
+                    var attributes = mbr.GetCustomAttributes(typeof(FormatAsAttribute), false) as FormatAsAttribute[];
+                    if (attributes.Length != 1)
+                        return;
+
+                    formatters.Add(mbr, application.FormatManagerFactory.GetManagerInstance().GetFormatterByFormat(attributes[0].FormatName));
+                }
+            );
+        }
 
 		/// <summary>
 		/// Gets the controller instance.
@@ -240,12 +264,12 @@ namespace Bistro.Controllers
                 if (pInfo == null)
                 {
                     FieldInfo fInfo = (FieldInfo)member;
-                    fInfo.SetValue(instance, value == null ? null : Coerce(value, fInfo.FieldType));
+                    fInfo.SetValue(instance, value == null ? null : Coerce(value, member, fInfo.FieldType));
                 }
                 else
                 {
                     if (pInfo.CanWrite)
-                        pInfo.SetValue(instance, value == null ? null : Coerce(value, pInfo.PropertyType), null);
+                        pInfo.SetValue(instance, value == null ? null : Coerce(value, member, pInfo.PropertyType), null);
                 }
             }
             catch (Exception ex)
@@ -262,12 +286,27 @@ namespace Bistro.Controllers
         /// <param name="value">The value.</param>
         /// <param name="type">The type.</param>
         /// <returns></returns>
-        private object Coerce(object value, Type type)
+        private object Coerce(object value, MemberInfo field, Type type)
         {
+            // if it's the same, no worries
             if (type.IsAssignableFrom(value.GetType()))
                 return value;
+            // if it's a value type, or we don't have a formatter that can take care of it, 
+            // try the ChangeType option
+            else if (type.IsValueType || 
+                (application.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter() == null && !formatters.ContainsKey(field)))
+                return Convert.ChangeType(value, type);
+            else
+            {
+                if (value == null)
+                    return null;
 
-            return Convert.ChangeType(value, type);
+                IWebFormatter formatter;
+                if (!formatters.TryGetValue(field, out formatter))
+                    formatter = application.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter();
+
+                return formatter.Deserialize(type, value.ToString());
+            }
         }
 
 		/// <summary>

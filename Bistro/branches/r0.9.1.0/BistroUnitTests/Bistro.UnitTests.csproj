@@ -60,7 +60,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Tests\TypeValidationTests.cs" />
+    <Compile Include="Tests\FormatTests.cs" />
     <Compile Include="Tests\DataPipelineTests.cs" />
+    <Compile Include="Tests\Data\FormatControllers.cs" />
     <Compile Include="Tests\Data\ValidationControllers.cs" />
     <Compile Include="Tests\DispatchTests.cs" />
     <Compile Include="Support\TestingBase.cs" />

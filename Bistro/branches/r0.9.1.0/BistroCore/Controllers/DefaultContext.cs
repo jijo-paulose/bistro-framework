@@ -30,6 +30,7 @@ using System.Threading;
 using Bistro.Controllers.Security;
 using Bistro.Http;
 using System.Web;
+using Bistro.Controllers.OutputHandling;
 
 namespace Bistro.Controllers
 {
@@ -346,5 +347,26 @@ namespace Bistro.Controllers
 
             return result.ToString();
         }
+
+        #region IResponse Members
+
+
+        public void Return(object objectGraph)
+        {
+            IWebFormatter formatter =
+                Application.Instance.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter();
+
+            ReturnFreeForm(formatter.Serialize(objectGraph), formatter.ContentType);
+        }
+
+        public void Return(object objectGraph, string formatName)
+        {
+            IWebFormatter formatter =
+                Application.Instance.FormatManagerFactory.GetManagerInstance().GetFormatterByFormat(formatName);
+
+            ReturnFreeForm(formatter.Serialize(objectGraph), formatter.ContentType);
+        }
+
+        #endregion
     }
 }

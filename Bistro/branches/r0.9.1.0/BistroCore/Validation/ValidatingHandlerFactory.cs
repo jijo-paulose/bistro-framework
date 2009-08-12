@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Bistro.Controllers;
+using Bistro.Configuration;
 
 namespace Bistro.Validation
 {
@@ -15,7 +16,7 @@ namespace Bistro.Validation
         /// Initializes a new instance of the <see cref="ValidationHandlerFactory"/> class.
         /// </summary>
         /// <param name="application">The application.</param>
-        public ValidatingHandlerFactory(Application application) : base(application) { }
+        public ValidatingHandlerFactory(Application application, SectionHandler configuration) : base(application, configuration) { }
 
         /// <summary>
         /// Creates the controller handler for the given descriptor.
@@ -26,7 +27,7 @@ namespace Bistro.Validation
         {
             var type = descriptor.ControllerType as Type;
             if (type != null && typeof(IValidatable).IsAssignableFrom(type))
-                return new ValidatingControllerHandler(descriptor, application.LoggerFactory.GetLogger(typeof(ControllerHandler)));
+                return new ValidatingControllerHandler(application, descriptor, application.LoggerFactory.GetLogger(typeof(ControllerHandler)));
 
             return base.CreateControllerHandler(descriptor);
         }

@@ -23,48 +23,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Bistro.Controllers;
-using Bistro.Controllers.Dispatch;
-using Bistro.Configuration;
 
-namespace Bistro.Controllers
+namespace Bistro.Controllers.OutputHandling
 {
     /// <summary>
-    /// Default implementation of a controller handler
+    /// Manager of all available formatters
     /// </summary>
-    public class ControllerManagerFactory: IControllerManagerFactory
+    public interface IFormatManager
     {
-        IControllerManager instance;
-        Application application;
-
-        public ControllerManagerFactory(Application application, SectionHandler configuration)
-        {
-            this.application = application;
-
-            instance = GetInstanceImpl(application);
-        }
+        /// <summary>
+        /// Gets a formatter for the given format type
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
+        IWebFormatter GetFormatterByFormat(string formatName);
 
         /// <summary>
-        /// Retrieves an instance of the manager.
+        /// Gets the default formatter.
         /// </summary>
-        /// <param name="application"></param>
         /// <returns></returns>
-        public IControllerManager GetManagerInstance()
-        {
-            return instance;
-        }
+        IWebFormatter GetDefaultFormatter();
 
         /// <summary>
-        /// Gets the instance impl.
+        /// Registers an instance of the formatter with the manager
         /// </summary>
-        /// <param name="application">The application.</param>
-        /// <returns></returns>
-        public virtual IControllerManager GetInstanceImpl(Application application)
-        {
-            var mgr = new ControllerManager(application);
-            mgr.Load();
-
-            return mgr;
-        }
+        /// <param name="formatter"></param>
+        void RegisterFormatter(IWebFormatter formatter, bool isDefault);
     }
 }

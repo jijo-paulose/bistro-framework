@@ -23,46 +23,66 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Bistro.Controllers.Descriptor;
-using Bistro.Controllers.OutputHandling;
-using Bistro.Configuration;
 
-namespace Bistro.Controllers
+namespace Bistro.Controllers.OutputHandling
 {
     /// <summary>
-    /// Default handler factory implementation
+    /// Default format manager implementation
     /// </summary>
-    public class HandlerFactory: IControllerHandlerFactory
+    public class DefaultFormatManager: IFormatManager
     {
+        /// <summary>
+        /// The map of all available formatters
+        /// </summary>
+        Dictionary<string, IWebFormatter> formatters = new Dictionary<string, IWebFormatter>();
+
+        /// <summary>
+        /// The default formatter
+        /// </summary>
+        IWebFormatter defaultFormatter;
+
         /// <summary>
         /// The application object
         /// </summary>
-        protected Application application;
+        Application application;
 
         /// <summary>
-        /// The configuration data
-        /// </summary>
-        protected SectionHandler configuration;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HandlerFactory"/> class.
+        /// Initializes a new instance of the <see cref="DefaultFormatManager"/> class.
         /// </summary>
         /// <param name="application">The application.</param>
-        /// <param name="configuration">The configuration.</param>
-        public HandlerFactory(Application application, SectionHandler configuration)
+        public DefaultFormatManager(Application application)
         {
             this.application = application;
-            this.configuration = configuration;
         }
 
         /// <summary>
-        /// Creates the controller handler for the given descriptor.
+        /// Gets a formatter for the given format type
         /// </summary>
-        /// <param name="descriptor">The descriptor.</param>
+        /// <param name="formatName"></param>
         /// <returns></returns>
-        public virtual IControllerHandler CreateControllerHandler(ControllerDescriptor descriptor)
+        public IWebFormatter GetFormatterByFormat(string formatName)
         {
-            return new ControllerHandler(application, descriptor, application.LoggerFactory.GetLogger(typeof(ControllerHandler)));
+            return formatters[formatName];
+        }
+
+        /// <summary>
+        /// Gets the default formatter.
+        /// </summary>
+        /// <returns></returns>
+        public IWebFormatter GetDefaultFormatter()
+        {
+            if (defaultFormatter == null)
+                throw new InvalidOperationException("No default formatter specified");
+
+            return defaultFormatter;
+        }
+
+        public void RegisterFormatter(IWebFormatter formatter, bool isDefault)
+        {
+            formatters.Add(formatter.FormatName, formatter);
+
+            if (isDefault)
+                defaultFormatter = formatter;
         }
     }
 }

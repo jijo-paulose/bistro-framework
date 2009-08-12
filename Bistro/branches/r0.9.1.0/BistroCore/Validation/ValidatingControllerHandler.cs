@@ -28,8 +28,8 @@ namespace Bistro.Validation
         /// </summary>
         /// <param name="descriptor"></param>
         /// <param name="logger"></param>
-        protected internal ValidatingControllerHandler(ControllerDescriptor descriptor, ILogger logger)
-            : base(descriptor, logger)
+        protected internal ValidatingControllerHandler(Application application, ControllerDescriptor descriptor, ILogger logger)
+            : base(application, descriptor, logger)
         {
             try
             {

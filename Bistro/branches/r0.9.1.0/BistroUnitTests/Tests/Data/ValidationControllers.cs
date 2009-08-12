@@ -22,7 +22,7 @@ namespace Bistro.UnitTests.Tests.Data
                         .AliasedAs("otherField")
                         .IsRequired("someField is required")
                         .IsInRange("a", "zzzzzzzzzzzzzzzzzz", "someField must be alpha")
-                        .IsLongerThan(2, "someField must be at least two characters in length")
+                        .IsMinLength(2, "someField must be at least two characters in length")
                         .IsOfType(ValidatableTypes.date, "someField must be type of date")
                         .IsOfType(ValidatableTypes.email, "someField must be type of email")
                         .IsOfType(ValidatableTypes.dateISO, "someField must be type of dateISO")

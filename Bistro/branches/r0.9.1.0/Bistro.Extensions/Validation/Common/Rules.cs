@@ -48,7 +48,7 @@ namespace Bistro.Extensions.Validation.Common
         /// <param name="maxLength">Length of the max.</param>
         /// <param name="message">The message.</param>
         /// <returns></returns>
-        public static ValidationSite<T, K> IsShorterThan<T, K>(this ValidationSite<T, K> site, int maxLength, string message) where T : IValidatable
+        public static ValidationSite<T, K> IsMaxLength<T, K>(this ValidationSite<T, K> site, int maxLength, string message) where T : IValidatable
         {
             site.AddValidation(new LengthValidator<T>(message, -1, maxLength));
 
@@ -62,7 +62,7 @@ namespace Bistro.Extensions.Validation.Common
         /// <param name="minLength">Length of the min.</param>
         /// <param name="message">The message.</param>
         /// <returns></returns>
-        public static ValidationSite<T, K> IsLongerThan<T, K>(this ValidationSite<T, K> site, int minLength, string message) where T : IValidatable
+        public static ValidationSite<T, K> IsMinLength<T, K>(this ValidationSite<T, K> site, int minLength, string message) where T : IValidatable
         {
             site.AddValidation(new LengthValidator<T>(message, minLength, -1));
 

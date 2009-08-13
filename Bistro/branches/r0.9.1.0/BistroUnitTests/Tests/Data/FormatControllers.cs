@@ -31,4 +31,25 @@ namespace Bistro.UnitTests.Tests.Data
             context.Response.Return(input.foo + " " + input.baz);
         }
     }
+
+    [Bind("get /format-xml")]
+    public class FormatXmlController : AbstractController
+    {
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            context.Response.Return(new SimpleTuple { foo = "bar", baz = "qux" }, "Xml");
+        }
+    }
+
+    [Bind("post /format-xml")]
+    public class FormatXmlController2 : AbstractController
+    {
+        [FormField, FormatAs(Format.Xml)]
+        protected SimpleTuple input;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            context.Response.Return(input.foo + " " + input.baz);
+        }
+    }
 }

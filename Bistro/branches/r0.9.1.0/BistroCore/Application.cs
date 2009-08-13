@@ -107,13 +107,12 @@ namespace Bistro
             // may rely on that stuff being there.
             application.PreLoadAssemblies();
 
+            application.FormatManagerFactory = LoadComponent<IFormatManagerFactory>(logger, configuration.FormatManager, typeof(DefaultFormatManagerFactory), new object[] { application, configuration });
             application.HandlerFactory = LoadComponent<IControllerHandlerFactory>(logger, configuration.ControllerHandlerFactory, typeof(ValidatingHandlerFactory), new object[] { application, configuration });
             application.DispatcherFactory = LoadComponent<IDispatcherFactory>(logger, configuration.DispatcherFactory, typeof(DispatcherFactory), new object[] { application, configuration });
 
             // manager factory requires handler and dispatcher factories to be in place
             application.ManagerFactory = LoadComponent<IControllerManagerFactory>(logger, configuration.ControllerManagerFactory, typeof(ControllerManagerFactory), new object[] { application, configuration });
-
-            application.FormatManagerFactory = LoadComponent<IFormatManagerFactory>(logger, configuration.FormatManager, typeof(DefaultFormatManagerFactory), new object[] { application, configuration });
 
             application.Initialized = true;
         }

@@ -22,7 +22,7 @@ namespace Bistro.UnitTests.Tests
         [Test]
         public void PassedValidation()
         {
-            var resp = handler.RunForTest("GET/validationTest/ab?thirdField=de");
+            var resp = handler.RunForTest("GET/validationTest/ab@mail.com?secondField=123123&thirdField=2008-01-01");
             var contexts = handler.AllContents;
 
             var messages = contexts["request"]["Messages"] as List<IValidationResult>;
@@ -41,7 +41,7 @@ namespace Bistro.UnitTests.Tests
             Assert.That(messages != null, "The list of messages is missing");
 
             // only the two required field rules should be complaining
-            Assert.That(messages.Count == 2, String.Format("The list of messages has {0} elements instead of 2", messages.Count));
+            Assert.That(messages.Count == 3, String.Format("The list of messages has {0} elements instead of 2", messages.Count));
             Assert.That(containsValidation("someField is required", messages), "Field length validation didn't fire");
         }
 

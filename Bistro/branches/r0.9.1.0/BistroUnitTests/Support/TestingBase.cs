@@ -25,6 +25,7 @@ namespace Bistro.UnitTests.Support
 
             sh.DefaultFormatter = "Json";
             sh.WebFormatters.Add(new NameValueConfigurationElement("Json", "Bistro.Extensions.Format.Json.JsonFormatter, Bistro.Extensions"));
+            sh.WebFormatters.Add(new NameValueConfigurationElement("Xml", "Bistro.Extensions.Format.Xml.XmlFormatter, Bistro.Extensions"));
 
             if (Application.Instance == null)
                 Application.Initialize(sh);

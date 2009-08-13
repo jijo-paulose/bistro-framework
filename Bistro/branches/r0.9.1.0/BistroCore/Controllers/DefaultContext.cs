@@ -269,6 +269,12 @@ namespace Bistro.Controllers
             CurrentReturnType = ReturnType.File;
         }
 
+        /// <summary>
+        /// Returns the file as the http reponse, closing the output stream
+        /// </summary>
+        /// <param name="fileName">The absolute path to the file.</param>
+        /// <param name="contentType">the content-type header value to supply.</param>
+        /// <param name="asAttachment">whether the file should be returned as an attachment</param>
         public void ReturnFile(string fileName, string contentType, bool asAttachment)
         {
             ClearReturnValues();
@@ -295,6 +301,9 @@ namespace Bistro.Controllers
             CurrentReturnType = ReturnType.Other;
         }
 
+        /// <summary>
+        /// Clears the return values.
+        /// </summary>
         protected virtual void ClearReturnValues()
         {
             ExplicitResult = null;
@@ -348,9 +357,10 @@ namespace Bistro.Controllers
             return result.ToString();
         }
 
-        #region IResponse Members
-
-
+        /// <summary>
+        /// Returns the specified object graph.
+        /// </summary>
+        /// <param name="objectGraph">The object graph.</param>
         public void Return(object objectGraph)
         {
             IWebFormatter formatter =
@@ -359,6 +369,11 @@ namespace Bistro.Controllers
             ReturnFreeForm(formatter.Serialize(objectGraph), formatter.ContentType);
         }
 
+        /// <summary>
+        /// Returns the specified object graph.
+        /// </summary>
+        /// <param name="objectGraph">The object graph.</param>
+        /// <param name="formatName">Name of the format.</param>
         public void Return(object objectGraph, string formatName)
         {
             IWebFormatter formatter =
@@ -366,7 +381,5 @@ namespace Bistro.Controllers
 
             ReturnFreeForm(formatter.Serialize(objectGraph), formatter.ContentType);
         }
-
-        #endregion
     }
 }

@@ -298,13 +298,22 @@ namespace Bistro.Controllers
                 return Convert.ChangeType(value, type);
             else
             {
-                if (value == null)
-                    return null;
-
                 IWebFormatter formatter;
                 if (!formatters.TryGetValue(field, out formatter))
                     formatter = application.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter();
 
+                // we can't find (or don't have) an explicit formatter, 
+                // and we don't have a default to fall back to. buh-bye.
+                if (formatter == null)
+                    throw new InvalidCastException(
+                        String.Format(
+                            "Unable to convert value for {0}.{1} from {2} to {3}. Specific formatter not found, and no default formatter specified",
+                            field.DeclaringType.Name,
+                            field.Name,
+                            value.GetType().Name,
+                            type.Name));
+
+                // value will never be null
                 return formatter.Deserialize(type, value.ToString());
             }
         }

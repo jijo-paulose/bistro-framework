@@ -1,17 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
 using NUnit.Framework;
-using Bistro.Controllers;
-using Bistro.Controllers.Dispatch;
-using System.Collections;
-using Bistro.Controllers.OutputHandling;
-using Bistro.Configuration.Logging;
-using Bistro.Configuration;
-using Bistro.Validation;
 using Bistro.UnitTests.Support;
 using System.Collections.Specialized;
 
@@ -23,12 +11,13 @@ namespace Bistro.UnitTests.Tests
         [Test]
         public void ValidOutput()
         {
-            var expected = "{foo:\"bar\",baz:\"qux\"}";
+            var expected = "{foo:bar,baz:qux}";
             var resp = handler.RunForTest("GET/format");
             resp = resp
                 .Replace(" ", "")
                 .Replace("\r", "")
-                .Replace("\n", "");
+                .Replace("\n", "")
+                .Replace("\"", "");
 
             Assert.That(
                 expected.Equals(resp),
@@ -38,11 +27,11 @@ namespace Bistro.UnitTests.Tests
         [Test]
         public void ValidInput()
         {
-            var expected = "hello world";
+            var expected = "\"hello world\"";
             var formData = new NameValueCollection();
-            formData.Add("input", "{ foo: \"hello\", bar: \"world\" }");
+            formData.Add("input", "{ foo: \"hello\", baz: \"world\" }");
 
-            var resp = handler.RunForTest("POST/format");
+            var resp = handler.RunForTest("POST/format", formData);
 
             Assert.That(
                 expected.Equals(resp),

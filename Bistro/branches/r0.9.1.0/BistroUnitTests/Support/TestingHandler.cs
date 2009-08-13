@@ -65,7 +65,8 @@ namespace Bistro.UnitTests.Support
     public class TestingHandler: Bistro.Http.Module
     {
         private readonly HttpSessionMock sessionMock = new HttpSessionMock();
-        private readonly MemoryStream stream = new MemoryStream();
+        private MemoryStream stream = new MemoryStream();
+        private StringBuilder responseData = new StringBuilder();
         private IContext requestContext = null;
         private NameValueCollection formCollection = new NameValueCollection();
 
@@ -79,9 +80,10 @@ namespace Bistro.UnitTests.Support
             : base()
         {
             Context.Setup(ctx => ctx.Session).Returns(sessionMock);
-            Context.Setup(ctx => ctx.Response.OutputStream).Returns(stream);
+            Context.Setup(ctx => ctx.Response.OutputStream).Returns(() => stream);
+            Context.Setup(ctx => ctx.Response.Write(It.IsAny<string>())).Callback((string parm) => responseData.Append(parm));
             Context.Setup(ctx => ctx.Request.Cookies).Returns(new HttpCookieCollection());
-            Context.Setup(ctx => ctx.Request.Form).Returns(formCollection);
+            Context.Setup(ctx => ctx.Request.Form).Returns(() => formCollection);
             Context.Setup(ctx => ctx.Request.Files.AllKeys).Returns(new string[] { });
 
             LoadFactories(null);
@@ -109,12 +111,14 @@ namespace Bistro.UnitTests.Support
             httpContext.Session.Clear();
             formCollection.Clear();
             formCollection.Add(formData);
+            stream = new MemoryStream();
+            responseData.Remove(0, responseData.Length);
 
             requestContext = CreateRequestContext(httpContext);
 
             ProcessRequestRecursive(httpContext, path, requestContext);
 
-            return new StreamReader(stream).ReadToEnd();
+            return responseData.ToString();
         }
 
         /// <summary>
@@ -126,10 +130,12 @@ namespace Bistro.UnitTests.Support
         {
             get
             {
-                var ret = new Dictionary<string, Dictionary<string, object>>();
-                ret.Add("session", sessionMock.InternalContents);
-                ret.Add("request", (Dictionary<string, object>)requestContext);
-                
+                var ret = new Dictionary<string, Dictionary<string, object>>
+                              {
+                                  {"session", sessionMock.InternalContents},
+                                  {"request", (Dictionary<string, object>) requestContext}
+                              };
+
                 return ret;
             }
         }

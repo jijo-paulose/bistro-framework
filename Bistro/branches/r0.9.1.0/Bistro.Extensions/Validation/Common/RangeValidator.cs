@@ -64,7 +64,7 @@ namespace Bistro.Extensions.Validation.Common
                 }
 
             if (fail)
-                messages.Add(new CommonValidationResult(this, target as IValidatable, Message, !fail));
+                messages.Add(new CommonValidationResult(this, target as IValidatable, String.Format(Message,min,max), !fail));
 
             return !fail;
         }

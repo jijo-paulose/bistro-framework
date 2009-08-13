@@ -23,24 +23,28 @@ namespace Bistro.UnitTests.Tests.Data
                         .IsRequired("someField is required")
                         .IsInRange("a", "zzzzzzzzzzzzzzzzzz", "someField must be alpha")
                         .IsMinLength(2, "someField must be at least two characters in length")
-                        .IsOfType(ValidatableTypes.date, "someField must be type of date")
                         .IsOfType(ValidatableTypes.email, "someField must be type of email")
-                        .IsOfType(ValidatableTypes.dateISO, "someField must be type of dateISO")
-                        .IsOfType(ValidatableTypes.number, "someField must be type of number")
-                        .IsOfType(ValidatableTypes.digits, "someField must be type of digits")
-                        .IsOfType(ValidatableTypes.url, "someField must be type of url")
-                        .MatchesRegex("ab", RegexOptions.None, "someField must be 'ab'"))                       
+                        .MatchesRegex("ab", RegexOptions.None, "someField must be 'ab'"))
                 .And(
                     Value(c => c.thirdField)
-                        .IsRequired("thirdField is required"));
+                        .IsRequired("thirdField is required")
+                        .IsOfType(ValidatableTypes.date, "thirdField must be type of date")
+                        .IsOfType(ValidatableTypes.dateISO, "thirdField must be type of dateISO"))
+                .And(
+                    Value(c => c.secondField)
+                        .IsRequired("secondField is required")
+                        .IsOfType(ValidatableTypes.number, "secondField must be type of number")
+                        .IsOfType(ValidatableTypes.digits, "secondField must be type of digits"));
         }
     }
 
-    [Bind("/validationTest/{someField}?{thirdField}")]
+    [Bind("/validationTest/{someField}?{secondField}&{thirdField}")]
     [ValidateWith(typeof(ControllerValidator))]
     public class ValidatingController : AbstractController, IValidatable
     {
         public string someField;
+
+        public string secondField;
 
         public string thirdField;
 

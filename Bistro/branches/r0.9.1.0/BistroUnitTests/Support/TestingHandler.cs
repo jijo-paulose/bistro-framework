@@ -99,6 +99,11 @@ namespace Bistro.UnitTests.Support
             return RunForTest(path, new NameValueCollection());
         }
 
+        public HttpContextBase GetContext()
+        {
+            return Context.Object;
+        }
+
         /// <summary>
         /// Retrieves the string response of executing the given url with the given form data
         /// </summary>

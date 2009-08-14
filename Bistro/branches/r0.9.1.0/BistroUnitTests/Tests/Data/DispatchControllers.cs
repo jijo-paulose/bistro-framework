@@ -12,6 +12,30 @@ using System.Text.RegularExpressions;
 
 namespace Bistro.UnitTests
 {
+    [Bind("event /bistro/application/startup")]
+    public class StartupController : AbstractController
+    {
+        public static int hitcount = 0;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            hitcount++;
+        }
+    }
+
+    [Bind("event /eventtest")]
+    public class EventController : AbstractController
+    {
+        public static int hitcount = 0;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            hitcount++;
+        }
+    }
+
+
+
     [Bind("/")]
     public class HomeUrlController1 : AbstractController
     {

@@ -172,6 +172,14 @@ namespace Bistro.UnitTests.Tests
                 "a:b".Equals(contexts["request"]["output"]),
                 String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
         }
+
+        [Test]
+        public void EventFires()
+        {
+            new DefaultContext(handler.GetContext()).RaiseEvent("/eventtest");
+
+            Assert.AreEqual(1, EventController.hitcount, String.Format("Event hit count {0} instead of 1", EventController.hitcount));
+        }
         //
         // This test will invalidate other tests by appending another global controller
         // to the execution chain. uncomment only when necessary

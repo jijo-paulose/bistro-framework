@@ -28,6 +28,9 @@ namespace Bistro.UnitTests.Tests.Data
 
         public override void DoProcessRequest(IExecutionContext context)
         {
+            if (input == null)
+                return;
+
             context.Response.Return(input.foo + " " + input.baz);
         }
     }
@@ -49,6 +52,9 @@ namespace Bistro.UnitTests.Tests.Data
 
         public override void DoProcessRequest(IExecutionContext context)
         {
+            if (input == null)
+                return;
+
             context.Response.Return(input.foo + " " + input.baz);
         }
     }

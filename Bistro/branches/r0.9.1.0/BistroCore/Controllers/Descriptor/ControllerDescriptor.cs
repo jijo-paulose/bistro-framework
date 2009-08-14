@@ -53,7 +53,7 @@ namespace Bistro.Controllers.Descriptor
         /// <summary>
         /// A list of accepted http verbs
         /// </summary>
-        public static ICollection<string> HttpVerbs = new List<string>(new string[] { "GET", "POST", "PUT", "DELETE" });
+        public static ICollection<string> HttpVerbs = new List<string>(new string[] { "GET", "POST", "PUT", "DELETE", "EVENT" });
 
         /// <summary>
         /// Makes sure the url is [VERB/url], not [VERB url].

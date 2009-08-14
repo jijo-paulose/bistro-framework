@@ -116,7 +116,7 @@ namespace Bistro.UnitTests.Support
 
             requestContext = CreateRequestContext(httpContext);
 
-            ProcessRequestRecursive(httpContext, path, requestContext);
+            new MethodDispatcher(Application.Instance).InvokeMethod(httpContext, path, requestContext);
 
             return responseData.ToString();
         }

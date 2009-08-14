@@ -15,6 +15,11 @@ namespace Bistro.Controllers.Descriptor
         POST = 2,
         PUT = 4,
         HEAD = 8,
-        DELETE = 16
+        DELETE = 16,
+        /// <summary>
+        /// The event verb is for internal system events, that should never be invoked externally. 
+        /// To that end, a non-existant http verb is used.
+        /// </summary>
+        EVENT = 256
     }
 }

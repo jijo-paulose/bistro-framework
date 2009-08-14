@@ -381,5 +381,9 @@ namespace Bistro.Controllers
 
             ReturnFreeForm(formatter.Serialize(objectGraph), formatter.ContentType);
         }
+
+        public void RaiseEvent(string eventUrl)
+        {
+        }
     }
 }

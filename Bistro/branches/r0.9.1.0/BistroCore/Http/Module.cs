@@ -47,32 +47,6 @@ namespace Bistro.Http
 	{
         enum Messages
         {
-            [DefaultMessage("Application has not been properly initialized")]
-            NotInitialized,
-            [DefaultMessage("No web session factory defined")]
-            NoSessionFactory,
-            [DefaultMessage("Application is being unloaded")]
-            Unloading,
-            [DefaultMessage("Exception processing URL ({0}) {1}\r\n\tSession: N/A. For additional information, reference {2}. ")]
-            ExceptionNoSession,
-            [DefaultMessage("Exception processing URL ({0}) {1}\r\n\tSession: ID={2} Activity: {3} ({4}). For additional information, reference {5}.")]
-            Exception,
-            [DefaultMessage("Headers are \r\n{0}")]
-            Headers,
-            [DefaultMessage("Extended information for trace {0}. Review attached parameters.")]
-            ExtendedInfo,
-            [DefaultMessage("Initializing Application")]
-            Initializing,
-            [DefaultMessage("Waiting for parallel initialization to complete")]
-            Waiting,
-            [DefaultMessage("Parallel initialization completed")]
-            Initialized,
-            [DefaultMessage("{0} could not be associated with a bind point")]
-            ControllerNotFound,
-            [DefaultMessage("Redirecting to {0} based on requirement(s) for \r\n{1}")]
-            SecurityRedirect,
-            [DefaultMessage("Processing request {0}")]
-            ProcessingRequest,
             [DefaultMessage("{0} is not a valid extension, and will be skipped")]
             InvalidExtension
         }
@@ -89,15 +63,13 @@ namespace Bistro.Http
         private ILogger logger;
 
         /// <summary>
-        /// The controller manager to use
-        /// </summary>
-        private IControllerManager manager;
-
-        /// <summary>
         /// The disptacher to use
         /// </summary>
-        private IControllerDispatcher dispatcher;
+        private MethodDispatcher methodDispatcher;
 
+        /// <summary>
+        /// The application object
+        /// </summary>
         private Application application;
 
         /// <summary>
@@ -176,6 +148,35 @@ namespace Bistro.Http
                     ignoredDirectories.Add(elem.Value.Replace('\\', '/').Trim(' ', '/'));
             }
         }
+        
+        /// <summary>
+        /// Enables processing of HTTP Web requests by a custom HttpHandler that implements the <see cref="T:System.Web.IHttpHandler"/> interface.
+        /// </summary>
+        /// <param name="context">An <see cref="T:System.Web.HttpContext"/> object that provides references to the intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
+        public void ProcessRequest(HttpContext context)
+        {
+            string requestPoint =
+                BindPointUtilities.Combine(context.Request.HttpMethod, context.Request.RawUrl.Substring(context.Request.ApplicationPath.Length));
+            try
+            {
+                var contextWrapper = new HttpContextWrapper(context);
+                IContext requestContext = CreateRequestContext(contextWrapper);
+
+                context.User = requestContext.CurrentUser;
+
+                methodDispatcher.InvokeMethod(contextWrapper, requestPoint, requestContext);
+            }
+            catch (WebException webEx)
+            {
+                context.Response.Clear();
+                context.Response.StatusCode = Convert.ToInt16(webEx.Code);
+                if (!String.IsNullOrEmpty(webEx.Message))
+                    context.Response.Write(webEx.Message);
+
+                if (webEx.InnerException != null && webEx.Code == StatusCode.InternalServerError)
+                    context.Response.Write("\r\n\r\n" + webEx.ToString());
+            }
+        }
 
         /// <summary>
         /// Loads the factories.
@@ -186,9 +187,8 @@ namespace Bistro.Http
                 Application.Initialize(section);
 
             application = Application.Instance;
-            manager = application.ManagerFactory.GetManagerInstance();
-            dispatcher = application.DispatcherFactory.GetDispatcherInstance();
             logger = application.LoggerFactory.GetLogger(GetType());
+            methodDispatcher = new MethodDispatcher(application);
         }
 
         /// <summary>
@@ -275,170 +275,6 @@ namespace Bistro.Http
             get { return true; }
         }
 
-        /// <summary>
-        /// Enables processing of HTTP Web requests by a custom HttpHandler that implements the <see cref="T:System.Web.IHttpHandler"/> interface.
-        /// </summary>
-        /// <param name="context">An <see cref="T:System.Web.HttpContext"/> object that provides references to the intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
-        public void ProcessRequest(HttpContext context)
-        {
-            string requestPoint =
-                BindPointUtilities.Combine(context.Request.HttpMethod, context.Request.RawUrl.Substring(context.Request.ApplicationPath.Length));
-            try
-            {
-                var contextWrapper = new HttpContextWrapper(context);
-                IContext requestContext = CreateRequestContext(contextWrapper);
-
-                context.User = requestContext.CurrentUser;
-
-                ProcessRequestRecursive(contextWrapper, requestPoint, requestContext);
-            }
-            catch (WebException webEx)
-            {
-                context.Response.Clear();
-                context.Response.StatusCode = Convert.ToInt16(webEx.Code);
-                if (!String.IsNullOrEmpty(webEx.Message))
-                    context.Response.Write(webEx.Message);
-
-                if (webEx.InnerException != null && webEx.Code == StatusCode.InternalServerError)
-                    context.Response.Write("\r\n\r\n" + webEx.ToString());
-            }
-        }
-
-        /// <summary>
-        /// Obtains and processes the chain of controllers servicing this request. If a transfer is requested
-        /// during the processing of a controller, the computed chain of controllers finishes, and then a
-        /// recursive call is made to process the new contrller.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="requestPoint">The request point.</param>
-        /// <param name="requestContext">The request context.</param>
-        protected virtual void ProcessRequestRecursive(HttpContextBase context, string requestPoint, IContext requestContext)
-        {
-            logger.Report(Messages.ProcessingRequest, requestPoint);
-            
-
-            ControllerInvocationInfo[] controllers = dispatcher.GetControllers(requestPoint);
-
-            if (controllers.Length == 0)
-            {
-                logger.Report(Messages.ControllerNotFound, requestPoint);
-                Signal404(context.Response);
-                return;
-            }
-
-            bool securityCheckComplete = false;
-            bool securityCheckFailed = false;
-            var failedPermissions = new Dictionary<string, KeyValuePair<FailAction, string>>();
-
-            foreach (ControllerInvocationInfo info in controllers)
-            {
-                IController controller = manager.GetController(info, context, requestContext);
-
-                try
-                {
-                    // all security controllers are guaranteed to be at the top of the list, in proper order.
-                    // we need to run through all of them, because an inner controller may override the decision 
-                    // of an outer controller. therefore, the final decision is deferred until all security checks
-                    // have passed
-                    if (!securityCheckComplete)
-                    {
-                        ISecurityController securityController = controller as ISecurityController;
-                        if (securityController == null)
-                            securityCheckComplete = true;
-                        else
-                        {
-                            // this needs to run prior to the check
-                            controller.ProcessRequest(context, requestContext);
-
-                            // we only care about the actual return value of the last controller, as intermediate
-                            // results can be overriden by subsequent controllers. discard intermediate return values.
-                            securityCheckFailed = !securityController.HasAccess(requestContext, failedPermissions);
-                        }
-                    }
-
-                    // we have to do the check a second time, because the securityCheckComplete flag
-                    // gets set inside the top if. doing this in an else up top would skip the first
-                    // non-security controller
-                    if (securityCheckComplete)
-                    {
-                        if (securityCheckFailed || failedPermissions.Count != 0)
-                        {
-                            StringBuilder builder = new StringBuilder();
-                            foreach (string perm in failedPermissions.Keys)
-                                builder.AppendLine(perm);
-
-                            foreach (KeyValuePair<FailAction, string> kvp in failedPermissions.Values)
-                                if (kvp.Key == FailAction.Redirect)
-                                {
-                                    // currently you can only house one transfer request per context, 
-                                    // however, that may change in the future.
-                                    requestContext.ClearTransferRequest();
-
-                                    // give the fail action target a chance to redirect after re-validating
-                                    requestContext.Transfer(
-                                        kvp.Value + 
-                                        (kvp.Value.Contains("?") ? "&" : "?") + 
-                                        "originalRequest=" + 
-                                        HttpUtility.UrlEncode(requestPoint));
-
-                                    logger.Report(Messages.SecurityRedirect, kvp.Value, builder.ToString());
-                                    break;
-                                }
-
-                            if (!requestContext.TransferRequested)
-                                throw new WebException(StatusCode.Unauthorized, "Access denied");
-                            else
-                                // break out of the controller loop. we shouldn't be processing any more
-                                // controllers for this request, and need to get into whatever the security
-                                // guys requested
-                                break;
-                        }
-                        else
-                        {
-                            if (info.BindPoint.Controller.DefaultTemplate != null)
-                                requestContext.Response.RenderWith(info.BindPoint.Controller.DefaultTemplate);
-
-                            controller.ProcessRequest(context, requestContext);
-                        }
-                    }
-                }
-                finally
-                {
-                    manager.ReturnController(controller, context, requestContext);
-                }
-            }
-
-            if (requestContext.TransferRequested)
-            {
-                string transferRequestPoint = BindPointUtilities.VerbQualify(requestContext.TransferTarget, "get");
-                requestContext.ClearTransferRequest();
-
-                ProcessRequestRecursive(context, transferRequestPoint, requestContext);
-            }
-        }
-
-        /// <summary>
-        /// Creates an <see cref="T:Bistro.Controllers.IContext"/>
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <returns></returns>
-        protected virtual IContext CreateRequestContext(HttpContextBase context)
-        {
-            return new DefaultContext(context);
-        }
-
-        /// <summary>
-        /// Returns a 404 code
-        /// </summary>
-        /// <param name="httpResponse">The HTTP response.</param>
-        private void Signal404(HttpResponseBase httpResponse)
-        {
-            httpResponse.Clear();
-            httpResponse.StatusCode = 404;
-            httpResponse.Write(String.Format("404 - requested resource could not be found"));
-            httpResponse.End();
-        }
-
         Dictionary<Type, TemplateEngine> engines = new Dictionary<Type, TemplateEngine>();
         /// <summary>
         /// Returns an instance of the template engine od the specified type associated with this particular 
@@ -465,5 +301,15 @@ namespace Bistro.Http
             return result;
         }
         #endregion
+
+        /// <summary>
+        /// Creates an <see cref="T:Bistro.Controllers.IContext"/>
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
+        protected virtual IContext CreateRequestContext(HttpContextBase context)
+        {
+            return new DefaultContext(context);
+        }
     }
 }

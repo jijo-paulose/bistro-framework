@@ -92,6 +92,7 @@
     <Compile Include="Controllers\IControllerManagerFactory.cs" />
     <Compile Include="Controllers\IExecutionContext.cs" />
     <Compile Include="Controllers\IResponse.cs" />
+    <Compile Include="Controllers\MethodDispatcher.cs" />
     <Compile Include="Controllers\OutputHandling\DefaultFormatManagerFactory.cs" />
     <Compile Include="Controllers\OutputHandling\IFormatManagerFactory.cs" />
     <Compile Include="Controllers\OutputHandling\DefaultFormatManager.cs" />

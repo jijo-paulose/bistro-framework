@@ -81,6 +81,7 @@
     <Compile Include="Controllers\DefaultContext.cs" />
     <Compile Include="Controllers\DependencyHelper.cs" />
     <Compile Include="Controllers\Dispatch\DispatcherFactory.cs" />
+    <Compile Include="Controllers\EventContext.cs" />
     <Compile Include="Controllers\HandlerFactory.cs" />
     <Compile Include="Controllers\IContext.cs" />
     <Compile Include="Controllers\IController.cs" />

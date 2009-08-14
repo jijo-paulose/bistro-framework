@@ -140,27 +140,33 @@ namespace Bistro.Controllers
 						info.BindPoint.ParameterFields[field], 
 						info.Parameters[field]);
 
-			// asking for a non-existant session value will simply return null
-			ArrayList allSessionFields = new ArrayList(context.Session.Keys);
-			foreach (string sessionField in descriptor.SessionFields.Keys)
-				if (allSessionFields.Contains(sessionField))
-					SetValue(instance, descriptor.SessionFields[sessionField], context.Session[sessionField]);
+            if (context != null)
+            {
+                if (context.Session != null)
+                {
+                    // asking for a non-existant session value will simply return null
+                    ArrayList allSessionFields = new ArrayList(context.Session.Keys);
+                    foreach (string sessionField in descriptor.SessionFields.Keys)
+                        if (allSessionFields.Contains(sessionField))
+                            SetValue(instance, descriptor.SessionFields[sessionField], context.Session[sessionField]);
+                }
 
-			//TODO: both the allCookies and allFormFields collections should be computed once per request, not for every controller
-			List<string> allCookies = new List<string>(context.Request.Cookies.AllKeys);
-			foreach (string cookie in descriptor.CookieFields.Keys)
-				if (allCookies.Contains(cookie))
-					SetValue(instance, descriptor.CookieFields[cookie].Field, context.Request.Cookies[cookie].Value);
-			
-			HttpFileCollectionBase files = context.Request.Files;
-			foreach (string file in files.AllKeys)
-				if (descriptor.FormFields.ContainsKey(file))
-					SetFileValue(instance, descriptor.FormFields[file], files[file]);
-						
-			List<string> allFormFields = new List<string>(context.Request.Form.AllKeys);
-			foreach (string formField in descriptor.FormFields.Keys)
-				if (allFormFields.Contains(formField))
-					SetValue(instance, descriptor.FormFields[formField], context.Request.Form[formField]);
+                //TODO: both the allCookies and allFormFields collections should be computed once per request, not for every controller
+                List<string> allCookies = new List<string>(context.Request.Cookies.AllKeys);
+                foreach (string cookie in descriptor.CookieFields.Keys)
+                    if (allCookies.Contains(cookie))
+                        SetValue(instance, descriptor.CookieFields[cookie].Field, context.Request.Cookies[cookie].Value);
+
+                HttpFileCollectionBase files = context.Request.Files;
+                foreach (string file in files.AllKeys)
+                    if (descriptor.FormFields.ContainsKey(file))
+                        SetFileValue(instance, descriptor.FormFields[file], files[file]);
+
+                List<string> allFormFields = new List<string>(context.Request.Form.AllKeys);
+                foreach (string formField in descriptor.FormFields.Keys)
+                    if (allFormFields.Contains(formField))
+                        SetValue(instance, descriptor.FormFields[formField], context.Request.Form[formField]);
+            }
 
 			foreach (string requestField in descriptor.RequestFields.Keys)
 				if (requestContext.Contains(requestField))

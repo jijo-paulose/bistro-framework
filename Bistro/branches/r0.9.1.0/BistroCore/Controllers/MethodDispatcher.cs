@@ -78,6 +78,19 @@ namespace Bistro.Controllers
         }
 
         /// <summary>
+        /// Determines whether <c>method</c> is defined on the runtime, i.e. if there is at least one
+        /// controller that would fire for the given request
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>
+        /// 	<c>true</c> if [is method supported] [the specified method]; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsMethodDefined(string method)
+        {
+            return dispatcher.GetControllers(method).Length > 0;
+        }
+
+        /// <summary>
         /// Enables processing of HTTP Web requests by a custom HttpHandler that implements the <see cref="T:System.Web.IHttpHandler"/> interface.
         /// </summary>
         /// <param name="context">An <see cref="T:System.Web.HttpContext"/> object that provides references to the intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>

@@ -41,6 +41,21 @@ namespace Bistro
     public class Application
     {
         /// <summary>
+        /// Name of Bistro events
+        /// </summary>
+        public const string SystemEvents = "/bistro";
+
+        /// <summary>
+        /// Name application events
+        /// </summary>
+        public const string ApplicationEvents = "/application";
+
+        /// <summary>
+        /// Name of the startup event
+        /// </summary>
+        public const string ApplicationStartup = "EVENT" + SystemEvents + ApplicationEvents + "/startup";
+
+        /// <summary>
         /// Gets or sets the application instance.
         /// </summary>
         /// <value>The instance.</value>
@@ -115,6 +130,10 @@ namespace Bistro
             application.ManagerFactory = LoadComponent<IControllerManagerFactory>(logger, configuration.ControllerManagerFactory, typeof(ControllerManagerFactory), new object[] { application, configuration });
 
             application.Initialized = true;
+
+            var methodDispatcher = new MethodDispatcher(application);
+            if (methodDispatcher.IsMethodDefined(ApplicationStartup))
+                methodDispatcher.InvokeMethod(null, ApplicationStartup, new EventContext(null, false));
         }
 
         /// <summary>

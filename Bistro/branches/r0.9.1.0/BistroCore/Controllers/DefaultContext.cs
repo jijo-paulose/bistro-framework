@@ -31,6 +31,7 @@ using Bistro.Controllers.Security;
 using Bistro.Http;
 using System.Web;
 using Bistro.Controllers.OutputHandling;
+using Bistro.Controllers.Descriptor;
 
 namespace Bistro.Controllers
 {
@@ -60,7 +61,7 @@ namespace Bistro.Controllers
         /// <param name="session">The session.</param>
         public DefaultContext(HttpContextBase context)
         {
-            this.session = context.Session;
+            this.session = context == null ? null : context.Session;
             this.context = context;
             this.Code = StatusCode.OK;
         }
@@ -79,7 +80,7 @@ namespace Bistro.Controllers
         /// Notifies the rendering engine how to render the results of the current request
         /// </summary>
         /// <param name="target"></param>
-        public void RenderWith(string target)
+        public virtual void RenderWith(string target)
         {
             ClearReturnValues();
             RenderTarget = target;
@@ -191,7 +192,7 @@ namespace Bistro.Controllers
         /// Gets the session.
         /// </summary>
         /// <value>The session.</value>
-        public HttpSessionStateBase Session
+        public virtual HttpSessionStateBase Session
         {
             get { return session; }
         }
@@ -292,7 +293,7 @@ namespace Bistro.Controllers
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="contentType">the content-type header value to supply.</param>
-        public void ReturnFreeForm(string value, string contentType)
+        public virtual void ReturnFreeForm(string value, string contentType)
         {
             ClearReturnValues();
             ExplicitResult = value;
@@ -341,7 +342,7 @@ namespace Bistro.Controllers
         /// Gets the response object.
         /// </summary>
         /// <value>The response.</value>
-        public IResponse Response { get { return this; } }
+        public virtual IResponse Response { get { return this; } }
 
         /// <summary>
         /// Returns the content of the current context. This method is called 
@@ -361,7 +362,7 @@ namespace Bistro.Controllers
         /// Returns the specified object graph.
         /// </summary>
         /// <param name="objectGraph">The object graph.</param>
-        public void Return(object objectGraph)
+        public virtual void Return(object objectGraph)
         {
             IWebFormatter formatter =
                 Application.Instance.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter();
@@ -374,7 +375,7 @@ namespace Bistro.Controllers
         /// </summary>
         /// <param name="objectGraph">The object graph.</param>
         /// <param name="formatName">Name of the format.</param>
-        public void Return(object objectGraph, string formatName)
+        public virtual void Return(object objectGraph, string formatName)
         {
             IWebFormatter formatter =
                 Application.Instance.FormatManagerFactory.GetManagerInstance().GetFormatterByFormat(formatName);
@@ -382,8 +383,17 @@ namespace Bistro.Controllers
             ReturnFreeForm(formatter.Serialize(objectGraph), formatter.ContentType);
         }
 
-        public void RaiseEvent(string eventUrl)
+        /// <summary>
+        /// Raises the given event. No expectation of when the actual event will be executed is provided.
+        /// </summary>
+        /// <param name="eventUrl">The event URL.</param>
+        public virtual void RaiseEvent(string eventUrl)
         {
+            new MethodDispatcher(Application.Instance)
+                .InvokeMethod(
+                    context, 
+                    BindPointUtilities.VerbQualify(eventUrl, "EVENT"), 
+                    new EventContext(context, true));
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Bistro.UnitTests.Tests
         public void ApplicationCreated()
         {
             Assert.IsNotNull(Application.Instance, "Application not created.");
+            Assert.AreEqual(1, StartupController.hitcount, String.Format("Application startup event called {0} time(s), instead of 1.", StartupController.hitcount));
         }
 
         [Test]
@@ -30,6 +31,5 @@ namespace Bistro.UnitTests.Tests
         {
             Assert.IsNotNull(dispatcher);
         }
-
     }
 }

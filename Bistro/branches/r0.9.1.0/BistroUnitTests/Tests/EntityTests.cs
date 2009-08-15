@@ -24,7 +24,7 @@ namespace Bistro.UnitTests.Tests
         [Test]
         public void MapsFromInputToEntity()
         {
-            var resp = handler.RunForTest("GET/entityTest?foo=hello&bar=world&thirdField=stuff&unwrap=false");
+            var resp = handler.RunForTest("GET/entityTest?foo=hello&bar=world&thirdField=stuff&unwrap=false&extra=something");
             var contexts = handler.AllContents;
             var entity = contexts["request"]["entity"] as SimpleEntity;
 
@@ -35,6 +35,7 @@ namespace Bistro.UnitTests.Tests
                 Assert.AreEqual("hello", entity.foo);
                 Assert.AreEqual("world", entity.bar);
                 Assert.AreEqual("stuff", entity.baz, String.Format("Expected 'stuff', received '{0}'. If the other tests passed, and this failed, the explicit mapping call is suspect", entity.baz));
+                Assert.IsNull(entity.extra, "Field 'extra' should remain null. Issue with Except() method.");
             }
         }
 

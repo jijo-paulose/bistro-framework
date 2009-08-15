@@ -29,6 +29,7 @@ namespace Bistro.UnitTests.Tests.Data
         public string foo;
         public string bar;
         public string baz;
+        public string extra;
 
         public List<IValidationResult> Messages { get; set; }
         public bool IsValid { get; set; }
@@ -39,6 +40,7 @@ namespace Bistro.UnitTests.Tests.Data
         public TestMapper()
         {
             Infer()
+                .Except(x => x.extra)
                 .Map(x => x.thirdField).To(y => y.baz);
         }
     }
@@ -48,7 +50,7 @@ namespace Bistro.UnitTests.Tests.Data
         protected override void Define() { ByMapping(); }
     }
 
-    [Bind("/entityTest?{foo}&{bar}&{thirdField}&{unwrap}")]
+    [Bind("/entityTest?{foo}&{bar}&{thirdField}&{extra}&{unwrap}")]
     [ValidateWith(typeof(EntityControllerValidator))]
     [MapsWith(typeof(TestMapper))]
     public class EntityController : AbstractController, IMappable, IValidatable
@@ -58,6 +60,8 @@ namespace Bistro.UnitTests.Tests.Data
             foo,
             bar,
             thirdField;
+
+        public string extra;
 
         public bool unwrap;
 

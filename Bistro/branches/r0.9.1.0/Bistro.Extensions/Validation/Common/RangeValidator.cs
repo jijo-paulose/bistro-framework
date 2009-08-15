@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Bistro.Validation;
 using System.Globalization;
+using System.Reflection;
 
 namespace Bistro.Extensions.Validation.Common
 {
@@ -67,6 +68,11 @@ namespace Bistro.Extensions.Validation.Common
                 messages.Add(new CommonValidationResult(this, target as IValidatable, String.Format(Message,min,max), !fail));
 
             return !fail;
+        }
+
+        public override IValidator Translate(MemberInfo target)
+        {
+            return ValidatorForType(target.DeclaringType, new object[] { Message, min, max });
         }
     }
 }

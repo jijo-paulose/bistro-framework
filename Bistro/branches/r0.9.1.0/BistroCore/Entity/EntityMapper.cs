@@ -54,6 +54,8 @@ namespace Bistro.Entity
     {
         Dictionary<MemberAccessor, MemberAccessor> mapping = new Dictionary<MemberAccessor, MemberAccessor>();
 
+        public IDictionary<MemberAccessor, MemberAccessor> Mapping { get { return mapping; } }
+
         /// <summary>
         /// Adds the mapping.
         /// </summary>
@@ -80,7 +82,7 @@ namespace Bistro.Entity
         /// <summary>
         /// Builds the mapping based on field names and types only
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Updated entity mapper</returns>
         public EntityMapper<TController, TEntity> Infer()
         {
             return Infer(BindingFlags.Public);
@@ -100,7 +102,12 @@ namespace Bistro.Entity
                     target.TargetType.IsAssignableFrom(source.TargetType));
         }
 
-        private EntityMapper<TController, TEntity> Infer(BindingFlags bindingFlags)
+        /// <summary>
+        /// Builds the mapping based on field names and types only
+        /// </summary>
+        /// <param name="bindingFlags">The binding flags.</param>
+        /// <returns>Updated entity mapper</returns>
+        public EntityMapper<TController, TEntity> Infer(BindingFlags bindingFlags)
         {
             var finalFlags = bindingFlags | BindingFlags.Instance;
 

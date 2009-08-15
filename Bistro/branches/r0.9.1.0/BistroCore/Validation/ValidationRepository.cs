@@ -26,6 +26,26 @@ namespace Bistro.Validation
         private Dictionary<Type, IValidator> validatorsByType = new Dictionary<Type, IValidator>();
 
         /// <summary>
+        /// Registers a type marked with the <see cref="ValidateWithAttribute"/> attribute.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The list of validators generated</returns>
+        public ICollection<IValidator> RegisterValidatable(Type type)
+        {
+            var attribs = type.GetCustomAttributes(typeof(ValidateWithAttribute), false);
+            var validators = new List<IValidator>();
+
+            foreach (ValidateWithAttribute attrib in attribs)
+            {
+                var v = (IValidator)Activator.CreateInstance(attrib.TargetType);
+                RegisterValidator(type, v);
+                validators.Add(v);
+            }
+
+            return validators;
+        }
+
+        /// <summary>
         /// Registers the validator.
         /// </summary>
         /// <param name="validator">The validator.</param>
@@ -61,7 +81,13 @@ namespace Bistro.Validation
         {
             IValidator validator = null;
             if (!validatorsByType.TryGetValue(type, out validator))
+            {
+                // if we can't find it, maybe we haven't loaded it yet...
+                if (RegisterValidatable(type).Count > 0)
+                    return GetValidatorForType(type);
+
                 return null;
+            }
 
             return validator;
         }

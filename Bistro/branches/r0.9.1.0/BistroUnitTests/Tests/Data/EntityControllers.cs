@@ -13,11 +13,26 @@ using Bistro.Entity;
 
 namespace Bistro.UnitTests.Tests.Data
 {
-    public class SimpleEntity
+    public class SimpleEntityValidator: Validator<SimpleEntity>
+    {
+        protected override void Define()
+        {
+            As("SimpleEntity")
+            .Define(
+                Value(c => c.foo).IsRequired("Foo is required")
+                );
+        }
+    }
+
+    [ValidateWith(typeof(SimpleEntityValidator))]
+    public class SimpleEntity: IValidatable
     {
         public string foo;
         public string bar;
         public string baz;
+
+        public List<IValidationResult> Messages { get; set; }
+        public bool IsValid { get; set; }
     }
 
     class TestMapper: EntityMapper<EntityController, SimpleEntity>
@@ -29,10 +44,19 @@ namespace Bistro.UnitTests.Tests.Data
         }
     }
 
+    class EntityControllerValidator: Validator<EntityController>
+    {
+        protected override void Define()
+        {
+            As("Entity")
+                .ByMapping();
+        }
+    }
+
     [Bind("/entityTest?{foo}&{bar}&{thirdField}&{unwrap}")]
-    [ValidateWith(typeof(ControllerValidator))]
+    [ValidateWith(typeof(EntityControllerValidator))]
     [MapsWith(typeof(TestMapper))]
-    public class EntityController : AbstractController, IMappable
+    public class EntityController : AbstractController, IMappable, IValidatable
     {
         [Request]
         public string 
@@ -47,6 +71,8 @@ namespace Bistro.UnitTests.Tests.Data
 
         [Request]
         public List<IValidationResult> Messages { get; set; }
+
+        [Request]
         public bool IsValid { get; set; }
 
         public override void DoProcessRequest(IExecutionContext context)
@@ -55,6 +81,9 @@ namespace Bistro.UnitTests.Tests.Data
                 Mapper.Unmap(this, entity);
             else
             {
+                if (!IsValid)
+                    return;
+
                 entity = new SimpleEntity();
                 Mapper.Map(this, entity);
 

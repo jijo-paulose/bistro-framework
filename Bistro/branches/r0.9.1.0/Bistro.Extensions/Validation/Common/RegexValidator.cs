@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Bistro.Validation;
 using System.Text.RegularExpressions;
@@ -39,6 +40,11 @@ namespace Bistro.Extensions.Validation.Common
                 messages.Add(new CommonValidationResult(this, target as IValidatable, Message, !fail));
 
             return !fail;
+        }
+
+        public override IValidator Translate(MemberInfo target)
+        {
+            return ValidatorForType(target.DeclaringType, new object[] { Message, re.ToString(), re.Options });
         }
     }
 }

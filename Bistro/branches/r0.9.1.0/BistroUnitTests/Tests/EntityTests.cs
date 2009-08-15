@@ -50,5 +50,18 @@ namespace Bistro.UnitTests.Tests
             Assert.AreEqual("world", contexts["request"]["bar"]);
             Assert.AreEqual("stuff", contexts["request"]["thirdField"], String.Format("Expected 'stuff', received '{0}'. If the other tests passed, and this failed, the explicit mapping call is suspect", contexts["request"]["thirdField"]));
         }
+
+        [Test]
+        public void ValidatesByMapping()
+        {
+            var resp = handler.RunForTest("GET/entityTest?bar=world&thirdField=stuff&unwrap=false");
+            var contexts = handler.AllContents;
+            var entity = contexts["request"]["entity"] as SimpleEntity;
+
+            Assert.Null(entity, "Entity should have been null - not enough data was supplied.");
+
+            var messages = contexts["request"]["Messages"] as List<IValidationResult>;
+            Assert.AreEqual(1, messages.Count);
+        }
     }
 }

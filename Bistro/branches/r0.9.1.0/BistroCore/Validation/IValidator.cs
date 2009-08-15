@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 namespace Bistro.Validation
 {
@@ -34,6 +35,20 @@ namespace Bistro.Validation
         /// <param name="target">The target.</param>
         /// <returns></returns>
         IValidator Merge(IValidator target);
+
+        /// <summary>
+        /// Adds the specified child validator.
+        /// </summary>
+        /// <param name="child">The child.</param>
+        /// <returns></returns>
+        IValidator Add(IValidator child);
+
+        /// <summary>
+        /// Translates this validation to a different target
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns></returns>
+        IValidator Translate(MemberInfo target);
 
         /// <summary>
         /// Gets the parameters that define this validator

@@ -24,5 +24,11 @@ namespace Bistro.Entity
         /// <param name="controller">The controller.</param>
         /// <param name="entity">The entity.</param>
         void Unmap(IController controller, object entity);
+
+        /// <summary>
+        /// Gets the mapping.
+        /// </summary>
+        /// <value>The mapping.</value>
+        IDictionary<MemberAccessor, MemberAccessor> Mapping { get; }
     }
 }

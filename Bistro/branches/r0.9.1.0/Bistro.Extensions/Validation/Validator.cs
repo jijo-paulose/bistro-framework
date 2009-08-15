@@ -23,6 +23,7 @@ namespace Bistro.Extensions.Validation
         public Validator()
         {
             DefiningParams = new Dictionary<string, object>();
+            Name = typeof(T).Name;
 
             Define();
         }

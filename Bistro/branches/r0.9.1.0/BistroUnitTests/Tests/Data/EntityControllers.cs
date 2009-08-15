@@ -17,8 +17,7 @@ namespace Bistro.UnitTests.Tests.Data
     {
         protected override void Define()
         {
-            As("SimpleEntity")
-            .Define(
+            Define(
                 Value(c => c.foo).IsRequired("Foo is required")
                 );
         }
@@ -46,11 +45,7 @@ namespace Bistro.UnitTests.Tests.Data
 
     class EntityControllerValidator: Validator<EntityController>
     {
-        protected override void Define()
-        {
-            As("Entity")
-                .ByMapping();
-        }
+        protected override void Define() { ByMapping(); }
     }
 
     [Bind("/entityTest?{foo}&{bar}&{thirdField}&{unwrap}")]

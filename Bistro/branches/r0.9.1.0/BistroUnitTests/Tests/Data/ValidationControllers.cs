@@ -16,8 +16,7 @@ namespace Bistro.UnitTests.Tests.Data
     {
         protected override void Define()
         {
-            this.As("validationTest")
-                .Define(
+            this.Define(
                     Value(c => c.someField)
                         .AliasedAs("otherField")
                         .IsRequired("someField is required")

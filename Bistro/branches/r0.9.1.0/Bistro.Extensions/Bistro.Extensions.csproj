@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{81D48228-73A8-4A92-84B9-ECD57F86DB72}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -60,6 +60,7 @@
     <Compile Include="Validation\Common\RegexValidator.cs" />
     <Compile Include="Validation\Common\Rules.cs" />
     <Compile Include="Validation\Common\RequiredValidator.cs" />
+    <Compile Include="Validation\IValidationSite.cs" />
     <Compile Include="Validation\ValidationSite.cs" />
     <Compile Include="Validation\Validator.cs" />
   </ItemGroup>

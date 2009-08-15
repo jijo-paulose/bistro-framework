@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Bistro.Validation;
+using System.Reflection;
 
 namespace Bistro.Extensions.Validation.Common
 {
@@ -15,6 +16,11 @@ namespace Bistro.Extensions.Validation.Common
             Message = message;
 
             DefiningParams.Add("message", message);
+        }
+
+        public override IValidator Translate(MemberInfo target)
+        {
+            return ValidatorForType(target.DeclaringType, new object[] { Message });
         }
     }
 }

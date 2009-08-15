@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Bistro.Validation;
 using System.Linq.Expressions;
+using Bistro.Entity;
+using System.Reflection;
 
 namespace Bistro.Extensions.Validation
 {
@@ -87,6 +89,17 @@ namespace Bistro.Extensions.Validation
         }
 
         /// <summary>
+        /// Adds the specified validator.
+        /// </summary>
+        /// <param name="validator">The validator.</param>
+        /// <returns></returns>
+        public IValidator Add(IValidator validator)
+        {
+            children.Add(validator);
+            return this;
+        }
+
+        /// <summary>
         /// Determines whether the specified target, and all of its children, is valid.
         /// </summary>
         /// <param name="target">The target.</param>
@@ -155,12 +168,97 @@ namespace Bistro.Extensions.Validation
             return validator;
         }
 
+        /// <summary>
+        /// Defines this instance.
+        /// </summary>
         protected virtual void Define() { }
 
+        /// <summary>
+        /// Gets the parameters that define this validator
+        /// </summary>
+        /// <value>The defining params.</value>
         public virtual Dictionary<string, object> DefiningParams
         {
             get;
             protected set;
+        }
+
+        /// <summary>
+        /// Builds a validator by cloning rules on mapped fields
+        /// </summary>
+        /// <returns></returns>
+        public virtual Validator<T> ByMapping()
+        {
+            var attributes = typeof (T).GetCustomAttributes(typeof (MapsWithAttribute), false) as MapsWithAttribute[];
+            if (attributes.Length != 1)
+                throw new InvalidOperationException(String.Format("{0} is not mappable, and cannot be used in this context", typeof(T).Name));
+
+            // the entity type is the second type parameter to EntityMapper<T,K>
+            var entityType = attributes[0].MapperType.BaseType.GetGenericArguments()[1];
+            var mapper = Activator.CreateInstance(attributes[0].MapperType) as IEntityMapper;
+
+            // the mapping the mapper will have is controller field -> entity field. the validation
+            // will have rules for the entity, and so we'll need to get the controller field by
+            // the entity field. reverse the mapping, and also strip off the memberaccessor - easier
+            // to work with that here, and this is metadata, so not worried about performance.
+            Dictionary<MemberInfo, MemberInfo> reversedMapping = new Dictionary<MemberInfo, MemberInfo>();
+
+            // little f# trick :)
+            mapper.Mapping
+                .ToList()
+                .ForEach(
+                    x => { reversedMapping.Add(x.Value.Member, x.Key.Member); }
+                );
+
+            var validator = ValidationRepository.Instance.GetValidatorForType(entityType);
+
+            if (validator == null)
+                return this;
+
+            foreach (IValidator child in validator.Children)
+            {
+                var validationSite = child as IValidationSite;
+                if (validationSite == null)
+                    continue;
+
+                MemberInfo controllerField;
+                if (reversedMapping.TryGetValue(validationSite.Member, out controllerField))
+                    children.Add(validationSite.Translate(controllerField));
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Translates this validation to a different target
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns></returns>
+        public virtual IValidator Translate(MemberInfo target)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Validators for type.
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns></returns>
+        protected IValidator ValidatorForType(Type target, params object[] ctrParams)
+        {
+            Type[] typeSignature = GetType().GetGenericArguments();
+            typeSignature[0] = target;
+
+            return
+                Activator.CreateInstance(
+                    GetType()
+                        .GetGenericTypeDefinition()
+                        .MakeGenericType(typeSignature),
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                    null,
+                    ctrParams,
+                    null
+                    ) as IValidator;
         }
     }
 }

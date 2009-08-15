@@ -33,14 +33,7 @@ namespace Bistro.Validation
         {
             try
             {
-                var attribs = descriptor.ControllerType.GetCustomAttributes(typeof(ValidateWithAttribute), false);
-
-                foreach (ValidateWithAttribute attrib in attribs)
-                {
-                    var v = (IValidator)Activator.CreateInstance(attrib.TargetType);
-                    ValidationRepository.Instance.RegisterValidator(descriptor.ControllerType as Type, v);
-                    validators.Add(v);
-                }
+                validators.InsertRange(0, ValidationRepository.Instance.RegisterValidatable(descriptor.ControllerType as Type));
             }
             catch (InvalidCastException)
             {

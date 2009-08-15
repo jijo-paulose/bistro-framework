@@ -13,12 +13,18 @@ namespace Bistro.Extensions.Validation
     /// </summary>
     /// <typeparam name="T">the type of the owner class</typeparam>
     /// <typeparam name="K">the type of the member to be validated</typeparam>
-    public class ValidationSite<T,K>: Validator<T> where T: IValidatable
+    public class ValidationSite<T, K> : Validator<T>, IValidationSite where T : IValidatable
     {
         /// <summary>
         /// The member represented by this validation site
         /// </summary>
         MemberInfo member;
+
+        /// <summary>
+        /// Gets the member represented by this validation site.
+        /// </summary>
+        /// <value>The member.</value>
+        public MemberInfo Member { get { return member; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationSite&lt;T, K&gt;"/> class.
@@ -30,6 +36,17 @@ namespace Bistro.Extensions.Validation
             member = body.Member;
 
             this.Name = body.Member.Name;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationSite&lt;T, K&gt;"/> class.
+        /// </summary>
+        /// <param name="member">The member.</param>
+        protected ValidationSite(MemberInfo member)
+        {
+            this.member = member;
+
+            this.Name = member.Name;
         }
 
         /// <summary>
@@ -81,6 +98,21 @@ namespace Bistro.Extensions.Validation
             }
 
             return fInfo.GetValue(target);
+        }
+
+        /// <summary>
+        /// Translates this validation to a different target
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns></returns>
+        public override IValidator Translate(MemberInfo target)
+        {
+            var site = ValidatorForType(target.DeclaringType, new object[] { target }) as IValidationSite;
+
+            foreach (IValidator child in children)
+                site.Add(child.Translate(target));
+
+            return site;
         }
     }
 }

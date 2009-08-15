@@ -30,6 +30,7 @@ using Bistro.Controllers.Descriptor;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers.OutputHandling;
 using Bistro.Controllers.Descriptor.Data;
+using Bistro.Entity;
 
 namespace Bistro.Controllers
 {
@@ -55,6 +56,11 @@ namespace Bistro.Controllers
 		/// A list of all fields modified by the system
 		/// </summary>
 		List<MemberInfo> manipulatedFields = new List<MemberInfo>();
+
+        /// <summary>
+        /// The mapper associated with this controller
+        /// </summary>
+        private IEntityMapper mapper;
 
         /// <summary>
         /// A mapping of members to formatters used to serialize their input data
@@ -111,6 +117,10 @@ namespace Bistro.Controllers
                     formatters.Add(mbr, application.FormatManagerFactory.GetManagerInstance().GetFormatterByFormat(attributes[0].FormatName));
                 }
             );
+
+		    var mapperAttribute = descriptor.ControllerType.GetCustomAttributes(typeof (MapsWithAttribute), false) as MapsWithAttribute[];
+            if (mapperAttribute != null && mapperAttribute.Length == 1)
+                mapper = Activator.CreateInstance(mapperAttribute[0].MapperType) as IEntityMapper;
         }
 
 		/// <summary>
@@ -171,6 +181,13 @@ namespace Bistro.Controllers
 			foreach (string requestField in descriptor.RequestFields.Keys)
 				if (requestContext.Contains(requestField))
 					SetValue(instance, descriptor.RequestFields[requestField], requestContext[requestField]);
+
+            if (mapper != null)
+            {
+                IMappable mappable = instance as IMappable;
+                if (mappable != null)
+                    mappable.Mapper = mapper;
+            }
 
 			return instance;
 		}

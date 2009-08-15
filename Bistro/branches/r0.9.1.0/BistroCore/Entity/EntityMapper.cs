@@ -149,6 +149,20 @@ namespace Bistro.Entity
         }
 
         /// <summary>
+        /// Removes a mapping expression. This is used to remove fields from an inferred mapping.
+        /// </summary>
+        /// <param name="expr">Expression identifying the controller field.</param>
+        /// <returns></returns>
+        public EntityMapper<TController, TEntity> Except<T>(Expression<Func<TController, T>> expr)
+        {
+            var body = expr.Body as MemberExpression;
+            var controllerMember = body.Member;
+
+            mapping.Remove(new MemberAccessor(controllerMember));
+            return this;
+        }
+
+        /// <summary>
         /// Performs the mapping from the controller to the entity
         /// </summary>
         /// <param name="controller">The controller.</param>

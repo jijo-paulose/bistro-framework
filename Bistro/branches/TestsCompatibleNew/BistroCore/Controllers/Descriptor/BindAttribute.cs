@@ -25,6 +25,7 @@ using System.Text;
 
 namespace Bistro.Controllers.Descriptor
 {
+
     /// <summary>
     /// Marks a class as bound to a particular meta-url
     /// </summary>
@@ -38,6 +39,20 @@ namespace Bistro.Controllers.Descriptor
         public BindAttribute(string target)
         {
             this.target = target;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BindAttribute"/> class.
+        /// </summary>
+        /// <param name="verb">The verb.</param>
+        /// <param name="target">The target.</param>
+        public BindAttribute(BindVerb verb, string target)
+        {
+            if (BindPointUtilities.IsVerbQualified(target))
+                throw new ApplicationException(
+                    String.Format("Bind attributes may not use both the BindVerb and an HTTP Verb in the bind specification: '{0}'", target));
+
+            this.target = verb.ToString() + " " + target.Trim();
         }
 
         /// <summary>

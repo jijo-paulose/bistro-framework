@@ -26,15 +26,20 @@ using System.Text;
 using System.Reflection;
 using System.Web;
 using System.Collections;
+using System.Collections.Generic;
 using Bistro.Controllers.Descriptor;
 using Bistro.Configuration.Logging;
+using Bistro.Controllers.OutputHandling;
+using Bistro.Controllers.Descriptor.Data;
+using Bistro.Entity;
 using Bistro.Special.Reflection;
+using System.Linq;
 
 namespace Bistro.Controllers
 {
-	/// <summary>
-	/// Manages the state of a controller pre and post processing.
-	/// </summary>
+    /// <summary>
+    /// Manages the state of a controller pre and post processing.
+    /// </summary>
 	public class ControllerHandler : Bistro.Controllers.IControllerHandler
 	{
 		enum Messages 
@@ -56,9 +61,19 @@ namespace Bistro.Controllers
 		List<IMemberInfo> manipulatedFields = new List<IMemberInfo>();
 
         /// <summary>
+        /// The mapper associated with this controller
+        /// </summary>
+        private IEntityMapper mapper;
+
+        /// <summary>
+        /// A mapping of members to formatters used to serialize their input data
+        /// </summary>
+        Dictionary<IMemberInfo, IWebFormatter> formatters = new Dictionary<IMemberInfo, IWebFormatter>();
+
+        /// <summary>
         /// Empty object array for no-parameter method signatures
         /// </summary>
-        private object[] EmptyParams = new object[] { };
+        protected object[] EmptyParams = new object[] { };
 
         /// <summary>
         /// Constructor for our controller
@@ -70,25 +85,47 @@ namespace Bistro.Controllers
         /// </summary>
         private ILogger logger;
 
+        /// <summary>
+        /// The application object
+        /// </summary>
+        private Application application;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ControllerHandler"/> class.
 		/// </summary>
 		/// <param name="controllerType">Type of the controller.</param>
-		protected internal ControllerHandler(ControllerDescriptor descriptor, ILogger logger)
-		{
-			this.descriptor = descriptor;
+        protected internal ControllerHandler(Application application, ControllerDescriptor descriptor, ILogger logger)
+        {
+            this.descriptor = descriptor;
             this.logger = logger;
+            this.application = application;
 
             controllerConstructor = descriptor.ControllerType.GetConstructor(Type.EmptyTypes);
 
-			foreach (ControllerDescriptor.BindPointDescriptor bindPoint in descriptor.Targets)
-				manipulatedFields.AddRange(bindPoint.ParameterFields.Values);
-			manipulatedFields.AddRange(descriptor.FormFields.Values);
-			manipulatedFields.AddRange(descriptor.RequestFields.Values);
-			manipulatedFields.AddRange(descriptor.SessionFields.Values);
-			foreach (ControllerDescriptor.CookieFieldDescriptor cookieField in descriptor.CookieFields.Values)
-				manipulatedFields.Add(cookieField.Field);
-		}
+            foreach (ControllerDescriptor.BindPointDescriptor bindPoint in descriptor.Targets)
+                manipulatedFields.AddRange(bindPoint.ParameterFields.Values);
+            manipulatedFields.AddRange(descriptor.FormFields.Values);
+            manipulatedFields.AddRange(descriptor.RequestFields.Values);
+            manipulatedFields.AddRange(descriptor.SessionFields.Values);
+            foreach (ControllerDescriptor.CookieFieldDescriptor cookieField in descriptor.CookieFields.Values)
+                manipulatedFields.Add(cookieField.Field);
+
+            manipulatedFields.ForEach(
+                (mbr) => 
+                {
+//                    var attributes = mbr.GetCustomAttributes(typeof(FormatAsAttribute), false) as FormatAsAttribute[];
+                    var attributes = mbr.GetCustomAttributes(typeof(FormatAsAttribute), false).ToArray();
+                    if (attributes.Length != 1)
+                        return;
+
+                    formatters.Add(mbr, application.FormatManagerFactory.GetManagerInstance().GetFormatterByFormat(attributes[0].Properties["FormatName"].AsString()));
+                }
+            );
+
+		    var mapperAttribute = descriptor.ControllerType.GetCustomAttributes(typeof (MapsWithAttribute), false) as MapsWithAttribute[];
+            if (mapperAttribute != null && mapperAttribute.Length == 1)
+                mapper = Activator.CreateInstance(mapperAttribute[0].MapperType) as IEntityMapper;
+        }
 
 		/// <summary>
 		/// Gets the controller instance.
@@ -122,31 +159,44 @@ namespace Bistro.Controllers
 						info.BindPoint.ParameterFields[field], 
 						info.Parameters[field]);
 
-			// asking for a non-existant session value will simply return null
-			ArrayList allSessionFields = new ArrayList(context.Session.Keys);
-			foreach (string sessionField in descriptor.SessionFields.Keys)
-				if (allSessionFields.Contains(sessionField))
-					SetValue(instance, descriptor.SessionFields[sessionField], context.Session[sessionField]);
+            if (context != null)
+            {
+                if (context.Session != null)
+                {
+                    // asking for a non-existant session value will simply return null
+                    ArrayList allSessionFields = new ArrayList(context.Session.Keys);
+                    foreach (string sessionField in descriptor.SessionFields.Keys)
+                        if (allSessionFields.Contains(sessionField))
+                            SetValue(instance, descriptor.SessionFields[sessionField], context.Session[sessionField]);
+                }
 
-			//TODO: both the allCookies and allFormFields collections should be computed once per request, not for every controller
-			List<string> allCookies = new List<string>(context.Request.Cookies.AllKeys);
-			foreach (string cookie in descriptor.CookieFields.Keys)
-				if (allCookies.Contains(cookie))
-					SetValue(instance, descriptor.CookieFields[cookie].Field, context.Request.Cookies[cookie].Value);
-			
-			HttpFileCollectionBase files = context.Request.Files;
-			foreach (string file in files.AllKeys)
-				if (descriptor.FormFields.ContainsKey(file))
-					SetFileValue(instance, descriptor.FormFields[file], files[file]);
-						
-			List<string> allFormFields = new List<string>(context.Request.Form.AllKeys);
-			foreach (string formField in descriptor.FormFields.Keys)
-				if (allFormFields.Contains(formField))
-					SetValue(instance, descriptor.FormFields[formField], context.Request.Form[formField]);
+                //TODO: both the allCookies and allFormFields collections should be computed once per request, not for every controller
+                List<string> allCookies = new List<string>(context.Request.Cookies.AllKeys);
+                foreach (string cookie in descriptor.CookieFields.Keys)
+                    if (allCookies.Contains(cookie))
+                        SetValue(instance, descriptor.CookieFields[cookie].Field, context.Request.Cookies[cookie].Value);
+
+                HttpFileCollectionBase files = context.Request.Files;
+                foreach (string file in files.AllKeys)
+                    if (descriptor.FormFields.ContainsKey(file))
+                        SetFileValue(instance, descriptor.FormFields[file], files[file]);
+
+                List<string> allFormFields = new List<string>(context.Request.Form.AllKeys);
+                foreach (string formField in descriptor.FormFields.Keys)
+                    if (allFormFields.Contains(formField))
+                        SetValue(instance, descriptor.FormFields[formField], context.Request.Form[formField]);
+            }
 
 			foreach (string requestField in descriptor.RequestFields.Keys)
 				if (requestContext.Contains(requestField))
 					SetValue(instance, descriptor.RequestFields[requestField], requestContext[requestField]);
+
+            if (mapper != null)
+            {
+                IMappable mappable = instance as IMappable;
+                if (mappable != null)
+                    mappable.Mapper = mapper;
+            }
 
 			return instance;
 		}
@@ -282,16 +332,36 @@ namespace Bistro.Controllers
         /// <param name="value">The value.</param>
         /// <param name="member">IMember</param>
         /// <returns></returns>
-        //private object Coerce(object value, Type type)
-        //{
-        //    if (type.IsAssignableFrom(value.GetType()))
-        //        return value;
-
-        //    return Convert.ChangeType(value, type);
-        //}
-        private object Coerce(object value, IMemberInfo member)
+        private object Coerce(object value, IMemberInfo field)
         {
-            return member.Coerce(value);
+            // if it's the same, no worries
+            if (field.TypeForCoercion.IsAssignableFrom(value.GetType()))
+                return value;
+            // if it's a value type, or we don't have a formatter that can take care of it, 
+            // try the ChangeType option
+            else if (field.TypeForCoercion.IsValueType || 
+                (application.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter() == null && !formatters.ContainsKey(field)))
+                return Convert.ChangeType(value, field.TypeForCoercion);
+            else
+            {
+                IWebFormatter formatter;
+                if (!formatters.TryGetValue(field, out formatter))
+                    formatter = application.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter();
+
+                // we can't find (or don't have) an explicit formatter, 
+                // and we don't have a default to fall back to. buh-bye.
+                if (formatter == null)
+                    throw new InvalidCastException(
+                        String.Format(
+                            "Unable to convert value for {0}.{1} from {2} to {3}. Specific formatter not found, and no default formatter specified",
+                            field.TypeForCoercion.DeclaringType.Name,// That's bad, but for diagnostics - it's okay.
+                            field.Name,
+                            value.GetType().Name,
+                            field.TypeForCoercion.Name));
+
+                // value will never be null
+                return formatter.Deserialize(field.TypeForCoercion, value.ToString());
+            }
         }
 
 		/// <summary>

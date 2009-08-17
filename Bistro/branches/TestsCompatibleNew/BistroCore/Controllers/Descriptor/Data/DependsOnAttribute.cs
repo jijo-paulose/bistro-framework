@@ -28,19 +28,28 @@ namespace Bistro.Controllers.Descriptor.Data
     /// <summary>
     /// Marks the controller as affected by the marked value on the context
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public class DependsOnAttribute : Attribute, IDataFieldMarker
     {
         /// <summary>
         /// Gets or sets the element.
         /// </summary>
         /// <value>The element.</value>
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DependsOnAttribute"/> class.
         /// </summary>
         /// <param name="element">The element.</param>
         public DependsOnAttribute() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DependsOnAttribute"/> class.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        public DependsOnAttribute(string name)
+        {
+            Name = name;
+        }
     }
 }

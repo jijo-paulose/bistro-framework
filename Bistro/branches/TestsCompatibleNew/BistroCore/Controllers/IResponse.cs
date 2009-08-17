@@ -38,18 +38,21 @@ namespace Bistro.Controllers
         /// Returns XML as the http response, closing the output stream.
         /// </summary>
         /// <param name="xml">The XML string.</param>
+        [Obsolete("This method is being deprecated in favor of the Return(objectGraph[, format]) methods")]
         void ReturnXml(string xml);
 
         /// <summary>
         /// Returns XML as the http response, closing the output stream.
         /// </summary>
         /// <param name="xml">The XML fragment.</param>
+        [Obsolete("This method is being deprecated in favor of the Return(objectGraph[, format]) methods")]
         void ReturnXml(XmlNode xml);
 
         /// <summary>
         /// Returns the JSON as the http response, closing the output stream.
         /// </summary>
         /// <param name="json">The json.</param>
+        [Obsolete("This method is being deprecated in favor of the Return(objectGraph[, format]) methods")]
         void ReturnJSON(string json);
 
         /// <summary>
@@ -84,6 +87,19 @@ namespace Bistro.Controllers
         /// <param name="status">The status.</param>
         /// <param name="message">The message.</param>
         void ReturnStatus(StatusCode status, string message);
+
+        /// <summary>
+        /// Returns the specified object graph.
+        /// </summary>
+        /// <param name="objectGraph">The object graph.</param>
+        void Return(Object objectGraph);
+
+        /// <summary>
+        /// Returns the specified object graph.
+        /// </summary>
+        /// <param name="objectGraph">The object graph.</param>
+        /// <param name="formatName">Name of the format.</param>
+        void Return(Object objectGraph, string formatName);
 
         /// <summary>
         /// Gets the result that was supplied to one of the ReturnXXX methods.

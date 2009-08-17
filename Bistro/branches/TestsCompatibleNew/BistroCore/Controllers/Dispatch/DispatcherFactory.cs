@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Bistro.Configuration;
 
 namespace Bistro.Controllers.Dispatch
 {
@@ -45,7 +46,7 @@ namespace Bistro.Controllers.Dispatch
         /// Initializes a new instance of the <see cref="DispatcherFactory"/> class.
         /// </summary>
         /// <param name="application">The application.</param>
-        public DispatcherFactory(Application application)
+        public DispatcherFactory(Application application, SectionHandler configuration)
         {
             this.application = application;
             instance = GetDispatcherImpl(application);

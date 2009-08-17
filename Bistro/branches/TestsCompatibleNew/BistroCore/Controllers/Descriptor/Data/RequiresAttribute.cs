@@ -30,14 +30,22 @@ namespace Bistro.Controllers.Descriptor.Data
     /// If at the time of controller dispatch no controller is found that explicitly 
     /// provides this value, an exception is thrown.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public class RequiresAttribute : Attribute, IDataFieldMarker
     {
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequiresAttribute"/> class.
         /// </summary>
         public RequiresAttribute() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RequiresAttribute"/> class.
+        /// </summary>
+        public RequiresAttribute(string name)
+        {
+            Name = name;
+        }
     }
 }

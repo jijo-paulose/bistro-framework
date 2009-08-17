@@ -90,5 +90,11 @@ namespace Bistro.Controllers
         /// </summary>
         /// <value>The response.</value>
         IResponse Response { get; }
+
+        /// <summary>
+        /// Raises the given event. No expectation of when the actual event will be executed is provided. 
+        /// </summary>
+        /// <param name="eventUrl">The event URL.</param>
+        void RaiseEvent(string eventUrl);
     }
 }

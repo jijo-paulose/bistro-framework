@@ -25,6 +25,7 @@ using System.Linq;
 using System.Text;
 using Bistro.Controllers.Descriptor;
 using Bistro.Controllers.OutputHandling;
+using Bistro.Configuration;
 
 namespace Bistro.Controllers
 {
@@ -33,15 +34,25 @@ namespace Bistro.Controllers
     /// </summary>
     public class HandlerFactory: IControllerHandlerFactory
     {
-        private Application application;
+        /// <summary>
+        /// The application object
+        /// </summary>
+        protected Application application;
+
+        /// <summary>
+        /// The configuration data
+        /// </summary>
+        protected SectionHandler configuration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HandlerFactory"/> class.
         /// </summary>
         /// <param name="application">The application.</param>
-        public HandlerFactory(Application application)
+        /// <param name="configuration">The configuration.</param>
+        public HandlerFactory(Application application, SectionHandler configuration)
         {
             this.application = application;
+            this.configuration = configuration;
         }
 
         /// <summary>
@@ -49,10 +60,9 @@ namespace Bistro.Controllers
         /// </summary>
         /// <param name="descriptor">The descriptor.</param>
         /// <returns></returns>
-        public IControllerHandler CreateControllerHandler(ControllerDescriptor descriptor)
+        public virtual IControllerHandler CreateControllerHandler(ControllerDescriptor descriptor)
         {
-//#warning Trying to remove ControllerHandler
-            return new ControllerHandler(descriptor, application.LoggerFactory.GetLogger(typeof(ControllerHandler)));
+            return new ControllerHandler(application, descriptor, application.LoggerFactory.GetLogger(typeof(ControllerHandler)));
 //            return null;
         }
     }

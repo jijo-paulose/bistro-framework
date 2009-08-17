@@ -78,7 +78,7 @@ namespace Bistro.Configuration
         /// Gets or sets the controller handler factory.
         /// </summary>
         /// <value>The controller handler factory.</value>
-        [ConfigurationProperty("handler-factory", DefaultValue = "Bistro.Controllers.HandlerFactory")]
+        [ConfigurationProperty("handler-factory", DefaultValue = "Bistro.Validation.ValidatingHandlerFactory")]
         public string ControllerHandlerFactory
         {
             get { return (string)this["handler-factory"]; }
@@ -108,6 +108,17 @@ namespace Bistro.Configuration
         }
 
         /// <summary>
+        /// Gets or sets the controller manager factory.
+        /// </summary>
+        /// <value>The controller manager factory.</value>
+        [ConfigurationProperty("format-manager-factory", DefaultValue = "Bistro.OutputHandling.DefaultFormatManagerFactory")]
+        public string FormatManager
+        {
+            get { return (string)this["format-manager-factory"]; }
+            set { this["format-manager-factory"] = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the extensions that will be processed by bistro.
         /// </summary>
         /// <value>The allowed extensions.</value>
@@ -127,6 +138,28 @@ namespace Bistro.Configuration
         {
             get { return (NameValueConfigurationCollection)this["ignored-directories"]; }
             set { this["ignored-directories"] = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the formatters supported by bistro.
+        /// </summary>
+        /// <value>The formatters.</value>
+        [ConfigurationProperty("web-formatters")]
+        public NameValueConfigurationCollection WebFormatters
+        {
+            get { return (NameValueConfigurationCollection)this["web-formatters"]; }
+            set { this["web-formatters"] = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the default formatter for bistro.
+        /// </summary>
+        /// <value>The default formatter.</value>
+        [ConfigurationProperty("default-formatter")]
+        public string DefaultFormatter
+        {
+            get { return (string)this["default-formatter"]; }
+            set { this["default-formatter"] = value; }
         }
     }
 }

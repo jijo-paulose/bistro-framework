@@ -25,6 +25,7 @@ using System.Linq;
 using System.Text;
 using Bistro.Controllers;
 using Bistro.Controllers.Dispatch;
+using Bistro.Configuration;
 
 namespace Bistro.Controllers
 {
@@ -36,7 +37,7 @@ namespace Bistro.Controllers
         IControllerManager instance;
         Application application;
 
-        public ControllerManagerFactory(Application application)
+        public ControllerManagerFactory(Application application, SectionHandler configuration)
         {
             this.application = application;
 

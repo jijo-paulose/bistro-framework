@@ -33,13 +33,6 @@
   <ItemGroup>
     <Content Include="editTemplates.exe" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BistroCore\Bistro.csproj">
-      <Name>Bistro</Name>
-      <Project>{8a5337bb-438f-4ad7-b695-89df28f778df}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

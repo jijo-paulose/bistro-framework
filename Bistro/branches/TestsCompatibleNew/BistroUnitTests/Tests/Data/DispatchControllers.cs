@@ -5,9 +5,37 @@ using System.Text;
 using Bistro.Controllers;
 using Bistro.Controllers.Descriptor;
 using Bistro.Controllers.Descriptor.Data;
+using Bistro.Validation;
+using Bistro.Extensions.Validation.Common;
+using Bistro.Extensions.Validation;
+using System.Text.RegularExpressions;
 
 namespace Bistro.UnitTests
 {
+    [Bind("event /bistro/application/startup")]
+    public class StartupController : AbstractController
+    {
+        public static int hitcount = 0;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            hitcount++;
+        }
+    }
+
+    [Bind("event /eventtest")]
+    public class EventController : AbstractController
+    {
+        public static int hitcount = 0;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            hitcount++;
+        }
+    }
+
+
+
     [Bind("/")]
     public class HomeUrlController1 : AbstractController
     {
@@ -16,6 +44,65 @@ namespace Bistro.UnitTests
             throw new NotImplementedException();
         }
     }
+
+    [Bind("?/parameters?{parm1}&{parm2}")]
+    public class ParameterTest : AbstractController
+    {
+        public string parm1, parm2;
+
+        [Request]
+        public string output;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            output = parm1 + ":" + parm2;
+        }
+    }
+
+    [Bind("?/parameters2/{parm1}?{parm2}")]
+    public class ParameterTest2 : AbstractController
+    {
+        public string parm1, parm2;
+
+        [Request]
+        public string output;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            output = parm1 + ":" + parm2;
+        }
+    }
+
+    [Bind("/parameters3/??{parm1}&{parm2}")]
+    public class ParameterTest3 : AbstractController
+    {
+        public string parm1, parm2;
+
+        [Request]
+        public string output;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            output = parm1 + ":" + parm2;
+        }
+    }
+    //
+    // This test will invalidate other tests by appending another global controller
+    // to the execution chain. uncomment only when necessary
+    //
+    //[Bind("??{parm1}&{parm2}")]
+    //public class ParameterTest4 : AbstractController
+    //{
+    //    public string parm1, parm2;
+
+    //    [Request]
+    //    public string outputForRoot;
+
+    //    public override void DoProcessRequest(IExecutionContext context)
+    //    {
+    //        outputForRoot = parm1 + ":" + parm2;
+    //    }
+    //}
 
     [Bind("/")]
     public class HomeUrlController2 : AbstractController

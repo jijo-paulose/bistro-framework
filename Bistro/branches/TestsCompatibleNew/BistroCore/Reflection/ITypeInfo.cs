@@ -49,6 +49,8 @@ namespace Bistro.Special.Reflection
         string Type { get; }
         object Coerce( object value);
 
+        Type TypeForCoercion { get; }
+
         void SetValue(object instance, object value);
         object GetValue(object instance);
     }
@@ -73,5 +75,7 @@ namespace Bistro.Special.Reflection
         ConstructorInfo GetConstructor(Type[] types);
 
         ITypeInfo GetInterface(string p);
+
+
     }
 }

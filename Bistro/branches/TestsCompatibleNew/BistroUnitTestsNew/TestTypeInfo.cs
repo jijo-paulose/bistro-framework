@@ -105,6 +105,14 @@ namespace Bistro.UnitTestsNew
                 throw new NotImplementedException();
             }
 
+            public Type TypeForCoercion
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
             #endregion
         }
 
@@ -164,6 +172,14 @@ namespace Bistro.UnitTestsNew
             public object GetValue(object instance)
             {
                 throw new NotImplementedException();
+            }
+
+            public Type TypeForCoercion
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
             }
 
             #endregion

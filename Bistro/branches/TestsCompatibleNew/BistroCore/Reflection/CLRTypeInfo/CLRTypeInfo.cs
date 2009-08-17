@@ -121,6 +121,14 @@ namespace Bistro.Reflection.CLRTypeInfo
                 return Convert.ChangeType(value, systemType);
             }
 
+            public Type TypeForCoercion
+            {
+                get
+                {
+                    return systemType;
+                }
+            }
+
             #endregion
 
             #region IHasAttributes Members

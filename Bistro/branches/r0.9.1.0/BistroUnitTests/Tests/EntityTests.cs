@@ -24,7 +24,7 @@ namespace Bistro.UnitTests.Tests
         [Test]
         public void MapsFromInputToEntity()
         {
-            var resp = handler.RunForTest("GET/entityTest?foo=hello&bar=world&thirdField=stuff&unwrap=false&extra=something");
+            var resp = handler.RunForTest("GET/entityTest?Foo=hello&bar=world&thirdField=stuff&unwrap=false&extra=something");
             var contexts = handler.AllContents;
             var entity = contexts["request"]["entity"] as SimpleEntity;
 
@@ -47,7 +47,7 @@ namespace Bistro.UnitTests.Tests
             var resp = handler.RunForTest("GET/entityTest?unwrap=true", formFields);
             var contexts = handler.AllContents;
 
-            Assert.AreEqual("hello", contexts["request"]["foo"]);
+            Assert.AreEqual("hello", contexts["request"]["Foo"]);
             Assert.AreEqual("world", contexts["request"]["bar"]);
             Assert.AreEqual("stuff", contexts["request"]["thirdField"], String.Format("Expected 'stuff', received '{0}'. If the other tests passed, and this failed, the explicit mapping call is suspect", contexts["request"]["thirdField"]));
         }
@@ -63,6 +63,23 @@ namespace Bistro.UnitTests.Tests
 
             var messages = contexts["request"]["Messages"] as List<IValidationResult>;
             Assert.AreEqual(1, messages.Count);
+        }
+
+        [Test]
+        public void MapsFromInputToEntityStrict()
+        {
+            var resp = handler.RunForTest("GET/strictEntityTest?Foo=hello&bar=world&thirdField=stuff&unwrap=false");
+            var contexts = handler.AllContents;
+            var entity = contexts["request"]["entity"] as SimpleEntity;
+
+            Assert.NotNull(entity);
+
+            if (entity != null)
+            {
+                Assert.Null(entity.foo);
+                Assert.AreEqual("world", entity.bar);
+                Assert.AreEqual("stuff", entity.baz, String.Format("Expected 'stuff', received '{0}'. If the other tests passed, and this failed, the explicit mapping call is suspect", entity.baz));
+            }
         }
     }
 }

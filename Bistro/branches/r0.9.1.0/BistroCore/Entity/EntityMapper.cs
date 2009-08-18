@@ -78,12 +78,20 @@ namespace Bistro.Entity
             mapping.Add(controllerMember, entityMember);
         }
 
-
         /// <summary>
         /// Builds the mapping based on field names and types only
         /// </summary>
         /// <returns>Updated entity mapper</returns>
         public EntityMapper<TController, TEntity> Infer()
+        {
+            return Infer(BindingFlags.Public | BindingFlags.IgnoreCase);
+        }
+
+        /// <summary>
+        /// Builds the mapping based on field names and types only
+        /// </summary>
+        /// <returns>Updated entity mapper</returns>
+        public EntityMapper<TController, TEntity> InferStrict()
         {
             return Infer(BindingFlags.Public);
         }

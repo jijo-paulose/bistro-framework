@@ -17,7 +17,8 @@ namespace Bistro.UnitTests.Tests.Data
     {
         protected override void Define()
         {
-            Define(
+            As("Something")
+            .Define(
                 Value(c => c.foo).IsRequired("Foo is required")
                 );
         }
@@ -35,7 +36,7 @@ namespace Bistro.UnitTests.Tests.Data
         public bool IsValid { get; set; }
     }
 
-    class TestMapper: EntityMapper<EntityController, SimpleEntity>
+    class TestMapper : EntityMapper<EntityController, SimpleEntity>
     {
         public TestMapper()
         {
@@ -45,19 +46,19 @@ namespace Bistro.UnitTests.Tests.Data
         }
     }
 
-    class EntityControllerValidator: Validator<EntityController>
+    class EntityControllerValidator : Validator<EntityController>
     {
         protected override void Define() { ByMapping(); }
     }
 
-    [Bind("/entityTest?{foo}&{bar}&{thirdField}&{extra}&{unwrap}")]
+    [Bind("/entityTest?{Foo}&{bar}&{thirdField}&{extra}&{unwrap}")]
     [ValidateWith(typeof(EntityControllerValidator))]
     [MapsWith(typeof(TestMapper))]
     public class EntityController : AbstractController, IMappable, IValidatable
     {
         [Request]
-        public string 
-            foo,
+        public string
+            Foo,
             bar,
             thirdField;
 
@@ -90,7 +91,56 @@ namespace Bistro.UnitTests.Tests.Data
             }
         }
 
-        public IEntityMapper Mapper { get; set;}
+        public IEntityMapper Mapper { get; set; }
+    }
+
+    class StrictTestMapper : EntityMapper<StrictEntityController, SimpleEntity>
+    {
+        public StrictTestMapper()
+        {
+            InferStrict()
+                .Map(x => x.thirdField).To(y => y.baz);
+        }
+    }
+
+    [Bind("/strictEntityTest?{Foo}&{bar}&{thirdField}&{unwrap}")]
+    [MapsWith(typeof(StrictTestMapper))]
+    public class StrictEntityController : AbstractController, IMappable, IValidatable
+    {
+        [Request]
+        public string
+            Foo,
+            bar,
+            thirdField;
+
+        public bool unwrap;
+
+        [FormField, Request]
+        public SimpleEntity entity;
+
+        [Request]
+        public List<IValidationResult> Messages { get; set; }
+
+        [Request]
+        public bool IsValid { get; set; }
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            if (unwrap)
+                Mapper.Unmap(this, entity);
+            else
+            {
+                if (!IsValid)
+                    return;
+
+                entity = new SimpleEntity();
+                Mapper.Map(this, entity);
+
+                context.Response.Return(entity);
+            }
+        }
+
+        public IEntityMapper Mapper { get; set; }
     }
 
 }

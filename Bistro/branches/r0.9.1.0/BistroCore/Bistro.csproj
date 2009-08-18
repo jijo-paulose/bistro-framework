@@ -111,6 +111,7 @@
     <Compile Include="Controllers\Security\SecurityController.cs" />
     <Compile Include="Entity\IEntityMapper.cs" />
     <Compile Include="Entity\IMappable.cs" />
+    <Compile Include="Entity\InferMappingForAttribute.cs" />
     <Compile Include="Entity\MemberAccessor.cs" />
     <Compile Include="Entity\EntityMapper.cs" />
     <Compile Include="Entity\MapWithAttribute.cs" />

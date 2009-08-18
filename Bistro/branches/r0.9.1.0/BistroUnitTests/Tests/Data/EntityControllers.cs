@@ -142,5 +142,43 @@ namespace Bistro.UnitTests.Tests.Data
 
         public IEntityMapper Mapper { get; set; }
     }
+    [Bind("/attributeInferredEntityTest?{Foo}&{bar}&{unwrap}")]
+    [InferMappingFor(typeof(SimpleEntity))]
+    public class InferredEntityController : AbstractController, IMappable, IValidatable
+    {
+        [Request]
+        public string
+            Foo,
+            bar;
+
+        public bool unwrap;
+
+        [FormField, Request]
+        public SimpleEntity entity;
+
+        [Request]
+        public List<IValidationResult> Messages { get; set; }
+
+        [Request]
+        public bool IsValid { get; set; }
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            if (unwrap)
+                Mapper.Unmap(this, entity);
+            else
+            {
+                if (!IsValid)
+                    return;
+
+                entity = new SimpleEntity();
+                Mapper.Map(this, entity);
+
+                context.Response.Return(entity);
+            }
+        }
+
+        public IEntityMapper Mapper { get; set; }
+    }
 
 }

@@ -60,9 +60,6 @@
     <Compile Include="Validation\Common\RegexValidator.cs" />
     <Compile Include="Validation\Common\Rules.cs" />
     <Compile Include="Validation\Common\RequiredValidator.cs" />
-    <Compile Include="Validation\IValidationSite.cs" />
-    <Compile Include="Validation\ValidationSite.cs" />
-    <Compile Include="Validation\Validator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BistroCore\Bistro.csproj">

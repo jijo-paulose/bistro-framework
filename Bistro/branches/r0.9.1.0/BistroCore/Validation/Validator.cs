@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using Bistro.Entity;
 using System.Reflection;
 
-namespace Bistro.Extensions.Validation
+namespace Bistro.Validation
 {
     /// <summary>
     /// Build class for validation rules
@@ -25,7 +25,9 @@ namespace Bistro.Extensions.Validation
             DefiningParams = new Dictionary<string, object>();
             Name = typeof(T).Name;
 
+#pragma warning disable 618,612
             Define();
+#pragma warning restore 618,612
         }
 
         /// <summary>
@@ -172,6 +174,7 @@ namespace Bistro.Extensions.Validation
         /// <summary>
         /// Defines this instance.
         /// </summary>
+        [ObsoleteAttribute("This method is deprecated and will be removed in future releases. Please move initialization logic into the constructor.")]
         protected virtual void Define() { }
 
         /// <summary>
@@ -185,18 +188,27 @@ namespace Bistro.Extensions.Validation
         }
 
         /// <summary>
+        /// Builds a validator based on the mapping of the target object
+        /// </summary>
+        /// <returns></returns>
+        public virtual IValidator ByMappingOnly()
+        {
+            return ByMapping();
+        }
+
+        /// <summary>
         /// Builds a validator by cloning rules on mapped fields
         /// </summary>
         /// <returns></returns>
         public virtual Validator<T> ByMapping()
         {
-            var attributes = typeof (T).GetCustomAttributes(typeof (MapsWithAttribute), false) as MapsWithAttribute[];
-            if (attributes.Length != 1)
+            IList<EntityMapperBase> mappers = MapperRepository.Instance.FindMapperBySource(typeof (T));
+            if (mappers.Count != 1)
                 throw new InvalidOperationException(String.Format("{0} is not mappable, and cannot be used in this context", typeof(T).Name));
 
             // the entity type is the second type parameter to EntityMapper<T,K>
-            var entityType = attributes[0].MapperType.BaseType.GetGenericArguments()[1];
-            var mapper = Activator.CreateInstance(attributes[0].MapperType) as IEntityMapper;
+            var entityType = mappers[0].Target;
+            var mapper = mappers[0];
 
             // the mapping the mapper will have is controller field -> entity field. the validation
             // will have rules for the entity, and so we'll need to get the controller field by

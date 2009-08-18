@@ -14,6 +14,6 @@ namespace Bistro.Entity
         /// Gets or sets the mapper.
         /// </summary>
         /// <value>The mapper.</value>
-        IEntityMapper Mapper { get; set; }
+        EntityMapperBase Mapper { get; set; }
     }
 }

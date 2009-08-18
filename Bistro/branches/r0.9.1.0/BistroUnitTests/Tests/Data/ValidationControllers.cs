@@ -12,11 +12,11 @@ using Bistro.Controllers;
 
 namespace Bistro.UnitTests.Tests.Data
 {
-    class ControllerValidator : Validator<ValidatingController>
+    sealed class ControllerValidator : Validator<ValidatingController>
     {
-        protected override void Define()
+        public ControllerValidator()
         {
-            this.Define(
+            Define(
                     Value(c => c.someField)
                         .AliasedAs("otherField")
                         .IsRequired("someField is required")

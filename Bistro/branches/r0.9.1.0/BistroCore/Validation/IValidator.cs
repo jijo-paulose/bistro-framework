@@ -61,5 +61,11 @@ namespace Bistro.Validation
         /// </summary>
         /// <value>The name.</value>
         string Name { get; }
+
+        /// <summary>
+        /// Builds a validator based on the mapping of the target object
+        /// </summary>
+        /// <returns></returns>
+        IValidator ByMappingOnly();
     }
 }

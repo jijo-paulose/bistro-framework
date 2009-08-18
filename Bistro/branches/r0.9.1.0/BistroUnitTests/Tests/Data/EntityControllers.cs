@@ -13,9 +13,9 @@ using Bistro.Entity;
 
 namespace Bistro.UnitTests.Tests.Data
 {
-    public class SimpleEntityValidator: Validator<SimpleEntity>
+    public sealed class SimpleEntityValidator : Validator<SimpleEntity>
     {
-        protected override void Define()
+        public SimpleEntityValidator()
         {
             As("Something")
             .Define(
@@ -24,13 +24,21 @@ namespace Bistro.UnitTests.Tests.Data
         }
     }
 
-    [ValidateWith(typeof(SimpleEntityValidator))]
-    public class SimpleEntity: IValidatable
+    public interface ISimpleEntity : IValidatable
     {
-        public string foo;
-        public string bar;
-        public string baz;
-        public string extra;
+        string foo { get; set;}
+        string bar { get; set; }
+        string baz { get; set; }
+        string extra { get; set; }
+    }
+
+    [ValidateWith(typeof(SimpleEntityValidator))]
+    public class SimpleEntity: ISimpleEntity
+    {
+        public string foo { get; set; }
+        public string bar { get; set; }
+        public string baz { get; set; }
+        public string extra { get; set; }
 
         public List<IValidationResult> Messages { get; set; }
         public bool IsValid { get; set; }
@@ -46,9 +54,9 @@ namespace Bistro.UnitTests.Tests.Data
         }
     }
 
-    class EntityControllerValidator : Validator<EntityController>
+    sealed class EntityControllerValidator : Validator<EntityController>
     {
-        protected override void Define() { ByMapping(); }
+        public EntityControllerValidator() { ByMapping(); }
     }
 
     [Bind("/entityTest?{Foo}&{bar}&{thirdField}&{extra}&{unwrap}")]
@@ -91,7 +99,7 @@ namespace Bistro.UnitTests.Tests.Data
             }
         }
 
-        public IEntityMapper Mapper { get; set; }
+        public EntityMapperBase Mapper { get; set; }
     }
 
     class StrictTestMapper : EntityMapper<StrictEntityController, SimpleEntity>
@@ -140,10 +148,11 @@ namespace Bistro.UnitTests.Tests.Data
             }
         }
 
-        public IEntityMapper Mapper { get; set; }
+        public EntityMapperBase Mapper { get; set; }
     }
     [Bind("/attributeInferredEntityTest?{Foo}&{bar}&{unwrap}")]
     [InferMappingFor(typeof(SimpleEntity))]
+    [InferValidationFrom(typeof(SimpleEntity))]
     public class InferredEntityController : AbstractController, IMappable, IValidatable
     {
         [Request]
@@ -178,7 +187,46 @@ namespace Bistro.UnitTests.Tests.Data
             }
         }
 
-        public IEntityMapper Mapper { get; set; }
+        public EntityMapperBase Mapper { get; set; }
     }
 
+
+    [Bind("/attributeInterfaceEntityTest?{Foo}&{bar}&{unwrap}")]
+    [InferMappingFor(typeof(ISimpleEntity))]
+    public class InferredInterfaceController : AbstractController, IMappable, IValidatable
+    {
+        [Request]
+        public string
+            Foo,
+            bar;
+
+        public bool unwrap;
+
+        [FormField, Request]
+        public ISimpleEntity entity;
+
+        [Request]
+        public List<IValidationResult> Messages { get; set; }
+
+        [Request]
+        public bool IsValid { get; set; }
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            if (unwrap)
+                Mapper.Unmap(this, entity);
+            else
+            {
+                if (!IsValid)
+                    return;
+
+                entity = new SimpleEntity();
+                Mapper.Map(this, entity);
+
+                context.Response.Return(entity);
+            }
+        }
+
+        public EntityMapperBase Mapper { get; set; }
+    }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Bistro.Entity;
 
 namespace Bistro.Validation
 {
@@ -40,6 +41,37 @@ namespace Bistro.Validation
                 var v = (IValidator)Activator.CreateInstance(attrib.TargetType);
                 RegisterValidator(type, v);
                 validators.Add(v);
+            }
+
+            validators.InsertRange(0, CheckAndRegisterInferred(type));
+            return validators;
+        }
+
+        /// <summary>
+        /// Checks for the presence of an <see cref="InferValidationFromAttribute"/>, and creates validators if present
+        /// </summary>
+        /// <param name="type">The type.</param>
+        protected virtual IList<IValidator> CheckAndRegisterInferred(Type type)
+        {
+            var attribs = type.GetCustomAttributes(typeof (InferValidationFromAttribute), false) as InferValidationFromAttribute[];
+            var validators = new List<IValidator>();
+
+            foreach (var attrib in attribs)
+            {
+                // the 'source' here is the controller. we use the target of the infer attribute 
+                // to make sure that we bring in validations from the correct mapper
+                IList<EntityMapperBase> mappers = MapperRepository.Instance.FindMapperBySource(type);
+
+                foreach (var mapper in mappers)
+                {
+                    if (mapper.Target != attrib.TargetType)
+                        continue;
+                    
+                    Type validatorType = typeof (Validator<>).MakeGenericType(new Type[] {mapper.Source});
+                    var validator = Activator.CreateInstance(validatorType) as IValidator;
+                    validator.ByMappingOnly();
+                    validators.Add(validator);
+                }
             }
 
             return validators;

@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using Bistro.Validation;
 
-namespace Bistro.Extensions.Validation
+namespace Bistro.Validation
 {
     /// <summary>
     /// A non-generic validation site representation

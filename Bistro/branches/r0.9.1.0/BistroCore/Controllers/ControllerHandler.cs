@@ -118,12 +118,48 @@ namespace Bistro.Controllers
                 }
             );
 
-		    var mapperAttribute = descriptor.ControllerType.GetCustomAttributes(typeof (MapsWithAttribute), false) as MapsWithAttribute[];
-            if (mapperAttribute != null && mapperAttribute.Length == 1)
-                mapper = Activator.CreateInstance(mapperAttribute[0].MapperType) as IEntityMapper;
+		    BuildMapper(descriptor);
         }
 
-		/// <summary>
+        /// <summary>
+        /// Builds the mapper. MapsWith attribute takes priority over InferMappingFor. Also, multiple mapping attributes are currently unsupported.
+        /// </summary>
+        /// <param name="descriptor">The descriptor.</param>
+        protected virtual void BuildMapper(ControllerDescriptor descriptor)
+        {
+            var mapperAttribute = descriptor.ControllerType.GetCustomAttributes(typeof (MapsWithAttribute), false) as MapsWithAttribute[];
+            if (mapperAttribute != null && mapperAttribute.Length == 1)
+            {
+                mapper = Activator.CreateInstance(mapperAttribute[0].MapperType) as IEntityMapper;
+
+                if (mapper != null)
+                    return;
+            }
+
+            var inferredAttribute = descriptor.ControllerType.GetCustomAttributes(typeof(InferMappingForAttribute), false) as InferMappingForAttribute[];
+            if (inferredAttribute != null && inferredAttribute.Length == 1)
+            {
+                var mapperType =
+                    typeof (EntityMapper<,>).MakeGenericType(new Type[]
+                                                                 {
+                                                                     descriptor.ControllerType as Type,
+                                                                     inferredAttribute[0].TargetType
+                                                                 });
+                mapper =
+                    Activator.CreateInstance(mapperType) as IEntityMapper;
+
+                // explanation. there's no way (that i can see at 12:40am) to get at these methods without
+                // exposing them as part of the IEntityMapper interface, and then polluting the return values 
+                // with the interface. since this is startup code, we can hope that this won't get broken.
+                // TODO: fix this.
+                if (inferredAttribute[0].Strict)
+                    mapperType.GetMethod("InferStrict", Type.EmptyTypes).Invoke(mapper, null);
+                else
+                    mapperType.GetMethod("Infer", Type.EmptyTypes).Invoke(mapper, null);
+            }
+        }
+
+        /// <summary>
 		/// Gets the controller instance.
 		/// </summary>
 		/// <param name="info">The info.</param>

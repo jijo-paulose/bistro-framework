@@ -81,5 +81,22 @@ namespace Bistro.UnitTests.Tests
                 Assert.AreEqual("stuff", entity.baz, String.Format("Expected 'stuff', received '{0}'. If the other tests passed, and this failed, the explicit mapping call is suspect", entity.baz));
             }
         }
+    
+        [Test]
+        public void MapsFromInputToEntityAttributeInferred()
+        {
+            var resp = handler.RunForTest("GET/attributeInferredEntityTest?Foo=hello&bar=world&unwrap=false&extra=something");
+            var contexts = handler.AllContents;
+            var entity = contexts["request"]["entity"] as SimpleEntity;
+
+            Assert.NotNull(entity);
+
+            if (entity != null)
+            {
+                Assert.AreEqual("hello", entity.foo);
+                Assert.AreEqual("world", entity.bar);
+                Assert.IsNull(entity.extra, "Field 'extra' should remain null. Issue with Except() method.");
+            }
+        }
     }
 }

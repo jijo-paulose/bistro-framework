@@ -60,7 +60,7 @@ namespace Bistro.Controllers
         /// <summary>
         /// The mapper associated with this controller
         /// </summary>
-        private IEntityMapper mapper;
+        private EntityMapperBase mapper;
 
         /// <summary>
         /// A mapping of members to formatters used to serialize their input data
@@ -130,10 +130,13 @@ namespace Bistro.Controllers
             var mapperAttribute = descriptor.ControllerType.GetCustomAttributes(typeof (MapsWithAttribute), false) as MapsWithAttribute[];
             if (mapperAttribute != null && mapperAttribute.Length == 1)
             {
-                mapper = Activator.CreateInstance(mapperAttribute[0].MapperType) as IEntityMapper;
+                mapper = Activator.CreateInstance(mapperAttribute[0].MapperType) as EntityMapperBase;
 
                 if (mapper != null)
+                {
+                    MapperRepository.Instance.RegisterMapper(mapper);
                     return;
+                }
             }
 
             var inferredAttribute = descriptor.ControllerType.GetCustomAttributes(typeof(InferMappingForAttribute), false) as InferMappingForAttribute[];
@@ -146,16 +149,15 @@ namespace Bistro.Controllers
                                                                      inferredAttribute[0].TargetType
                                                                  });
                 mapper =
-                    Activator.CreateInstance(mapperType) as IEntityMapper;
+                    Activator.CreateInstance(mapperType) as EntityMapperBase;
 
-                // explanation. there's no way (that i can see at 12:40am) to get at these methods without
-                // exposing them as part of the IEntityMapper interface, and then polluting the return values 
-                // with the interface. since this is startup code, we can hope that this won't get broken.
-                // TODO: fix this.
+                // configure the mapper based on the strict flag.
                 if (inferredAttribute[0].Strict)
-                    mapperType.GetMethod("InferStrict", Type.EmptyTypes).Invoke(mapper, null);
+                    mapper.InferStrictOnly();
                 else
-                    mapperType.GetMethod("Infer", Type.EmptyTypes).Invoke(mapper, null);
+                    mapper.InferOnly();
+
+                MapperRepository.Instance.RegisterMapper(mapper);
             }
         }
 

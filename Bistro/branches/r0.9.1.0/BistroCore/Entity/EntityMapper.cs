@@ -50,11 +50,19 @@ namespace Bistro.Entity
     /// </summary>
     /// <typeparam name="TController">The type of the controller.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
-    public class EntityMapper<TController, TEntity> : IEntityMapper
+    public class EntityMapper<TController, TEntity> : EntityMapperBase
     {
-        Dictionary<MemberAccessor, MemberAccessor> mapping = new Dictionary<MemberAccessor, MemberAccessor>();
+        /// <summary>
+        /// Gets the source type.
+        /// </summary>
+        /// <value>The source.</value>
+        public override Type Source { get { return typeof(TController); } }
 
-        public IDictionary<MemberAccessor, MemberAccessor> Mapping { get { return mapping; } }
+        /// <summary>
+        /// Gets the target type.
+        /// </summary>
+        /// <value>The target.</value>
+        public override Type Target { get { return typeof(TEntity); } }
 
         /// <summary>
         /// Adds the mapping.
@@ -76,6 +84,22 @@ namespace Bistro.Entity
                         ));
 
             mapping.Add(controllerMember, entityMember);
+        }
+
+        /// <summary>
+        /// Configures the mapper for an inferred mapping, without using the Builder pattern.
+        /// </summary>
+        protected internal override void InferOnly()
+        {
+            Infer();
+        }
+
+        /// <summary>
+        /// Configures the mapper for a strict inferred mapping, without using the Builder pattern.
+        /// </summary>
+        protected internal override void InferStrictOnly()
+        {
+            InferStrict();
         }
 
         /// <summary>
@@ -168,47 +192,6 @@ namespace Bistro.Entity
 
             mapping.Remove(new MemberAccessor(controllerMember));
             return this;
-        }
-
-        /// <summary>
-        /// Performs the mapping from the controller to the entity
-        /// </summary>
-        /// <param name="controller">The controller.</param>
-        /// <param name="entity">The entity.</param>
-        public void Map(IController controller, object entity)
-        {
-            Perform(controller, entity, true);
-        }
-
-        /// <summary>
-        /// Performs the mapping from the entity to the controller
-        /// </summary>
-        /// <param name="controller">The controller.</param>
-        /// <param name="entity">The entity.</param>
-        public void Unmap(IController controller, object entity)
-        {
-            Perform(controller, entity, false);
-        }
-
-        /// <summary>
-        /// Performs the specified controller.
-        /// </summary>
-        /// <param name="controller">The controller.</param>
-        /// <param name="entity">The entity.</param>
-        /// <param name="forward">if set to <c>true</c> [forward].</param>
-        protected virtual void Perform(IController controller, object entity, bool forward)
-        {
-            foreach (KeyValuePair<MemberAccessor, MemberAccessor> row in mapping)
-                if (forward)
-                {
-                    if (row.Value.CanWrite && row.Key.CanRead)
-                        row.Value.SetValue(entity, row.Key.GetValue((controller)));
-                }
-                else
-                {
-                    if (row.Key.CanWrite && row.Value.CanRead)
-                        row.Key.SetValue(controller, row.Value.GetValue((entity)));
-                }
         }
     }
 }

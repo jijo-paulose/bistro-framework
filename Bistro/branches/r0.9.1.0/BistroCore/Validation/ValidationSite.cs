@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Bistro.Validation;
 
-namespace Bistro.Extensions.Validation
+namespace Bistro.Validation
 {
     /// <summary>
     /// A class member to to be validated

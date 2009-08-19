@@ -8,7 +8,7 @@ namespace Bistro.Validation
     /// <summary>
     /// Maps a Validatable class to the class(s) that define its validation rules
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
     public class ValidateWithAttribute: Attribute
     {
         /// <summary>

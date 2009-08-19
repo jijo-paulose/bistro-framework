@@ -33,6 +33,11 @@ namespace Bistro.Extensions.Validation.Common
             DefiningParams.Add("type", type);
         }
 
+        public override IValidator Translate(System.Reflection.MemberInfo target)
+        {
+            return ValidatorForType(target.DeclaringType, new object[] {Message, type});
+        }
+
         public override bool DoValidate(object target, out List<IValidationResult> messages)
         {
             messages = new List<IValidationResult>();

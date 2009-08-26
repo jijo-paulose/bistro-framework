@@ -69,7 +69,7 @@ namespace Bistro.Controllers
         /// <summary>
         /// The dispatcher factory to use
         /// </summary>
-        IDispatcherFactory dispatcherFactory;
+        protected IDispatcherFactory dispatcherFactory;
 
         /// <summary>
         /// A mapping of controller type to handler instance

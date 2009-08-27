@@ -57,7 +57,7 @@ namespace Bistro.Controllers
             this.handlerFactory = application.HandlerFactory;
             this.dispatcherFactory = application.DispatcherFactory;
         }
-        private ILogger logger;
+        protected ILogger logger;
 
         private Application application;
 

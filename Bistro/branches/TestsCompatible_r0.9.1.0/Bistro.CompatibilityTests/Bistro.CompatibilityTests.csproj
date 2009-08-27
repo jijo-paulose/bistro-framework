@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Reflection\ITypeInfo.cs" />
+    <Compile Include="Reflection\TestMemberInfo.cs" />
     <Compile Include="Reflection\TestTypeInfo.cs" />
     <Compile Include="TestControllerManager.cs" />
     <Compile Include="TestControllerManagerFactory.cs" />

@@ -423,8 +423,7 @@ namespace Bistro.Controllers.Descriptor
             // load the renderwith attribute
             IterateAttributes<RenderWithAttribute>(t, false, (attrib) => { DefaultTemplate = attrib.Template; }, null);
 
-            // load all of the Bind attributes
-            IterateAttributes<BindAttribute>(t, false, NonEmptyBindProcess, EmptyBindProcess);
+
         }
 
         /// <summary>
@@ -483,7 +482,8 @@ namespace Bistro.Controllers.Descriptor
             var type = ControllerType as Type;
             if (type == null)
                 throw new ApplicationException("This method should not be called for non-class controllers.");
-
+                // load all of the Bind attributes
+                IterateAttributes<BindAttribute>(type, false, NonEmptyBindProcess, EmptyBindProcess);
                 IterateMembers(type, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
                     (member) =>
                     {

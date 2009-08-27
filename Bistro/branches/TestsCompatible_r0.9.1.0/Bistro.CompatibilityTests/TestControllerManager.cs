@@ -87,6 +87,8 @@ namespace Bistro.CompatibilityTests
                     bindAttr.Priority = bindAttrInfo.Properties["Priority"].AsNInt32().Value;
                     bindsTemp.Add(bindAttr);
                 }
+
+                #region alternative code
                 /*
                     try
                         {
@@ -126,6 +128,7 @@ namespace Bistro.CompatibilityTests
                         }
 
                  */
+                #endregion
 
 
                 ControllerDescriptor testDescriptor = ControllerDescriptor.CreateDescriptorRaw(

@@ -40,7 +40,9 @@ namespace Bistro.Controllers
         {
             [DefaultMessage("Exception occured during applicaiton load")]
             ExceptionDuringLoad,
-            [DefaultMessage("Exception occured attempting to load assembly '{0}'. This is likely caused by assembly version mismatches. Exception follows. \r\n{1}")]
+            [DefaultMessage(@"Skipping assembly '{0}' due to load exceptions. 
+If this assembly contains controllers, the exception may be caused by assembly version mismatches. Exception follows.
+{1}")]
             ExceptionLoadingAssembly
         }
 
@@ -143,8 +145,6 @@ namespace Bistro.Controllers
                         sb.AppendFormat("\texception {0}\r\n", ex.LoaderExceptions[i].Message);
 
                 logger.Report(Messages.ExceptionLoadingAssembly, assm.FullName, sb.ToString());
-
-                throw ex;
             }
         }
 

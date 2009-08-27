@@ -381,6 +381,36 @@ namespace Bistro.Controllers.Descriptor
             this.logger = logger;
         }
 
+
+        private void NonEmptyBindProcess(BindAttribute attribute)
+        {
+            if (BindPointUtilities.IsVerbQualified(attribute.Target))
+                Targets.Add(new BindPointDescriptor(
+                                BindPointUtilities.VerbNormalize(attribute.Target),
+                                attribute.ControllerBindType,
+                                attribute.Priority,
+                                this));
+            else
+                // if not verb qualified, make it work for all verbs
+                foreach (string verb in BindPointUtilities.HttpVerbs)
+                    Targets.Add(new BindPointDescriptor(
+                                    BindPointUtilities.Combine(verb, attribute.Target),
+                                    attribute.ControllerBindType,
+                                    attribute.Priority,
+                                    this));
+        }
+
+        private void EmptyBindProcess()
+        {
+            foreach (string verb in BindPointUtilities.HttpVerbs)
+                Targets.Add(new BindPointDescriptor(
+                                BindPointUtilities.Combine(verb, ControllerTypeName.Replace('.', '/')),
+                                BindType.Before,
+                                -1,
+                                this));
+        }
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ControllerDescriptor"/> class.
         /// </summary>
@@ -393,34 +423,7 @@ namespace Bistro.Controllers.Descriptor
             // load the renderwith attribute
             IterateAttributes<RenderWithAttribute>(t, false, (attrib) => { DefaultTemplate = attrib.Template; }, null);
 
-            // load all of the Bind attributes
-            IterateAttributes<BindAttribute>(t, false,
-                (attribute) => 
-                    {
-                        if (BindPointUtilities.IsVerbQualified(attribute.Target))
-                            Targets.Add(new BindPointDescriptor(
-                                            BindPointUtilities.VerbNormalize(attribute.Target), 
-                                            attribute.ControllerBindType, 
-                                            attribute.Priority, 
-                                            this)); 
-                        else
-                            // if not verb qualified, make it work for all verbs
-                            foreach (string verb in BindPointUtilities.HttpVerbs)
-                                Targets.Add(new BindPointDescriptor(
-                                                BindPointUtilities.Combine(verb, attribute.Target),
-                                                attribute.ControllerBindType,
-                                                attribute.Priority,
-                                                this));
-                    },
-                () => 
-                    {
-                        foreach (string verb in BindPointUtilities.HttpVerbs)
-                            Targets.Add(new BindPointDescriptor(
-                                            BindPointUtilities.Combine(verb, ControllerTypeName.Replace('.', '/')), 
-                                            BindType.Before, 
-                                            -1, 
-                                            this)); 
-                    });
+
         }
 
         /// <summary>
@@ -479,7 +482,8 @@ namespace Bistro.Controllers.Descriptor
             var type = ControllerType as Type;
             if (type == null)
                 throw new ApplicationException("This method should not be called for non-class controllers.");
-
+                // load all of the Bind attributes
+                IterateAttributes<BindAttribute>(type, false, NonEmptyBindProcess, EmptyBindProcess);
                 IterateMembers(type, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
                     (member) =>
                     {
@@ -578,7 +582,7 @@ namespace Bistro.Controllers.Descriptor
         public static ControllerDescriptor CreateDescriptorRaw(MemberInfo t, IEnumerable<string> dependsOn, IEnumerable<string> requires, 
             IEnumerable<string> provides, IDictionary<string, CookieFieldDescriptor> cookieFields, 
             IDictionary<string, MemberInfo> formFields, IDictionary<string, MemberInfo>
-            requestFields, IDictionary<string, MemberInfo> sessionFields, ILogger logger)
+            requestFields, IDictionary<string, MemberInfo> sessionFields,IEnumerable<BindAttribute> binds, ILogger logger)
         {
             ControllerDescriptor ret = new ControllerDescriptor(t, logger);
 
@@ -590,6 +594,16 @@ namespace Bistro.Controllers.Descriptor
 
             Action<IDictionary<string, CookieFieldDescriptor>, IDictionary<string, CookieFieldDescriptor>> copyCookieDict = (source, target) =>
                 { if (source == null) return; foreach (string key in source.Keys) target.Add(key, source[key]); };
+
+            bool empty = true;
+            foreach (BindAttribute attrib in binds)
+            {
+                ret.NonEmptyBindProcess(attrib);
+                empty = false;
+            }
+            if (empty)
+                ret.EmptyBindProcess();
+
 
             copyList(ret.DependsOn, dependsOn);
             copyList(ret.Requires, requires);

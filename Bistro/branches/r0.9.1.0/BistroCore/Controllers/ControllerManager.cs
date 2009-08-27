@@ -59,7 +59,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
             this.handlerFactory = application.HandlerFactory;
             this.dispatcherFactory = application.DispatcherFactory;
         }
-        private ILogger logger;
+        protected ILogger logger;
 
         private Application application;
 
@@ -71,7 +71,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
         /// <summary>
         /// The dispatcher factory to use
         /// </summary>
-        IDispatcherFactory dispatcherFactory;
+        protected IDispatcherFactory dispatcherFactory;
 
         /// <summary>
         /// A mapping of controller type to handler instance

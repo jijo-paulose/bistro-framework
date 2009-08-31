@@ -152,6 +152,37 @@ namespace Bistro.UnitTests.Tests
         }
 
         [Test]
+        public void ThreeAltOrderParameters4()
+        {
+            var resp = handler.RunForTest("GET/parameters?&parm1=a&foo=bar&parm2=b");
+            var contexts = handler.AllContents;
+
+            Assert.That(
+                "a:b".Equals(contexts["request"]["output"]),
+                String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
+        }
+        [Test]
+        public void ThreeAltOrderParameters5()
+        {
+            var resp = handler.RunForTest("GET/parameters?&parm1=a&&&foo=bar&parm2=b");
+            var contexts = handler.AllContents;
+
+            Assert.That(
+                "a:b".Equals(contexts["request"]["output"]),
+                String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
+        }
+        [Test]
+        public void ThreeAltOrderParameters6()
+        {
+            var resp = handler.RunForTest("GET/parameters?&parm1=a&&&foo=bar&parm2=b&");
+            var contexts = handler.AllContents;
+
+            Assert.That(
+                "a:b".Equals(contexts["request"]["output"]),
+                String.Format("Expected 'a:b', Received {0}. Issue with parameter processing.", contexts["request"]["output"]));
+        }
+
+        [Test]
         public void PositionalAndQueryParameters()
         {
             var resp = handler.RunForTest("GET/parameters2/a?foo=bar&parm2=b");

@@ -30,6 +30,7 @@ using Bistro.Controllers.Security;
 using Bistro.Controllers.Dispatch;
 using System.Reflection;
 using Bistro.Configuration.Logging;
+using System.Text.RegularExpressions;
 
 namespace Bistro.Controllers.Dispatch
 {
@@ -47,6 +48,20 @@ namespace Bistro.Controllers.Dispatch
         /// A wild card enoting multiple (1 or more) url components
         /// </summary>
         private const string globalWildCard = "?";
+
+        /// <summary>
+        /// Regular expression for capturing leading ampersands in a query string
+        /// </summary>
+        private Regex leadingAmpRE = new Regex("^&+", RegexOptions.Compiled);
+        /// <summary>
+        /// Regular expression for capturing leading ampersands in a query string
+        /// </summary>
+        private Regex trailingAmpRE = new Regex("&+$", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Regular expression for capturing consequtive ampersands in a query string
+        /// </summary>
+        private Regex dupedAmpRE = new Regex("(?<=&)&", RegexOptions.Compiled);
 
         enum Messages
         {
@@ -194,9 +209,10 @@ namespace Bistro.Controllers.Dispatch
                     }
 
                     // if there are query string parameters, populate them by name, and not positionally
-                    if (splitQueryString.Length == 2)
+                    if (splitQueryString.Length == 2)   
                     {
-                        string[] queryStringParameters = splitQueryString[1].Split('&', '=');
+                        // if there are any errant leading or trailing ampersands, get rid of them
+                        string[] queryStringParameters = CleanQueryString(splitQueryString[1]).Split('&', '=');
                         for (int i = 0; i + 1 < queryStringParameters.Length; i += 2)
                             if (descriptor.ParameterFields.ContainsKey(queryStringParameters[i]) && !parameterValues.ContainsKey(queryStringParameters[i]))
                                 parameterValues.Add(queryStringParameters[i], queryStringParameters[i + 1]);
@@ -226,6 +242,21 @@ namespace Bistro.Controllers.Dispatch
             logger.Report(Messages.ExecutionPath, requestUrl, path.ToString());
 
             return after;
+        }
+
+        /// <summary>
+        /// Cleans query strings of leading and duplicate ampersands
+        /// </summary>
+        /// <param name="queryString">the query string</param>
+        /// <returns></returns>
+        protected virtual string CleanQueryString(string queryString)
+        {
+            return
+                dupedAmpRE.Replace(
+                    trailingAmpRE.Replace(
+                        leadingAmpRE.Replace(queryString, String.Empty),
+                        String.Empty),
+                    String.Empty);
         }
 
         /// <summary>

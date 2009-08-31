@@ -9,6 +9,7 @@ using Bistro.Configuration;
 using Bistro.CompatibilityTests.Reflection;
 using Bistro.Controllers.Descriptor;
 using Bistro.Controllers.Descriptor.Data;
+using System.Text.RegularExpressions;
 
 namespace Bistro.CompatibilityTests
 {
@@ -165,9 +166,76 @@ namespace Bistro.CompatibilityTests
         #endregion
 
 
+        #region Generate stuff. We'll move it to some other place
+
+        private class UrlTuple
+        {
+
+            internal UrlTuple(string verb, string url)
+            {
+                Url = url;
+                Verb = verb;
+            }
+
+            internal string Verb { get; set; }
+            internal string Url { get; set; }
+
+        }
+
+        private Regex rgx = new Regex(@"(/(?:\*|\?|\{\w+}))", RegexOptions.Compiled | RegexOptions.Singleline);
+
+
+
+        string[] testQuestionMark = new string[] { "", "/abcde/edcba/aaaa123/bbb124", "/bbb124", "/aaaa123/bbb124" };
+
+        string[] testAsterisk = new string[] { "/aaaaa", "/abcde", "/testvalue" };
+        string[] testVariable = new string[] { "/", "/variablevalue1", "/123412423", "/testvalue" };
+
+
+        private void ProcessUrlRec(List<UrlTuple> urlsList, string vrb, string preProcessedUrl)
+        {
+            Match mtch = rgx.Match(preProcessedUrl);
+            if (!mtch.Success)
+            {
+                if (preProcessedUrl.Trim() != String.Empty)
+                    urlsList.Add(new UrlTuple(vrb, preProcessedUrl));
+            }
+            else
+            {
+
+                switch (mtch.Groups[1].Value)
+                {
+                    case "/?":
+                        foreach (string repItem in testQuestionMark)
+                        {
+                            ProcessUrlRec(urlsList, vrb, preProcessedUrl.Remove(mtch.Groups[1].Index, mtch.Groups[1].Length).Insert(mtch.Groups[1].Index, repItem));
+                        }
+                        break;
+                    case "/*":
+                        foreach (string repItem in testAsterisk)
+                        {
+                            ProcessUrlRec(urlsList, vrb, preProcessedUrl.Remove(mtch.Groups[1].Index, mtch.Groups[1].Length).Insert(mtch.Groups[1].Index, repItem));
+                        }
+
+                        break;
+                    default:
+                        foreach (string repItem in testVariable)
+                        {
+                            ProcessUrlRec(urlsList, vrb, preProcessedUrl.Remove(mtch.Groups[1].Index, mtch.Groups[1].Length).Insert(mtch.Groups[1].Index, repItem));
+                        }
+
+                        break;
+                }
+            }
+
+        }
+
+        #endregion
+
 
         void realTest(object test)
         {
+            #region Load part
             TestDescriptor descriptor = (TestDescriptor)test;
 
 
@@ -181,11 +249,81 @@ namespace Bistro.CompatibilityTests
             Assert.IsNotNull(testMgr,"Invalid TestControllerManager");
 
             testMgr.LoadSpecial(descriptor.Controllers);
+            #endregion
+
+            #region Generate stuff
+            ///
+
+            List<IAttributeInfo> list = new List<IAttributeInfo>();
+
+
+            foreach (TestTypeInfo testType in descriptor.Controllers)
+            {
+                IEnumerable<IAttributeInfo> attrList = testType.Attributes.Where(attr => { return attr.Type == typeof(BindAttribute).FullName; });
+                list.AddRange(attrList);
+            }
+
+            List<UrlTuple> urlsList = new List<UrlTuple>();
+
+
+            foreach (IAttributeInfo item in list)
+            {
+                string url = item.Properties[0].AsString();
+                string verb = "";
+                foreach (string verbItem in BindPointUtilities.HttpVerbs)
+                {
+                    if (!url.StartsWith(verbItem, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    string remainder = url.Substring(verbItem.Length);
+                    url = remainder.TrimStart();
+                    verb = verbItem;
+                    break;
+                }
+                if (verb == "")
+                {
+                    foreach (var vrb in BindPointUtilities.HttpVerbs)
+                    {
+                        ProcessUrlRec(urlsList, vrb, url);
+                    }
+                }
+                else
+                {
+                    ProcessUrlRec(urlsList, verb, url);
+                }
+
+            }
+
+
+            StringBuilder sb1 = new StringBuilder();
+
+            foreach (UrlTuple tuple in urlsList)
+            {
+                ControllerInvocationInfo[] testControllers = dispatcher.GetControllers(String.Format("{0}{1}", tuple.Verb, tuple.Url));
+                sb1.AppendFormat("UrlTest(\"{0} {1}\",\"{0} {1}\" ", tuple.Verb, tuple.Url);
+                foreach (ControllerInvocationInfo ctrlInfo in testControllers)
+                {
+                    sb1.AppendFormat(",\"{0}\"", ctrlInfo.BindPoint.Controller.ControllerTypeName);
+                }
+                sb1.AppendLine("),");
+            }
+            string resString = sb1.ToString();
+
+            ///
+            #endregion
+
+
+
+            #region Test part
+
+
 
             foreach (UrlControllersTest urlTest in descriptor.UrlTests)
             {
                 urlTest.Validate(dispatcher);
             }
+
+            #endregion
         }
 
 
@@ -1596,6 +1734,1470 @@ namespace Bistro.CompatibilityTests
                     );
 
 
+            #endregion
+
+            #region Branching
+            NewTestWithUrl("Branching",
+               Types(
+                   Type(
+                       "C1",
+                       BindAttribute("/a/b1/c1")
+                       ),
+                   Type(
+                       "C2",
+                       BindAttribute("/a/b1/c2")
+                       ),
+                   Type(
+                       "C3",
+                       BindAttribute("/a/b2/c1")
+                       ),
+                   Type(
+                       "C4",
+                       BindAttribute("/a/b2/c2")
+                       )
+                   ),
+                   UrlTest("test1","GET /a"),
+                   UrlTest("GET /a/b1/c1","GET /a/b1/c1" ,"C1"),
+                   UrlTest("POST /a/b1/c1","POST /a/b1/c1" ,"C1"),
+                   UrlTest("PUT /a/b1/c1","PUT /a/b1/c1" ,"C1"),
+                   UrlTest("DELETE /a/b1/c1","DELETE /a/b1/c1" ,"C1"),
+                   UrlTest("HEAD /a/b1/c1","HEAD /a/b1/c1" ,"C1"),
+                   UrlTest("GET /a/b1/c2","GET /a/b1/c2" ,"C2"),
+                   UrlTest("POST /a/b1/c2","POST /a/b1/c2" ,"C2"),
+                   UrlTest("PUT /a/b1/c2","PUT /a/b1/c2" ,"C2"),
+                   UrlTest("DELETE /a/b1/c2","DELETE /a/b1/c2" ,"C2"),
+                   UrlTest("HEAD /a/b1/c2","HEAD /a/b1/c2" ,"C2"),
+                   UrlTest("GET /a/b2/c1","GET /a/b2/c1" ,"C3"),
+                   UrlTest("POST /a/b2/c1","POST /a/b2/c1" ,"C3"),
+                   UrlTest("PUT /a/b2/c1","PUT /a/b2/c1" ,"C3"),
+                   UrlTest("DELETE /a/b2/c1","DELETE /a/b2/c1" ,"C3"),
+                   UrlTest("HEAD /a/b2/c1","HEAD /a/b2/c1" ,"C3"),
+                   UrlTest("GET /a/b2/c2","GET /a/b2/c2" ,"C4"),
+                   UrlTest("POST /a/b2/c2","POST /a/b2/c2" ,"C4"),
+                   UrlTest("PUT /a/b2/c2","PUT /a/b2/c2" ,"C4"),
+                   UrlTest("DELETE /a/b2/c2","DELETE /a/b2/c2" ,"C4"),
+                   UrlTest("HEAD /a/b2/c2","HEAD /a/b2/c2" ,"C4")
+               //Node("* /a", Controllers(),
+               //    Node("/b1", Controllers(),
+               //        Node("/c1", "C1"),
+               //        Node("/c2", "C2")
+               //        ),
+               //    Node("/b2", Controllers(),
+               //        Node("/c1", "C3"),
+               //        Node("/c2", "C4")
+               //        )
+               //    )
+
+               );
+            #endregion
+
+            #region tree - one controller - 2 bindings (flat)
+            NewTestWithUrl(
+                "tree - one controller - 2 bindings (flat)",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/"),
+                        BindAttribute("/path1"))
+                    )),
+                //Node("* /", "Controller1"),
+                //Node("* /path1", "Controller1")
+                UrlTest("GET /","GET /" ,"Controller1"),
+                UrlTest("POST /","POST /" ,"Controller1"),
+                UrlTest("PUT /","PUT /" ,"Controller1"),
+                UrlTest("DELETE /","DELETE /" ,"Controller1"),
+                UrlTest("HEAD /","HEAD /" ,"Controller1"),
+                UrlTest("GET /path1","GET /path1" ,"Controller1"),
+                UrlTest("POST /path1","POST /path1" ,"Controller1"),
+                UrlTest("PUT /path1","PUT /path1" ,"Controller1"),
+                UrlTest("DELETE /path1","DELETE /path1" ,"Controller1"),
+                UrlTest("HEAD /path1","HEAD /path1" ,"Controller1")
+
+            );
+            #endregion
+
+            #region Imported - home/root
+            NewTestWithUrl(
+                "Imported - home/root",
+                Types(
+                    Type(
+                        "HomeUrlController1",
+                        BindAttribute("/?")
+                    ),
+                    Type(
+                        "HomeUrlController2",
+                        BindAttribute("/?")
+                    )
+                ),
+                UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("GET /bbb124","GET /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("POST /bbb124","POST /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("PUT /bbb124","PUT /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("DELETE /bbb124","DELETE /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("HEAD /abcde/edcba/aaaa123/bbb124","HEAD /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("HEAD /bbb124","HEAD /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("HEAD /aaaa123/bbb124","HEAD /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("GET /bbb124","GET /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("POST /bbb124","POST /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("PUT /bbb124","PUT /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("DELETE /bbb124","DELETE /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("HEAD /abcde/edcba/aaaa123/bbb124","HEAD /abcde/edcba/aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("HEAD /bbb124","HEAD /bbb124" ,"HomeUrlController2","HomeUrlController1"),
+                UrlTest("HEAD /aaaa123/bbb124","HEAD /aaaa123/bbb124" ,"HomeUrlController2","HomeUrlController1")
+
+//                Node("* /?", "HomeUrlController2", "HomeUrlController1") // Actually that's not so good - controllers may come in any order here.
+                );
+            #endregion
+
+            #region Imported - /hello/...
+            NewTestWithUrl("Imported - /hello/...",
+                Types(
+                    Type("HelloYouController1", BindAttribute("/hello/?/you")),
+                    Type("HelloYouController2", BindAttribute("/hello/*/you"))
+                ),
+                UrlTest("GET /hello/you","GET /hello/you" ,"HelloYouController1"),
+                UrlTest("GET /hello/abcde/edcba/aaaa123/bbb124/you","GET /hello/abcde/edcba/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("GET /hello/bbb124/you","GET /hello/bbb124/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("GET /hello/aaaa123/bbb124/you","GET /hello/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("POST /hello/you","POST /hello/you" ,"HelloYouController1"),
+                UrlTest("POST /hello/abcde/edcba/aaaa123/bbb124/you","POST /hello/abcde/edcba/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("POST /hello/bbb124/you","POST /hello/bbb124/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("POST /hello/aaaa123/bbb124/you","POST /hello/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("PUT /hello/you","PUT /hello/you" ,"HelloYouController1"),
+                UrlTest("PUT /hello/abcde/edcba/aaaa123/bbb124/you","PUT /hello/abcde/edcba/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("PUT /hello/bbb124/you","PUT /hello/bbb124/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("PUT /hello/aaaa123/bbb124/you","PUT /hello/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("DELETE /hello/you","DELETE /hello/you" ,"HelloYouController1"),
+                UrlTest("DELETE /hello/abcde/edcba/aaaa123/bbb124/you","DELETE /hello/abcde/edcba/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("DELETE /hello/bbb124/you","DELETE /hello/bbb124/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("DELETE /hello/aaaa123/bbb124/you","DELETE /hello/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("HEAD /hello/you","HEAD /hello/you" ,"HelloYouController1"),
+                UrlTest("HEAD /hello/abcde/edcba/aaaa123/bbb124/you","HEAD /hello/abcde/edcba/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("HEAD /hello/bbb124/you","HEAD /hello/bbb124/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("HEAD /hello/aaaa123/bbb124/you","HEAD /hello/aaaa123/bbb124/you" ,"HelloYouController1"),
+                UrlTest("GET /hello/aaaaa/you","GET /hello/aaaaa/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("GET /hello/abcde/you","GET /hello/abcde/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("GET /hello/testvalue/you","GET /hello/testvalue/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("POST /hello/aaaaa/you","POST /hello/aaaaa/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("POST /hello/abcde/you","POST /hello/abcde/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("POST /hello/testvalue/you","POST /hello/testvalue/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("PUT /hello/aaaaa/you","PUT /hello/aaaaa/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("PUT /hello/abcde/you","PUT /hello/abcde/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("PUT /hello/testvalue/you","PUT /hello/testvalue/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("DELETE /hello/aaaaa/you","DELETE /hello/aaaaa/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("DELETE /hello/abcde/you","DELETE /hello/abcde/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("DELETE /hello/testvalue/you","DELETE /hello/testvalue/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("HEAD /hello/aaaaa/you","HEAD /hello/aaaaa/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("HEAD /hello/abcde/you","HEAD /hello/abcde/you" ,"HelloYouController1","HelloYouController2"),
+                UrlTest("HEAD /hello/testvalue/you","HEAD /hello/testvalue/you" ,"HelloYouController1","HelloYouController2")
+
+                //Node("* /hello", Controllers(),
+                //    Node("/*/you", "HelloYouController2", "HelloYouController1"),
+                //    Node("/?/you", "HelloYouController1")
+                //    )
+                );
+            #endregion
+
+            #region Imported - /order/world/new
+            NewTestWithUrl("Imported - /order/world/new",
+                Types(
+                    Type(
+                        "OrderController1",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c1", "string", SessionAttribute),
+                        Field("c2", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController2",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c2", "string", SessionAttribute),
+                        Field("c5", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController3",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c3", "string", SessionAttribute),
+                        Field("c2", "string", SessionAttribute, RequiresAttribute),
+                        Field("c4", "string", SessionAttribute, RequiresAttribute),
+                        Field("c5", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController4",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c4", "string", SessionAttribute),
+                        Field("c1", "string", SessionAttribute, RequiresAttribute),
+                        Field("c2", "string", SessionAttribute, RequiresAttribute),
+                        Field("c5", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController5",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c5", "string", SessionAttribute)
+                    ),
+                    Type(
+                        "OrderController6",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c6", "string", SessionAttribute),
+                        Field("c3", "string", SessionAttribute, RequiresAttribute),
+                        Field("c7", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController7",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c7", "string", SessionAttribute)
+                    )
+                ),
+                UrlTest("GET /order/world/new","GET /order/world/new" ,"OrderController5","OrderController7","OrderController2","OrderController1","OrderController4","OrderController3","OrderController6"),
+                UrlTest("POST /order/world/new","POST /order/world/new" ,"OrderController5","OrderController7","OrderController2","OrderController1","OrderController4","OrderController3","OrderController6"),
+                UrlTest("PUT /order/world/new","PUT /order/world/new" ,"OrderController5","OrderController7","OrderController2","OrderController1","OrderController4","OrderController3","OrderController6"),
+                UrlTest("DELETE /order/world/new","DELETE /order/world/new" ,"OrderController5","OrderController7","OrderController2","OrderController1","OrderController4","OrderController3","OrderController6"),
+                UrlTest("HEAD /order/world/new","HEAD /order/world/new" ,"OrderController5","OrderController7","OrderController2","OrderController1","OrderController4","OrderController3","OrderController6")
+                //Node("* /order/world/new", "OrderController7", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6")
+            );
+            #endregion
+
+            #region Imported - /one_little_url
+            NewTestWithUrl(
+                "Imported - /one_little_url",
+                Types(
+                    Type("littleController1",
+                        Attributes(
+                            BindAttribute("/one_little_url")
+                        ),
+                        Field("l1", "string", RequestAttribute),
+                        Field("l2", "string", RequestAttribute, RequiresAttribute)
+                    ),
+                    Type("littleController2",
+                        Attributes(
+                            BindAttribute("/one_little_url")
+                        ),
+                        Field("l2", "string", RequestAttribute)
+                    )
+                ),
+                UrlTest("GET /one_little_url","GET /one_little_url" ,"littleController2","littleController1"),
+                UrlTest("POST /one_little_url","POST /one_little_url" ,"littleController2","littleController1"),
+                UrlTest("PUT /one_little_url","PUT /one_little_url" ,"littleController2","littleController1"),
+                UrlTest("DELETE /one_little_url","DELETE /one_little_url" ,"littleController2","littleController1"),
+                UrlTest("HEAD /one_little_url","HEAD /one_little_url" ,"littleController2","littleController1")
+                //Node("* /one_little_url", "littleController2", "littleController1")
+            );
+            #endregion
+
+            #region Imported - /little_url/more
+            NewTestWithUrl(
+                "Imported - /little_url/more",
+                Types(
+                    Type(
+                        "littleController3",
+                        Attributes(
+                            BindAttribute("/little_url/more")
+                        ),
+                        Field("l3", "string", RequestAttribute)
+                    ),
+                    Type(
+                        "littleController4",
+                        Attributes(
+                            BindAttribute("/little_url/more")
+                        ),
+                        Field("l4", "string", RequestAttribute),
+                        Field("l3", "string", RequestAttribute, RequiresAttribute),
+                        Field("l5", "string", RequestAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "littleController5",
+                        Attributes(
+                            BindAttribute("/little_url/more")
+                        ),
+                        Field("l5", "string", RequestAttribute),
+                        Field("l3", "string", RequestAttribute, RequiresAttribute)
+                    )
+                ),
+                UrlTest("GET /little_url/more","GET /little_url/more" ,"littleController3","littleController5","littleController4"),
+                UrlTest("POST /little_url/more","POST /little_url/more" ,"littleController3","littleController5","littleController4"),
+                UrlTest("PUT /little_url/more","PUT /little_url/more" ,"littleController3","littleController5","littleController4"),
+                UrlTest("DELETE /little_url/more","DELETE /little_url/more" ,"littleController3","littleController5","littleController4"),
+                UrlTest("HEAD /little_url/more","HEAD /little_url/more" ,"littleController3","littleController5","littleController4")
+                //Node("* /little_url/more", "littleController3", "littleController5", "littleController4")
+            );
+            #endregion
+
+            #region Imported - GET/hi/...
+            NewTestWithUrl(
+                "Imported - GET/hi/...",
+                Types(
+                    Type(
+                        "hiController1",
+                        BindAttribute("GET /hi/new/world/a")
+                    ),
+                    Type(
+                        "hiController2",
+                        BindAttribute("GET /hi/new/*/*/now")
+                    ),
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/now")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController5",
+                        BindAttribute("GET /hi/*/world/a/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("GET /hi/new/world/a","GET /hi/new/world/a" ,"hiController6","hiController1"),
+                UrlTest("GET /hi/new/aaaaa/aaaaa/now","GET /hi/new/aaaaa/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/aaaaa/abcde/now","GET /hi/new/aaaaa/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/aaaaa/testvalue/now","GET /hi/new/aaaaa/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/aaaaa/now","GET /hi/new/abcde/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/abcde/now","GET /hi/new/abcde/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/testvalue/now","GET /hi/new/abcde/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/aaaaa/now","GET /hi/new/testvalue/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/abcde/now","GET /hi/new/testvalue/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/testvalue/now","GET /hi/new/testvalue/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/aaaaa/world/now","GET /hi/aaaaa/world/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/bbb124/now","GET /hi/aaaaa/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now","GET /hi/aaaaa/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/now","GET /hi/abcde/world/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/bbb124/now","GET /hi/abcde/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now","GET /hi/abcde/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/now","GET /hi/testvalue/world/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/bbb124/now","GET /hi/testvalue/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now","GET /hi/testvalue/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now","GET /hi/aaaaa/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/abcde/now","GET /hi/aaaaa/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now","GET /hi/aaaaa/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaaa/now","GET /hi/abcde/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/abcde/now","GET /hi/abcde/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/testvalue/now","GET /hi/abcde/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now","GET /hi/testvalue/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/abcde/now","GET /hi/testvalue/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/testvalue/now","GET /hi/testvalue/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/a/now","GET /hi/aaaaa/world/a/now" ,"hiController6","hiController3","hiController7","hiController4","hiController5"),
+                UrlTest("GET /hi/abcde/world/a/now","GET /hi/abcde/world/a/now" ,"hiController6","hiController3","hiController7","hiController4","hiController5"),
+                UrlTest("GET /hi/testvalue/world/a/now","GET /hi/testvalue/world/a/now" ,"hiController6","hiController3","hiController7","hiController4","hiController5"),
+                UrlTest("GET /hi/aaaaa/world/a","GET /hi/aaaaa/world/a" ,"hiController6"),
+                UrlTest("GET /hi/abcde/world/a","GET /hi/abcde/world/a" ,"hiController6"),
+                UrlTest("GET /hi/testvalue/world/a","GET /hi/testvalue/world/a" ,"hiController6"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa","GET /hi/aaaaa/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/abcde","GET /hi/aaaaa/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue","GET /hi/aaaaa/world/a/testvalue" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/aaaaa","GET /hi/abcde/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/abcde","GET /hi/abcde/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/testvalue","GET /hi/abcde/world/a/testvalue" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa","GET /hi/testvalue/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/abcde","GET /hi/testvalue/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/testvalue","GET /hi/testvalue/world/a/testvalue" ,"hiController6","hiController7")
+
+                //Node("GET /hi", Controllers(),
+                //    Node("/*/world", Controllers(),
+                //        Node("/*/now", "hiController4", "hiController3"),
+                //        Node("/?/now", "hiController3"),
+                //        Node("/a", Controllers("hiController7", "hiController6"),
+                //            Node("/*", "hiController7", "hiController6"),
+                //            Node("/now", "hiController7", "hiController6", "hiController5", "hiController4", "hiController3")
+                //            )
+                //        ),
+                //    Node("/new", Controllers(),
+                //        Node("/*/*/now", "hiController2"),
+                //        Node("/world/a", "hiController7", "hiController6", "hiController1")
+                //        )
+                //    )
+                );
+            #endregion
+
+            //We need more complicated tests - with complex url AND parameters to sort by.
+
+            #region Imported - GET/hi/... - 0
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 0",
+                Types(
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now","GET /hi/aaaaa/world/aaaaa/now" ,"hiController4"),
+                UrlTest("GET /hi/aaaaa/world/abcde/now","GET /hi/aaaaa/world/abcde/now" ,"hiController4"),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now","GET /hi/aaaaa/world/testvalue/now" ,"hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaaa/now","GET /hi/abcde/world/aaaaa/now" ,"hiController4"),
+                UrlTest("GET /hi/abcde/world/abcde/now","GET /hi/abcde/world/abcde/now" ,"hiController4"),
+                UrlTest("GET /hi/abcde/world/testvalue/now","GET /hi/abcde/world/testvalue/now" ,"hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now","GET /hi/testvalue/world/aaaaa/now" ,"hiController4"),
+                UrlTest("GET /hi/testvalue/world/abcde/now","GET /hi/testvalue/world/abcde/now" ,"hiController4"),
+                UrlTest("GET /hi/testvalue/world/testvalue/now","GET /hi/testvalue/world/testvalue/now" ,"hiController4"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa","GET /hi/aaaaa/world/a/aaaaa" ,"hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/abcde","GET /hi/aaaaa/world/a/abcde" ,"hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue","GET /hi/aaaaa/world/a/testvalue" ,"hiController7"),
+                UrlTest("GET /hi/abcde/world/a/aaaaa","GET /hi/abcde/world/a/aaaaa" ,"hiController7"),
+                UrlTest("GET /hi/abcde/world/a/abcde","GET /hi/abcde/world/a/abcde" ,"hiController7"),
+                UrlTest("GET /hi/abcde/world/a/testvalue","GET /hi/abcde/world/a/testvalue" ,"hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa","GET /hi/testvalue/world/a/aaaaa" ,"hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/abcde","GET /hi/testvalue/world/a/abcde" ,"hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/testvalue","GET /hi/testvalue/world/a/testvalue" ,"hiController7")
+
+                //Node("GET /hi/*/world", Controllers(),
+                //    Node("/*/now", "hiController4"),
+                //    Node("/a/*", "hiController7")
+                //    )
+                );
+            #endregion
+
+            #region Imported - GET/hi/... - 1
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 1",
+                Types(
+                    Type(
+                        "hiController2",
+                        BindAttribute("GET /hi/new/*/*/now")
+                    ),
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/now")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("GET /hi/new/aaaaa/aaaaa/now","GET /hi/new/aaaaa/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/aaaaa/abcde/now","GET /hi/new/aaaaa/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/aaaaa/testvalue/now","GET /hi/new/aaaaa/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/aaaaa/now","GET /hi/new/abcde/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/abcde/now","GET /hi/new/abcde/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/testvalue/now","GET /hi/new/abcde/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/aaaaa/now","GET /hi/new/testvalue/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/abcde/now","GET /hi/new/testvalue/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/testvalue/now","GET /hi/new/testvalue/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/aaaaa/world/now","GET /hi/aaaaa/world/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/bbb124/now","GET /hi/aaaaa/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now","GET /hi/aaaaa/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/now","GET /hi/abcde/world/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/bbb124/now","GET /hi/abcde/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now","GET /hi/abcde/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/now","GET /hi/testvalue/world/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/bbb124/now","GET /hi/testvalue/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now","GET /hi/testvalue/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now","GET /hi/aaaaa/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/abcde/now","GET /hi/aaaaa/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now","GET /hi/aaaaa/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaaa/now","GET /hi/abcde/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/abcde/now","GET /hi/abcde/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/testvalue/now","GET /hi/abcde/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now","GET /hi/testvalue/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/abcde/now","GET /hi/testvalue/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/testvalue/now","GET /hi/testvalue/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/a","GET /hi/aaaaa/world/a" ,"hiController6"),
+                UrlTest("GET /hi/abcde/world/a","GET /hi/abcde/world/a" ,"hiController6"),
+                UrlTest("GET /hi/testvalue/world/a","GET /hi/testvalue/world/a" ,"hiController6"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa","GET /hi/aaaaa/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/abcde","GET /hi/aaaaa/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue","GET /hi/aaaaa/world/a/testvalue" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/aaaaa","GET /hi/abcde/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/abcde","GET /hi/abcde/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/testvalue","GET /hi/abcde/world/a/testvalue" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa","GET /hi/testvalue/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/abcde","GET /hi/testvalue/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/testvalue","GET /hi/testvalue/world/a/testvalue" ,"hiController6","hiController7")
+
+                //Node("GET /hi", Controllers(),
+                //    Node("/*/world", Controllers(),
+                //        Node("/*/now", "hiController4", "hiController3"),
+                //        Node("/?/now", "hiController3"),
+                //        Node("/a", Controllers("hiController7", "hiController6"),
+                //            Node("/*", "hiController7", "hiController6")
+                //            )
+                //        ),
+                //    Node("/new/*/*/now", "hiController2"
+                //        )
+                //    )
+                );
+            #endregion
+
+            #region Imported - GET/hi/... - 2
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 2",
+                Types(
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/now")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("GET /hi/aaaaa/world/now","GET /hi/aaaaa/world/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/bbb124/now","GET /hi/aaaaa/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now","GET /hi/aaaaa/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/now","GET /hi/abcde/world/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/bbb124/now","GET /hi/abcde/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now","GET /hi/abcde/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/now","GET /hi/testvalue/world/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/bbb124/now","GET /hi/testvalue/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now","GET /hi/testvalue/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now","GET /hi/aaaaa/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/abcde/now","GET /hi/aaaaa/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now","GET /hi/aaaaa/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaaa/now","GET /hi/abcde/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/abcde/now","GET /hi/abcde/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/testvalue/now","GET /hi/abcde/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now","GET /hi/testvalue/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/abcde/now","GET /hi/testvalue/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/testvalue/now","GET /hi/testvalue/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/a","GET /hi/aaaaa/world/a" ,"hiController6"),
+                UrlTest("GET /hi/abcde/world/a","GET /hi/abcde/world/a" ,"hiController6"),
+                UrlTest("GET /hi/testvalue/world/a","GET /hi/testvalue/world/a" ,"hiController6"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa","GET /hi/aaaaa/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/abcde","GET /hi/aaaaa/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue","GET /hi/aaaaa/world/a/testvalue" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/aaaaa","GET /hi/abcde/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/abcde","GET /hi/abcde/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/abcde/world/a/testvalue","GET /hi/abcde/world/a/testvalue" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa","GET /hi/testvalue/world/a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/abcde","GET /hi/testvalue/world/a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/testvalue","GET /hi/testvalue/world/a/testvalue" ,"hiController6","hiController7")
+
+                //Node("GET /hi/*/world", Controllers(),
+                //        Node("/*/now", "hiController4", "hiController3"),
+                //        Node("/?/now", "hiController3"),
+                //        Node("/a", Controllers("hiController7", "hiController6"),
+                //            Node("/*", "hiController7", "hiController6")//,
+                //            )
+                //    )
+                );
+            #endregion
+
+            #region Imported - GET/hi/... - 3
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 3",
+                Types(
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /a/*")
+                    )
+                ),
+                UrlTest("GET /aaaaa/now","GET /aaaaa/now" ,"hiController4"),
+                UrlTest("GET /abcde/now","GET /abcde/now" ,"hiController4"),
+                UrlTest("GET /testvalue/now","GET /testvalue/now" ,"hiController4"),
+                UrlTest("GET /a","GET /a" ,"hiController6"),
+                UrlTest("GET /a/aaaaa","GET /a/aaaaa" ,"hiController6","hiController7"),
+                UrlTest("GET /a/abcde","GET /a/abcde" ,"hiController6","hiController7"),
+                UrlTest("GET /a/testvalue","GET /a/testvalue" ,"hiController6","hiController7")
+
+                //Node("GET /*/now", "hiController4"),
+                //Node("GET /a", Controllers("hiController7", "hiController6"),
+                //    Node("/*", "hiController7", "hiController6")
+                //    )
+                );
+            #endregion
+
+            #region Imported - GET/hi/... - 4
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 4",
+                Types(
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
+                UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
+                UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", "hiController6", "hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", "hiController6", "hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", "hiController6", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", "hiController6", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", "hiController6", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", "hiController6", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", "hiController6", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", "hiController6", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", "hiController6", "hiController7")
+                //Node("GET /hi/*/world", Controllers(),
+                //        Node("/*/now", "hiController4"),
+                //        Node("/a", Controllers("hiController7", "hiController6"),
+                //            Node("/*", "hiController7", "hiController6")
+                //            )
+                //    )
+                );
+            #endregion
+
+            #region Imported - GET/hi/... - 5
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 5",
+                Types(
+                    Type(
+                        "hiController2",
+                        BindAttribute("GET /hi/new/*/*/now")
+                    ),
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/now")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("GET /hi/new/aaaaa/aaaaa/now","GET /hi/new/aaaaa/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/aaaaa/abcde/now","GET /hi/new/aaaaa/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/aaaaa/testvalue/now","GET /hi/new/aaaaa/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/aaaaa/now","GET /hi/new/abcde/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/abcde/now","GET /hi/new/abcde/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/abcde/testvalue/now","GET /hi/new/abcde/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/aaaaa/now","GET /hi/new/testvalue/aaaaa/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/abcde/now","GET /hi/new/testvalue/abcde/now" ,"hiController2"),
+                UrlTest("GET /hi/new/testvalue/testvalue/now","GET /hi/new/testvalue/testvalue/now" ,"hiController2"),
+                UrlTest("GET /hi/aaaaa/world/now","GET /hi/aaaaa/world/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/bbb124/now","GET /hi/aaaaa/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now","GET /hi/aaaaa/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/now","GET /hi/abcde/world/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/abcde/world/bbb124/now","GET /hi/abcde/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now","GET /hi/abcde/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/now","GET /hi/testvalue/world/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now","GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/testvalue/world/bbb124/now","GET /hi/testvalue/world/bbb124/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now","GET /hi/testvalue/world/aaaa123/bbb124/now" ,"hiController3"),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now","GET /hi/aaaaa/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/abcde/now","GET /hi/aaaaa/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now","GET /hi/aaaaa/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaaa/now","GET /hi/abcde/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/abcde/now","GET /hi/abcde/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/abcde/world/testvalue/now","GET /hi/abcde/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now","GET /hi/testvalue/world/aaaaa/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/abcde/now","GET /hi/testvalue/world/abcde/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/testvalue/world/testvalue/now","GET /hi/testvalue/world/testvalue/now" ,"hiController3","hiController4"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa","GET /hi/aaaaa/world/a/aaaaa" ,"hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/abcde","GET /hi/aaaaa/world/a/abcde" ,"hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue","GET /hi/aaaaa/world/a/testvalue" ,"hiController7"),
+                UrlTest("GET /hi/abcde/world/a/aaaaa","GET /hi/abcde/world/a/aaaaa" ,"hiController7"),
+                UrlTest("GET /hi/abcde/world/a/abcde","GET /hi/abcde/world/a/abcde" ,"hiController7"),
+                UrlTest("GET /hi/abcde/world/a/testvalue","GET /hi/abcde/world/a/testvalue" ,"hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa","GET /hi/testvalue/world/a/aaaaa" ,"hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/abcde","GET /hi/testvalue/world/a/abcde" ,"hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/testvalue","GET /hi/testvalue/world/a/testvalue" ,"hiController7")
+                //Node("GET /hi", Controllers(),
+                //    Node("/*/world", Controllers(),
+                //        Node("/*/now", "hiController4", "hiController3"),
+                //        Node("/?/now", "hiController3"),
+                //        Node("/a/*", "hiController7")
+                //        ),
+                //    Node("/new/*/*/now", "hiController2"
+                //        )
+                //    )
+                );
+            #endregion
+
+            #region Imported - DependsOn/Requires
+            NewTestWithUrl(
+                "Imported - DependsOn/Requires",
+                Types(
+                    Type("DRController2",
+                        Attributes(BindAttribute("GET /dependson/requires")),
+                        Field("z", "int", RequestAttribute, RequiresAttribute)
+                        ),
+                    Type("DRController1",
+                        Attributes(BindAttribute("GET /dependson/requires")),
+                        Field("z", "int", RequestAttribute)
+                        )
+                    ),
+                    UrlTest("GET /dependson/requires", "GET /dependson/requires", "DRController1", "DRController2")
+                //Node("GET /dependson/requires", "DRController1", "DRController2") // Check for Verbs???
+                );
+            #endregion
+
+            #region Imported - DataQPaging
+            NewTestWithUrl(
+                "Imported - DataQPaging",
+                Types(
+                    Type("DataRoot",
+                        Attributes(BindAttribute("GET /data/?")),
+                        Field("dataRoot", "Boolean", RequestAttribute)
+                        ),
+                    Type("ProvidersData",
+                        Attributes(
+                            BindAttribute("GET /data/client/id/{clientId}/providers/id/{dataId}"),
+                            BindAttribute("GET /data/client/id/{clientId}/providers/id/{dataId}/withpaging/{linesPerPage}/{pageNumber}")
+                        ),
+                        Field("dataRoot", "Boolean", RequestAttribute, RequiresAttribute),
+                        Field("dataSource", "Boolean", RequestAttribute)
+                        ),
+                    Type("BlueCrossProvidersData",
+                        Attributes(
+                            BindAttribute("GET /data/client/id/11/providers/id/{dataId}"),
+                            BindAttribute("GET /data/client/id/11/providers/id/{dataId}/withpaging/{linesPerPage}/{pageNumber}")
+                        ),
+                        Field("dataSource", "Boolean", RequestAttribute, RequiresAttribute),
+                        Field("dataSourceCustom", "Boolean", RequestAttribute),
+                        Field("dataId", "int")
+                        ),
+                    Type("WithPaging",
+                        Attributes(
+                            BindAttribute("GET /data/?/withpaging/{linesPerPage}/{pageNumber}")
+                        ),
+                        Field("dataSource", "Boolean", RequestAttribute, DependsOnAttribute),
+                        Field("dataSourceCustom", "Boolean", RequestAttribute, DependsOnAttribute),
+                        Field("withPaging", "Boolean", RequestAttribute)
+                        ),
+                    Type("ProvidersRender",
+                        Attributes(
+                            BindAttribute("GET /data/client/id/*/providers/id/*")
+                        ),
+                        Field("dataSource", "Boolean", RequestAttribute, RequiresAttribute),
+                        Field("dataSourceCustom", "Boolean", RequestAttribute, DependsOnAttribute),
+                        Field("withPaging", "Boolean", RequestAttribute, DependsOnAttribute)
+                        )
+                    ),
+                    UrlTest("GET /data", "GET /data"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124", "GET /data/abcde/edcba/aaaa123/bbb124", "DataRoot"),
+                    UrlTest("GET /data/bbb124", "GET /data/bbb124", "DataRoot"),
+                    UrlTest("GET /data/aaaa123/bbb124", "GET /data/aaaa123/bbb124", "DataRoot"),
+                    UrlTest("GET /data/client/id//providers/id/", "GET /data/client/id//providers/id/", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1", "GET /data/client/id//providers/id/variablevalue1", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423", "GET /data/client/id//providers/id/123412423", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue", "GET /data/client/id//providers/id/testvalue", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/", "GET /data/client/id/variablevalue1/providers/id/", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/variablevalue1", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423", "GET /data/client/id/variablevalue1/providers/id/123412423", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue", "GET /data/client/id/variablevalue1/providers/id/testvalue", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/", "GET /data/client/id/123412423/providers/id/", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1", "GET /data/client/id/123412423/providers/id/variablevalue1", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423", "GET /data/client/id/123412423/providers/id/123412423", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue", "GET /data/client/id/123412423/providers/id/testvalue", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/", "GET /data/client/id/testvalue/providers/id/", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1", "GET /data/client/id/testvalue/providers/id/variablevalue1", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423", "GET /data/client/id/testvalue/providers/id/123412423", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue", "GET /data/client/id/testvalue/providers/id/testvalue", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging//", "GET /data/client/id//providers/id//withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging//variablevalue1", "GET /data/client/id//providers/id//withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging//123412423", "GET /data/client/id//providers/id//withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging//testvalue", "GET /data/client/id//providers/id//withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/variablevalue1/", "GET /data/client/id//providers/id//withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/variablevalue1/variablevalue1", "GET /data/client/id//providers/id//withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/variablevalue1/123412423", "GET /data/client/id//providers/id//withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/variablevalue1/testvalue", "GET /data/client/id//providers/id//withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/123412423/", "GET /data/client/id//providers/id//withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/123412423/variablevalue1", "GET /data/client/id//providers/id//withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/123412423/123412423", "GET /data/client/id//providers/id//withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/123412423/testvalue", "GET /data/client/id//providers/id//withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/testvalue/", "GET /data/client/id//providers/id//withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/testvalue/variablevalue1", "GET /data/client/id//providers/id//withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/testvalue/123412423", "GET /data/client/id//providers/id//withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id//withpaging/testvalue/testvalue", "GET /data/client/id//providers/id//withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging//", "GET /data/client/id//providers/id/variablevalue1/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging//variablevalue1", "GET /data/client/id//providers/id/variablevalue1/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging//123412423", "GET /data/client/id//providers/id/variablevalue1/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging//testvalue", "GET /data/client/id//providers/id/variablevalue1/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/variablevalue1/", "GET /data/client/id//providers/id/variablevalue1/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "GET /data/client/id//providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/variablevalue1/123412423", "GET /data/client/id//providers/id/variablevalue1/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "GET /data/client/id//providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/123412423/", "GET /data/client/id//providers/id/variablevalue1/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/123412423/variablevalue1", "GET /data/client/id//providers/id/variablevalue1/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/123412423/123412423", "GET /data/client/id//providers/id/variablevalue1/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/123412423/testvalue", "GET /data/client/id//providers/id/variablevalue1/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/testvalue/", "GET /data/client/id//providers/id/variablevalue1/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "GET /data/client/id//providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/testvalue/123412423", "GET /data/client/id//providers/id/variablevalue1/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/variablevalue1/withpaging/testvalue/testvalue", "GET /data/client/id//providers/id/variablevalue1/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging//", "GET /data/client/id//providers/id/123412423/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging//variablevalue1", "GET /data/client/id//providers/id/123412423/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging//123412423", "GET /data/client/id//providers/id/123412423/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging//testvalue", "GET /data/client/id//providers/id/123412423/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/variablevalue1/", "GET /data/client/id//providers/id/123412423/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/variablevalue1/variablevalue1", "GET /data/client/id//providers/id/123412423/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/variablevalue1/123412423", "GET /data/client/id//providers/id/123412423/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/variablevalue1/testvalue", "GET /data/client/id//providers/id/123412423/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/123412423/", "GET /data/client/id//providers/id/123412423/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/123412423/variablevalue1", "GET /data/client/id//providers/id/123412423/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/123412423/123412423", "GET /data/client/id//providers/id/123412423/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/123412423/testvalue", "GET /data/client/id//providers/id/123412423/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/testvalue/", "GET /data/client/id//providers/id/123412423/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/testvalue/variablevalue1", "GET /data/client/id//providers/id/123412423/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/testvalue/123412423", "GET /data/client/id//providers/id/123412423/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/123412423/withpaging/testvalue/testvalue", "GET /data/client/id//providers/id/123412423/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging//", "GET /data/client/id//providers/id/testvalue/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging//variablevalue1", "GET /data/client/id//providers/id/testvalue/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging//123412423", "GET /data/client/id//providers/id/testvalue/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging//testvalue", "GET /data/client/id//providers/id/testvalue/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/variablevalue1/", "GET /data/client/id//providers/id/testvalue/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "GET /data/client/id//providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/variablevalue1/123412423", "GET /data/client/id//providers/id/testvalue/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/variablevalue1/testvalue", "GET /data/client/id//providers/id/testvalue/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/123412423/", "GET /data/client/id//providers/id/testvalue/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/123412423/variablevalue1", "GET /data/client/id//providers/id/testvalue/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/123412423/123412423", "GET /data/client/id//providers/id/testvalue/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/123412423/testvalue", "GET /data/client/id//providers/id/testvalue/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/testvalue/", "GET /data/client/id//providers/id/testvalue/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/testvalue/variablevalue1", "GET /data/client/id//providers/id/testvalue/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/testvalue/123412423", "GET /data/client/id//providers/id/testvalue/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id//providers/id/testvalue/withpaging/testvalue/testvalue", "GET /data/client/id//providers/id/testvalue/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging//", "GET /data/client/id/variablevalue1/providers/id//withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging//variablevalue1", "GET /data/client/id/variablevalue1/providers/id//withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging//123412423", "GET /data/client/id/variablevalue1/providers/id//withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging//testvalue", "GET /data/client/id/variablevalue1/providers/id//withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/variablevalue1/", "GET /data/client/id/variablevalue1/providers/id//withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/variablevalue1/variablevalue1", "GET /data/client/id/variablevalue1/providers/id//withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/variablevalue1/123412423", "GET /data/client/id/variablevalue1/providers/id//withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/variablevalue1/testvalue", "GET /data/client/id/variablevalue1/providers/id//withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/123412423/", "GET /data/client/id/variablevalue1/providers/id//withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/123412423/variablevalue1", "GET /data/client/id/variablevalue1/providers/id//withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/123412423/123412423", "GET /data/client/id/variablevalue1/providers/id//withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/123412423/testvalue", "GET /data/client/id/variablevalue1/providers/id//withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/testvalue/", "GET /data/client/id/variablevalue1/providers/id//withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/testvalue/variablevalue1", "GET /data/client/id/variablevalue1/providers/id//withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/testvalue/123412423", "GET /data/client/id/variablevalue1/providers/id//withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id//withpaging/testvalue/testvalue", "GET /data/client/id/variablevalue1/providers/id//withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging//", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging//variablevalue1", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging//123412423", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging//testvalue", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/variablevalue1/", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/variablevalue1/123412423", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/123412423/", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/123412423/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/123412423/123412423", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/123412423/testvalue", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/testvalue/", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/testvalue/123412423", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/testvalue/testvalue", "GET /data/client/id/variablevalue1/providers/id/variablevalue1/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging//", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging//variablevalue1", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging//123412423", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging//testvalue", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/variablevalue1/", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/variablevalue1/123412423", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/variablevalue1/testvalue", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/123412423/", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/123412423/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/123412423/123412423", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/123412423/testvalue", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/testvalue/", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/testvalue/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/testvalue/123412423", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/testvalue/testvalue", "GET /data/client/id/variablevalue1/providers/id/123412423/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging//", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging//variablevalue1", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging//123412423", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging//testvalue", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/variablevalue1/", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/variablevalue1/123412423", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/variablevalue1/testvalue", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/123412423/", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/123412423/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/123412423/123412423", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/123412423/testvalue", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/testvalue/", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/testvalue/variablevalue1", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/testvalue/123412423", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/testvalue/testvalue", "GET /data/client/id/variablevalue1/providers/id/testvalue/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging//", "GET /data/client/id/123412423/providers/id//withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging//variablevalue1", "GET /data/client/id/123412423/providers/id//withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging//123412423", "GET /data/client/id/123412423/providers/id//withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging//testvalue", "GET /data/client/id/123412423/providers/id//withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/variablevalue1/", "GET /data/client/id/123412423/providers/id//withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/variablevalue1/variablevalue1", "GET /data/client/id/123412423/providers/id//withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/variablevalue1/123412423", "GET /data/client/id/123412423/providers/id//withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/variablevalue1/testvalue", "GET /data/client/id/123412423/providers/id//withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/123412423/", "GET /data/client/id/123412423/providers/id//withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/123412423/variablevalue1", "GET /data/client/id/123412423/providers/id//withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/123412423/123412423", "GET /data/client/id/123412423/providers/id//withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/123412423/testvalue", "GET /data/client/id/123412423/providers/id//withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/testvalue/", "GET /data/client/id/123412423/providers/id//withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/testvalue/variablevalue1", "GET /data/client/id/123412423/providers/id//withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/testvalue/123412423", "GET /data/client/id/123412423/providers/id//withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id//withpaging/testvalue/testvalue", "GET /data/client/id/123412423/providers/id//withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging//", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging//variablevalue1", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging//123412423", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging//testvalue", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/variablevalue1/", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/variablevalue1/123412423", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/123412423/", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/123412423/variablevalue1", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/123412423/123412423", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/123412423/testvalue", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/testvalue/", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/testvalue/123412423", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/testvalue/testvalue", "GET /data/client/id/123412423/providers/id/variablevalue1/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging//", "GET /data/client/id/123412423/providers/id/123412423/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging//variablevalue1", "GET /data/client/id/123412423/providers/id/123412423/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging//123412423", "GET /data/client/id/123412423/providers/id/123412423/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging//testvalue", "GET /data/client/id/123412423/providers/id/123412423/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/variablevalue1/", "GET /data/client/id/123412423/providers/id/123412423/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/123412423/providers/id/123412423/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/variablevalue1/123412423", "GET /data/client/id/123412423/providers/id/123412423/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/variablevalue1/testvalue", "GET /data/client/id/123412423/providers/id/123412423/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/123412423/", "GET /data/client/id/123412423/providers/id/123412423/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/123412423/variablevalue1", "GET /data/client/id/123412423/providers/id/123412423/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/123412423/123412423", "GET /data/client/id/123412423/providers/id/123412423/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/123412423/testvalue", "GET /data/client/id/123412423/providers/id/123412423/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/testvalue/", "GET /data/client/id/123412423/providers/id/123412423/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/testvalue/variablevalue1", "GET /data/client/id/123412423/providers/id/123412423/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/testvalue/123412423", "GET /data/client/id/123412423/providers/id/123412423/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/123412423/withpaging/testvalue/testvalue", "GET /data/client/id/123412423/providers/id/123412423/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging//", "GET /data/client/id/123412423/providers/id/testvalue/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging//variablevalue1", "GET /data/client/id/123412423/providers/id/testvalue/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging//123412423", "GET /data/client/id/123412423/providers/id/testvalue/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging//testvalue", "GET /data/client/id/123412423/providers/id/testvalue/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/variablevalue1/", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/variablevalue1/123412423", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/variablevalue1/testvalue", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/123412423/", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/123412423/variablevalue1", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/123412423/123412423", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/123412423/testvalue", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/testvalue/", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/testvalue/variablevalue1", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/testvalue/123412423", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/123412423/providers/id/testvalue/withpaging/testvalue/testvalue", "GET /data/client/id/123412423/providers/id/testvalue/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging//", "GET /data/client/id/testvalue/providers/id//withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging//variablevalue1", "GET /data/client/id/testvalue/providers/id//withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging//123412423", "GET /data/client/id/testvalue/providers/id//withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging//testvalue", "GET /data/client/id/testvalue/providers/id//withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/variablevalue1/", "GET /data/client/id/testvalue/providers/id//withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/variablevalue1/variablevalue1", "GET /data/client/id/testvalue/providers/id//withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/variablevalue1/123412423", "GET /data/client/id/testvalue/providers/id//withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/variablevalue1/testvalue", "GET /data/client/id/testvalue/providers/id//withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/123412423/", "GET /data/client/id/testvalue/providers/id//withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/123412423/variablevalue1", "GET /data/client/id/testvalue/providers/id//withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/123412423/123412423", "GET /data/client/id/testvalue/providers/id//withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/123412423/testvalue", "GET /data/client/id/testvalue/providers/id//withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/testvalue/", "GET /data/client/id/testvalue/providers/id//withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/testvalue/variablevalue1", "GET /data/client/id/testvalue/providers/id//withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/testvalue/123412423", "GET /data/client/id/testvalue/providers/id//withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id//withpaging/testvalue/testvalue", "GET /data/client/id/testvalue/providers/id//withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging//", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging//variablevalue1", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging//123412423", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging//testvalue", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/variablevalue1/", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/variablevalue1/123412423", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/123412423/", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/123412423/variablevalue1", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/123412423/123412423", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/123412423/testvalue", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/testvalue/", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/testvalue/123412423", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/testvalue/testvalue", "GET /data/client/id/testvalue/providers/id/variablevalue1/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging//", "GET /data/client/id/testvalue/providers/id/123412423/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging//variablevalue1", "GET /data/client/id/testvalue/providers/id/123412423/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging//123412423", "GET /data/client/id/testvalue/providers/id/123412423/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging//testvalue", "GET /data/client/id/testvalue/providers/id/123412423/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/variablevalue1/", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/variablevalue1/123412423", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/variablevalue1/testvalue", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/123412423/", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/123412423/variablevalue1", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/123412423/123412423", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/123412423/testvalue", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/testvalue/", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/testvalue/variablevalue1", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/testvalue/123412423", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/123412423/withpaging/testvalue/testvalue", "GET /data/client/id/testvalue/providers/id/123412423/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging//", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging//variablevalue1", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging//123412423", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging//testvalue", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/variablevalue1/", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/variablevalue1/123412423", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/variablevalue1/testvalue", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/123412423/", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/123412423/variablevalue1", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/123412423/123412423", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/123412423/testvalue", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/testvalue/", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/testvalue/variablevalue1", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/testvalue/123412423", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue/withpaging/testvalue/testvalue", "GET /data/client/id/testvalue/providers/id/testvalue/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/", "GET /data/client/id/11/providers/id/", "DataRoot", "ProvidersData", "BlueCrossProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1", "GET /data/client/id/11/providers/id/variablevalue1", "DataRoot", "ProvidersData", "BlueCrossProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423", "GET /data/client/id/11/providers/id/123412423", "DataRoot", "ProvidersData", "BlueCrossProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue", "GET /data/client/id/11/providers/id/testvalue", "DataRoot", "ProvidersData", "BlueCrossProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging//", "GET /data/client/id/11/providers/id//withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging//variablevalue1", "GET /data/client/id/11/providers/id//withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging//123412423", "GET /data/client/id/11/providers/id//withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging//testvalue", "GET /data/client/id/11/providers/id//withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/variablevalue1/", "GET /data/client/id/11/providers/id//withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/variablevalue1/variablevalue1", "GET /data/client/id/11/providers/id//withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/variablevalue1/123412423", "GET /data/client/id/11/providers/id//withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/variablevalue1/testvalue", "GET /data/client/id/11/providers/id//withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/123412423/", "GET /data/client/id/11/providers/id//withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/123412423/variablevalue1", "GET /data/client/id/11/providers/id//withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/123412423/123412423", "GET /data/client/id/11/providers/id//withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/123412423/testvalue", "GET /data/client/id/11/providers/id//withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/testvalue/", "GET /data/client/id/11/providers/id//withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/testvalue/variablevalue1", "GET /data/client/id/11/providers/id//withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/testvalue/123412423", "GET /data/client/id/11/providers/id//withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id//withpaging/testvalue/testvalue", "GET /data/client/id/11/providers/id//withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging//", "GET /data/client/id/11/providers/id/variablevalue1/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging//variablevalue1", "GET /data/client/id/11/providers/id/variablevalue1/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging//123412423", "GET /data/client/id/11/providers/id/variablevalue1/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging//testvalue", "GET /data/client/id/11/providers/id/variablevalue1/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/variablevalue1/", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/variablevalue1/123412423", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/123412423/", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/123412423/variablevalue1", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/123412423/123412423", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/123412423/testvalue", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/testvalue/", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/testvalue/123412423", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/variablevalue1/withpaging/testvalue/testvalue", "GET /data/client/id/11/providers/id/variablevalue1/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging//", "GET /data/client/id/11/providers/id/123412423/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging//variablevalue1", "GET /data/client/id/11/providers/id/123412423/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging//123412423", "GET /data/client/id/11/providers/id/123412423/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging//testvalue", "GET /data/client/id/11/providers/id/123412423/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/variablevalue1/", "GET /data/client/id/11/providers/id/123412423/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/11/providers/id/123412423/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/variablevalue1/123412423", "GET /data/client/id/11/providers/id/123412423/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/variablevalue1/testvalue", "GET /data/client/id/11/providers/id/123412423/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/123412423/", "GET /data/client/id/11/providers/id/123412423/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/123412423/variablevalue1", "GET /data/client/id/11/providers/id/123412423/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/123412423/123412423", "GET /data/client/id/11/providers/id/123412423/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/123412423/testvalue", "GET /data/client/id/11/providers/id/123412423/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/testvalue/", "GET /data/client/id/11/providers/id/123412423/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/testvalue/variablevalue1", "GET /data/client/id/11/providers/id/123412423/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/testvalue/123412423", "GET /data/client/id/11/providers/id/123412423/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/123412423/withpaging/testvalue/testvalue", "GET /data/client/id/11/providers/id/123412423/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging//", "GET /data/client/id/11/providers/id/testvalue/withpaging//", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging//variablevalue1", "GET /data/client/id/11/providers/id/testvalue/withpaging//variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging//123412423", "GET /data/client/id/11/providers/id/testvalue/withpaging//123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging//testvalue", "GET /data/client/id/11/providers/id/testvalue/withpaging//testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/variablevalue1/", "GET /data/client/id/11/providers/id/testvalue/withpaging/variablevalue1/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "GET /data/client/id/11/providers/id/testvalue/withpaging/variablevalue1/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/variablevalue1/123412423", "GET /data/client/id/11/providers/id/testvalue/withpaging/variablevalue1/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/variablevalue1/testvalue", "GET /data/client/id/11/providers/id/testvalue/withpaging/variablevalue1/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/123412423/", "GET /data/client/id/11/providers/id/testvalue/withpaging/123412423/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/123412423/variablevalue1", "GET /data/client/id/11/providers/id/testvalue/withpaging/123412423/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/123412423/123412423", "GET /data/client/id/11/providers/id/testvalue/withpaging/123412423/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/123412423/testvalue", "GET /data/client/id/11/providers/id/testvalue/withpaging/123412423/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/testvalue/", "GET /data/client/id/11/providers/id/testvalue/withpaging/testvalue/", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/testvalue/variablevalue1", "GET /data/client/id/11/providers/id/testvalue/withpaging/testvalue/variablevalue1", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/testvalue/123412423", "GET /data/client/id/11/providers/id/testvalue/withpaging/testvalue/123412423", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/11/providers/id/testvalue/withpaging/testvalue/testvalue", "GET /data/client/id/11/providers/id/testvalue/withpaging/testvalue/testvalue", "DataRoot", "ProvidersData", "ProvidersData", "BlueCrossProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender"),
+                    UrlTest("GET /data/withpaging//", "GET /data/withpaging//", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging//variablevalue1", "GET /data/withpaging//variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging//123412423", "GET /data/withpaging//123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging//testvalue", "GET /data/withpaging//testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/variablevalue1/", "GET /data/withpaging/variablevalue1/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/variablevalue1/variablevalue1", "GET /data/withpaging/variablevalue1/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/variablevalue1/123412423", "GET /data/withpaging/variablevalue1/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/variablevalue1/testvalue", "GET /data/withpaging/variablevalue1/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/123412423/", "GET /data/withpaging/123412423/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/123412423/variablevalue1", "GET /data/withpaging/123412423/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/123412423/123412423", "GET /data/withpaging/123412423/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/123412423/testvalue", "GET /data/withpaging/123412423/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/testvalue/", "GET /data/withpaging/testvalue/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/testvalue/variablevalue1", "GET /data/withpaging/testvalue/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/testvalue/123412423", "GET /data/withpaging/testvalue/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/withpaging/testvalue/testvalue", "GET /data/withpaging/testvalue/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging//", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging//", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging//variablevalue1", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging//variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging//123412423", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging//123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging//testvalue", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging//testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/variablevalue1/", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/variablevalue1/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/variablevalue1/variablevalue1", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/variablevalue1/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/variablevalue1/123412423", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/variablevalue1/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/variablevalue1/testvalue", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/variablevalue1/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/123412423/", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/123412423/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/123412423/variablevalue1", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/123412423/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/123412423/123412423", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/123412423/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/123412423/testvalue", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/123412423/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/testvalue/", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/testvalue/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/testvalue/variablevalue1", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/testvalue/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/testvalue/123412423", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/testvalue/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/abcde/edcba/aaaa123/bbb124/withpaging/testvalue/testvalue", "GET /data/abcde/edcba/aaaa123/bbb124/withpaging/testvalue/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging//", "GET /data/bbb124/withpaging//", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging//variablevalue1", "GET /data/bbb124/withpaging//variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging//123412423", "GET /data/bbb124/withpaging//123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging//testvalue", "GET /data/bbb124/withpaging//testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/variablevalue1/", "GET /data/bbb124/withpaging/variablevalue1/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/variablevalue1/variablevalue1", "GET /data/bbb124/withpaging/variablevalue1/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/variablevalue1/123412423", "GET /data/bbb124/withpaging/variablevalue1/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/variablevalue1/testvalue", "GET /data/bbb124/withpaging/variablevalue1/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/123412423/", "GET /data/bbb124/withpaging/123412423/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/123412423/variablevalue1", "GET /data/bbb124/withpaging/123412423/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/123412423/123412423", "GET /data/bbb124/withpaging/123412423/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/123412423/testvalue", "GET /data/bbb124/withpaging/123412423/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/testvalue/", "GET /data/bbb124/withpaging/testvalue/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/testvalue/variablevalue1", "GET /data/bbb124/withpaging/testvalue/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/testvalue/123412423", "GET /data/bbb124/withpaging/testvalue/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/bbb124/withpaging/testvalue/testvalue", "GET /data/bbb124/withpaging/testvalue/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging//", "GET /data/aaaa123/bbb124/withpaging//", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging//variablevalue1", "GET /data/aaaa123/bbb124/withpaging//variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging//123412423", "GET /data/aaaa123/bbb124/withpaging//123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging//testvalue", "GET /data/aaaa123/bbb124/withpaging//testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/variablevalue1/", "GET /data/aaaa123/bbb124/withpaging/variablevalue1/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/variablevalue1/variablevalue1", "GET /data/aaaa123/bbb124/withpaging/variablevalue1/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/variablevalue1/123412423", "GET /data/aaaa123/bbb124/withpaging/variablevalue1/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/variablevalue1/testvalue", "GET /data/aaaa123/bbb124/withpaging/variablevalue1/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/123412423/", "GET /data/aaaa123/bbb124/withpaging/123412423/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/123412423/variablevalue1", "GET /data/aaaa123/bbb124/withpaging/123412423/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/123412423/123412423", "GET /data/aaaa123/bbb124/withpaging/123412423/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/123412423/testvalue", "GET /data/aaaa123/bbb124/withpaging/123412423/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/testvalue/", "GET /data/aaaa123/bbb124/withpaging/testvalue/", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/testvalue/variablevalue1", "GET /data/aaaa123/bbb124/withpaging/testvalue/variablevalue1", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/testvalue/123412423", "GET /data/aaaa123/bbb124/withpaging/testvalue/123412423", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/aaaa123/bbb124/withpaging/testvalue/testvalue", "GET /data/aaaa123/bbb124/withpaging/testvalue/testvalue", "DataRoot", "WithPaging"),
+                    UrlTest("GET /data/client/id/aaaaa/providers/id/aaaaa", "GET /data/client/id/aaaaa/providers/id/aaaaa", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/aaaaa/providers/id/abcde", "GET /data/client/id/aaaaa/providers/id/abcde", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/aaaaa/providers/id/testvalue", "GET /data/client/id/aaaaa/providers/id/testvalue", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/abcde/providers/id/aaaaa", "GET /data/client/id/abcde/providers/id/aaaaa", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/abcde/providers/id/abcde", "GET /data/client/id/abcde/providers/id/abcde", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/abcde/providers/id/testvalue", "GET /data/client/id/abcde/providers/id/testvalue", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/aaaaa", "GET /data/client/id/testvalue/providers/id/aaaaa", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/abcde", "GET /data/client/id/testvalue/providers/id/abcde", "DataRoot", "ProvidersData", "ProvidersRender"),
+                    UrlTest("GET /data/client/id/testvalue/providers/id/testvalue", "GET /data/client/id/testvalue/providers/id/testvalue", "DataRoot", "ProvidersData", "ProvidersRender")
+                    //Node("GET /data", Controllers(),
+                    //    Node("/?", Controllers("DataRoot"),
+                    //        Node("/withpaging/{linesPerPage}/{pageNumber}", Controllers("WithPaging", "DataRoot"))),
+                    //    Node("/client/id", Controllers(),
+                    //        Node("/*/providers/id/*", Controllers("DataRoot", "ProvidersData", "ProvidersRender")),
+                    //        Node("/{clientId}/providers/id/{dataId}", Controllers("DataRoot", "ProvidersData", "ProvidersRender"),
+                    //            Node("/withpaging/{linesPerPage}/{pageNumber}", Controllers("DataRoot", "ProvidersData", "WithPaging", "ProvidersRender"))),
+                    //        Node("/11/providers/id/{dataId}", Controllers("DataRoot", "ProvidersData", "BlueCrossProvidersData", "ProvidersRender"),
+                    //            Node("/withpaging/{linesPerPage}/{pageNumber}", Controllers("DataRoot", "ProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender")))
+                    //        )
+                    //    )
+                    );
+            #endregion
+
+            #region Imported - DataQPaging-simple
+            NewTestWithUrl(
+                "Imported - DataQPaging-simple",
+                Types(
+                    Type("DataRoot",
+                        Attributes(BindAttribute("GET /a/?"))
+                        ),
+                    Type("WithPaging",
+                        Attributes(
+                            BindAttribute("GET /a/?/c3")
+                        )
+                        ),
+                    Type("ProvidersRender",
+                        Attributes(
+                            BindAttribute("GET /a/b/c2")
+                        )
+                        ),
+                    Type("ProvidersRenderBis",
+                        Attributes(
+                            BindAttribute("GET /a/b/c1")
+                        )
+                        )
+                    ),
+                    UrlTest("GET /a", "GET /a"),
+                    UrlTest("GET /a/abcde/edcba/aaaa123/bbb124", "GET /a/abcde/edcba/aaaa123/bbb124", "DataRoot"),
+                    UrlTest("GET /a/bbb124", "GET /a/bbb124", "DataRoot"),
+                    UrlTest("GET /a/aaaa123/bbb124", "GET /a/aaaa123/bbb124", "DataRoot"),
+                    UrlTest("GET /a/c3", "GET /a/c3", "WithPaging", "DataRoot"),
+                    UrlTest("GET /a/abcde/edcba/aaaa123/bbb124/c3", "GET /a/abcde/edcba/aaaa123/bbb124/c3", "WithPaging", "DataRoot"),
+                    UrlTest("GET /a/bbb124/c3", "GET /a/bbb124/c3", "WithPaging", "DataRoot"),
+                    UrlTest("GET /a/aaaa123/bbb124/c3", "GET /a/aaaa123/bbb124/c3", "WithPaging", "DataRoot"),
+                    UrlTest("GET /a/b/c2", "GET /a/b/c2", "DataRoot", "ProvidersRender"),
+                    UrlTest("GET /a/b/c1", "GET /a/b/c1", "DataRoot", "ProvidersRenderBis")
+
+                    //Node("GET /a", Controllers(),// is empty because it's not a method node
+                    //    Node("/?", Controllers("DataRoot"),
+                    //        Node("/c3", Controllers("WithPaging", "DataRoot"))),
+                    //    Node("/b", Controllers(),// is empty because it's not a method node
+                    //        Node("/c2", Controllers("ProvidersRender", "DataRoot")),
+                    //        Node("/c1", Controllers("ProvidersRenderBis", "DataRoot"))
+                    //        )
+                    //    )
+                );
+            #endregion
+
+            #region tree - single controller
+            NewTestWithUrl(
+                "tree - single controller",
+                Types(Type("Controller1", BindAttribute("/?"))),
+                UrlTest("GET /abcde/edcba/aaaa123/bbb124","GET /abcde/edcba/aaaa123/bbb124" ,"Controller1"),
+                UrlTest("GET /bbb124","GET /bbb124" ,"Controller1"),
+                UrlTest("GET /aaaa123/bbb124","GET /aaaa123/bbb124" ,"Controller1"),
+                UrlTest("POST /abcde/edcba/aaaa123/bbb124","POST /abcde/edcba/aaaa123/bbb124" ,"Controller1"),
+                UrlTest("POST /bbb124","POST /bbb124" ,"Controller1"),
+                UrlTest("POST /aaaa123/bbb124","POST /aaaa123/bbb124" ,"Controller1"),
+                UrlTest("PUT /abcde/edcba/aaaa123/bbb124","PUT /abcde/edcba/aaaa123/bbb124" ,"Controller1"),
+                UrlTest("PUT /bbb124","PUT /bbb124" ,"Controller1"),
+                UrlTest("PUT /aaaa123/bbb124","PUT /aaaa123/bbb124" ,"Controller1"),
+                UrlTest("DELETE /abcde/edcba/aaaa123/bbb124","DELETE /abcde/edcba/aaaa123/bbb124" ,"Controller1"),
+                UrlTest("DELETE /bbb124","DELETE /bbb124" ,"Controller1"),
+                UrlTest("DELETE /aaaa123/bbb124","DELETE /aaaa123/bbb124" ,"Controller1"),
+                UrlTest("HEAD /abcde/edcba/aaaa123/bbb124","HEAD /abcde/edcba/aaaa123/bbb124" ,"Controller1"),
+                UrlTest("HEAD /bbb124","HEAD /bbb124" ,"Controller1"),
+                UrlTest("HEAD /aaaa123/bbb124","HEAD /aaaa123/bbb124" ,"Controller1")
+
+//                Node("* /?", Controller("Controller1", 1))
+            );
+            #endregion
+
+            #region tree - one controller - 3 bindings (flat)
+            NewTestWithUrl(
+                "tree - one controller - 3 bindings (flat)",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path1"),
+                        BindAttribute("/path2/more"))
+                    )),
+                    UrlTest("GET /default","GET /default" ,"Controller1"),
+                    UrlTest("POST /default","POST /default" ,"Controller1"),
+                    UrlTest("PUT /default","PUT /default" ,"Controller1"),
+                    UrlTest("DELETE /default","DELETE /default" ,"Controller1"),
+                    UrlTest("HEAD /default","HEAD /default" ,"Controller1"),
+                    UrlTest("GET /path1","GET /path1" ,"Controller1"),
+                    UrlTest("POST /path1","POST /path1" ,"Controller1"),
+                    UrlTest("PUT /path1","PUT /path1" ,"Controller1"),
+                    UrlTest("DELETE /path1","DELETE /path1" ,"Controller1"),
+                    UrlTest("HEAD /path1","HEAD /path1" ,"Controller1"),
+                    UrlTest("GET /path2/more","GET /path2/more" ,"Controller1"),
+                    UrlTest("POST /path2/more","POST /path2/more" ,"Controller1"),
+                    UrlTest("PUT /path2/more","PUT /path2/more" ,"Controller1"),
+                    UrlTest("DELETE /path2/more","DELETE /path2/more" ,"Controller1"),
+                    UrlTest("HEAD /path2/more","HEAD /path2/more" ,"Controller1")
+
+                //Node("* /default", "Controller1"),
+                //Node("* /path1", "Controller1"),
+                //Node("* /path2/more", "Controller1")
+                );
+            #endregion
+
+            #region tree - one controller - 3 bindings (tree)
+            NewTestWithUrl(
+                "tree - one controller - 3 bindings (tree)",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                    )),
+                    UrlTest("GET /default","GET /default" ,"Controller1"),
+                    UrlTest("POST /default","POST /default" ,"Controller1"),
+                    UrlTest("PUT /default","PUT /default" ,"Controller1"),
+                    UrlTest("DELETE /default","DELETE /default" ,"Controller1"),
+                    UrlTest("HEAD /default","HEAD /default" ,"Controller1"),
+                    UrlTest("GET /path2","GET /path2" ,"Controller1"),
+                    UrlTest("POST /path2","POST /path2" ,"Controller1"),
+                    UrlTest("PUT /path2","PUT /path2" ,"Controller1"),
+                    UrlTest("DELETE /path2","DELETE /path2" ,"Controller1"),
+                    UrlTest("HEAD /path2","HEAD /path2" ,"Controller1"),
+                    UrlTest("GET /path2/more","GET /path2/more" ,"Controller1","Controller1"),
+                    UrlTest("POST /path2/more","POST /path2/more" ,"Controller1","Controller1"),
+                    UrlTest("PUT /path2/more","PUT /path2/more" ,"Controller1","Controller1"),
+                    UrlTest("DELETE /path2/more","DELETE /path2/more" ,"Controller1","Controller1"),
+                    UrlTest("HEAD /path2/more","HEAD /path2/more" ,"Controller1","Controller1")
+
+                //Node("* /default", "Controller1"),
+                //Node("* /path2", Controllers("Controller1"),
+                //    Node("/more", "Controller1")
+                //    )
+                );
+            #endregion
+
+            #region tree - one generic one specific
+            NewTestWithUrl(
+                "tree - one generic one specific",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                        ),
+                    Type("Controller2", BindAttribute("/?"))
+                    ),
+                    UrlTest("GET /default", "GET /default", "Controller2", "Controller1"),
+                    UrlTest("POST /default", "POST /default", "Controller2", "Controller1"),
+                    UrlTest("PUT /default", "PUT /default", "Controller2", "Controller1"),
+                    UrlTest("DELETE /default", "DELETE /default", "Controller2", "Controller1"),
+                    UrlTest("HEAD /default", "HEAD /default", "Controller2", "Controller1"),
+                    UrlTest("GET /path2", "GET /path2", "Controller2", "Controller1"),
+                    UrlTest("POST /path2", "POST /path2", "Controller2", "Controller1"),
+                    UrlTest("PUT /path2", "PUT /path2", "Controller2", "Controller1"),
+                    UrlTest("DELETE /path2", "DELETE /path2", "Controller2", "Controller1"),
+                    UrlTest("HEAD /path2", "HEAD /path2", "Controller2", "Controller1"),
+                    UrlTest("GET /path2/more", "GET /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("POST /path2/more", "POST /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("GET /bbb124", "GET /bbb124", "Controller2"),
+                    UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "Controller2"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124", "POST /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("POST /bbb124", "POST /bbb124", "Controller2"),
+                    UrlTest("POST /aaaa123/bbb124", "POST /aaaa123/bbb124", "Controller2"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124", "PUT /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("PUT /bbb124", "PUT /bbb124", "Controller2"),
+                    UrlTest("PUT /aaaa123/bbb124", "PUT /aaaa123/bbb124", "Controller2"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124", "DELETE /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("DELETE /bbb124", "DELETE /bbb124", "Controller2"),
+                    UrlTest("DELETE /aaaa123/bbb124", "DELETE /aaaa123/bbb124", "Controller2"),
+                    UrlTest("HEAD /abcde/edcba/aaaa123/bbb124", "HEAD /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("HEAD /bbb124", "HEAD /bbb124", "Controller2"),
+                    UrlTest("HEAD /aaaa123/bbb124", "HEAD /aaaa123/bbb124", "Controller2")
+                //Node("* /default", "Controller2", "Controller1"),
+                //Node("* /path2", Controllers("Controller2", "Controller1"),
+                //    Node("/more", "Controller2", "Controller1")
+                //    ),
+                //Node("* /?", "Controller2")
+                );
+            #endregion
+
+
+            // Note that there's questionmark here, without leading slash
+            #region tree - one generic one specific - reversed
+            NewTestWithUrl(
+                "tree - one generic one specific - reversed",
+                Types(
+                    Type("Controller2", BindAttribute("?")),
+                    Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                        )
+                    ),
+                    UrlTest("test special","GET /anytestpath","Controller2"),
+                    UrlTest("GET /default","GET /default" ,"Controller1","Controller2"),
+                    UrlTest("POST /default","POST /default" ,"Controller1","Controller2"),
+                    UrlTest("PUT /default","PUT /default" ,"Controller1","Controller2"),
+                    UrlTest("DELETE /default","DELETE /default" ,"Controller1","Controller2"),
+                    UrlTest("HEAD /default","HEAD /default" ,"Controller1","Controller2"),
+                    UrlTest("GET /path2","GET /path2" ,"Controller1","Controller2"),
+                    UrlTest("POST /path2","POST /path2" ,"Controller1","Controller2"),
+                    UrlTest("PUT /path2","PUT /path2" ,"Controller1","Controller2"),
+                    UrlTest("DELETE /path2","DELETE /path2" ,"Controller1","Controller2"),
+                    UrlTest("HEAD /path2","HEAD /path2" ,"Controller1","Controller2"),
+                    UrlTest("GET /path2/more","GET /path2/more" ,"Controller1","Controller2","Controller1"),
+                    UrlTest("POST /path2/more","POST /path2/more" ,"Controller1","Controller2","Controller1"),
+                    UrlTest("PUT /path2/more","PUT /path2/more" ,"Controller1","Controller2","Controller1"),
+                    UrlTest("DELETE /path2/more","DELETE /path2/more" ,"Controller1","Controller2","Controller1"),
+                    UrlTest("HEAD /path2/more","HEAD /path2/more" ,"Controller1","Controller2","Controller1")
+                //Node("* ?", "Controller2"),
+                //Node("* /default", "Controller1", "Controller2"),
+                //Node("* /path2", Controllers("Controller1", "Controller2"),
+                //    Node("/more", "Controller1", "Controller2")
+                //    )
+                );
             #endregion
 
 

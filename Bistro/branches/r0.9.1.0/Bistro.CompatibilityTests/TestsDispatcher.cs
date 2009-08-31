@@ -251,67 +251,6 @@ namespace Bistro.CompatibilityTests
             testMgr.LoadSpecial(descriptor.Controllers);
             #endregion
 
-            #region Generate stuff
-            ///
-
-            List<IAttributeInfo> list = new List<IAttributeInfo>();
-
-
-            foreach (TestTypeInfo testType in descriptor.Controllers)
-            {
-                IEnumerable<IAttributeInfo> attrList = testType.Attributes.Where(attr => { return attr.Type == typeof(BindAttribute).FullName; });
-                list.AddRange(attrList);
-            }
-
-            List<UrlTuple> urlsList = new List<UrlTuple>();
-
-
-            foreach (IAttributeInfo item in list)
-            {
-                string url = item.Properties[0].AsString();
-                string verb = "";
-                foreach (string verbItem in BindPointUtilities.HttpVerbs)
-                {
-                    if (!url.StartsWith(verbItem, StringComparison.OrdinalIgnoreCase))
-                        continue;
-
-                    string remainder = url.Substring(verbItem.Length);
-                    url = remainder.TrimStart();
-                    verb = verbItem;
-                    break;
-                }
-                if (verb == "")
-                {
-                    foreach (var vrb in BindPointUtilities.HttpVerbs)
-                    {
-                        ProcessUrlRec(urlsList, vrb, url);
-                    }
-                }
-                else
-                {
-                    ProcessUrlRec(urlsList, verb, url);
-                }
-
-            }
-
-
-            StringBuilder sb1 = new StringBuilder();
-
-            foreach (UrlTuple tuple in urlsList)
-            {
-                ControllerInvocationInfo[] testControllers = dispatcher.GetControllers(String.Format("{0}{1}", tuple.Verb, tuple.Url));
-                sb1.AppendFormat("UrlTest(\"{0} {1}\",\"{0} {1}\" ", tuple.Verb, tuple.Url);
-                foreach (ControllerInvocationInfo ctrlInfo in testControllers)
-                {
-                    sb1.AppendFormat(",\"{0}\"", ctrlInfo.BindPoint.Controller.ControllerTypeName);
-                }
-                sb1.AppendLine("),");
-            }
-            string resString = sb1.ToString();
-
-            ///
-            #endregion
-
 
 
             #region Test part

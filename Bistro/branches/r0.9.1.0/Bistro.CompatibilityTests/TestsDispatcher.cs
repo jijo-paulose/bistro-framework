@@ -420,10 +420,10 @@ namespace Bistro.CompatibilityTests
                         ),
                     Type("GetNextStep",
                         Attributes(
-                            BindAttribute("GET /Clinical/GetNextStep?{TransactionId}&{DiagnosisId}")
+                            BindAttribute("GET /Clinical/GetNextStep?{TransactionId}&{Data17isId}")
                         ),
                         Field("TransactionId", "string", RequestAttribute),
-                        Field("DiagnosisId", "string", RequestAttribute),
+                        Field("Data17isId", "string", RequestAttribute),
                         Field("Questions", "List<ClinicalQuestionStub>", RequestAttribute),
                         Field("Actions", "List<ClinicalAction>", RequestAttribute)
                         ),
@@ -432,7 +432,7 @@ namespace Bistro.CompatibilityTests
                             BindAttribute("GET /Clinical/Initialize")
                         ),
                         Field("TransactionId", "string", ProvidesAttribute, RequestAttribute),
-                        Field("Diagnoses", "List<Diagnosis>", ProvidesAttribute, RequestAttribute),
+                        Field("Data17es", "List<Data17is>", ProvidesAttribute, RequestAttribute),
                         Field("ApplicationId", "int", RequestAttribute),
                         Field("BarId", "int", RequestAttribute),
                         Field("ExamId", "int", RequestAttribute),
@@ -764,7 +764,7 @@ namespace Bistro.CompatibilityTests
                     UrlTest("DELETE /Bar/123412423", "DELETE /Bar/123412423", "Messenger", "QueryStringDeterminer", "DefaultController", "Authenticator", "AjaxDeterminer", "Fake", "BarDelete"),
                     UrlTest("DELETE /Bar/testvalue", "DELETE /Bar/testvalue", "Messenger", "QueryStringDeterminer", "DefaultController", "Authenticator", "AjaxDeterminer", "Fake", "BarDelete"),
                     UrlTest("GET /Bars", "GET /Bars", "QueryStringDeterminer", "Messenger", "DefaultController", "AjaxDeterminer", "Authenticator", "Fake", "Bars", "AntiForgeryRequestSetter"),
-                    UrlTest("GET /Clinical/GetNextStep?{TransactionId}&{DiagnosisId}", "GET /Clinical/GetNextStep?{TransactionId}&{DiagnosisId}", "Messenger", "QueryStringDeterminer", "DefaultController", "Fake", "Authenticator", "AjaxDeterminer", "AntiForgeryRequestSetter", "GetNextStep"),
+                    UrlTest("GET /Clinical/GetNextStep?{TransactionId}&{Data17isId}", "GET /Clinical/GetNextStep?{TransactionId}&{Data17isId}", "Messenger", "QueryStringDeterminer", "DefaultController", "Fake", "Authenticator", "AjaxDeterminer", "AntiForgeryRequestSetter", "GetNextStep"),
                     UrlTest("GET /Clinical/Initialize", "GET /Clinical/Initialize", "Messenger", "QueryStringDeterminer", "DefaultController", "Fake", "Authenticator", "AjaxDeterminer", "AntiForgeryRequestSetter", "InitializeClinical"),
                     UrlTest("GET /Comments", "GET /Comments", "QueryStringDeterminer", "Messenger", "DefaultController", "Comments", "AjaxDeterminer", "Authenticator", "Fake", "AntiForgeryRequestSetter"),
                     UrlTest("GET /Comments/Get", "GET /Comments/Get", "QueryStringDeterminer", "Messenger", "DefaultController", "Comments", "AjaxDeterminer", "Authenticator", "Fake", "AntiForgeryRequestSetter", "CommentsSend"),

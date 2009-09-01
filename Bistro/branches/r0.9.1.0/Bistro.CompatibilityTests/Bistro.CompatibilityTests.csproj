@@ -52,8 +52,11 @@
     <Compile Include="Reflection\TestTypeInfo.cs" />
     <Compile Include="TestControllerManager.cs" />
     <Compile Include="TestControllerManagerFactory.cs" />
+    <Compile Include="TestsDispatcher.Tests1.cs" />
+    <Compile Include="TestsDispatcher.Tests2.cs" />
     <Compile Include="TestsDispatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestsDispatcher.Tests3.cs" />
     <Compile Include="UrlControllersTest.cs" />
   </ItemGroup>
   <ItemGroup>

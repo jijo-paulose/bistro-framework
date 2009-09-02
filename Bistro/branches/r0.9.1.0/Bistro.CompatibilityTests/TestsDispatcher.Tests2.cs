@@ -344,6 +344,7 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /hi/*/world/a/*")
                     )
                 ),
+                UrlTest("special - GET /hi/anyvalue/world/a/now","GET /hi/anyvalue/world/a/now","hiController6","hiController7","hiController4"),
                 UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", "hiController4"),
@@ -395,6 +396,10 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /hi/*/world/a/*")
                     )
                 ),
+                UrlTest("special - GET /hi/old/world/b/now", "GET /hi/old/world/b/now", "hiController3", "hiController4"),
+                UrlTest("special - GET /hi/old/world/a/now", "GET /hi/old/world/a/now", "hiController3", "hiController7", "hiController4"),
+                UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", "hiController3", "hiController7", "hiController4", "hiController2"),
+                UrlTest("special - GET /hi/new/world/testvalue/now", "GET /hi/new/world/testvalue/now", "hiController3", "hiController4", "hiController2"),
                 UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
                 UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
                 UrlTest("GET /hi/new/aaaaa/testvalue/now", "GET /hi/new/aaaaa/testvalue/now", "hiController2"),
@@ -960,6 +965,7 @@ namespace Bistro.CompatibilityTests
                         )
                         )
                     ),
+                    UrlTest("special - GET /a/b/c2/c3", "GET /a/b/c2/c3", "WithPaging", "DataRoot", "Data14sRender"),
                     UrlTest("GET /a", "GET /a"),
                     UrlTest("GET /a/abcde/edcba/aaaa123/bbb124", "GET /a/abcde/edcba/aaaa123/bbb124", "DataRoot"),
                     UrlTest("GET /a/bbb124", "GET /a/bbb124", "DataRoot"),

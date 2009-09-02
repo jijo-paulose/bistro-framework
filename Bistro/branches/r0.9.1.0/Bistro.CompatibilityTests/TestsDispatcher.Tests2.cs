@@ -43,6 +43,9 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /hi/*/world/a/*")
                     )
                 ),
+                UrlTest("special - GET /hi/old/world/a/notnow", "GET /hi/new/world/a/notnow", "hiController6", "hiController1", "hiController7"),
+                UrlTest("special - GET /hi/new/world/b/now", "GET /hi/new/world/b/now", "hiController3", "hiController4", "hiController2"),
+                UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", "hiController3", "hiController6", "hiController1", "hiController7", "hiController5", "hiController2", "hiController4"),
                 UrlTest("GET /hi/new/world/a", "GET /hi/new/world/a", "hiController6", "hiController1"),
                 UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
                 UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
@@ -122,6 +125,8 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /hi/*/world/a/*")
                     )
                 ),
+                UrlTest("special - GET /hi/aaaa/world/a/now","GET /hi/aaaa/world/a/now","hiController7","hiController4"),
+                UrlTest("special - GET /hi/aaaa/world/a/now/aaa", "GET /hi/aaaa/world/a/now/aaa", "hiController7", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", "hiController4"),
@@ -173,6 +178,9 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /hi/*/world/a/*")
                     )
                 ),
+                UrlTest("special - GET /hi/new/world/a1/a2/now", "GET /hi/new/world/a1/a2/now", "hiController3"),
+                UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", "hiController6", "hiController3", "hiController7", "hiController2", "hiController4"),
+                UrlTest("special - GET /hi/new/world/bb/now", "GET /hi/new/world/bb/now", "hiController3", "hiController4", "hiController2"),
                 UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
                 UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
                 UrlTest("GET /hi/new/aaaaa/testvalue/now", "GET /hi/new/aaaaa/testvalue/now", "hiController2"),
@@ -251,6 +259,9 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /hi/*/world/a/*")
                     )
                 ),
+                UrlTest("special GET /hi/testvalue/world/a/bbb/ccc", "GET /hi/testvalue/world/a/bbb/ccc", "hiController6", "hiController7"),
+                UrlTest("special GET /hi/testvalue/world/a/bbb", "GET /hi/testvalue/world/a/bbb", "hiController6", "hiController7"),
+                UrlTest("special GET /hi/testvalue/world/a/now", "GET /hi/testvalue/world/a/now", "hiController6", "hiController3", "hiController7", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
                 UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
                 UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", "hiController3", "hiController4"),
@@ -312,6 +323,8 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /a/*")
                     )
                 ),
+                UrlTest("special - GET /a/now/aaa", "GET /a/now/aaa", "hiController6", "hiController7", "hiController4"),
+                UrlTest("special - GET /a/now", "GET /a/now", "hiController6", "hiController7", "hiController4"),
                 UrlTest("GET /aaaaa/now", "GET /aaaaa/now", "hiController4"),
                 UrlTest("GET /abcde/now", "GET /abcde/now", "hiController4"),
                 UrlTest("GET /testvalue/now", "GET /testvalue/now", "hiController4"),
@@ -344,7 +357,8 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /hi/*/world/a/*")
                     )
                 ),
-                UrlTest("special - GET /hi/anyvalue/world/a/now","GET /hi/anyvalue/world/a/now","hiController6","hiController7","hiController4"),
+                UrlTest("special - GET /hi/anyvalue/world/a/now/aaa", "GET /hi/anyvalue/world/a/now/aaa", "hiController6", "hiController7", "hiController4"),
+                UrlTest("special - GET /hi/anyvalue/world/a/now", "GET /hi/anyvalue/world/a/now", "hiController6", "hiController7", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", "hiController4"),
@@ -469,9 +483,9 @@ namespace Bistro.CompatibilityTests
                 );
             #endregion
 
-            #region Imported - DataQPaging
+            #region Imported - Paging
             NewTestWithUrl(
-                "Imported - DataQPaging",
+                "Imported - Paging",
                 Types(
                     Type("DataRoot",
                         Attributes(BindAttribute("GET /data/?")),
@@ -942,9 +956,9 @@ namespace Bistro.CompatibilityTests
                     );
             #endregion
 
-            #region Imported - DataQPaging-simple
+            #region Imported - Paging-simple
             NewTestWithUrl(
-                "Imported - DataQPaging-simple",
+                "Imported - Paging-simple",
                 Types(
                     Type("DataRoot",
                         Attributes(BindAttribute("GET /a/?"))

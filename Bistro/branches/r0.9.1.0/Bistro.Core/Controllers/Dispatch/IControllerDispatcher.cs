@@ -24,7 +24,7 @@ using Bistro.Controllers.Descriptor;
 namespace Bistro.Controllers.Dispatch
 {
     /// <summary>
-    /// Manages controller application to urls. This interface should be implemented only if 
+    /// Manages controller application to urls. This interface should be implemented only if
     /// a drastic departure from default dispatch functionality is required
     /// </summary>
     public interface IControllerDispatcher
@@ -35,6 +35,15 @@ namespace Bistro.Controllers.Dispatch
         /// <param name="requestUrl">The request URL.</param>
         /// <returns>A sorted list of controllers</returns>
         ControllerInvocationInfo[] GetControllers(string requestUrl);
+
+        /// <summary>
+        /// Determines whether the specified url has a controller explicitly bound to it
+        /// </summary>
+        /// <param name="requestUrl">The request URL.</param>
+        /// <returns>
+        /// 	<c>true</c> if an exact binding exists; otherwise, <c>false</c>.
+        /// </returns>
+        bool HasExactBind(string requestUrl);
 
         /// <summary>
         /// Registers the controller with the dispatcher.

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8A5337BB-438F-4AD7-B695-89DF28F778DF}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -103,6 +103,7 @@
     <Compile Include="Controllers\OutputHandling\RenderingController.cs" />
     <Compile Include="Controllers\OutputHandling\TemplateEngine.cs" />
     <Compile Include="Controllers\OutputHandling\TemplateMappingAttribute.cs" />
+    <Compile Include="Controllers\OutputHandling\RenderType.cs" />
     <Compile Include="Controllers\Security\AnonymousUser.cs" />
     <Compile Include="Controllers\Security\SecurityAttribute.cs" />
     <Compile Include="Controllers\Security\AllowAttribute.cs" />

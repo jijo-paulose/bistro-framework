@@ -56,6 +56,11 @@ namespace Bistro
         public const string ApplicationStartup = "EVENT" + SystemEvents + ApplicationEvents + "/startup";
 
         /// <summary>
+        /// Name of the unhandled exception event
+        /// </summary>
+        public const string UnhandledException = "GET" + SystemEvents + ApplicationEvents + "/exception";
+
+        /// <summary>
         /// Gets or sets the application instance.
         /// </summary>
         /// <value>The instance.</value>

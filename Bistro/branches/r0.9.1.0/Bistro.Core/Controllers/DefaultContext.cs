@@ -82,8 +82,18 @@ namespace Bistro.Controllers
         /// <param name="target"></param>
         public virtual void RenderWith(string target)
         {
+            RenderWith(new Dictionary<RenderType, string>() { { RenderType.Full, target } });
+        }
+
+        /// <summary>
+        /// Notifies the rendering engine how to render the results of the current request,
+        /// providing a listing of different rendering options.
+        /// </summary>
+        /// <param name="targets"></param>
+        public virtual void RenderWith(IDictionary<RenderType, string> targets)
+        {
             ClearReturnValues();
-            RenderTarget = target;
+            RenderTargets = targets;
 
             CurrentReturnType = ReturnType.Template;
         }
@@ -92,7 +102,8 @@ namespace Bistro.Controllers
         /// Gets the render target.
         /// </summary>
         /// <value>The render target.</value>
-        public virtual string RenderTarget { 
+        public virtual IDictionary<RenderType, string> RenderTargets
+        { 
             get; 
             protected set; 
         }
@@ -311,7 +322,7 @@ namespace Bistro.Controllers
             ContentType = null;
             AttachmentName = null;
             Encoding = null;
-            RenderTarget = null;
+            RenderTargets = null;
 
             CurrentReturnType = ReturnType.Other;
         }

@@ -20,11 +20,24 @@
  ***************************************************************************/
 
 using System.Web;
+using System;
 
 namespace Bistro.Controllers.OutputHandling
 {
+    /// <summary>
+    /// Base class for rendering engines in bistro
+    /// </summary>
     public abstract class TemplateEngine
     {
-        public abstract void Render(HttpContextBase httpContext, IContext requestContext);
+        [Obsolete("Use the Render(HttpContextBase, IContext, string) method")]
+        public virtual void Render(HttpContextBase httpContext, IContext requestContext) { }
+
+        /// <summary>
+        /// Renders the specified target.
+        /// </summary>
+        /// <param name="httpContext">The HTTP context.</param>
+        /// <param name="requestContext">The request context.</param>
+        /// <param name="target">The target.</param>
+        public abstract void Render(HttpContextBase httpContext, IContext requestContext, string target);
     }
 }

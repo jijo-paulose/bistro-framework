@@ -85,6 +85,8 @@ namespace Bistro.UnitTests.Support
             Context.Setup(ctx => ctx.Request.Cookies).Returns(new HttpCookieCollection());
             Context.Setup(ctx => ctx.Request.Form).Returns(() => formCollection);
             Context.Setup(ctx => ctx.Request.Files.AllKeys).Returns(new string[] { });
+            Context.Setup(ctx => ctx.Request.Headers).Returns(new NameValueCollection());
+            Context.Setup(ctx => ctx.Handler).Returns(() => this);
 
             LoadFactories(null);
         }

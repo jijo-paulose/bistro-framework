@@ -60,8 +60,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Support\TestingRenderingEngine.cs" />
+    <Compile Include="Tests\Data\RenderingControllers.cs" />
     <Compile Include="Tests\EntityTests.cs" />
     <Compile Include="Tests\Data\EntityControllers.cs" />
+    <Compile Include="Tests\RenderTests.cs" />
     <Compile Include="Tests\TypeValidationTests.cs" />
     <Compile Include="Tests\FormatTests.cs" />
     <Compile Include="Tests\DataPipelineTests.cs" />

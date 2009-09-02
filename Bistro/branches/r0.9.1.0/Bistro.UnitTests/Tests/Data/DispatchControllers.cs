@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace Bistro.UnitTests
 {
-    [Bind("event /bistro/application/startup")]
+    [Bind(Application.ApplicationStartup)]
     public class StartupController : AbstractController
     {
         public static int hitcount = 0;
@@ -20,6 +20,27 @@ namespace Bistro.UnitTests
         public override void DoProcessRequest(IExecutionContext context)
         {
             hitcount++;
+        }
+    }
+
+    [Bind(Application.UnhandledException)]
+    public class ExceptionController : AbstractController
+    {
+        [Request]
+        protected Exception unhandledException;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            context.Response.Return("exception " + unhandledException.Message);
+        }
+    }
+
+    [Bind("get /exception")]
+    public class ExceptionTestController : AbstractController
+    {
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            throw new NotImplementedException();
         }
     }
 

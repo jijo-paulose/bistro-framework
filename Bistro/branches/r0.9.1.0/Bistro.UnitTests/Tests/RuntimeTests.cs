@@ -31,5 +31,15 @@ namespace Bistro.UnitTests.Tests
         {
             Assert.IsNotNull(dispatcher);
         }
+
+        [Test]
+        public void BistroReflectionCorrect()
+        {
+            var dispatcher = new MethodDispatcher(Application.Instance);
+
+            Assert.That(dispatcher.IsMethodDefined("GET/foo"), "Since there are wild-card mappings in the test apps, \"foo\" should return true");
+            Assert.That(!dispatcher.IsMethodDefinedExplicitly("GET/foobar"), "There isn't an explicit controller binding to \"foobar\"");
+            Assert.That(dispatcher.IsMethodDefinedExplicitly("EVENT/bistro/application/startup"), "The application startup method is defined explicitly. Something's amiss");
+        }
     }
 }

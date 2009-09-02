@@ -63,7 +63,7 @@
     <Compile Include="UrlControllersTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BistroCore\Bistro.Core.csproj">
+    <ProjectReference Include="..\Bistro.Core\Bistro.Core.csproj">
       <Project>{8A5337BB-438F-4AD7-B695-89DF28F778DF}</Project>
       <Name>Bistro.Core</Name>
     </ProjectReference>

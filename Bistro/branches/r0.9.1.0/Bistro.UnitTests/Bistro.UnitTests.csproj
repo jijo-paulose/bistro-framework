@@ -81,7 +81,7 @@
       <Project>{81D48228-73A8-4A92-84B9-ECD57F86DB72}</Project>
       <Name>Bistro.Extensions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\BistroCore\Bistro.Core.csproj">
+    <ProjectReference Include="..\Bistro.Core\Bistro.Core.csproj">
       <Project>{8A5337BB-438F-4AD7-B695-89DF28F778DF}</Project>
       <Name>Bistro.Core</Name>
     </ProjectReference>

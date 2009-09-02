@@ -249,6 +249,21 @@ namespace Bistro.CompatibilityTests
                         )
 
                     ),
+					UrlTest("badTest - GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true","GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true","DefaultController","SignInDisplay","DataAccessControl","Untag","Tag"),
+					UrlTest("GET /auth/signin/byname/ShortNameValue?originalRequest=origReqValue", "GET /auth/signin/byname/ShortNameValue?originalRequest=origReqValue","DefaultController","SignInDisplay","DataAccessControl"),
+					UrlTest("GET /auth/signin/byname?originalRequest=origReqValue", "GET /auth/signin/byname?originalRequest=origReqValue","DefaultController","DataAccessControl","SignInDisplay"),
+
+					UrlTest("GET /postings/ContentTypeValue/byname/ShortNameValue?firstTime=true", "GET /postings/ContentTypeValue/byname/ShortNameValue?firstTime=true","DefaultController","FirstTimeSearch","Search","DataAccessControl"),
+					UrlTest("GET /postings/ContentTypeValue/byname?firstTime=true", "GET /postings/ContentTypeValue/byname?firstTime=true","DefaultController","DataAccessControl","Search","FirstTimeSearch"),
+					UrlTest("GET /postings/ContentTypeValue/byname/?firstTime=true", "GET /postings/ContentTypeValue/byname/?firstTime=true","DefaultController","FirstTimeSearch","Search","DataAccessControl"),
+					UrlTest("GET /postings/byname/ShortNameValue?firstTime=true", "GET /postings/byname/ShortNameValue?firstTime=true","DefaultController","FirstTimeSearch","Search","DataAccessControl"),
+					UrlTest("GET /postings/byname?firstTime=true", "GET /postings/byname?firstTime=true","DefaultController","DataAccessControl","Search","FirstTimeSearch"),
+					
+					
+					UrlTest("special - GET /postings/contTypeValue?firstTime=true", "GET /postings/contTypeValue?firstTime=true","DefaultController", "Search", "FirstTimeSearch"),
+					UrlTest("special - GET /postings/?firstTime=true", "GET /postings/?firstTime=true", "DefaultController", "Search", "FirstTimeSearch"),
+                    UrlTest("special - GET /auth/signin?originalRequest=aaa","GET /auth/signin?originalRequest=aaa", "DefaultController", "SignInDisplay"),
+                    UrlTest("special - GET /auth/signin/aaa?originalRequest=aaa","GET /auth/signin/aaa?originalRequest=aaa", "DefaultController", "SignInDisplay"),
                     UrlTest("GET /auth/register", "GET /auth/register", "DefaultController", "RegisterDisplay"),
                     UrlTest("POST /auth/register", "POST /auth/register", "DefaultController", "Register"),
                     UrlTest("GET /auth/signin?{originalRequest}", "GET /auth/signin?{originalRequest}", "DefaultController", "SignInDisplay"),
@@ -840,7 +855,7 @@ namespace Bistro.CompatibilityTests
                        BindAttribute("/a/b2/c2")
                        )
                    ),
-                   UrlTest("test1", "GET /a"),
+                   UrlTest("special - GET /a", "GET /a"),
                    UrlTest("GET /a/b1/c1", "GET /a/b1/c1", "C1"),
                    UrlTest("POST /a/b1/c1", "POST /a/b1/c1", "C1"),
                    UrlTest("PUT /a/b1/c1", "PUT /a/b1/c1", "C1"),
@@ -886,6 +901,16 @@ namespace Bistro.CompatibilityTests
                     )),
                 //Node("* /", "Controller1"),
                 //Node("* /path1", "Controller1")
+                UrlTest("GET /path1/anotherpath", "GET /path1/anotherpath", "Controller1"),
+                UrlTest("POST /path1/anotherpath", "POST /path1/anotherpath", "Controller1"),
+                UrlTest("PUT /path1/anotherpath", "PUT /path1/anotherpath", "Controller1"),
+                UrlTest("DELETE /path1/anotherpath", "DELETE /path1/anotherpath", "Controller1"),
+                UrlTest("HEAD /path1/anotherpath", "HEAD /path1/anotherpath", "Controller1"),
+                UrlTest("GET /anotherpath", "GET /anotherpath"),
+                UrlTest("POST /anotherpath", "POST /anotherpath"),
+                UrlTest("PUT /anotherpath", "PUT /anotherpath"),
+                UrlTest("DELETE /anotherpath", "DELETE /anotherpath"),
+                UrlTest("HEAD /anotherpath", "HEAD /anotherpath"),
                 UrlTest("GET /", "GET /", "Controller1"),
                 UrlTest("POST /", "POST /", "Controller1"),
                 UrlTest("PUT /", "PUT /", "Controller1"),
@@ -913,21 +938,6 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("/?")
                     )
                 ),
-                UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("GET /bbb124", "GET /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("POST /abcde/edcba/aaaa123/bbb124", "POST /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("POST /bbb124", "POST /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("POST /aaaa123/bbb124", "POST /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("PUT /abcde/edcba/aaaa123/bbb124", "PUT /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("PUT /bbb124", "PUT /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("PUT /aaaa123/bbb124", "PUT /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("DELETE /abcde/edcba/aaaa123/bbb124", "DELETE /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("DELETE /bbb124", "DELETE /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("DELETE /aaaa123/bbb124", "DELETE /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("HEAD /abcde/edcba/aaaa123/bbb124", "HEAD /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("HEAD /bbb124", "HEAD /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("HEAD /aaaa123/bbb124", "HEAD /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
                 UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
                 UrlTest("GET /bbb124", "GET /bbb124", "HomeUrlController2", "HomeUrlController1"),
                 UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),

@@ -363,5 +363,17 @@ namespace Bistro.Controllers.Dispatch
         {
             return bindComponent.StartsWith("{") && bindComponent.EndsWith("}");
         }
+
+        /// <summary>
+        /// Determines whether the specified url has a controller explicitly bound to it
+        /// </summary>
+        /// <param name="requestUrl">The request URL.</param>
+        /// <returns>
+        /// 	<c>true</c> if an exact binding exists; otherwise, <c>false</c>.
+        /// </returns>
+        public bool HasExactBind(string requestUrl)
+        {
+            return map.ContainsKey(requestUrl);
+        }
     }
 }

@@ -26,6 +26,7 @@ using System.Text;
 using Bistro.Http;
 using System.Xml;
 using System.IO;
+using Bistro.Controllers.OutputHandling;
 
 namespace Bistro.Controllers
 {
@@ -135,10 +136,16 @@ namespace Bistro.Controllers
         void RenderWith(string target);
 
         /// <summary>
+        /// Notifies the rendering engine how to render the results of the current request, 
+        /// providing a listing of different rendering options.
+        /// </summary>
+        void RenderWith(IDictionary<RenderType, string> targets);
+
+        /// <summary>
         /// Gets the render target.
         /// </summary>
         /// <value>The render target.</value>
-        string RenderTarget { get; }
+        IDictionary<RenderType, string> RenderTargets { get; }
 
         /// <summary>
         /// Gets the return type that is currently set on the context

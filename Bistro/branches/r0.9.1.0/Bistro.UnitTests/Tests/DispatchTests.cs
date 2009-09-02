@@ -16,40 +16,80 @@ using Bistro.UnitTests.Support;
 
 namespace Bistro.UnitTests.Tests
 {
+    public static class TypeExtention
+    {
+        public static bool IsBefore(this Type before, Type after, ControllerInvocationInfo[] controllers) {
+            bool ret = false;
+            int count = 0;
+
+            foreach (var info in controllers)
+            {
+                if (info.BindPoint.Controller.ControllerType == after)
+                {
+                    if (count == 0)
+                        ret = false;
+
+                    count++;
+                }
+                else if (info.BindPoint.Controller.ControllerType == before)
+                {
+                    if (count == 0)
+                        ret = true;
+
+                    count++;
+                }
+            }
+
+            // both have to be present at least once, and in the correct order
+            return ret && count >= 2;
+        }
+
+        public static bool IsPresentIn(this Type t, ControllerInvocationInfo[] controllers)
+        {
+            foreach (var info in controllers)
+                if (info.BindPoint.Controller.ControllerType == t)
+                    return true;
+
+            return false;
+        }
+    }
+
     [TestFixture]
     public class DispatchTests: TestingBase
     {
+        private const int controllerCountOffset = 2;
+
         [Test]
         public void HomeURL()
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/");
-            Assert.AreEqual(3, controllers.Length);
-            Assert.AreEqual(typeof(HomeUrlController1), controllers[1].BindPoint.Controller.ControllerType);
-            Assert.AreEqual(typeof(HomeUrlController2), controllers[0].BindPoint.Controller.ControllerType);
+            Assert.AreEqual(2 + controllerCountOffset, controllers.Length);
+
+            Assert.That(typeof(HomeUrlController1).IsPresentIn(controllers), "HomeUrlController1 is missing");
+            Assert.That(typeof(HomeUrlController2).IsPresentIn(controllers), "HomeUrlController2 is missing");
         }
 
         [Test]
         public void HelloYou1()
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/hello/world");
-            Assert.AreEqual(1, controllers.Length);
+            Assert.AreEqual(0 + controllerCountOffset, controllers.Length);
         }
 
         [Test]
         public void HelloYou2()
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/hello/how/are/you");
-            Assert.AreEqual(2, controllers.Length);
-            Assert.AreEqual(typeof(HelloYouController1), controllers[0].BindPoint.Controller.ControllerType);
+            Assert.AreEqual(1 + controllerCountOffset, controllers.Length);
+            Assert.That(typeof(HelloYouController1).IsPresentIn(controllers), "Controller HelloYouController1 is missing");
         }
 
         [Test]
         public void HelloYou3()
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/hello/howAre/you");
-            Assert.AreEqual(3, controllers.Length);
-            Assert.AreEqual(typeof(HelloYouController1), controllers[0].BindPoint.Controller.ControllerType);
-            Assert.AreEqual(typeof(HelloYouController2), controllers[1].BindPoint.Controller.ControllerType);
+            Assert.AreEqual(2 + controllerCountOffset, controllers.Length);
+            Assert.That(typeof(HelloYouController1).IsBefore(typeof(HelloYouController2), controllers), "HelloYouController1 should be before HelloYouController2");
         }
 
         //This test checks the correct binding and order of 2 related controllers
@@ -57,10 +97,9 @@ namespace Bistro.UnitTests.Tests
         public void URLs2()
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/one_little_url");
-            Assert.That(controllers.Length == 3, "We have " + controllers.Length + "controllers bound to the URL \"/one_little_url\" instead of 3");
-            Assert.That(controllers[0].BindPoint.Controller.ControllerType == typeof(littleController2), "Wrong order, problems with littleController1");
-            Assert.That(controllers[1].BindPoint.Controller.ControllerType == typeof(littleController1), "Wrong order, problems with littleController2");
-            Assert.That(controllers[2].BindPoint.Controller.ControllerType == typeof(ReturnTypesController), "Wrong order, problems with ReturnTypesController");
+            Assert.That(controllers.Length == 2 + controllerCountOffset, "We have " + (controllers.Length - controllerCountOffset) + "controllers bound to the URL \"/one_little_url\" instead of 2");
+            Assert.That(typeof(littleController2).IsBefore(typeof(littleController1), controllers), "Wrong order, problems with littleController1");
+            Assert.That(typeof(littleController1).IsBefore(typeof(ReturnTypesController), controllers), "Wrong order, problems with ReturnTypesController");
         }
 
         //This test checks the correct binding and order of 3 related controllers
@@ -68,11 +107,10 @@ namespace Bistro.UnitTests.Tests
         public void URLs3()
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/little_url/more");
-            Assert.That(controllers.Length == 4, "We have " + controllers.Length + "controllers bound to the URL \"/little_url/more\" instead of 4");
-            Assert.That(controllers[0].BindPoint.Controller.ControllerType == typeof(littleController3), "Wrong order, problems with littleController3");
-            Assert.That(controllers[1].BindPoint.Controller.ControllerType == typeof(littleController5), "Wrong order, problems with littleController5");
-            Assert.That(controllers[2].BindPoint.Controller.ControllerType == typeof(littleController4), "Wrong order, problems with littleController4");
-            Assert.That(controllers[3].BindPoint.Controller.ControllerType == typeof(ReturnTypesController), "Wrong order, problems with ReturnTypesController");
+            Assert.That(controllers.Length == 3 + controllerCountOffset, "We have " + (controllers.Length - controllerCountOffset) + "controllers bound to the URL \"/little_url/more\" instead of 3");
+            Assert.That(typeof(littleController3).IsBefore(typeof(littleController5), controllers), "Wrong order, problems with littleController5");
+            Assert.That(typeof(littleController5).IsBefore(typeof(littleController4), controllers), "Wrong order, problems with littleController4");
+            Assert.That(typeof(littleController4).IsBefore(typeof(ReturnTypesController), controllers), "Wrong order, problems with ReturnTypesController");
         }
 
         //This test checks that rather complicated graph of controllers will be invoked in correct order
@@ -83,7 +121,7 @@ namespace Bistro.UnitTests.Tests
         public void Order()
         {
             ControllerInvocationInfo[] controllers = dispatcher.GetControllers("GET/order/world/new");
-            Assert.That(controllers.Length == 8, "We have " + controllers.Length + "controllers bound to the URL \"/order/world/new\" instead of 8");
+            Assert.That(controllers.Length == 7 + controllerCountOffset, "We have " + controllers.Length + " controllers bound to the URL \"/order/world/new\" instead of 8");
             List<string> ctrs = new List<string>();
             foreach (ControllerInvocationInfo ctr in controllers)
             {
@@ -93,7 +131,8 @@ namespace Bistro.UnitTests.Tests
             string controllerSequence = "";
             foreach (string ctrNum in ctrs)
             {
-                if (ctrNum == ctrs[ctrs.Count - 1] && ctrNum.Substring(ctrNum.LastIndexOf(".") + 1) == "ReturnTypesController")
+                if (ctrNum.Substring(ctrNum.LastIndexOf(".") + 1) == "ReturnTypesController" ||
+                    ctrNum.Substring(ctrNum.LastIndexOf(".") + 1) == "AjaxDeterminer")
                     continue;
 
                 if (ctrNum == "7")
@@ -211,6 +250,15 @@ namespace Bistro.UnitTests.Tests
 
             Assert.AreEqual(1, EventController.hitcount, String.Format("Event hit count {0} instead of 1", EventController.hitcount));
         }
+
+        [Test]
+        public void ExceptionHandled()
+        {
+            var resp = handler.RunForTest("GET/exception");
+
+            Assert.AreEqual("\"exception The method or operation is not implemented.\"", resp);
+        }
+
         //
         // This test will invalidate other tests by appending another global controller
         // to the execution chain. uncomment only when necessary

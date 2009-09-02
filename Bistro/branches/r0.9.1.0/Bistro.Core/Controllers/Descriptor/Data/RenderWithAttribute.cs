@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Bistro.Controllers.OutputHandling;
 
 namespace Bistro.Controllers.Descriptor.Data
 {
@@ -32,6 +33,7 @@ namespace Bistro.Controllers.Descriptor.Data
     /// after this class being invoked (including from within the class itself) will
     /// override this attribute
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
     public class RenderWithAttribute: Attribute
     {
         /// <summary>
@@ -48,5 +50,11 @@ namespace Bistro.Controllers.Descriptor.Data
         /// </summary>
         /// <value>The template.</value>
         public string Template { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the type of the render.
+        /// </summary>
+        /// <value>The type of the render.</value>
+        public RenderType RenderType { get; set; }
     }
 }

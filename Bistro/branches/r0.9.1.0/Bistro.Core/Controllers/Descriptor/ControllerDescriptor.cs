@@ -27,6 +27,8 @@ using Bistro.Controllers.Descriptor.Data;
 using System.Collections;
 using System.Text.RegularExpressions;
 using Bistro.Configuration.Logging;
+using Bistro.Controllers.OutputHandling;
+using System.Configuration;
 
 namespace Bistro.Controllers.Descriptor
 {
@@ -356,7 +358,7 @@ namespace Bistro.Controllers.Descriptor
         /// Gets or sets the default template.
         /// </summary>
         /// <value>The default template.</value>
-        public string DefaultTemplate { get; private set;}
+        public Dictionary<RenderType, string> DefaultTemplates { get; private set;}
 
         /// <summary>
         /// Our logger
@@ -377,12 +379,17 @@ namespace Bistro.Controllers.Descriptor
             RequestFields = new Dictionary<string, MemberInfo>();
             SessionFields = new Dictionary<string, MemberInfo>();
             CookieFields = new Dictionary<string, CookieFieldDescriptor>();
+            DefaultTemplates = new Dictionary<RenderType, string>();
 
             this.logger = logger;
         }
 
 
-        private void NonEmptyBindProcess(BindAttribute attribute)
+        /// <summary>
+        /// Builds the <see cref="BindPointDescriptor"/> based on the supplied bind attribute
+        /// </summary>
+        /// <param name="attribute">The Bind attribute.</param>
+        protected virtual void ProcessNonEmptyBind(BindAttribute attribute)
         {
             if (BindPointUtilities.IsVerbQualified(attribute.Target))
                 Targets.Add(new BindPointDescriptor(
@@ -400,7 +407,10 @@ namespace Bistro.Controllers.Descriptor
                                     this));
         }
 
-        private void EmptyBindProcess()
+        /// <summary>
+        /// Infers the <see cref="BindPointDescriptor"/> based on controller type name, and all Http verbs.
+        /// </summary>
+        protected virtual void ProcessEmptyBind()
         {
             foreach (string verb in BindPointUtilities.HttpVerbs)
                 Targets.Add(new BindPointDescriptor(
@@ -421,9 +431,16 @@ namespace Bistro.Controllers.Descriptor
             ControllerType = t;
 
             // load the renderwith attribute
-            IterateAttributes<RenderWithAttribute>(t, false, (attrib) => { DefaultTemplate = attrib.Template; }, null);
+            IterateAttributes<RenderWithAttribute>(t, false, 
+                (attrib) => {
+                    if (DefaultTemplates.ContainsKey(attrib.RenderType))
+                        throw new ConfigurationErrorsException(
+                            String.Format("Multilpe RenderWith attributes specified for {0} on controller {1}",
+                                            attrib.RenderType,
+                                            GetType().FullName));
 
-
+                    DefaultTemplates.Add(attrib.RenderType, attrib.Template);
+                }, null);
         }
 
         /// <summary>
@@ -483,7 +500,7 @@ namespace Bistro.Controllers.Descriptor
             if (type == null)
                 throw new ApplicationException("This method should not be called for non-class controllers.");
                 // load all of the Bind attributes
-                IterateAttributes<BindAttribute>(type, false, NonEmptyBindProcess, EmptyBindProcess);
+                IterateAttributes<BindAttribute>(type, false, ProcessNonEmptyBind, ProcessEmptyBind);
                 IterateMembers(type, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
                     (member) =>
                     {
@@ -598,11 +615,11 @@ namespace Bistro.Controllers.Descriptor
             bool empty = true;
             foreach (BindAttribute attrib in binds)
             {
-                ret.NonEmptyBindProcess(attrib);
+                ret.ProcessNonEmptyBind(attrib);
                 empty = false;
             }
             if (empty)
-                ret.EmptyBindProcess();
+                ret.ProcessEmptyBind();
 
 
             copyList(ret.DependsOn, dependsOn);

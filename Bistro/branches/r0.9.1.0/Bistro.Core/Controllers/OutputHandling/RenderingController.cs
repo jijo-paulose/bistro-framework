@@ -27,6 +27,7 @@ using System.Web;
 
 using Bistro.Controllers.Descriptor;
 using System.Reflection;
+using Bistro.Controllers.Descriptor.Data;
 
 namespace Bistro.Controllers.OutputHandling
 {
@@ -36,6 +37,9 @@ namespace Bistro.Controllers.OutputHandling
     [Bind("?", ControllerBindType = BindType.Payload)]
     public abstract class RenderingController : IController
     {
+        [Request, DependsOn]
+        protected RenderType renderType = RenderType.Full;
+
         /// <summary>
         /// Processes the request.
         /// </summary>
@@ -47,7 +51,11 @@ namespace Bistro.Controllers.OutputHandling
             if (requestContext.TransferRequested)
                 return;
 
-            if (requestContext.Response.RenderTarget == null)
+            string renderTarget;
+
+            if (requestContext.Response.RenderTargets == null ||
+                (!requestContext.Response.RenderTargets.TryGetValue(renderType, out renderTarget) &&
+                requestContext.Response.RenderTargets.Count == 0))
             {
                 if (requestContext.Response.CurrentReturnType == Bistro.Controllers.ReturnType.Template)
                     throw new ApplicationException("No template specified");
@@ -55,15 +63,24 @@ namespace Bistro.Controllers.OutputHandling
                 return;
             }
 
+            // if the requested render type doesn't have a corresponding target supplied,
+            // default to the first non-empty target available.
+            if (String.IsNullOrEmpty(renderTarget))
+                renderTarget = requestContext.Response.RenderTargets.First(kvp => !String.IsNullOrEmpty(kvp.Value)).Value;
+
             var attrs = (TemplateMappingAttribute[])GetType().GetCustomAttributes(typeof(TemplateMappingAttribute), true);
             foreach (TemplateMappingAttribute attr in attrs)
-                if (requestContext.Response.RenderTarget.EndsWith(attr.Extension))
+                if (renderTarget.EndsWith(attr.Extension))
                 {
-                    ((Bistro.Http.Module)context.Handler).GetTemplateEngine(EngineType).Render(context, requestContext);
+                    ((Bistro.Http.Module)context.Handler).GetTemplateEngine(EngineType).Render(context, requestContext, renderTarget);
                     return;
                 }
         }
 
+        /// <summary>
+        /// Gets the type of rendering engine this rendering controller uses
+        /// </summary>
+        /// <value>The type of the engine.</value>
         protected abstract Type EngineType { get; }
 
         /// <summary>

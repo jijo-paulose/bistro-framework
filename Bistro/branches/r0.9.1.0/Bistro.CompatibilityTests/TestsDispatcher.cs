@@ -158,6 +158,8 @@ namespace Bistro.CompatibilityTests
         }
 
 
+
+
         #region private fields
         private Application application;
         private IControllerManager manager;
@@ -183,6 +185,8 @@ namespace Bistro.CompatibilityTests
 
             testMgr.LoadSpecial(descriptor.Controllers);
             #endregion
+
+
 
 
 

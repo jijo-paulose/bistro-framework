@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0371FD88-B4C8-4685-A66D-650E31185BDA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Controls</RootNamespace>
+    <AssemblyName>Controls</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Control.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Control.designer.cs">
+      <DependentUpon>Control.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Nodes\ApplicationNode.cs" />
+    <Compile Include="Nodes\BindingNode.cs" />
+    <Compile Include="Nodes\BistroNode.cs" />
+    <Compile Include="Nodes\ControllerNode.cs" />
+    <Compile Include="Nodes\ErrorNode.cs" />
+    <Compile Include="Nodes\ErrorsNode.cs" />
+    <Compile Include="Nodes\MethodsNode.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Control.resx">
+      <DependentUpon>Control.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BistroEngine\BistroMethodEngine.csproj">
+      <Project>{A73415D0-0FD8-4D7B-8016-3916D464F5B2}</Project>
+      <Name>BistroMethodEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DesignerInterfaces\DesignerInterfaces.csproj">
+      <Project>{DC91C31D-B231-4FB2-A0B5-9081E0C64EC8}</Project>
+      <Name>DesignerInterfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TestDate\TestData.csproj">
+      <Project>{6C6FE3E2-AC23-460C-8C93-CB0AAF3D20F5}</Project>
+      <Name>TestData</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\Action.bmp" />
+    <Content Include="Images\Activities.bmp" />
+    <Content Include="Images\Activity.bmp" />
+    <Content Include="Images\Application.bmp" />
+    <Content Include="Images\Binder.bmp" />
+    <Content Include="Images\Binders.bmp" />
+    <Content Include="Images\Document.bmp" />
+    <Content Include="Images\Documents.bmp" />
+    <Content Include="Images\Error.bmp" />
+    <Content Include="Images\Field.bmp" />
+    <Content Include="Images\FieldSelected.bmp" />
+    <Content Include="Images\Folder.bmp" />
+    <Content Include="Images\Link.bmp" />
+    <Content Include="Images\ModelExplorerToolWindowBitmaps.bmp" />
+    <Content Include="Images\OpenFolder.bmp" />
+    <Content Include="Images\OpenFolderYellow.bmp" />
+    <Content Include="Images\Resource.bmp" />
+    <Content Include="Images\ResourceConsumer.bmp" />
+    <Content Include="Images\ResourceProvider.bmp" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

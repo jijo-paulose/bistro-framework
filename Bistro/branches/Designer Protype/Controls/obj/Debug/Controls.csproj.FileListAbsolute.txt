@@ -1,0 +1,28 @@
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\Controls.dll
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\Controls.pdb
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\Bistro.DesignerInterfaces.dll
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\Bistro.Engine.dll
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\TestDate.dll
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\Bistro.Core.dll
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\Bistro.DesignerInterfaces.pdb
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\TestDate.pdb
+C:\Project\Example\MyControlSamples\Controls\bin\Debug\Bistro.Engine.pdb
+C:\Project\Example\MyControlSamples\Controls\obj\Debug\ResolveAssemblyReference.cache
+C:\Project\Example\MyControlSamples\Controls\obj\Debug\Bistro.Designer.Explorer.Control.resources
+C:\Project\Example\MyControlSamples\Controls\obj\Debug\Controls.csproj.GenerateResource.Cache
+C:\Project\Example\MyControlSamples\Controls\obj\Debug\Controls.dll
+C:\Project\Example\MyControlSamples\Controls\obj\Debug\Controls.pdb
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\Controls.dll
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\Controls.pdb
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\Bistro.DesignerInterfaces.dll
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\Bistro.Engine.dll
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\TestDate.dll
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\Bistro.Core.dll
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\Bistro.DesignerInterfaces.pdb
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\TestDate.pdb
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\bin\Debug\Bistro.Engine.pdb
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\obj\Debug\Bistro.Designer.Explorer.Control.resources
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\obj\Debug\Controls.csproj.GenerateResource.Cache
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\obj\Debug\Controls.dll
+C:\Documents and Settings\User\Мои документы\Visual Studio 2008\Projects\MyControlSamples\MyControlSamples\Controls\obj\Debug\Controls.pdb

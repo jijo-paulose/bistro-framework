@@ -1191,7 +1191,10 @@ namespace Bistro.CompatibilityTests
                     ),
                     UrlTest("GET /a/bbb/b/c", "GET /a/bbb/b/c", "Controller1"),
                     UrlTest("GET /a/z/bbb/c", "GET /a/z/bbb/c", "Controller2"),
-                    UrlTest("GET /a/z/b/c", "GET /a/z/b/c", "Controller2", "Controller1")
+                    UrlTest("GET /a/z/b/c", "GET /a/z/b/c", "Controller2", "Controller1"),
+                    UrlTest("GET /a/bbb/b/c/tail", "GET /a/bbb/b/c/tail", "Controller1"),
+                    UrlTest("GET /a/z/bbb/c/tail", "GET /a/z/bbb/c/tail", "Controller2"),
+                    UrlTest("GET /a/z/b/c/tail", "GET /a/z/b/c/tail", "Controller2", "Controller1")
                     );
 
 

@@ -483,6 +483,8 @@ namespace Bistro.CompatibilityTests
                 );
             #endregion
 
+
+
             #region Imported - Paging
             NewTestWithUrl(
                 "Imported - Paging",
@@ -1179,6 +1181,23 @@ namespace Bistro.CompatibilityTests
                 //    )
                 );
             #endregion
+
+            #region Cross-bindings
+            NewTestWithUrl(
+                "Cross-bindings",
+                Types(
+                    Type("Controller1", BindAttribute("/a/*/b/c")),
+                    Type("Controller2", BindAttribute("/a/z/*/c"))
+                    ),
+                    UrlTest("GET /a/bbb/b/c", "GET /a/bbb/b/c", "Controller1"),
+                    UrlTest("GET /a/z/bbb/c", "GET /a/z/bbb/c", "Controller2"),
+                    UrlTest("GET /a/z/b/c", "GET /a/z/b/c", "Controller2", "Controller1")
+                    );
+
+
+            #endregion 
+
+
 
         }
 

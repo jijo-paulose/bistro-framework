@@ -6,7 +6,7 @@ using Bistro.Methods.Reflection;
 
 namespace Bistro.Methods
 {
-    internal class Binding
+    public class Binding
     {
         Binding parent;
         Engine engine;

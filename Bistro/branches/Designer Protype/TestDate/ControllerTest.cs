@@ -16,7 +16,7 @@ namespace Bistro.Tests
         string type;
         int seq;
 
-        public void Validate(string url, Controller controller)
+        internal void Validate(string url, Controller controller)
         {
         }
     }

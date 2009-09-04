@@ -27,12 +27,12 @@ namespace Bistro.Tests
         Dictionary<string, BindingTest> children = new Dictionary<string,BindingTest>();
         ControllerTest[] controllers;
 
-        public void Validate(Binding binding)
+        internal void Validate(Binding binding)
         {
             Validate("", binding);
         }
 
-        public void Validate(string parentUrl, Binding binding)
+        internal void Validate(string parentUrl, Binding binding)
         {
             string fullUrl = parentUrl + bindingUrl;
             binding.Bindings.ForEach(child =>

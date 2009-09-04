@@ -8,8 +8,8 @@
     <ProjectGuid>{6C6FE3E2-AC23-460C-8C93-CB0AAF3D20F5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestDate</RootNamespace>
-    <AssemblyName>TestDate</AssemblyName>
+    <RootNamespace>TestData</RootNamespace>
+    <AssemblyName>TestData</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -33,7 +33,7 @@
   <ItemGroup>
     <Reference Include="Bistro.Core, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\DesignerCurrent\BistroEngine\bin\Debug\Bistro.Core.dll</HintPath>
+      <HintPath>..\Lib\Bistro.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">

@@ -11,7 +11,7 @@ namespace TestDate
     public class TestDescriptor
     {
         public string Name { get; set; }
-        public TestTypeInfo[] Controllers { get; set; }
+        internal TestTypeInfo[] Controllers { get; set; }
         public IErrorDescriptor[] Errors { get; set; }
         public BindingTest[] BindingTree { get; set; }
 
@@ -20,7 +20,7 @@ namespace TestDate
             return Name;
         }
 
-        public TestDescriptor(string name, TestTypeInfo[] controllers, IErrorDescriptor[] errors, params BindingTest[] bindingTree)
+        internal TestDescriptor(string name, TestTypeInfo[] controllers, IErrorDescriptor[] errors, params BindingTest[] bindingTree)
         {
             Name = name;
             Controllers = controllers;

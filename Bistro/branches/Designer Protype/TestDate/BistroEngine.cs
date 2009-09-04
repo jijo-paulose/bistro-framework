@@ -105,13 +105,13 @@ namespace TestDate
 
         public event MethodEvent OnResourceLoop;
 
-        public override void RaiseInvalidBinding(ControllerType controller, params string[] args)
+        internal override void RaiseInvalidBinding(ControllerType controller, params string[] args)
         {
             if (OnInvalidBinding != null)
                 OnInvalidBinding(this, new ControllerEventArgs(controller.Type, args));
         }
 
-        public override void RaiseResourceLoop(string methodUrl, IEnumerable<Controller> controllers, params string[] args)
+        internal override void RaiseResourceLoop(string methodUrl, IEnumerable<Controller> controllers, params string[] args)
         {
             if (OnResourceLoop != null)
                 OnResourceLoop(this, new MethodEventArgs(methodUrl, null, new controllerIterator(controllers), args));
@@ -119,7 +119,7 @@ namespace TestDate
 
         public event MethodEvent OnMissingProvider;
 
-        public override void RaiseMissingProvider(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
+        internal override void RaiseMissingProvider(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
         {
             if (OnMissingProvider != null)
                 OnMissingProvider(this, new MethodEventArgs(methodUrl, resName, new controllerTypeIterator(controllers), args));
@@ -127,7 +127,7 @@ namespace TestDate
 
         public event MethodResourceEvent OnInconsistentResourceType;
 
-        public override void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
+        internal override void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
         {
             if (OnInconsistentResourceType != null)
                 OnInconsistentResourceType(this, new MethodResourceEventArgs(methodUrl, resName, controllers, args));

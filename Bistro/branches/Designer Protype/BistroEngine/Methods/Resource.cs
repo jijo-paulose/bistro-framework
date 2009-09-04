@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Bistro.Methods
 {
-    internal class Resource
+    public class Resource
     {
         internal Resource(Engine engine, Binding binding, string name)
         {

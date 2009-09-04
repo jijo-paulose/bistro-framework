@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Bistro.Methods
 {
-    internal class Controller
+    public class Controller
     {
         public Controller(Binding binding, Controller source)
         {

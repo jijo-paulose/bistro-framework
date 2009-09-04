@@ -33,7 +33,7 @@
   <ItemGroup>
     <Reference Include="Bistro.Core, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\r0.9.1.0\Bistro.Core\bin\Bistro.Core.dll</HintPath>
+      <HintPath>..\Lib\Bistro.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">

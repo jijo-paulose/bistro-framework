@@ -6,24 +6,24 @@ using Bistro.Methods.Reflection;
 
 namespace Bistro.Tests
 {
-    public class TestTypeInfo : ITypeInfo
+    internal class TestTypeInfo : ITypeInfo
     {
         public class TestAttributeInfo : IAttributeInfo
         {
             public class Parameter : IAttributeParameter
             {
-                public Parameter(string value)
-                    : this (null, value)
+                public Parameter(object value)
+                    : this(null, value)
                 {
                 }
 
-                public Parameter(string name, string value)
+                public Parameter(string name, object value)
                 {
                     this.name = name;
                     this.value = value;
                 }
                 string name;
-                string value;
+                object value;
 
                 public string Name { get { return name; } }
 
@@ -31,8 +31,14 @@ namespace Bistro.Tests
 
                 public string AsString()
                 {
+                    return value.ToString();
+                }
+
+                public object AsObject()
+                {
                     return value;
                 }
+
 
                 #endregion
             }
@@ -68,7 +74,7 @@ namespace Bistro.Tests
 
                 public IAttributeParameter this[string name]
                 {
-                    get 
+                    get
                     {
                         Parameter result = new Parameter(null);
                         d.TryGetValue(name, out result);
@@ -217,7 +223,7 @@ namespace Bistro.Tests
             public IEnumerator<TTarget> GetEnumerator()
             {
                 foreach (TSource item in list)
-                    yield return (TTarget) item;
+                    yield return (TTarget)item;
             }
 
             #endregion

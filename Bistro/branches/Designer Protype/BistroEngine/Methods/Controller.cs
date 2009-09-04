@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+//using WorkflowServer.Bistro.Designer.Explorer;
 
 namespace Bistro.Methods
 {
-    public class Controller
+    internal class Controller
     {
         public Controller(Binding binding, Controller source)
         {

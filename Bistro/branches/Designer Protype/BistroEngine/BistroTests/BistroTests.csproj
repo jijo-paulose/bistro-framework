@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A73415D0-0FD8-4D7B-8016-3916D464F5B2}</ProjectGuid>
+    <ProjectGuid>{FC8C6BF2-8CA3-4B6A-AF75-CC32B11BBD90}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bistro.Engine</RootNamespace>
-    <AssemblyName>Bistro.Engine</AssemblyName>
+    <RootNamespace>BistroTests</RootNamespace>
+    <AssemblyName>BistroTests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -33,8 +33,9 @@
   <ItemGroup>
     <Reference Include="Bistro.Core, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\r0.9.1.0\Bistro.Core\bin\Bistro.Core.dll</HintPath>
+      <HintPath>..\..\..\r0.9.1.0\Bistro.Core\bin\Bistro.Core.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=2.5.0.9015, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -53,15 +54,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Methods\Binding.cs" />
-    <Compile Include="Methods\BindingList.cs" />
-    <Compile Include="Methods\Controller.cs" />
-    <Compile Include="Methods\ControllerType.cs" />
-    <Compile Include="Methods\DependencyGraph.cs" />
-    <Compile Include="Methods\Engine.cs" />
-    <Compile Include="Methods\Reflection\ITypeInfo.cs" />
-    <Compile Include="Methods\Resource.cs" />
+    <Compile Include="BindingTest.cs" />
+    <Compile Include="ControllerTest.cs" />
+    <Compile Include="Errors\ErrorDescriptor.cs" />
+    <Compile Include="Errors\ErrorInconsResourceType.cs" />
+    <Compile Include="Errors\ErrorInvalidBinding.cs" />
+    <Compile Include="Errors\ErrorMissingProvider.cs" />
+    <Compile Include="Errors\ErrorResourceLoop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestEngine.cs" />
+    <Compile Include="Tests.cs" />
+    <Compile Include="TestTypeInfo.cs" />
+    <Compile Include="UrlControllersTest.cs" />
+    <Compile Include="UrlMethodTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BistroMethodEngine.csproj">
+      <Project>{A73415D0-0FD8-4D7B-8016-3916D464F5B2}</Project>
+      <Name>BistroMethodEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

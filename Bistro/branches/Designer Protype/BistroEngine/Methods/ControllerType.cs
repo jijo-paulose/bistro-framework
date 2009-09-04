@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 
 using System.Text.RegularExpressions;
+using Bistro.Methods.Reflection;
+//using Bistro.Controllers.Descriptor.Data;
+using Bistro.Methods.Reflection;
 using Bistro.Controllers.Descriptor;
 using Bistro.Controllers.Descriptor.Data;
-using Bistro.Methods.Reflection;
 
 namespace Bistro.Methods
 {
@@ -91,7 +93,6 @@ namespace Bistro.Methods
 		public ITypeInfo Type { get { return type; } }
 
 		List<Controller> controllers = new List<Controller>();
-               
 
 		internal void Register(Controller controller)
 		{
@@ -116,7 +117,7 @@ namespace Bistro.Methods
             resources.Remove(resource);
         }
 
-        public string GetResourceType(string Name)
+        internal string GetResourceType(string Name)
         {
             return resourceTypes[Name];
         }

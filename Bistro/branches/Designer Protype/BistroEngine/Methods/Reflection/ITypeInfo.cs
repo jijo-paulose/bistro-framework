@@ -21,6 +21,7 @@ namespace Bistro.Methods.Reflection
     public interface IAttributeParameter
     {
         string AsString();
+        object AsObject();
     }
 
     public interface IFieldInfo

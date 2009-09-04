@@ -1,0 +1,10 @@
+C:\Project\DesignerCurrent\DesignerInterfaces\obj\Debug\ResolveAssemblyReference.cache
+C:\Project\DesignerCurrent\DesignerInterfaces\bin\Debug\Bistro.DesignerInterfaces.dll
+C:\Project\DesignerCurrent\DesignerInterfaces\bin\Debug\Bistro.DesignerInterfaces.pdb
+C:\Project\DesignerCurrent\DesignerInterfaces\obj\Debug\Bistro.DesignerInterfaces.dll
+C:\Project\DesignerCurrent\DesignerInterfaces\obj\Debug\Bistro.DesignerInterfaces.pdb
+C:\Project\Example\MyControlSamples\DesignerInterfaces\bin\Debug\Bistro.DesignerInterfaces.dll
+C:\Project\Example\MyControlSamples\DesignerInterfaces\bin\Debug\Bistro.DesignerInterfaces.pdb
+C:\Project\Example\MyControlSamples\DesignerInterfaces\obj\Debug\ResolveAssemblyReference.cache
+C:\Project\Example\MyControlSamples\DesignerInterfaces\obj\Debug\Bistro.DesignerInterfaces.dll
+C:\Project\Example\MyControlSamples\DesignerInterfaces\obj\Debug\Bistro.DesignerInterfaces.pdb

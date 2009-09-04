@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Bistro.Controllers.Descriptor;
+//using Bistro.Controllers.Descriptor;
 using System.Text.RegularExpressions;
 using Bistro.Methods.Reflection;
+using Bistro.Controllers.Descriptor;
 
 namespace Bistro.Methods
 {
@@ -31,26 +32,26 @@ namespace Bistro.Methods
             root.Validate();
         }
 
-        public Binding Root { get { return root; } }
+        internal Binding Root { get { return root; } }
 
 //        Regex bindingParser = new Regex("^\\s*(?'binding'(\\w*\\s*)(\\?|/|(/(\\*|(\\w|-)+|\\{\\w+}|\\?/((\\w|-)+|\\{\\w+})))*(/\\?)?))\\s*$", RegexOptions.Compiled | RegexOptions.Singleline);
         Regex bindingParser = new Regex(@"^\s*(?'binding'(\w*\s*)((\?|/|(/(\*|(\w|-)+|\{\w+}|\?/((\w|-)+|\{\w+})))*(/\?)?)(?:\?(?:(?:\w|-|=)+|\{\w+})(?:\&(?:(?:\w|-|=)+|\{\w+}))*|)))\s*$", RegexOptions.Compiled | RegexOptions.Singleline);
 
         Dictionary<string, ControllerType> controllerTypes = new Dictionary<string, ControllerType>();
 
-        public virtual void RaiseInvalidBinding(ControllerType controller, params string[] args)
+        internal virtual void RaiseInvalidBinding(ControllerType controller, params string[] args)
         {
         }
 
-        public virtual void RaiseResourceLoop(string methodUrl, IEnumerable<Controller> controllers, params string[] args)
+        internal virtual void RaiseResourceLoop(string methodUrl, IEnumerable<Controller> controllers, params string[] args)
         {
         }
 
-        public virtual void RaiseMissingProvider(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
+        internal virtual void RaiseMissingProvider(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
         {
         }
 
-        public virtual void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
+        internal virtual void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
         {
         }
 

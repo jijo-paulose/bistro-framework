@@ -6,7 +6,7 @@ using Bistro.Methods.Reflection;
 
 namespace Bistro.Methods
 {
-    public class Binding
+    internal class Binding
     {
         Binding parent;
         Engine engine;
@@ -44,7 +44,9 @@ namespace Bistro.Methods
         private Dictionary<string, Binding> partialUrls = new Dictionary<string, Binding>();
         private List<Binding> bindings = new List<Binding>();
         private List<Controller> controllers = new List<Controller>();
+        private Dictionary<string, Resource> resources = new Dictionary<string, Resource>();
 
+        public Dictionary<string, Resource> Resources { get { return resources; } }
         public List<Binding> Bindings { get { return bindings; } }
         public string Verb { get { return verb; } }
         public string BindingUrl { get { return bindingUrl; } }
@@ -259,7 +261,7 @@ namespace Bistro.Methods
             return true;
         }
 
-        Dictionary<string, Resource> resources = new Dictionary<string, Resource>();
+        
 
         private Resource lookupResource(string resourceName)
         {

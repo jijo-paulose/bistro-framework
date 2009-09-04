@@ -1,0 +1,17 @@
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\BistroDesignerMockUp.exe
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\BistroDesignerMockUp.pdb
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\Bistro.DesignerInterfaces.dll
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\Bistro.Engine.dll
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\Controls.dll
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\TestDate.dll
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\Bistro.Core.dll
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\Bistro.DesignerInterfaces.pdb
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\Controls.pdb
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\TestDate.pdb
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\bin\Debug\Bistro.Engine.pdb
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\obj\Debug\ResolveAssemblyReference.cache
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\obj\Debug\BistroDesignerMockUp.MainForm.resources
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\obj\Debug\BistroDesignerMockUp.Properties.Resources.resources
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\obj\Debug\BistroDesignerMockUp.csproj.GenerateResource.Cache
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\obj\Debug\BistroDesignerMockUp.exe
+C:\Project\Example\MyControlSamples\BistroDesignerMockUp\obj\Debug\BistroDesignerMockUp.pdb

@@ -1,0 +1,8 @@
+C:\Project\Example\MyControlSamples\TestDate\bin\Debug\TestDate.dll
+C:\Project\Example\MyControlSamples\TestDate\bin\Debug\TestDate.pdb
+C:\Project\Example\MyControlSamples\TestDate\bin\Debug\Bistro.Core.dll
+C:\Project\Example\MyControlSamples\TestDate\bin\Debug\Bistro.Engine.dll
+C:\Project\Example\MyControlSamples\TestDate\bin\Debug\Bistro.Engine.pdb
+C:\Project\Example\MyControlSamples\TestDate\obj\Debug\ResolveAssemblyReference.cache
+C:\Project\Example\MyControlSamples\TestDate\obj\Debug\TestDate.dll
+C:\Project\Example\MyControlSamples\TestDate\obj\Debug\TestDate.pdb

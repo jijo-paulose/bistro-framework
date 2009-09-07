@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Bistro.CompatibilityTests
+namespace Bistro.UnitTests.Tests
 {
-    public partial class TestsDispatcher
+    public partial class CompatibilityTests
     {
         private void SubSource2()
         {
@@ -125,7 +125,7 @@ namespace Bistro.CompatibilityTests
                         BindAttribute("GET /hi/*/world/a/*")
                     )
                 ),
-                UrlTest("special - GET /hi/aaaa/world/a/now","GET /hi/aaaa/world/a/now","hiController7","hiController4"),
+                UrlTest("special - GET /hi/aaaa/world/a/now", "GET /hi/aaaa/world/a/now", "hiController7", "hiController4"),
                 UrlTest("special - GET /hi/aaaa/world/a/now/aaa", "GET /hi/aaaa/world/a/now/aaa", "hiController7", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
                 UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
@@ -1198,7 +1198,7 @@ namespace Bistro.CompatibilityTests
                     );
 
 
-            #endregion 
+            #endregion
 
 
 

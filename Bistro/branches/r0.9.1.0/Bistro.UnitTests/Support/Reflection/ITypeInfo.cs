@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Reflection;
 
-namespace Bistro.CompatibilityTests.Reflection
+namespace Bistro.UnitTests.Support.Reflection
 {
     public interface IAttributeInfo
     {
         string Type { get; }
-        IAttributeProperties Properties { get; } 
+        IAttributeProperties Properties { get; }
     }
 
     public interface IAttributeProperties
@@ -38,7 +37,6 @@ namespace Bistro.CompatibilityTests.Reflection
     public interface IHasAttributes
     {
         IEnumerable<IAttributeInfo> Attributes { get; }
-//        IEnumerable<IAttributeInfo> GetCustomAttributes(Type attributeType, bool inherit);
     }
 
 
@@ -56,18 +54,6 @@ namespace Bistro.CompatibilityTests.Reflection
         string FullName { get; }
         IEnumerable<IFieldInfo> Fields { get; }
         IEnumerable<IPropertyInfo> Properties { get; }
-
-        //IEnumerable<IMemberInfo> GetMember(string name,
-        //                            BindingFlags bindingAttr);
-
-        //IEnumerable<IMemberInfo> GetMember(string name,
-        //                                    MemberTypes type,
-        //                                    BindingFlags bindingAttr);
-
-        //IEnumerable<IMemberInfo> GetMembers(BindingFlags bindingAttr);
-
-//        ConstructorInfo GetConstructor(Type[] types);
-
 
     }
 }

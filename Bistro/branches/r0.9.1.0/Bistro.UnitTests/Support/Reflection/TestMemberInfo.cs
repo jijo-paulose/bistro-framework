@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Bistro.CompatibilityTests.Reflection
+namespace Bistro.UnitTests.Support.Reflection
 {
     public class TestMemberInfo : MemberInfo
     {
@@ -16,7 +16,7 @@ namespace Bistro.CompatibilityTests.Reflection
 
         private string name;
 
-        public override string Name 
+        public override string Name
         {
             get
             {

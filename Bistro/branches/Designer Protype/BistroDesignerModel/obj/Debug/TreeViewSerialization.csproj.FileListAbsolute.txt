@@ -1,0 +1,16 @@
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\TreeViewSerialization.exe
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\TreeViewSerialization.pdb
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\obj\Debug\ResolveAssemblyReference.cache
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\obj\Debug\TreeViewSerialization.Form1.resources
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\obj\Debug\TreeViewSerialization.csproj.GenerateResource.Cache
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\obj\Debug\TreeViewSerialization.exe
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\obj\Debug\TreeViewSerialization.pdb
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\Bistro.DesignerInterfaces.dll
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\Bistro.Engine.dll
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\Controls.dll
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\TestDate.dll
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\Bistro.Core.dll
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\Bistro.DesignerInterfaces.pdb
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\Controls.pdb
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\TestDate.pdb
+C:\Project\TreeViewFromXML\TreeViewDemoSrc\bin\Debug\Bistro.Engine.pdb

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<TreeView>
+  <node text="DataAccessControl" imageindex="6" tag="">
+    <node text="Bindings" imageindex="6" tag="">
+      <node text="[ANY]/?" imageindex="5" tag="">
+        <node text="/byId/{postingId}" imageindex="5" tag=""/>
+        <node text="/byName/{shortName}" imageindex="5" tag=""/>
+      </node>
+      <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag=""/>
+      <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag=""/>
+    </node>
+    <node text="Resources" imageindex="6" tag="">
+      <node text="Resource2" imageindex="1" tag="">
+        <node text="Filelds" imageindex="17" tag="">
+          <node text="postingId" imageindex="17" tag=""/>
+          <node text="shortName" imageindex="17" tag=""/>
+        </node>
+      </node>
+      <node text="Resource1" imageindex="0" tag="">
+        <node text="methodName" imageindex="17" tag=""/>
+        <node text="purchaseList" imageindex="17" tag=""/>
+      </node>
+    </node>
+      </node>
+ </TreeView> 

@@ -270,7 +270,7 @@ namespace Bistro.Controllers
 				FieldInfo fInfo = (FieldInfo)member;
 				if (file == null || string.IsNullOrEmpty(file.FileName))
 					fInfo.SetValue(instance, null);
-				else if (fInfo.FieldType == typeof(HttpPostedFile))
+				else if (fInfo.FieldType == typeof(HttpPostedFileBase))
 					fInfo.SetValue(instance, file);
 				else if (fInfo.FieldType == typeof(String))
 					fInfo.SetValue(instance, ReadFileText(file));
@@ -284,7 +284,7 @@ namespace Bistro.Controllers
 			else
 				if (file == null || string.IsNullOrEmpty(file.FileName))
 					pInfo.SetValue(instance, null, null);
-				else if (pInfo.PropertyType == typeof(HttpPostedFile))
+				else if (pInfo.PropertyType == typeof(HttpPostedFileBase))
 					pInfo.SetValue(instance, file, null);
 				else if (pInfo.PropertyType == typeof(String))
 					pInfo.SetValue(instance, ReadFileText(file), null);

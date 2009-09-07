@@ -7,10 +7,7 @@
     <node text="Controllers" imageindex="2" tag="">
       <node text="AdUpdate" imageindex="3" tag="">
         <node text="Methods" imageindex="17" tag="">
-          <node text="Method1" imageindex="3" tag=""/>
-          <node text="Method1" imageindex="3" tag=""/>
-          <node text="Method1" imageindex="3" tag=""/>
-          <node text="Method1" imageindex="3" tag=""/>
+          <node text="DoProcessRequest" imageindex="19" tag=""/>
         </node>
       </node>
     </node>

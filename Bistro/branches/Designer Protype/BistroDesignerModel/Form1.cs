@@ -102,6 +102,8 @@ namespace TreeViewSerialization
             this.imageList1.Images.SetKeyName(16, "OpenFolderYellow.bmp");
             this.imageList1.Images.SetKeyName(17, "Resource.bmp");
             this.imageList1.Images.SetKeyName(18, "ResourceConsumer.bmp");
+            this.imageList1.Images.SetKeyName(19, "method.bmp");
+            this.imageList1.Images.SetKeyName(20, "Field.bmp");
             // 
             // treeView2
             // 
@@ -111,10 +113,10 @@ namespace TreeViewSerialization
             this.treeView2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeView2.ImageIndex = 0;
             this.treeView2.ImageList = this.imageList1;
-            this.treeView2.Location = new System.Drawing.Point(0, 267);
+            this.treeView2.Location = new System.Drawing.Point(0, 270);
             this.treeView2.Name = "treeView2";
             this.treeView2.SelectedImageIndex = 0;
-            this.treeView2.Size = new System.Drawing.Size(440, 217);
+            this.treeView2.Size = new System.Drawing.Size(440, 215);
             this.treeView2.TabIndex = 4;
             // 
             // contextMenuStripSource
@@ -127,8 +129,9 @@ namespace TreeViewSerialization
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(440, 486);
-            this.Controls.Add(this.treeView2);
             this.Controls.Add(this.treeView1);
+            this.Controls.Add(this.treeView2);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Bistro Designer Mockup";
             this.Load += new System.EventHandler(this.Form1_Load);

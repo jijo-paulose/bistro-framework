@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<TreeView>
+  <node text="Resource2" imageindex="0" tag="Resource">
+    <node text="Bindings" imageindex="6" tag="">
+      <node text="[ANY]/?" imageindex="5" tag="Binding">
+        <node text="/byId/{postingId}" imageindex="5" tag="Binding"/>
+        <node text="/byName/{shortName}" imageindex="5" tag="Binding"/>
+      </node>
+      <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
+      <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
+    </node>
+    <node text="Controllers" imageindex="2" tag="">
+      <node text="DataAccessControl" imageindex="3" tag="Controller">
+        <node text="Methods" imageindex="3" tag="">
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+        </node>
+      </node>
+     </node>
+  </node>
+  <node text="Resource2" imageindex="1" tag="Resource">
+    <node text="Bindings" imageindex="6" tag="">
+      <node text="[ANY]/?" imageindex="5" tag="Binding">
+        <node text="/byId/{postingId}" imageindex="5" tag="Binding"/>
+        <node text="/byName/{shortName}" imageindex="5" tag="Binding"/>
+      </node>
+      <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
+      <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
+    </node>
+    <node text="Controllers" imageindex="2" tag="">
+        <node text="AdDisplay" imageindex="3" tag="">
+        <node text="Methods" imageindex="17" tag="">
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+        </node>
+      </node>
+      <node text="AdUpdate" imageindex="3" tag="">
+        <node text="Methods" imageindex="3" tag="">
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+          <node text="Method1" imageindex="3" tag=""/>
+        </node>
+      </node>
+    </node>
+  </node>
+</TreeView>

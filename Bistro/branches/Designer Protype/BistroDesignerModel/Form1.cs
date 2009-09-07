@@ -19,6 +19,7 @@ namespace TreeViewSerialization
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.ImageList imageList1;
         private TreeView treeView2;
+        private ContextMenuStrip contextMenuStripSource;
         private System.ComponentModel.IContainer components;
 
 		public Form1()
@@ -60,6 +61,7 @@ namespace TreeViewSerialization
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.treeView2 = new System.Windows.Forms.TreeView();
+            this.contextMenuStripSource = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SuspendLayout();
             // 
             // treeView1
@@ -115,6 +117,12 @@ namespace TreeViewSerialization
             this.treeView2.Size = new System.Drawing.Size(440, 217);
             this.treeView2.TabIndex = 4;
             // 
+            // contextMenuStripSource
+            // 
+            this.contextMenuStripSource.Name = "contextMenuStripSource";
+            this.contextMenuStripSource.Size = new System.Drawing.Size(61, 4);
+            this.contextMenuStripSource.Text = "Go to Source";
+            // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -166,8 +174,28 @@ namespace TreeViewSerialization
             {
                 item = "AdUpdate.xml";
             }
+
+            if (e.Node.Text == "Resource1")
+            {
+                item = "Resource1.xml";
+            }
             
-            if(!string.IsNullOrEmpty(item))
+            if (e.Node.Text == "Resource2")
+            {
+                item = "Resource2.xml";
+            }
+
+            if (e.Node.Text == "Resource3")
+            {
+                item = "Resource3.xml";
+            }
+
+            if (e.Node.Text == "Resource5")
+            {
+                item = "Resource5.xml";
+            } 
+            
+            if (!string.IsNullOrEmpty(item))
                 ShowInfoTreeView(this.treeView2, item);
         }
 
@@ -185,6 +213,6 @@ namespace TreeViewSerialization
          @"app_data\");
 
         }
-     
+               
 	}
 }

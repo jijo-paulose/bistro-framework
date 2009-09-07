@@ -122,7 +122,7 @@ namespace TreeViewSerialization
             this.Controls.Add(this.treeView2);
             this.Controls.Add(this.treeView1);
             this.Name = "Form1";
-            this.Text = "TreeView Serialization";
+            this.Text = "Bistro Designer Mockup";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 

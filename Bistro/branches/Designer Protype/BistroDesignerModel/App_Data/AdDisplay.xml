@@ -5,16 +5,16 @@
       <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
     </node>
     <node text="Resources" imageindex="6" tag="">
-       <node text="Resource2" imageindex="1" tag="">
-        <node text="Filelds" imageindex="10" tag="">
-          <node text="postingId" imageindex="10" tag=""/>
-          <node text="shortName" imageindex="10" tag=""/>
+       <node text="Resource2" imageindex="1" tag="Resource">
+        <node text="Filelds" imageindex="10" tag="Resource">
+          <node text="postingId" imageindex="10" tag="Resource"/>
+          <node text="shortName" imageindex="10" tag="Resource"/>
         </node>
       </node>
-      <node text="Resource3" imageindex="0" tag="">
+      <node text="Resource3" imageindex="0" tag="Resource">
         <node text="Filelds" imageindex="10" tag="">
-          <node text="methodName" imageindex="10" tag=""/>
-          <node text="purchaseList" imageindex="10" tag=""/>
+          <node text="methodName" imageindex="10" tag="Resource"/>
+          <node text="purchaseList" imageindex="10" tag="Resource"/>
         </node>
       </node>
     </node>

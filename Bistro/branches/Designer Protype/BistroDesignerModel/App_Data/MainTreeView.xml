@@ -7,15 +7,15 @@
           <node text="/byId/{postingId}" imageindex="5" tag="Binding">
             <node text="Methods" imageindex="2" tag="">
               <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-              <node text="Resource1" imageindex="17" tag=""/>
-              <node text="Resource2" imageindex="17" tag=""/>
+              <node text="Resource1" imageindex="17" tag="Resource"/>
+              <node text="Resource2" imageindex="17" tag="Resource"/>
             </node>
           </node>
           <node text="/byName/{shortName}" imageindex="5" tag="Binding">
             <node text="Methods" imageindex="2" tag="">
               <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-              <node text="Resource1" imageindex="17" tag=""/>
-              <node text="Resource2" imageindex="17" tag=""/>
+              <node text="Resource1" imageindex="17" tag="Resource"/>
+              <node text="Resource2" imageindex="17" tag="Resource"/>
             </node>
           </node>
         </node>
@@ -23,18 +23,18 @@
           <node text="Methods" imageindex="2" tag="">
             <node text="AdDisplay" imageindex="3" tag="Controller"/>
             <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-            <node text="Resource1" imageindex="17" tag=""/>
-            <node text="Resource2" imageindex="17" tag=""/>
-            <node text="Resource3" imageindex="17" tag=""/>
+            <node text="Resource1" imageindex="17" tag="Resource"/>
+            <node text="Resource2" imageindex="17" tag="Resource"/>
+            <node text="Resource3" imageindex="17" tag="Resource"/>
           </node>
         </node>
         <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
           <node text="Methods" imageindex="2" tag="">
             <node text="AdUpdate" imageindex="3" tag="Controller"/>
             <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-            <node text="Resource1" imageindex="17" tag=""/>
-            <node text="Resource2" imageindex="17" tag=""/>
-            <node text="Resource5" imageindex="17" tag=""/>
+            <node text="Resource1" imageindex="17" tag="Resource"/>
+            <node text="Resource2" imageindex="17" tag="Resource"/>
+            <node text="Resource5" imageindex="17" tag="Resource"/>
           </node>
         </node>
       </node>

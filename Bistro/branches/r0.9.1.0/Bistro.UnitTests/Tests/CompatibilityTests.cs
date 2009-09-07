@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Bistro.Controllers.Dispatch;
+using Bistro.UnitTests.Support.Reflection;
+using Bistro.UnitTests.Tests.Compatibility;
 using Bistro.Controllers;
+using Bistro.Controllers.Dispatch;
 using Bistro.Configuration;
-using Bistro.CompatibilityTests.Reflection;
 using Bistro.Controllers.Descriptor;
 using Bistro.Controllers.Descriptor.Data;
-using System.Text.RegularExpressions;
+using Bistro.UnitTests.Support.CustomManager;
+using System.Configuration;
 
-namespace Bistro.CompatibilityTests
+namespace Bistro.UnitTests.Tests
 {
     [TestFixture]
-    public partial class TestsDispatcher
+    public partial class CompatibilityTests
     {
         #region Test creation stuff
         #region TestDescriptor
@@ -24,7 +26,6 @@ namespace Bistro.CompatibilityTests
             public TestTypeInfo[] Controllers { get; set; }
             //            public IErrorDescriptor[] Errors { get; set; }
             public UrlControllersTest[] UrlTests { get; set; }
-            //            public BindingTest[] BindingTree { get; set; }
 
             public override string ToString()
             {
@@ -40,22 +41,6 @@ namespace Bistro.CompatibilityTests
                 //BindingTree = bindingTree;
             }
 
-            //public void ValidateErrors(List<IErrorDescriptor> baseErrorsList)
-            //{
-
-            //    Assert.IsNotNull(baseErrorsList, "Base errors list is null, something is wrong with tests initialization.");
-
-            //    IErrorDescriptor[] baseErrorsArr = baseErrorsList.ToArray();
-
-            //    Assert.AreEqual(baseErrorsArr.Length, Errors.Length, "Error lists have different lengths: actual-'{0}' expected-'{1}'", baseErrorsArr.Length, Errors.Length);
-
-
-            //    for (int i = 0; i < baseErrorsArr.Length; i++)
-            //    {
-            //        baseErrorsArr[i].Validate(Errors[i]);
-            //    }
-
-            //}
 
         }
         #endregion
@@ -142,22 +127,33 @@ namespace Bistro.CompatibilityTests
 
         #endregion
 
-
+        /// <summary>
+        /// Configures section handler.
+        /// </summary>
         [TestFixtureSetUp]
         public void setup()
         {
 
             initSh = new SectionHandler();
 
-            initSh.ControllerManagerFactory = "Bistro.CompatibilityTests.TestControllerManagerFactory, Bistro.CompatibilityTests";
-
+            initSh.ControllerManagerFactory = "Bistro.UnitTests.Support.CustomManager.TestControllerManagerFactory, Bistro.UnitTests";
+            initSh.Application = "Bistro.UnitTests.Support.CustomManager.TestApplication, Bistro.UnitTests";
 
 
 
 
         }
 
+        /// <summary>
+        /// Cleanups this instance.
+        /// </summary>
+        [TestFixtureTearDown]
+        public void Cleanup() 
+        {
+            TestApplication app = Application.Instance as TestApplication;
+            app.ResetApp();
 
+        }
 
 
         #region private fields
@@ -167,7 +163,10 @@ namespace Bistro.CompatibilityTests
         private SectionHandler initSh;
         #endregion
 
-
+        /// <summary>
+        /// Test execution.
+        /// </summary>
+        /// <param name="test"></param>
         void realTest(object test)
         {
             #region Load part
@@ -181,13 +180,10 @@ namespace Bistro.CompatibilityTests
             dispatcher = application.DispatcherFactory.GetDispatcherInstance();
 
             TestControllerManager testMgr = manager as TestControllerManager;
-            Assert.IsNotNull(testMgr,"Invalid TestControllerManager");
+            Assert.IsNotNull(testMgr, "Invalid TestControllerManager");
 
             testMgr.LoadSpecial(descriptor.Controllers);
             #endregion
-
-
-
 
 
             #region Test part
@@ -200,6 +196,7 @@ namespace Bistro.CompatibilityTests
             }
 
             #endregion
+            
         }
 
 

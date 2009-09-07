@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Bistro.CompatibilityTests
+namespace Bistro.UnitTests.Tests
 {
-    public partial class TestsDispatcher
+    public partial class CompatibilityTests
     {
         private void SubSource1()
         {
@@ -249,21 +249,21 @@ namespace Bistro.CompatibilityTests
                         )
 
                     ),
-					UrlTest("badTest - GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true","GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true","DefaultController","SignInDisplay","DataAccessControl","Untag","Tag"),
-					UrlTest("GET /auth/signin/byname/ShortNameValue?originalRequest=origReqValue", "GET /auth/signin/byname/ShortNameValue?originalRequest=origReqValue","DefaultController","SignInDisplay","DataAccessControl"),
-					UrlTest("GET /auth/signin/byname?originalRequest=origReqValue", "GET /auth/signin/byname?originalRequest=origReqValue","DefaultController","DataAccessControl","SignInDisplay"),
+                    UrlTest("badTest - GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true", "GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true", "DefaultController", "SignInDisplay", "DataAccessControl", "Untag", "Tag"),
+                    UrlTest("GET /auth/signin/byname/ShortNameValue?originalRequest=origReqValue", "GET /auth/signin/byname/ShortNameValue?originalRequest=origReqValue", "DefaultController", "SignInDisplay", "DataAccessControl"),
+                    UrlTest("GET /auth/signin/byname?originalRequest=origReqValue", "GET /auth/signin/byname?originalRequest=origReqValue", "DefaultController", "DataAccessControl", "SignInDisplay"),
 
-					UrlTest("GET /postings/ContentTypeValue/byname/ShortNameValue?firstTime=true", "GET /postings/ContentTypeValue/byname/ShortNameValue?firstTime=true","DefaultController","FirstTimeSearch","Search","DataAccessControl"),
-					UrlTest("GET /postings/ContentTypeValue/byname?firstTime=true", "GET /postings/ContentTypeValue/byname?firstTime=true","DefaultController","DataAccessControl","Search","FirstTimeSearch"),
-					UrlTest("GET /postings/ContentTypeValue/byname/?firstTime=true", "GET /postings/ContentTypeValue/byname/?firstTime=true","DefaultController","FirstTimeSearch","Search","DataAccessControl"),
-					UrlTest("GET /postings/byname/ShortNameValue?firstTime=true", "GET /postings/byname/ShortNameValue?firstTime=true","DefaultController","FirstTimeSearch","Search","DataAccessControl"),
-					UrlTest("GET /postings/byname?firstTime=true", "GET /postings/byname?firstTime=true","DefaultController","DataAccessControl","Search","FirstTimeSearch"),
-					
-					
-					UrlTest("special - GET /postings/contTypeValue?firstTime=true", "GET /postings/contTypeValue?firstTime=true","DefaultController", "Search", "FirstTimeSearch"),
-					UrlTest("special - GET /postings/?firstTime=true", "GET /postings/?firstTime=true", "DefaultController", "Search", "FirstTimeSearch"),
-                    UrlTest("special - GET /auth/signin?originalRequest=aaa","GET /auth/signin?originalRequest=aaa", "DefaultController", "SignInDisplay"),
-                    UrlTest("special - GET /auth/signin/aaa?originalRequest=aaa","GET /auth/signin/aaa?originalRequest=aaa", "DefaultController", "SignInDisplay"),
+                    UrlTest("GET /postings/ContentTypeValue/byname/ShortNameValue?firstTime=true", "GET /postings/ContentTypeValue/byname/ShortNameValue?firstTime=true", "DefaultController", "FirstTimeSearch", "Search", "DataAccessControl"),
+                    UrlTest("GET /postings/ContentTypeValue/byname?firstTime=true", "GET /postings/ContentTypeValue/byname?firstTime=true", "DefaultController", "DataAccessControl", "Search", "FirstTimeSearch"),
+                    UrlTest("GET /postings/ContentTypeValue/byname/?firstTime=true", "GET /postings/ContentTypeValue/byname/?firstTime=true", "DefaultController", "FirstTimeSearch", "Search", "DataAccessControl"),
+                    UrlTest("GET /postings/byname/ShortNameValue?firstTime=true", "GET /postings/byname/ShortNameValue?firstTime=true", "DefaultController", "FirstTimeSearch", "Search", "DataAccessControl"),
+                    UrlTest("GET /postings/byname?firstTime=true", "GET /postings/byname?firstTime=true", "DefaultController", "DataAccessControl", "Search", "FirstTimeSearch"),
+
+
+                    UrlTest("special - GET /postings/contTypeValue?firstTime=true", "GET /postings/contTypeValue?firstTime=true", "DefaultController", "Search", "FirstTimeSearch"),
+                    UrlTest("special - GET /postings/?firstTime=true", "GET /postings/?firstTime=true", "DefaultController", "Search", "FirstTimeSearch"),
+                    UrlTest("special - GET /auth/signin?originalRequest=aaa", "GET /auth/signin?originalRequest=aaa", "DefaultController", "SignInDisplay"),
+                    UrlTest("special - GET /auth/signin/aaa?originalRequest=aaa", "GET /auth/signin/aaa?originalRequest=aaa", "DefaultController", "SignInDisplay"),
                     UrlTest("GET /auth/register", "GET /auth/register", "DefaultController", "RegisterDisplay"),
                     UrlTest("POST /auth/register", "POST /auth/register", "DefaultController", "Register"),
                     UrlTest("GET /auth/signin?{originalRequest}", "GET /auth/signin?{originalRequest}", "DefaultController", "SignInDisplay"),

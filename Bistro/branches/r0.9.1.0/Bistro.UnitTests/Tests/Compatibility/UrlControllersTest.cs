@@ -5,7 +5,7 @@ using System.Text;
 using Bistro.Controllers.Dispatch;
 using NUnit.Framework;
 
-namespace Bistro.CompatibilityTests
+namespace Bistro.UnitTests.Tests.Compatibility
 {
 
     internal class UrlControllersTest

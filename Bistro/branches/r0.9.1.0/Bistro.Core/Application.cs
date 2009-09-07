@@ -64,7 +64,7 @@ namespace Bistro
         /// Gets or sets the application instance.
         /// </summary>
         /// <value>The instance.</value>
-        public static Application Instance { get; private set; }
+        public static Application Instance { get; protected set; }
 
         /// <summary>
         /// The application root directory
@@ -108,7 +108,7 @@ namespace Bistro
         /// Gets or sets a value indicating whether this <see cref="Application"/> is initialized.
         /// </summary>
         /// <value><c>true</c> if initialized; otherwise, <c>false</c>.</value>
-        public bool Initialized { get; private set; }
+        public bool Initialized { get; protected set; }
 
         /// <summary>
         /// Initializes the application from the configuration section provided.

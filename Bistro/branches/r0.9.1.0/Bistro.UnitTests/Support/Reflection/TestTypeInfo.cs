@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Reflection;
 
-namespace Bistro.CompatibilityTests.Reflection
+namespace Bistro.UnitTests.Support.Reflection
 {
-
     internal class TestTypeInfo : ITypeInfo
     {
         public class TestAttributeInfo : IAttributeInfo

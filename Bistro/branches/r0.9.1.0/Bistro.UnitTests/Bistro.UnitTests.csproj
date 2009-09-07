@@ -60,7 +60,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Support\CustomManager\TestApplication.cs" />
+    <Compile Include="Support\CustomManager\TestControllerManager.cs" />
+    <Compile Include="Support\CustomManager\TestControllerManagerFactory.cs" />
+    <Compile Include="Support\Reflection\ITypeInfo.cs" />
+    <Compile Include="Support\Reflection\TestMemberInfo.cs" />
+    <Compile Include="Support\Reflection\TestTypeInfo.cs" />
     <Compile Include="Support\TestingRenderingEngine.cs" />
+    <Compile Include="Tests\CompatibilityTests.cs" />
+    <Compile Include="Tests\CompatibilityTests.Part1.cs" />
+    <Compile Include="Tests\CompatibilityTests.Part2.cs" />
+    <Compile Include="Tests\CompatibilityTests.Part3.cs" />
+    <Compile Include="Tests\Compatibility\UrlControllersTest.cs" />
     <Compile Include="Tests\Data\RenderingControllers.cs" />
     <Compile Include="Tests\EntityTests.cs" />
     <Compile Include="Tests\Data\EntityControllers.cs" />

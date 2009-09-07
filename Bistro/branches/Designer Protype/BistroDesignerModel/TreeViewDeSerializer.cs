@@ -14,7 +14,7 @@ namespace TreeViewSerialization
 		// Xml tag for node, e.g. 'node' in case of <node></node>
 		private const string XmlNodeTag = "node";
 
-        // Xml attributes for node e.g. <node text="DataAccessControl" imageindex="6" tag=""></node>
+        // Xml attributes for node e.g. <node text="DataAccessControl" imageindex="6" tag="Controller"></node>
 		private const string XmlNodeTextAtt = "text";
 		private const string XmlNodeTagAtt = "tag";
         private const string XmlNodeImageIndexAtt = "imageindex";
@@ -118,12 +118,48 @@ namespace TreeViewSerialization
 			else if (propertyName == XmlNodeImageIndexAtt) 
 			{
 				node.ImageIndex = int.Parse(value);
+                node.SelectedImageIndex = int.Parse(value);
 			}
 			else if (propertyName == XmlNodeTagAtt)
 			{
 				node.Tag = value;
+                node.ContextMenuStrip = GetContextMenu(new ContextMenuStrip(), value); 
 			}		
 		}
 
+        protected ContextMenuStrip GetContextMenu(ContextMenuStrip contextMenu, string mode)
+        {
+            if (null == contextMenu ||string.IsNullOrEmpty(mode))
+                return null;
+            if (mode == "Binding")
+                contextMenu.Items.Add(new ToolStripMenuItem("Bindings", null, new EventHandler(ShowBindings), "Bindings"));
+            if (mode == "Controller")
+                contextMenu.Items.Add(new ToolStripMenuItem("Properties", null, new EventHandler(ShowProperties), "Properties"));
+            if (mode == "Resource")
+                contextMenu.Items.Add(new ToolStripMenuItem("Resource", null, new EventHandler(ShowResource), "Resource"));
+            contextMenu.Items.Add(new ToolStripMenuItem("Show Source", null, new EventHandler(ShowSource), "ShowSource"));
+
+            return contextMenu;
+        }
+
+        protected void ShowBindings(object sender, EventArgs args)
+        {
+            MessageBox.Show("Binding Message");
+        }
+
+        protected void ShowProperties(object sender, EventArgs args)
+        {
+            MessageBox.Show("Properties Message");
+        }
+
+        protected void ShowSource(object sender, EventArgs args)
+        {
+            MessageBox.Show("Source Message");
+        }
+
+        protected void ShowResource(object sender, EventArgs args)
+        {
+            MessageBox.Show("Resource Message");
+        }
 	}
 }

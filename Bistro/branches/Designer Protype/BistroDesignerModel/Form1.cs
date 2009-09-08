@@ -101,21 +101,21 @@ namespace TreeViewSerialization
             // 
             // treeView2
             // 
-            this.treeView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
+            this.treeView2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeView2.ImageIndex = 0;
             this.treeView2.ImageList = this.imageList1;
-            this.treeView2.Location = new System.Drawing.Point(0, 260);
+            this.treeView2.Location = new System.Drawing.Point(379, 3);
             this.treeView2.Name = "treeView2";
             this.treeView2.SelectedImageIndex = 0;
-            this.treeView2.Size = new System.Drawing.Size(441, 227);
+            this.treeView2.Size = new System.Drawing.Size(354, 485);
             this.treeView2.TabIndex = 4;
             // 
             // treeView1
             // 
-            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeView1.ImageIndex = 18;
@@ -123,7 +123,7 @@ namespace TreeViewSerialization
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
             this.treeView1.SelectedImageIndex = 7;
-            this.treeView1.Size = new System.Drawing.Size(441, 261);
+            this.treeView1.Size = new System.Drawing.Size(377, 488);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
@@ -136,13 +136,13 @@ namespace TreeViewSerialization
             this.panel1.Controls.Add(this.treeView2);
             this.panel1.Location = new System.Drawing.Point(0, -3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(441, 487);
+            this.panel1.Size = new System.Drawing.Size(733, 487);
             this.panel1.TabIndex = 5;
             // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(440, 486);
+            this.ClientSize = new System.Drawing.Size(733, 486);
             this.Controls.Add(this.panel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";

@@ -3,24 +3,22 @@
 	<node text="zzz-NoRecruiters-WFS" imageindex="4">
     <node text="Bistro Designer" imageindex="12" tag="">
       <node text="Bindings" imageindex="6" tag="">
-        <node text="[ANY]/?" imageindex="5" tag="Binding">
-          <node text="/byId/{postingId}" imageindex="5" tag="Binding">
-            <node text="Controllers" imageindex="2" tag="">
-              <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-            </node>
-            <node text="Resources" imageindex="2" tag="">
-              <node text="Resource1" imageindex="17" tag="Resource"/>
-              <node text="Resource2" imageindex="17" tag="Resource"/>
-            </node>
+        <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="Binding">
+          <node text="Controllers" imageindex="2" tag="">
+            <node text="DataAccessControl" imageindex="3" tag="Controller"/>
           </node>
-          <node text="/byName/{shortName}" imageindex="5" tag="Binding">
-            <node text="Controllers" imageindex="2" tag="">
-              <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-            </node>
-            <node text="Resources" imageindex="2" tag="">
-              <node text="Resource1" imageindex="17" tag="Resource"/>
-              <node text="Resource2" imageindex="17" tag="Resource"/>
-            </node>
+          <node text="Resources" imageindex="2" tag="">
+            <node text="Resource1" imageindex="17" tag="Resource"/>
+            <node text="Resource2" imageindex="17" tag="Resource"/>
+          </node>
+        </node>
+        <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding">
+          <node text="Controllers" imageindex="2" tag="">
+            <node text="DataAccessControl" imageindex="3" tag="Controller"/>
+          </node>
+          <node text="Resources" imageindex="2" tag="">
+            <node text="Resource1" imageindex="17" tag="Resource"/>
+            <node text="Resource2" imageindex="17" tag="Resource"/>
           </node>
         </node>
         <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">

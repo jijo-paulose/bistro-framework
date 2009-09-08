@@ -6,9 +6,6 @@
     </node>
     <node text="Controllers" imageindex="2" tag="">
       <node text="AdDisplay" imageindex="3" tag="Controller">
-        <node text="Methods" imageindex="17" tag="">
-          <node text="DoProcessRequest" imageindex="19" tag="Controller"/>
-        </node>
       </node>
     </node>
   </node>

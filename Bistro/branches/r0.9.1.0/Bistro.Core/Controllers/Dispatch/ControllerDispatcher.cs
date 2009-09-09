@@ -178,6 +178,7 @@ namespace Bistro.Controllers.Dispatch
             var before = init();
             var payload = init();
             var after = init();
+            var teardown = init();
 
             // make sure the match is only done based on url component, and not the parameters
             // if there are any parameters, they'll be handled later
@@ -206,6 +207,9 @@ namespace Bistro.Controllers.Dispatch
                         case BindType.After:
                             list = after;
                             break;
+                        case BindType.Teardown:
+                            list = teardown;
+                            break;
                     }
 
                     // if there are query string parameters, populate them by name, and not positionally
@@ -229,9 +233,11 @@ namespace Bistro.Controllers.Dispatch
             before.Sort(compare);
             payload.Sort(compare);
             after.Sort(compare);
+            teardown.Sort(compare);
 
             after.InsertRange(0, payload);
             after.InsertRange(0, before);
+            after.AddRange(teardown);
 
             new DependencyHelper().EnforceDependencies(after);
 

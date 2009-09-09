@@ -27,16 +27,27 @@ using System.Web;
 using System.Xml;
 using System.IO;
 using Bistro.Controllers.Descriptor;
+using Bistro.Controllers.Descriptor.Data;
 
 namespace Bistro.Controllers.OutputHandling
 {
     /// <summary>
+    /// Delegate for performing custom HttpResponse configuration. This delegate is 
+    /// accepted by the ReturnTypesController to allow external customization of the 
+    /// HttpResponseBase object that will be returned by the controller.
+    /// </summary>
+    public delegate HttpResponseBase ResponseConfigurer(HttpResponseBase response);
+
+    /// <summary>
     /// Controller for handling non-rendered data
     /// </summary>
-    [Bind("?", ControllerBindType = BindType.Payload)]
+    [Bind("?", ControllerBindType = BindType.After)]
     public class ReturnTypesController : IController
     {
         const int BLOCK_SIZE = 8192;
+
+        [Request, DependsOn]
+        protected ResponseConfigurer responseConfigurer;
 
         /// <summary>
         /// Processes the request.
@@ -64,6 +75,9 @@ namespace Bistro.Controllers.OutputHandling
 
             context.Response.AppendHeader("content-type", contentType);
             context.Response.StatusCode = Convert.ToInt32(response.Code);
+
+            if (responseConfigurer != null)
+                responseConfigurer(context.Response);
 
             switch (response.CurrentReturnType)
             {

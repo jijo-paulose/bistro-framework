@@ -10,7 +10,7 @@ using Bistro.Controllers.Descriptor.Data;
 
 namespace Bistro.UnitTests.Tests.Data
 {
-    [Bind("/render", ControllerBindType = BindType.Payload)]
+    [Bind("/render", ControllerBindType = BindType.After)]
     [TemplateMapping("t")]
     public class TestRenderingController: RenderingController
     {

@@ -69,6 +69,7 @@ namespace Bistro.UnitTests.Support
         private StringBuilder responseData = new StringBuilder();
         private IContext requestContext = null;
         private NameValueCollection formCollection = new NameValueCollection();
+        private NameValueCollection headerCollection = new NameValueCollection();
 
         protected readonly Mock<HttpContextBase> Context = new Mock<HttpContextBase>();
         //protected readonly Mock<HttpSessionStateBase> Session = new Mock<HttpSessionStateBase>();
@@ -82,10 +83,12 @@ namespace Bistro.UnitTests.Support
             Context.Setup(ctx => ctx.Session).Returns(sessionMock);
             Context.Setup(ctx => ctx.Response.OutputStream).Returns(() => stream);
             Context.Setup(ctx => ctx.Response.Write(It.IsAny<string>())).Callback((string parm) => responseData.Append(parm));
+            Context.Setup(ctx => ctx.Response.AppendHeader(It.IsAny<string>(), It.IsAny<string>())).Callback((string name, string val) => headerCollection.Add(name, val));
             Context.Setup(ctx => ctx.Request.Cookies).Returns(new HttpCookieCollection());
             Context.Setup(ctx => ctx.Request.Form).Returns(() => formCollection);
             Context.Setup(ctx => ctx.Request.Files.AllKeys).Returns(new string[] { });
-            Context.Setup(ctx => ctx.Request.Headers).Returns(new NameValueCollection());
+            Context.Setup(ctx => ctx.Response.Headers).Returns(() => headerCollection);
+            Context.Setup(ctx => ctx.Request.Headers).Returns(() => new NameValueCollection());
             Context.Setup(ctx => ctx.Handler).Returns(() => this);
 
             LoadFactories(null);
@@ -127,6 +130,8 @@ namespace Bistro.UnitTests.Support
 
             return responseData.ToString();
         }
+
+        public NameValueCollection Headers { get { return headerCollection; } }
 
         /// <summary>
         /// Gets all contents as it would be at the end of chain execution. The session values are available

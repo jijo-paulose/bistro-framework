@@ -8,8 +8,8 @@
             <node text="DataAccessControl" imageindex="3" tag="Controller"/>
           </node>
           <node text="Resources" imageindex="2" tag="">
-            <node text="postingId" imageindex="17" tag="Resource"/>
-            <node text="Resource2" imageindex="17" tag="Resource"/>
+            <node text="postingId, (string)" imageindex="24" tag="Resource"/>
+            <node text="Resource2, (string)" imageindex="23" tag="Resource"/>
           </node>
         </node>
         <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding">
@@ -17,8 +17,8 @@
             <node text="DataAccessControl" imageindex="3" tag="Controller"/>
           </node>
           <node text="Resources" imageindex="2" tag="">
-            <node text="shortName" imageindex="17" tag="Resource"/>
-            <node text="Resource2" imageindex="17" tag="Resource"/>
+            <node text="shortName, (string)" imageindex="22" tag="Resource"/>
+            <node text="Resource2, (string)" imageindex="23" tag="Resource"/>
           </node>
         </node>
         <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
@@ -27,9 +27,9 @@
             <node text="AdDisplay" imageindex="3" tag="Controller"/>
           </node>
           <node text="Resources" imageindex="2" tag="">
-            <node text="shortName" imageindex="17" tag="Resource"/>
-            <node text="Resource2" imageindex="17" tag="Resource"/>
-            <node text="Resource3" imageindex="17" tag="Resource"/>
+            <node text="shortName, (string)" imageindex="22" tag="Resource"/>
+            <node text="Resource2, (string)" imageindex="23" tag="Resource"/>
+            <node text="Resource3, (string)" imageindex="23" tag="Resource"/>
           </node>
         </node>
         <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
@@ -38,9 +38,9 @@
             <node text="AdUpdate" imageindex="3" tag="Controller"/>
           </node>
           <node text="Resources" imageindex="2" tag="">
-            <node text="shortName" imageindex="17" tag="Resource"/>
-            <node text="Resource2" imageindex="17" tag="Resource"/>
-            <node text="Resource5" imageindex="17" tag="Resource"/>
+            <node text="shortName, (string)" imageindex="22" tag="Resource"/>
+            <node text="Resource2, (string)" imageindex="23" tag="Resource"/>
+            <node text="Resource5, (Dictionary)" imageindex="23" tag="Resource"/>
           </node>
         </node>
       </node>

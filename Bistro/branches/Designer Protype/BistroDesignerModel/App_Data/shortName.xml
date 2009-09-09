@@ -10,14 +10,7 @@
       <node text="DataAccessControl" imageindex="3" tag="Controller">
       </node>
     </node>
-    <node text="Attribute" imageindex="10" tag="">
-      <node text="Type" imageindex="10" tag="Resource">
-        <node text="String" imageindex="10" tag="Resource"/>
-      </node>
-      <node text="Source" imageindex="10" tag="Resource">
-        <node text="Request" imageindex="10" tag="Resource"/>
-      </node>
-    </node>
   </node>
+    <node text="Request, Url" imageindex="10" tag="Resource"/>
  </TreeView>
 

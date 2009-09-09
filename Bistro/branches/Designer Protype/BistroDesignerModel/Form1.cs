@@ -92,6 +92,11 @@ namespace TreeViewSerialization
             this.imageList1.Images.SetKeyName(18, "ResourceConsumer.bmp");
             this.imageList1.Images.SetKeyName(19, "method.bmp");
             this.imageList1.Images.SetKeyName(20, "Field.bmp");
+            this.imageList1.Images.SetKeyName(21, "session.ico");
+            this.imageList1.Images.SetKeyName(22, "url.png");
+            this.imageList1.Images.SetKeyName(23, "controller.bmp");
+            this.imageList1.Images.SetKeyName(24, "form1.bmp");
+            this.imageList1.Images.SetKeyName(25, "cookies.bmp");
             // 
             // contextMenuStripSource
             // 
@@ -192,32 +197,32 @@ namespace TreeViewSerialization
                 item = "AdUpdate.xml";
             }
 
-            if (e.Node.Text == "Resource1")
+            if (e.Node.Text.Contains("Resource1"))
             {
                 item = "Resource1.xml";
             }
             
-            if (e.Node.Text == "Resource2")
+            if (e.Node.Text.Contains("Resource2"))
             {
                 item = "Resource2.xml";
             }
 
-            if (e.Node.Text == "Resource3")
+            if (e.Node.Text.Contains("Resource3"))
             {
                 item = "Resource3.xml";
             }
 
-            if (e.Node.Text == "Resource5")
+            if (e.Node.Text.Contains ("Resource5"))
             {
                 item = "Resource5.xml";
             }
 
-            if (e.Node.Text == "postingId")
+            if (e.Node.Text.Contains("postingId"))
             {
                 item = "postingId.xml";
             }
 
-            if (e.Node.Text == "shortName")
+            if (e.Node.Text.Contains("shortName"))
             {
                 item = "shortName.xml";
             }

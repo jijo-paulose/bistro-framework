@@ -9,4 +9,12 @@
       </node>
     </node>
   </node>
+  <node text="Attribute" imageindex="10" tag="">
+    <node text="Type" imageindex="10" tag="Resource">
+      <node text="String" imageindex="10" tag="Resource"/>
+    </node>
+    <node text="Source" imageindex="10" tag="Resource">
+      <node text="Controller, AdDisplay" imageindex="10" tag="Resource"/>
+    </node>
+  </node>
 </TreeView>

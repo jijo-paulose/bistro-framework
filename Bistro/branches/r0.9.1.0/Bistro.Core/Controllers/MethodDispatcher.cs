@@ -221,7 +221,7 @@ namespace Bistro.Controllers
             catch (Exception ex)
             {
                 if (!IsMethodDefinedExplicitly(Application.UnhandledException))
-                    throw ex;
+                    throw new ApplicationException("Unhandled exception, and no binding to " + Application.UnhandledException + " found.", ex);
 
                 requestContext.Clear();
                 requestContext.Add("unhandledException", ex);

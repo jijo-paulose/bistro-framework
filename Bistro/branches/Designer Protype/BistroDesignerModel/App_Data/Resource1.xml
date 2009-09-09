@@ -2,8 +2,8 @@
 <TreeView>
   <node text="Resource1" imageindex="1" tag="Resource">
     <node text="Bindings" imageindex="6" tag="">
-      <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="Binding"/>
-      <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding"/>
+      <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="Binding" mark="PowderBlue"/>
+      <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding" mark="PowderBlue"/>
       <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
       <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
     </node>

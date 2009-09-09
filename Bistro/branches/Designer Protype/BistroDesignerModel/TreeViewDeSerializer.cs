@@ -17,6 +17,7 @@ namespace TreeViewSerialization
         // Xml attributes for node e.g. <node text="DataAccessControl" imageindex="6" tag="Controller"></node>
 		private const string XmlNodeTextAtt = "text";
 		private const string XmlNodeTagAtt = "tag";
+        private const string XmlNodeMarkAtt = "mark";
         private const string XmlNodeImageIndexAtt = "imageindex";
 
 		public TreeViewDeSerializer()
@@ -41,7 +42,7 @@ namespace TreeViewSerialization
 				while (reader.Read())
 				{
 					if (reader.NodeType == XmlNodeType.Element)
-					{						
+					{	
 						if (reader.Name == XmlNodeTag)
 						{
 							TreeNode newNode = new TreeNode();
@@ -55,8 +56,8 @@ namespace TreeViewSerialization
 								{
 									reader.MoveToAttribute(i);
 									
-									SetAttributeValue(newNode, reader.Name, reader.Value);
-								}								
+                                    SetAttributeValue(newNode, reader.Name, reader.Value);
+                              	}								
 							}
 
                             // add new node to Parent Node or TreeView
@@ -111,9 +112,12 @@ namespace TreeViewSerialization
 		/// <param name="value"></param>
 		private void SetAttributeValue(TreeNode node, string propertyName, string value)
 		{
+            if (propertyName == XmlNodeMarkAtt) {
+                node.BackColor = System.Drawing.Color.FromName(value);
+            }
 			if (propertyName == XmlNodeTextAtt)
 			{                
-				node.Text = value;				
+				node.Text = value;
 			}
 			else if (propertyName == XmlNodeImageIndexAtt) 
 			{
@@ -124,9 +128,11 @@ namespace TreeViewSerialization
 			{
 				node.Tag = value;
                 node.ContextMenuStrip = GetContextMenu(new ContextMenuStrip(), value); 
-			}		
+			}
+
 		}
 
+       
         protected ContextMenuStrip GetContextMenu(ContextMenuStrip contextMenu, string mode)
         {
             if (null == contextMenu ||string.IsNullOrEmpty(mode))

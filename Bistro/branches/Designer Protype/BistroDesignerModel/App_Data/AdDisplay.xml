@@ -5,25 +5,11 @@
       <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
     </node>
     <node text="Resources" imageindex="6" tag="">
-       <node text="Resource2" imageindex="1" tag="Resource">
-         <node text="Attribute" imageindex="10" tag="">
-           <node text="Type" imageindex="10" tag="Resource">
-             <node text="String" imageindex="10" tag="Resource"/>
-           </node>
-           <node text="Source" imageindex="10" tag="Resource">
-             <node text="Controller, DataAccessControl" imageindex="10" tag="Resource"/>
-           </node>
-         </node>
-      </node>
-      <node text="Resource3" imageindex="0" tag="Resource">
-        <node text="Attribute" imageindex="10" tag="">
-          <node text="Type" imageindex="10" tag="Resource">
-            <node text="String" imageindex="10" tag="Resource"/>
-          </node>
-          <node text="Source" imageindex="10" tag="Resource">
-            <node text="Controller, AdDisplay" imageindex="10" tag="Resource"/>
-            </node>
-        </node>
+       <node text="Resource2, (string)" imageindex="1" tag="Resource">
+         <node text="Controller, DataAccessControl" imageindex="10" tag="Resource"/>
+       </node>
+      <node text="Resource3, (string)" imageindex="0" tag="Resource">
+        <node text="Controller, AdDisplay" imageindex="10" tag="Resource"/>
       </node>
     </node>
   </node>

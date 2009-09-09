@@ -81,7 +81,7 @@ namespace TreeViewSerialization
             this.imageList1.Images.SetKeyName(7, "Document.bmp");
             this.imageList1.Images.SetKeyName(8, "Documents.bmp");
             this.imageList1.Images.SetKeyName(9, "Error.bmp");
-            this.imageList1.Images.SetKeyName(10, "Field.bmp");
+            this.imageList1.Images.SetKeyName(10, "source.bmp");
             this.imageList1.Images.SetKeyName(11, "FieldSelected.bmp");
             this.imageList1.Images.SetKeyName(12, "Folder.bmp");
             this.imageList1.Images.SetKeyName(13, "Link.bmp");

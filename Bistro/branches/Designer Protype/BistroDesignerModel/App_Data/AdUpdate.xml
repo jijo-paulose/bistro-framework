@@ -5,25 +5,11 @@
       <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
     </node>
     <node text="Resources" imageindex="6" tag="">
-      <node text="Resource2" imageindex="1" tag="Resource">
-        <node text="Attribute" imageindex="10" tag="">
-          <node text="Type" imageindex="10" tag="Resource">
-            <node text="Dictionary" imageindex="10" tag="Resource"/>
-          </node>
-          <node text="Source" imageindex="10" tag="Resource">
-            <node text="Controller, DataAccessControl" imageindex="10" tag="Resource"/>
-          </node>
-        </node>
+      <node text="Resource2, (string)" imageindex="1" tag="Resource">
+        <node text="Controller, DataAccessControl" imageindex="10" tag="Resource"/>
       </node>
-      <node text="Resource3" imageindex="0" tag="Resource">
-        <node text="Attribute" imageindex="10" tag="">
-          <node text="Type" imageindex="10" tag="Resource">
-            <node text="Dictionary" imageindex="10" tag="Resource"/>
-          </node>
-          <node text="Source" imageindex="10" tag="Resource">
-            <node text="Controller, AdUpdate" imageindex="10" tag="Resource"/>
-          </node>
-        </node>
+      <node text="Resource5 , (dictionary)" imageindex="0" tag="Resource">
+        <node text="Controller, AdUpdate" imageindex="10" tag="Resource"/>
       </node>
     </node>
   </node>

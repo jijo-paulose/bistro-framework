@@ -40,7 +40,7 @@
           <node text="Resources" imageindex="2" tag="">
             <node text="shortName, (string)" imageindex="22" tag="Resource"/>
             <node text="Resource2, (string)" imageindex="23" tag="Resource"/>
-            <node text="Resource5, (Dictionary)" imageindex="23" tag="Resource"/>
+            <node text="Resource5, (dictionary)" imageindex="23" tag="Resource"/>
           </node>
         </node>
       </node>

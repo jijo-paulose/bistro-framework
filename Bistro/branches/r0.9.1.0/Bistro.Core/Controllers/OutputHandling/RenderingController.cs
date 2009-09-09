@@ -34,7 +34,7 @@ namespace Bistro.Controllers.OutputHandling
     /// <summary>
     /// Rendering controller for using both Velocity and Django templates
     /// </summary>
-    [Bind("?", ControllerBindType = BindType.Payload)]
+    [Bind("?", ControllerBindType = BindType.After)]
     public abstract class RenderingController : IController
     {
         [Request, DependsOn]

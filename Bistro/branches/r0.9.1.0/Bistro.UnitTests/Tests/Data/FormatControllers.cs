@@ -6,6 +6,7 @@ using System.Text;
 using Bistro.Controllers;
 using Bistro.Controllers.Descriptor.Data;
 using Bistro.Controllers.Descriptor;
+using Bistro.Controllers.OutputHandling;
 
 namespace Bistro.UnitTests.Tests.Data
 {
@@ -56,6 +57,23 @@ namespace Bistro.UnitTests.Tests.Data
                 return;
 
             context.Response.Return(input.foo + " " + input.baz);
+        }
+    }
+
+    [Bind("get /format/custom")]
+    public class ResponseConfigurerController : AbstractController
+    {
+        [Request]
+        protected ResponseConfigurer responseConfigurer;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            responseConfigurer =
+                response =>
+                {
+                    response.AppendHeader("x-test-configurer", "true");
+                    return response;
+                };
         }
     }
 }

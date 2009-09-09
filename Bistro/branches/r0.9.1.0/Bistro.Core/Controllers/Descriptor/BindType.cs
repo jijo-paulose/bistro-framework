@@ -35,12 +35,17 @@ namespace Bistro.Controllers.Descriptor
         /// </summary>
         Before,
         /// <summary>
+        /// Controller will be executed as the payload of the tree (i.e. once the final leaf is reached)
+        /// </summary>
+        Payload,
+        /// <summary>
         /// Controller will be executed on the way up the tree.
         /// </summary>
         After,
         /// <summary>
-        /// Controller will be executed as the payload of the tree (i.e. once the final leaf is reached)
+        /// Controller will be executed after all other processing. Attempts to return data from a Teardown
+        /// controller will cause a run-time exception
         /// </summary>
-        Payload
+        Teardown
     }
 }

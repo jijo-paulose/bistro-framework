@@ -101,6 +101,17 @@ namespace Bistro.UnitTests.Tests
                 expected.Equals(resp),
                 String.Format("Expected '{0}', Received {1}. Issue with Xml formatting.", expected, resp));
         }
+
+        [Test]
+        public void ResponseConfigurer()
+        {
+            var resp = handler.RunForTest("GET/format/custom");
+
+            Assert.AreEqual(
+                "true",
+                handler.Headers["x-test-configurer"],
+                "Missing 'x-test-configurer' header from response. Configurer must not have fired");
+        }
     }
 }
 

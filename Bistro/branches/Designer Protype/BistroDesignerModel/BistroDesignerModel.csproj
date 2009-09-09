@@ -128,10 +128,12 @@
     <Content Include="App_Data\AdDisplay.xml" />
     <Content Include="App_Data\AdUpdate.xml" />
     <Content Include="App_Data\MainTreeView.xml" />
+    <Content Include="App_Data\postingId.xml" />
     <Content Include="App_Data\Resource1.xml" />
     <Content Include="App_Data\Resource2.xml" />
     <Content Include="App_Data\Resource3.xml" />
     <Content Include="App_Data\Resource5.xml" />
+    <Content Include="App_Data\shortName.xml" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

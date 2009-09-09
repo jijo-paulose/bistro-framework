@@ -210,8 +210,17 @@ namespace TreeViewSerialization
             if (e.Node.Text == "Resource5")
             {
                 item = "Resource5.xml";
-            } 
-            
+            }
+
+            if (e.Node.Text == "postingId")
+            {
+                item = "postingId.xml";
+            }
+
+            if (e.Node.Text == "shortName")
+            {
+                item = "shortName.xml";
+            }
             if (!string.IsNullOrEmpty(item))
                 ShowInfoTreeView(this.treeView2, item);
         }

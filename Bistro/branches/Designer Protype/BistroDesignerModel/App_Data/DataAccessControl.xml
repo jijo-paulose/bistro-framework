@@ -2,7 +2,6 @@
 <TreeView>
   <node text="DataAccessControl" imageindex="6" tag="Controller">
     <node text="Bindings" imageindex="6" tag="">
-      <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="Binding" mark="PowderBlue"/>
       <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding" mark="PowderBlue"/>
       <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
       <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
@@ -18,7 +17,7 @@
           </node>
         </node>
       </node>
-      <node text="Resource1" imageindex="1" tag="Resource">
+      <node text="shortName" imageindex="1" tag="Resource">
         <node text="Attribute" imageindex="10" tag="">
           <node text="Type" imageindex="10" tag="Resource">
             <node text="String" imageindex="10" tag="Resource"/>
@@ -29,5 +28,31 @@
         </node>
       </node>
     </node>
+  </node>
+  <node text="DataAccessControl" imageindex="6" tag="Controller">
+    <node text="Bindings" imageindex="6" tag="">
+      <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="Binding" mark="Transparent"/>
+    </node>
+    <node text="Resources" imageindex="6" tag="">
+      <node text="Resource2" imageindex="0" tag="Resource">
+        <node text="Attribute" imageindex="10" tag="">
+          <node text="Type" imageindex="10" tag="Resource">
+            <node text="String" imageindex="10" tag="Resource"/>
+          </node>
+          <node text="Source" imageindex="10" tag="Resource">
+            <node text="Controller, DataAccessControl" imageindex="10" tag="Resource"/>
+          </node>
+        </node>
       </node>
- </TreeView> 
+      <node text="postingId" imageindex="1" tag="Resource">
+        <node text="Attribute" imageindex="10" tag="">
+          <node text="Type" imageindex="10" tag="Resource">
+            <node text="String" imageindex="10" tag="Resource"/>
+          </node>
+          <node text="Source" imageindex="10" tag="Resource">
+            <node text="Request" imageindex="10" tag="Resource"/>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node> </TreeView> 

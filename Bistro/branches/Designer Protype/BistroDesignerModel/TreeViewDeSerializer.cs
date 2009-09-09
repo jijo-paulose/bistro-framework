@@ -55,8 +55,7 @@ namespace TreeViewSerialization
 								for (int i = 0; i < attributeCount; i++)
 								{
 									reader.MoveToAttribute(i);
-									
-                                    SetAttributeValue(newNode, reader.Name, reader.Value);
+									SetAttributeValue(newNode, reader.Name, reader.Value);
                               	}								
 							}
 

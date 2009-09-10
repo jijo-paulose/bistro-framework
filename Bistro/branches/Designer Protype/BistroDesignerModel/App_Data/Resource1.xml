@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="shortName" imageindex="28" tag="Resource">
     <node text="Controllers" imageindex="2" tag="">
       <node text="DataAccessControl" imageindex="27" tag="Controller">
       </node>
      </node>
-  </node>
 </TreeView>

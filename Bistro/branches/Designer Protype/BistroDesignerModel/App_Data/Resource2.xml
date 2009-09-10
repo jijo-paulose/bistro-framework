@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="Resource2" imageindex="28" tag="Resource">
     <node text="Controllers" imageindex="2" tag="">
       <node text="DataAccessControl" imageindex="26" tag="Controller"/>
       <node text="AdDisplay" imageindex="27" tag="Controller"/>
       <node text="AdUpdate" imageindex="27" tag="Controller"/>
     </node>
     <node text="Controller, DataAccessControl" imageindex="10" tag="Resource"/>
-  </node>
 </TreeView>

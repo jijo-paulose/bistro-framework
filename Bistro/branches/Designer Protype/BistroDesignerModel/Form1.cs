@@ -7,6 +7,7 @@ using System.Data;
 using System.Xml;
 using System.Text;
 using System.Text.RegularExpressions;
+using TreeViewDeSerialization;
 
 
 namespace TreeViewSerialization
@@ -22,7 +23,8 @@ namespace TreeViewSerialization
         private TreeView treeView1;
         private SplitContainer splitContainer1;
         private System.ComponentModel.IContainer components;
-
+        TreeViewDeSerializer serializer = new TreeViewDeSerializer();
+        
 		public Form1()
 		{
 			//
@@ -185,8 +187,8 @@ namespace TreeViewSerialization
         private void LoadData()
         {
             this.treeView1.Nodes.Clear();
-            TreeViewDeSerializer serializer = new TreeViewDeSerializer();
-            serializer.DeserializeTreeView(this.treeView1, GetAppPath(Application.StartupPath) + "MainTreeView.xml"); 
+            serializer.DeserializeTreeView(this.treeView1, GetAppPath(Application.StartupPath) + "MainTreeView.xml");
+            serializer.myForm = this;
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
@@ -251,7 +253,6 @@ namespace TreeViewSerialization
         private void ShowInfoTreeView(TreeView treeView, string item)
         {
             treeView.Nodes.Clear();
-            TreeViewDeSerializer serializer = new TreeViewDeSerializer();
             serializer.DeserializeTreeView(treeView, GetAppPath(Application.StartupPath) + item);
             //Expanded all Nodes on detail tree
             treeView2.ExpandAll();
@@ -263,6 +264,30 @@ namespace TreeViewSerialization
          @"app_data\");
 
         }
-               
+
+        public void SearchProcess() {
+            Form2 dialog = new Form2();
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                FindTreeNode(treeView1.Nodes, dialog.search);
+            }
+        }
+
+        public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText)
+        {
+    
+            foreach (TreeNode child in treeNodeCollection)
+            {
+                if (child.Text == searchText)
+                {
+                    this.treeView1.SelectedNode = child;
+
+                }
+                else
+                {
+                    FindTreeNode(child.Nodes, searchText);
+                }
+            }
+        }  
 	}
 }

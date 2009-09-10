@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="postingId" imageindex="1" tag="Resource">
-    <node text="Bindings" imageindex="6" tag="">
-      <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="Binding" mark="Transparent"/>
-    </node>
+  <node text="postingId" imageindex="28" tag="Resource">
     <node text="Controllers" imageindex="2" tag="">
-      <node text="DataAccessControl" imageindex="3" tag="Controller">
+      <node text="DataAccessControl" imageindex="27" tag="Controller">
       </node>
     </node>
   </node>

@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="shortName" imageindex="1" tag="Resource">
-    <node text="Bindings" imageindex="6" tag="">
-      <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding" mark="PowderBlue"/>
-      <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
-      <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
-    </node>
-    <node text="Controllers" imageindex="2" tag="">
-      <node text="DataAccessControl" imageindex="3" tag="Controller">
+  <node text="shortName" imageindex="28" tag="Resource">
+     <node text="Controllers" imageindex="2" tag="">
+      <node text="DataAccessControl" imageindex="27" tag="Controller">
       </node>
     </node>
   </node>

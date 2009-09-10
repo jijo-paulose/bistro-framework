@@ -97,6 +97,9 @@ namespace TreeViewSerialization
             this.imageList1.Images.SetKeyName(23, "controller.bmp");
             this.imageList1.Images.SetKeyName(24, "form1.bmp");
             this.imageList1.Images.SetKeyName(25, "cookies.bmp");
+            this.imageList1.Images.SetKeyName(26, "controllerOut.bmp");
+            this.imageList1.Images.SetKeyName(27, "controllerIn.bmp");
+            this.imageList1.Images.SetKeyName(28, "resource.bmp");
             // 
             // contextMenuStripSource
             // 

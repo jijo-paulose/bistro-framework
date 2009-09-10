@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-	<node text="zzz-NoRecruiters-WFS" imageindex="4">
-    <node text="Bistro Designer" imageindex="12" tag="">
-      <node text="Bindings" imageindex="6" tag="">
+	<node text="zzz-NoRecruiters-WFS" imageindex="4" tag="">
+    <node text="Bistro Designer" imageindex="12" tag="Find">
+      <node text="Bindings" imageindex="6" tag="Find">
         <node text="[ANY]/?" imageindex="5" tag="Binding">
           <node text="Controllers" imageindex="2" tag="">
             <node text="DefaultController" imageindex="3" tag="Controller"/>

@@ -3,6 +3,7 @@ using System.Xml;
 using System.Windows.Forms;
 using System.Text;
 using System.Drawing;
+using TreeViewDeSerialization;
 
 namespace TreeViewSerialization
 {
@@ -11,10 +12,9 @@ namespace TreeViewSerialization
 	/// </summary>
 	public class TreeViewDeSerializer
 	{
-		
+        public Form1 myForm;
 		// Xml tag for node, e.g. 'node' in case of <node></node>
 		private const string XmlNodeTag = "node";
-
         // Xml attributes for node e.g. <node text="DataAccessControl" imageindex="6" tag="Controller"></node>
         private const string XmlNodeFontAtt = "fontstyle";
         private const string XmlNodeTextAtt = "text";
@@ -22,7 +22,8 @@ namespace TreeViewSerialization
         private const string XmlNodeMarkAtt = "mark";
         private const string XmlNodeImageIndexAtt = "imageindex";
 
-		public TreeViewDeSerializer()
+
+        public TreeViewDeSerializer()
 		{
 			//
 			// TODO: Add constructor logic here
@@ -166,10 +167,17 @@ namespace TreeViewSerialization
                 contextMenu.Items.Add(new ToolStripMenuItem("Go to Binding", null, new EventHandler(ShowBindings), "Bindings"));
             if (mode == "Resource")
                 contextMenu.Items.Add(new ToolStripMenuItem("Resource", null, new EventHandler(ShowResource), "Resource"));
-            if (mode != "Binding")
+            if (mode != "Binding" && mode != "Find")
                 contextMenu.Items.Add(new ToolStripMenuItem("Show Source", null, new EventHandler(ShowSource), "ShowSource"));
+            if (mode == "Find")
+                contextMenu.Items.Add(new ToolStripMenuItem("Search", null, new EventHandler(ShowFindControl), "Search"));
 
             return contextMenu;
+        }
+
+        protected void ShowFindControl(object sender, EventArgs args)
+        {
+            this.myForm.SearchProcess();
         }
 
         protected void ShowBindings(object sender, EventArgs args)
@@ -191,5 +199,6 @@ namespace TreeViewSerialization
         {
             MessageBox.Show("Resource Message");
         }
+                
 	}
 }

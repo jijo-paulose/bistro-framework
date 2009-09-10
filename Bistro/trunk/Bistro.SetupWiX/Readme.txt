@@ -10,7 +10,11 @@ New in 0.9.1.0:
 2. Added ResponseConfigurer delegate to change Response settings as needed.
 3. Added functionality to generate output using custom formatters.
 4. Controllers can be bound to the EVENT action, which allows handling of the bistro events. 
-
+5. Added uncaught exception handling
+6. Added "IsAjaxRequest" controller
+7. Introduced "teardown" pointcut
+8. Moved Rendering to "After" pointcut
+9. Added PartialRender attribute for ajax calls
 
 
 

@@ -229,6 +229,12 @@ namespace TreeViewSerialization
             {
                 item = "shortName.xml";
             }
+
+            if (e.Node.Text.Contains("DefaultController"))
+            {
+                item = "DefaultController.xml";
+            }
+            
             if (!string.IsNullOrEmpty(item))
                 ShowInfoTreeView(this.treeView2, item);
         }

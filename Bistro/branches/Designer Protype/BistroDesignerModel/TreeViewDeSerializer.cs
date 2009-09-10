@@ -168,7 +168,8 @@ namespace TreeViewSerialization
                 contextMenu.Items.Add(new ToolStripMenuItem("Properties", null, new EventHandler(ShowProperties), "Properties"));
             if (mode == "Resource")
                 contextMenu.Items.Add(new ToolStripMenuItem("Resource", null, new EventHandler(ShowResource), "Resource"));
-            contextMenu.Items.Add(new ToolStripMenuItem("Show Source", null, new EventHandler(ShowSource), "ShowSource"));
+            if (mode != "Binding")
+                contextMenu.Items.Add(new ToolStripMenuItem("Show Source", null, new EventHandler(ShowSource), "ShowSource"));
 
             return contextMenu;
         }

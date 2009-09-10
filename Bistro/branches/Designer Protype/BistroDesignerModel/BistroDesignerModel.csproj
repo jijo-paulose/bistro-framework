@@ -127,6 +127,7 @@
     <Content Include="App_Data\DataAccessControl.xml" />
     <Content Include="App_Data\AdDisplay.xml" />
     <Content Include="App_Data\AdUpdate.xml" />
+    <Content Include="App_Data\DefaultController.xml" />
     <Content Include="App_Data\MainTreeView.xml" />
     <Content Include="App_Data\postingId.xml" />
     <Content Include="App_Data\Resource1.xml" />

@@ -10,7 +10,7 @@
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\Wix.targets</WixTargetsPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>..\..\..\..\bin\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
     <LinkerAdditionalOptions>-fv</LinkerAdditionalOptions>
@@ -32,6 +32,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="editTemplates.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bistro.Core\Bistro.Core.csproj">
+      <Name>Bistro.Core</Name>
+      <Project>{8a5337bb-438f-4ad7-b695-89df28f778df}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Bistro.Extensions\Bistro.Extensions.csproj">
+      <Name>Bistro.Extensions</Name>
+      <Project>{81d48228-73a8-4a92-84b9-ecd57f86db72}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

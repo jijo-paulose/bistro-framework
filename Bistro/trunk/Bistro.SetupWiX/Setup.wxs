@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <?define ProductVersion="0.9.0" ?>
-  <?define ProductVersionTitle="0.9.0.0" ?>
+  <?define ProductVersion="0.9.1" ?>
+  <?define ProductVersionTitle="0.9.1.0" ?>
   <?define UpgradeCode="{EB7EA168-9F1A-45EF-8EDB-06AC4E4C69D6}"?>
-  <Product Id="A4576848-ECBB-4F3E-9588-7481D28CC4C2" Name="Bistro $(var.ProductVersionTitle)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Hill30" UpgradeCode="$(var.UpgradeCode)">
+  <Product Id="2A42616F-B4A6-4C37-98A7-9565D6D7DDAC" Name="Bistro $(var.ProductVersionTitle)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Hill30" UpgradeCode="$(var.UpgradeCode)">
     <Package InstallerVersion="200" Compressed="yes" />
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
     <Upgrade Id="$(var.UpgradeCode)">
@@ -14,14 +14,14 @@
     <Property Id="VS2008FOUND">
       <RegistrySearch Id="VS2008found" Type="raw" Root="HKLM" Key="Software\Microsoft\VisualStudio\9.0" Name="InstallDir" />
     </Property>
-    <!--<Property Id="FSHARPFOUND">
-      <DirectorySearch Path="$(env.windir)\assembly\GAC_MSIL\FSharp.Core\1.9.6.2__a19089b1c74d0809" Id="FSharpFoundDir">
-        <FileSearch Name="FSharp.Core.dll" />
-      </DirectorySearch>
-    </Property>-->
+	  <Property Id="VS2008ITEMTEMPLATESLOCATION">
+		  <RegistrySearch Id="UserItemTemplatesLocation" Type="raw" Root="HKCU" Key="Software\Microsoft\VisualStudio\9.0" Name="UserItemTemplatesLocation" />
+	  </Property>
+	  <Property Id="VS2008PROJECTTEMPLATESLOCATION">
+		  <RegistrySearch Id="UserProjectTemplatesLocation" Type="raw" Root="HKCU" Key="Software\Microsoft\VisualStudio\9.0" Name="UserProjectTemplatesLocation" />
+	  </Property>
     <Condition Message="This application requires Visual Studio 2008. Please install the Visual Studio 2008 then run this installer again.">Installed OR VS2008FOUND</Condition>
     <Condition Message="This application requires .NET Framework 3.5SP1. Please install the .NET Framework 3.5SP1 then run this installer again."><![CDATA[Installed OR (NETFRAMEWORK35_SP_LEVEL and NOT NETFRAMEWORK35_SP_LEVEL = "#0")]]></Condition>
-    <!--<Condition Message="This application requires FSharp 1.9.6.2. Please install the FSharp 1.9.6.2 then run this installer again.">Installed OR FSHARPFOUND</Condition>-->
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" Overridable="yes" />
     <WixVariable Id="WixUIBannerBmp" Value="bitmaps\bannrbmp.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="bitmaps\dlgbmp.bmp" />
@@ -30,8 +30,8 @@
         <Directory Id="Hill30" Name="Hill30">
           <Directory Id="INSTALLDIR" Name="Bistro">
             <Component Id="BistroAssemblies" Guid="5739EC31-4EA2-4252-A451-14DDF02B2556">
-              <File Id="Bistro.FSharpExtensions.dll" Name="Bistro.FSharpExtensions.dll" Source="..\..\..\..\bin\Bistro.FSharpExtensions.dll" />
-              <File Id="Bistro.Core.dll" Name="Bistro.Core.dll" Source="..\..\..\..\bin\Bistro.Core.dll" />
+              <File Id="Bistro.Core.dll" Name="$(var.Bistro.Core.TargetFileName)" Source="$(var.Bistro.Core.TargetPath)" DiskId="1" />
+              <File Id="Bistro.Extensions.dll" Name="$(var.Bistro.Extensions.TargetFileName)" Source="$(var.Bistro.Extensions.TargetPath)" DiskId="1" />
             </Component>
             <Component Id="Readme" Guid="5F247096-2032-4548-AFEE-687203A14C7E">
               <File Id="Readme.txt" Name="Readme.txt" ShortName="README.TXT" Source="Readme.txt" />
@@ -39,35 +39,25 @@
           </Directory>
         </Directory>
       </Directory>
-      <Directory Id="PersonalFolder">
-        <Directory Id="VisualStudio2008" Name="Visual Studio 2008">
-          <Directory Id="TemplatesVS2008" Name="Templates">
-            <Directory Id="vs2008ItemTemplates" Name="ItemTemplates">
-              <Directory Id="vs2008Web1" Name="Web">
-                <Component Id="ItemTemplates" Guid="534C36E1-1DD7-4B31-BD96-E1BF46E6DB57">
-                  <RemoveFolder Id="VisualStudio2008" Directory="VisualStudio2008" On="uninstall" />
-                  <RemoveFolder Id="TemplatesVS2008" Directory="TemplatesVS2008" On="uninstall" />
-                  <RemoveFolder Id="vs2008Web1" Directory="vs2008Web1" On="uninstall" />
-                  <RemoveFolder Id="vs2008ItemTemplates" Directory="vs2008ItemTemplates" On="uninstall" />
-                  <RegistryValue Root="HKCU" Key="Software\Hill30\Bistro\[ProductVersion]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
-                  <File Id="BistroController.zip" Name="BistroController.zip" Source="Templates\BistroController.zip" />
-                </Component>
-              </Directory>
-            </Directory>
-            <Directory Id="vs2008ProjectTemplates" Name="ProjectTemplates">
-              <Directory Id="vs2008CSharp2" Name="Visual C#">
-                <Component Id="ProjectTemplates" Guid="054B3E23-72D4-4D0C-A29E-39B7448E668A">
-                  <RemoveFolder Id="vs2008CSharp2" Directory="vs2008CSharp2" On="uninstall" />
-                  <RemoveFolder Id="vs2008ProjectTemplates" Directory="vs2008ProjectTemplates" On="uninstall" />
-                  <RegistryValue Root="HKCU" Key="Software\Hill30\Bistro\[ProductVersion]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
-                  <File Id="BistroProject.zip" Name="BistroProject.zip" Source="Templates\BistroProject.zip" />
-                  <File Id="BistroNHibernate.zip" Name="BistroNHibernate.zip" Source="Templates\BistroNHibernate.zip" />
-                </Component>
-              </Directory>
-            </Directory>
-          </Directory>
-        </Directory>
-      </Directory>
+		<Directory Id="VS2008ITEMTEMPLATESLOCATION">
+			<Directory Id="vs2008Web1" Name="Web">
+				<Component Id="ItemTemplates" Guid="534C36E1-1DD7-4B31-BD96-E1BF46E6DB57">
+					<RemoveFolder Id="vs2008Web1" Directory="vs2008Web1" On="uninstall" />
+					<RegistryValue Root="HKCU" Key="Software\Hill30\Bistro\[ProductVersion]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+					<File Id="BistroController.zip" Name="BistroController.zip" Source="Templates\BistroController.zip" />
+				</Component>
+			</Directory>
+		</Directory>
+		<Directory Id="VS2008PROJECTTEMPLATESLOCATION">
+			<Directory Id="vs2008CSharp2" Name="Visual C#">
+				<Component Id="ProjectTemplates" Guid="054B3E23-72D4-4D0C-A29E-39B7448E668A">
+					<RemoveFolder Id="vs2008CSharp2" Directory="vs2008CSharp2" On="uninstall" />
+					<RegistryValue Root="HKCU" Key="Software\Hill30\Bistro\[ProductVersion]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+					<File Id="BistroProject.zip" Name="BistroProject.zip" Source="Templates\BistroProject.zip" />
+					<File Id="BistroNHibernate.zip" Name="BistroNHibernate.zip" Source="Templates\BistroNHibernate.zip" />
+				</Component>
+			</Directory>
+		</Directory>
     </Directory>
     <Feature Id="ProductFeature" Level="1">
       <ComponentRef Id="BistroAssemblies" />
@@ -128,7 +118,6 @@
         <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
         <Control Id="Description" Type="Text" X="135" Y="80" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.WelcomeDlgDescription)" />
         <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.WelcomeDlgTitle)" />
-        <Control Type="Text" Width="220" Height="60" X="135" Y="140" Id="FSharpNOTE" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}NOTE: This application requires FSharp 1.9.6.2." />
       </Dialog>
       <InstallUISequence>
         <Show Dialog="WelcomeDlgCustom" Before="ProgressDlg">NOT Installed</Show>

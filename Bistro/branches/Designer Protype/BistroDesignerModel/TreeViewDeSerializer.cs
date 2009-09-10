@@ -2,6 +2,7 @@ using System;
 using System.Xml;
 using System.Windows.Forms;
 using System.Text;
+using System.Drawing;
 
 namespace TreeViewSerialization
 {
@@ -15,7 +16,8 @@ namespace TreeViewSerialization
 		private const string XmlNodeTag = "node";
 
         // Xml attributes for node e.g. <node text="DataAccessControl" imageindex="6" tag="Controller"></node>
-		private const string XmlNodeTextAtt = "text";
+        private const string XmlNodeFontAtt = "fontstyle";
+        private const string XmlNodeTextAtt = "text";
 		private const string XmlNodeTagAtt = "tag";
         private const string XmlNodeMarkAtt = "mark";
         private const string XmlNodeImageIndexAtt = "imageindex";
@@ -56,6 +58,7 @@ namespace TreeViewSerialization
 								{
 									reader.MoveToAttribute(i);
 									SetAttributeValue(newNode, reader.Name, reader.Value);
+
                               	}								
 							}
 
@@ -109,8 +112,31 @@ namespace TreeViewSerialization
 		/// <param name="node"></param>
 		/// <param name="propertyName"></param>
 		/// <param name="value"></param>
-		private void SetAttributeValue(TreeNode node, string propertyName, string value)
+        private void SetAttributeValue(TreeNode node, string propertyName, string value)
 		{
+            if (propertyName == XmlNodeFontAtt) {
+                FontStyle fontStyle;
+                switch (value)
+                {
+                    case "Bold":
+                        fontStyle = FontStyle.Bold;
+                        break;
+                    case "Italic":
+                        fontStyle = FontStyle.Italic;
+                        break;
+                    case "Strikeout":
+                        fontStyle = FontStyle.Strikeout;
+                        break;
+                    case "Underline":
+                        fontStyle = FontStyle.Underline;
+                        break;
+                    default:
+                        fontStyle = FontStyle.Regular;
+                        break;
+
+                }
+                node.NodeFont = new Font("Font", 10, fontStyle);
+            }
             if (propertyName == XmlNodeMarkAtt) {
                 node.BackColor = System.Drawing.Color.FromName(value);
             }
@@ -137,7 +163,7 @@ namespace TreeViewSerialization
             if (null == contextMenu ||string.IsNullOrEmpty(mode))
                 return null;
             if (mode == "Binding")
-                contextMenu.Items.Add(new ToolStripMenuItem("Bindings", null, new EventHandler(ShowBindings), "Bindings"));
+                contextMenu.Items.Add(new ToolStripMenuItem("Go to Binding", null, new EventHandler(ShowBindings), "Bindings"));
             if (mode == "Controller")
                 contextMenu.Items.Add(new ToolStripMenuItem("Properties", null, new EventHandler(ShowProperties), "Properties"));
             if (mode == "Resource")

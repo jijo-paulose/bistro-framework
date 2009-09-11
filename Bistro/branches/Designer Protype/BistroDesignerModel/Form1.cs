@@ -352,8 +352,13 @@ namespace TreeViewSerialization
                 findNodes = new List<TreeNode>();
             }
             foreach (TreeNode child in treeNodeCollection)
-            {      
-            if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
+            {
+
+            //Match with Contains
+            if (child.Text.ToLower().Contains(searchText.ToLower()))
+            
+            //strict match
+            //if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
                 {
                     findNodes.Add(child);
                 }

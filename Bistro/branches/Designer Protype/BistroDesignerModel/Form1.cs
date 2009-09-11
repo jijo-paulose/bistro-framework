@@ -211,7 +211,7 @@ namespace TreeViewSerialization
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(390, 39);
+            this.MinimumSize = new System.Drawing.Size(390, 500);
             this.Name = "Form1";
             this.Text = "Bistro Designer Mockup";
             this.Load += new System.EventHandler(this.Form1_Load);

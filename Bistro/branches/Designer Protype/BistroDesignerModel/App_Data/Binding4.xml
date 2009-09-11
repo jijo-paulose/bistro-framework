@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<TreeView>
+  <node text="Generalization Bindings" imageindex="2" tag="">
+    <node text="[ANY]/?" imageindex="5" tag="Binding"/>
+    <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding"/>
+  </node>
+</TreeView>

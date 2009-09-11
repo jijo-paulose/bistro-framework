@@ -244,8 +244,8 @@ namespace TreeViewSerialization
         {
             treeView2.Nodes.Clear();
             string item = String.Empty;
-            
-            //Define Controllers
+
+            #region Define Controllers
             if (e.Node.Text.Contains("DefaultController"))
             {
                 item = "DefaultController.xml";
@@ -264,8 +264,9 @@ namespace TreeViewSerialization
             {
                 item = "AdUpdate.xml";
             }
+            #endregion
 
-            //Define Resources
+            #region Define Resources
             if (e.Node.Text.Contains("Resource1"))
             {
                 item = "Resource1.xml";
@@ -297,8 +298,9 @@ namespace TreeViewSerialization
                     item = "shortName.xml";
                 }
             }
+            #endregion
 
-            //Define Bindings
+            #region Define Bindings
             if (e.Node.Text == "[ANY]/?")
             {
                 item = "Binding1.xml";
@@ -323,7 +325,7 @@ namespace TreeViewSerialization
             {
                 item = "Binding5.xml";
             }
-
+            #endregion
 
             if (!string.IsNullOrEmpty(item))
                 ShowInfoTreeView(this.treeView2, item);

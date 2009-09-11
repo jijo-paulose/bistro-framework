@@ -7,7 +7,7 @@ using System.Data;
 using System.Xml;
 using System.Text;
 using System.Text.RegularExpressions;
-using TreeViewDeSerialization;
+using System.Collections.Generic;
 
 
 namespace TreeViewSerialization
@@ -23,6 +23,11 @@ namespace TreeViewSerialization
         private TreeView treeView1;
         private SplitContainer splitContainer1;
         private System.ComponentModel.IContainer components;
+        private Panel panel1;
+        private TextBox textBox1;
+        private int Count = 0;
+        private List<TreeNode> findNodes = null;
+        private Button button1;
         TreeViewDeSerializer serializer = new TreeViewDeSerializer();
         
 		public Form1()
@@ -66,9 +71,13 @@ namespace TreeViewSerialization
             this.treeView2 = new System.Windows.Forms.TreeView();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // imageList1
@@ -113,6 +122,7 @@ namespace TreeViewSerialization
             // 
             // treeView2
             // 
+            this.treeView2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.treeView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeView2.ImageIndex = 0;
@@ -120,27 +130,32 @@ namespace TreeViewSerialization
             this.treeView2.Location = new System.Drawing.Point(0, 0);
             this.treeView2.Name = "treeView2";
             this.treeView2.SelectedImageIndex = 0;
-            this.treeView2.Size = new System.Drawing.Size(363, 483);
+            this.treeView2.Size = new System.Drawing.Size(393, 294);
             this.treeView2.TabIndex = 4;
             // 
             // treeView1
             // 
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView1.BackColor = System.Drawing.SystemColors.Window;
+            this.treeView1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.treeView1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.treeView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeView1.HideSelection = false;
             this.treeView1.ImageIndex = 18;
             this.treeView1.ImageList = this.imageList1;
-            this.treeView1.Location = new System.Drawing.Point(0, 0);
+            this.treeView1.Location = new System.Drawing.Point(0, 37);
             this.treeView1.Name = "treeView1";
             this.treeView1.SelectedImageIndex = 7;
-            this.treeView1.Size = new System.Drawing.Size(367, 483);
+            this.treeView1.Size = new System.Drawing.Size(393, 247);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Location = new System.Drawing.Point(0, 1);
+            this.splitContainer1.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // splitContainer1.Panel1
             // 
@@ -149,14 +164,46 @@ namespace TreeViewSerialization
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.treeView2);
-            this.splitContainer1.Size = new System.Drawing.Size(734, 483);
-            this.splitContainer1.SplitterDistance = 367;
+            this.splitContainer1.Size = new System.Drawing.Size(393, 582);
+            this.splitContainer1.SplitterDistance = 284;
             this.splitContainer1.TabIndex = 5;
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.panel1.Controls.Add(this.textBox1);
+            this.panel1.Controls.Add(this.button1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(393, 35);
+            this.panel1.TabIndex = 6;
+            // 
+            // textBox1
+            // 
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox1.Location = new System.Drawing.Point(42, 8);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(186, 20);
+            this.textBox1.TabIndex = 1;
+            this.textBox1.Text = "<search>";
+            // 
+            // button1
+            // 
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.button1.Location = new System.Drawing.Point(232, 6);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "Find";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(733, 486);
+            this.ClientSize = new System.Drawing.Size(393, 582);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
@@ -165,6 +212,8 @@ namespace TreeViewSerialization
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -265,29 +314,45 @@ namespace TreeViewSerialization
 
         }
 
-        public void SearchProcess() {
-            Form2 dialog = new Form2();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                FindTreeNode(treeView1.Nodes, dialog.search);
+        public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText, ref List<TreeNode> findNodes)
+        {   
+            if (findNodes == null){
+                findNodes = new List<TreeNode>();
             }
-        }
-
-        public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText)
-        {
-    
             foreach (TreeNode child in treeNodeCollection)
-            {
-                if (child.Text == searchText)
+            {      
+            if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
                 {
-                    this.treeView1.SelectedNode = child;
+                    
+                    findNodes.Add(child);
 
                 }
                 else
                 {
-                    FindTreeNode(child.Nodes, searchText);
+                    FindTreeNode(child.Nodes, searchText, ref findNodes);
                 }
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (Count == 0)
+            {   
+                if(findNodes != null)        
+                    findNodes.Clear();
+                FindTreeNode(treeView1.Nodes, textBox1.Text, ref findNodes);
+            }
+            if (Count < findNodes.Count)
+                this.treeView1.SelectedNode = findNodes[Count];
+            if (Count == findNodes.Count)
+            {
+                Count = 0;
+            }
+            else
+            {
+                Count++;
+            }
+            
         }  
 	}
 }

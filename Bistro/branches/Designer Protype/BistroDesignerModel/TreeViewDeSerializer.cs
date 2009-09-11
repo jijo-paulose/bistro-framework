@@ -3,7 +3,6 @@ using System.Xml;
 using System.Windows.Forms;
 using System.Text;
 using System.Drawing;
-using TreeViewDeSerialization;
 
 namespace TreeViewSerialization
 {
@@ -169,15 +168,8 @@ namespace TreeViewSerialization
                 contextMenu.Items.Add(new ToolStripMenuItem("Resource", null, new EventHandler(ShowResource), "Resource"));
             if (mode != "Binding" && mode != "Find")
                 contextMenu.Items.Add(new ToolStripMenuItem("Show Source", null, new EventHandler(ShowSource), "ShowSource"));
-            if (mode == "Find")
-                contextMenu.Items.Add(new ToolStripMenuItem("Search", null, new EventHandler(ShowFindControl), "Search"));
 
             return contextMenu;
-        }
-
-        protected void ShowFindControl(object sender, EventArgs args)
-        {
-            this.myForm.SearchProcess();
         }
 
         protected void ShowBindings(object sender, EventArgs args)

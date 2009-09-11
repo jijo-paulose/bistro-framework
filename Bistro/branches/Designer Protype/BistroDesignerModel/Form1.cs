@@ -122,8 +122,10 @@ namespace TreeViewSerialization
             // 
             // treeView2
             // 
+            this.treeView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.treeView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeView2.ImageIndex = 0;
             this.treeView2.ImageList = this.imageList1;
@@ -135,9 +137,11 @@ namespace TreeViewSerialization
             // 
             // treeView1
             // 
+            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView1.BackColor = System.Drawing.SystemColors.Window;
             this.treeView1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.treeView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeView1.HideSelection = false;
             this.treeView1.ImageIndex = 18;
@@ -175,6 +179,7 @@ namespace TreeViewSerialization
             this.panel1.Controls.Add(this.button1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.MinimumSize = new System.Drawing.Size(390, 35);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(393, 35);
             this.panel1.TabIndex = 6;
@@ -206,6 +211,7 @@ namespace TreeViewSerialization
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(390, 39);
             this.Name = "Form1";
             this.Text = "Bistro Designer Mockup";
             this.Load += new System.EventHandler(this.Form1_Load);

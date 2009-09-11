@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="AdDisplay" imageindex="6" tag="Controller">
     <node text="Bindings" imageindex="6" tag="">
       <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
     </node>
     <node text="Resources" imageindex="6" tag="">
-       <node text="Resource2, (string)" imageindex="1" tag="Resource">
-         <node text="Controller, DataAccessControl" imageindex="10" tag="Resource"/>
-       </node>
-      <node text="Resource3, (string)" imageindex="0" tag="Resource">
-        <node text="Controller, AdDisplay" imageindex="10" tag="Resource"/>
-      </node>
+       <node text="Resource2: string" imageindex="1" tag="Resource"/>
+      <node text="Resource3: string" imageindex="0" tag="Resource"/>
     </node>
-  </node>
 </TreeView>
 

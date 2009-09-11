@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
     <node text="Controllers" imageindex="2" tag="">
-      <node text="AdDisplay" imageindex="26" tag="Controller">
+      <node text="AdDisplay" imageindex="26" tag="ControllerBottom">
       </node>
     </node>
-  <node text="Controller, AdDisplay" imageindex="10" tag="Resource"/>
 </TreeView>

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="DefaultController" imageindex="6" tag="Controller">
     <node text="Bindings" imageindex="6" tag="">
       <node text="[ANY]/?" imageindex="5" tag="Binding"/>
     </node>
-  </node>
 </TreeView>
 

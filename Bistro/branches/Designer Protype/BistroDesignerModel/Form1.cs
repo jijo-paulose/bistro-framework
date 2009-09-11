@@ -244,6 +244,13 @@ namespace TreeViewSerialization
         {
             treeView2.Nodes.Clear();
             string item = String.Empty;
+            
+            //Define Controllers
+            if (e.Node.Text.Contains("DefaultController"))
+            {
+                item = "DefaultController.xml";
+            }
+
             if (e.Node.Text == "DataAccessControl") {
                 item = "DataAccessControl.xml";
             }
@@ -258,6 +265,7 @@ namespace TreeViewSerialization
                 item = "AdUpdate.xml";
             }
 
+            //Define Resources
             if (e.Node.Text.Contains("Resource1"))
             {
                 item = "Resource1.xml";
@@ -290,11 +298,33 @@ namespace TreeViewSerialization
                 }
             }
 
-            if (e.Node.Text.Contains("DefaultController"))
+            //Define Bindings
+            if (e.Node.Text == "[ANY]/?")
             {
-                item = "DefaultController.xml";
+                item = "Binding1.xml";
             }
-            
+
+            if (e.Node.Text == "[ANY]/?/byId/{postingId}")
+            {
+                item = "Binding2.xml";
+            }
+
+            if (e.Node.Text == "[ANY]/?/byName/{shortName}")
+            {
+                item = "Binding3.xml";
+            }
+
+            if (e.Node.Text == "[GET]/posting/ad/byname/{shortName}")
+            {
+                item = "Binding4.xml";
+            }
+
+            if (e.Node.Text == "[POST]/posting/ad/byname/{shortName}")
+            {
+                item = "Binding5.xml";
+            }
+
+
             if (!string.IsNullOrEmpty(item))
                 ShowInfoTreeView(this.treeView2, item);
         }
@@ -323,9 +353,7 @@ namespace TreeViewSerialization
             {      
             if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
                 {
-                    
                     findNodes.Add(child);
-
                 }
                 else
                 {

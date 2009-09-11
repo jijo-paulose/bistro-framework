@@ -124,6 +124,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.ico" />
+    <Content Include="App_Data\Binding1.xml" />
+    <Content Include="App_Data\Binding2.xml" />
+    <Content Include="App_Data\Binding3.xml" />
+    <Content Include="App_Data\Binding4.xml" />
+    <Content Include="App_Data\Binding5.xml" />
     <Content Include="App_Data\DataAccessControl.xml" />
     <Content Include="App_Data\AdDisplay.xml" />
     <Content Include="App_Data\AdUpdate.xml" />

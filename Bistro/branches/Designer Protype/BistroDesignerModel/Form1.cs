@@ -236,6 +236,7 @@ namespace TreeViewSerialization
         private void LoadData()
         {
             this.treeView1.Nodes.Clear();
+            //To show the old version, you must change the name on MainTreeViewOld.xml
             serializer.DeserializeTreeView(this.treeView1, GetAppPath(Application.StartupPath) + "MainTreeView.xml");
             serializer.myForm = this;
         }
@@ -306,12 +307,12 @@ namespace TreeViewSerialization
                 item = "Binding1.xml";
             }
 
-            if (e.Node.Text == "[ANY]/?/byId/{postingId}")
+            if (e.Node.Text == "[ANY]/?/byId/{postingId}" || e.Node.Text == "/byId/{postingId}")
             {
                 item = "Binding2.xml";
             }
 
-            if (e.Node.Text == "[ANY]/?/byName/{shortName}")
+            if (e.Node.Text == "[ANY]/?/byname/{shortName}" || e.Node.Text == "/byname/{shortName}")
             {
                 item = "Binding3.xml";
             }
@@ -357,7 +358,7 @@ namespace TreeViewSerialization
             //Match with Contains
             if (child.Text.ToLower().Contains(searchText.ToLower()))
             
-            //strict match
+            //Strict match
             //if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
                 {
                     findNodes.Add(child);

@@ -16,7 +16,7 @@
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
       </node>
     </node>
-    <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding">
+    <node text="[ANY]/?/byname/{shortName}" imageindex="5" tag="Binding">
       <node text="Controllers" imageindex="2" tag="">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
       </node>

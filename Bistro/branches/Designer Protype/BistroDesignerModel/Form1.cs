@@ -113,6 +113,9 @@ namespace TreeViewSerialization
             this.imageList1.Images.SetKeyName(26, "controllerOut.bmp");
             this.imageList1.Images.SetKeyName(27, "controllerIn.bmp");
             this.imageList1.Images.SetKeyName(28, "resource.bmp");
+            this.imageList1.Images.SetKeyName(29, "ErrorBinder.bmp");
+            this.imageList1.Images.SetKeyName(30, "ErrorController.bmp");
+            this.imageList1.Images.SetKeyName(31, "Errorurl.PNG");
             // 
             // contextMenuStripSource
             // 
@@ -271,6 +274,16 @@ namespace TreeViewSerialization
             {
                 item = "AdUpdate.xml";
             }
+
+            if (e.Node.Text == "UrlDataAccessControl")
+            {
+                item = "UrlDataAccessControl.xml";
+            }
+
+            if (e.Node.Text == "AdConverter")
+            {
+                item = "AdConverter.xml";
+            }
             #endregion
 
             #region Define Resources
@@ -292,6 +305,16 @@ namespace TreeViewSerialization
             if (e.Node.Text.Contains ("Resource5"))
             {
                 item = "Resource5.xml";
+            }
+
+            if (e.Node.Text.Contains("Resource6"))
+            {
+                item = "Resource6.xml";
+            }
+
+            if (e.Node.Text.Contains("Resource7"))
+            {
+                item = "Resource7.xml";
             }
 
             if ((string)e.Node.Tag != "Binding")
@@ -331,6 +354,11 @@ namespace TreeViewSerialization
             if (e.Node.Text == "[POST]/posting/ad/byname/{shortName}")
             {
                 item = "Binding5.xml";
+            }
+
+            if (e.Node.Text == "[GET]/posting/adconvert//byurl/{url}")
+            {
+                item = "Binding6.xml";
             }
             #endregion
 

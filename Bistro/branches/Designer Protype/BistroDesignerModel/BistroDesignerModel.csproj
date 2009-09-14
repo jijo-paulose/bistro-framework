@@ -124,11 +124,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.ico" />
+    <Content Include="App_Data\AdConverter.xml" />
     <Content Include="App_Data\Binding1.xml" />
     <Content Include="App_Data\Binding2.xml" />
     <Content Include="App_Data\Binding3.xml" />
     <Content Include="App_Data\Binding4.xml" />
     <Content Include="App_Data\Binding5.xml" />
+    <Content Include="App_Data\Binding6.xml" />
     <Content Include="App_Data\DataAccessControl.xml" />
     <Content Include="App_Data\AdDisplay.xml" />
     <Content Include="App_Data\AdUpdate.xml" />
@@ -140,7 +142,10 @@
     <Content Include="App_Data\Resource2.xml" />
     <Content Include="App_Data\Resource3.xml" />
     <Content Include="App_Data\Resource5.xml" />
+    <Content Include="App_Data\Resource6.xml" />
+    <Content Include="App_Data\Resource7.xml" />
     <Content Include="App_Data\shortName.xml" />
+    <Content Include="App_Data\UrlDataAccessControl.xml" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -1,4 +1,4 @@
-﻿<TreeView>
+﻿<!--<TreeView>
   <node text="Generalization Bindings" imageindex="2" tag="">
     <node text="[ANY]/?" imageindex="5" tag="Binding"/>
   </node>
@@ -6,4 +6,5 @@
     <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
     <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
   </node>
-</TreeView>
+</TreeView>-->
+<node text="[ANY]/?/byname/{shortName}" imageindex="5" tag="Binding"/>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="Generalization Bindings" imageindex="2" tag="">
+  <!--<node text="Generalization Bindings" imageindex="2" tag="">
     <node text="[ANY]/?" imageindex="5" tag="Binding"/>
-  </node>
+  </node>-->
   <node text="Invalid format for binding URL" imageindex="9" tag=""/>
 </TreeView>
 

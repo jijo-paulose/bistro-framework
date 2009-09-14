@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="Controllers" imageindex="2" tag="">
+  <!--<node text="Controllers" imageindex="2" tag="">-->
     <node text="UrlDataAccessControl" imageindex="26" tag="ControllerBottom"/>
     <node text="AdConverter" imageindex="27" tag="ControllerBottom"/>
-  </node>
+  <!--</node>-->
   <node text="Resource type mismatch" imageindex="9" tag=""/>
 </TreeView>

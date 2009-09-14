@@ -308,7 +308,7 @@ namespace TreeViewSerialization
                 item = "Resource5.xml";
             }
 
-            if (e.Node.Text.Contains("Resource6"))
+            if (e.Node.Text.Contains("url"))
             {
                 item = "Resource6.xml";
             }

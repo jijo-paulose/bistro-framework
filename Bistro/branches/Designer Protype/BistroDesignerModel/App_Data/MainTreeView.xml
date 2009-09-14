@@ -3,59 +3,37 @@
   <node text="zzz-NoRecruiters-WFS" imageindex="4" tag="">
 
     <node text="[ANY]/?" imageindex="5" tag="Binding">
-      <node text="Controllers" imageindex="2" tag="">
         <node text="DefaultController" imageindex="3" tag="Controller"/>
-      </node>
     </node>
     <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="Binding">
-      <node text="Controllers" imageindex="2" tag="">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-      </node>
-      <node text="Resources" imageindex="2" tag="">
         <node text="postingId: string" imageindex="24" tag="Resource"/>
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
-      </node>
     </node>
     <node text="[ANY]/?/byname/{shortName}" imageindex="5" tag="Binding">
-      <node text="Controllers" imageindex="2" tag="">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-      </node>
-      <node text="Resources" imageindex="2" tag="">
         <node text="shortName: string" imageindex="22" tag="Resource"/>
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
-      </node>
     </node>
     <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
-      <node text="Controllers" imageindex="2" tag="">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
         <node text="AdDisplay" imageindex="3" tag="Controller"/>
-      </node>
-      <node text="Resources" imageindex="2" tag="">
         <node text="shortName: string" imageindex="22" tag="Resource"/>
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
         <node text="Resource3: string" imageindex="23" tag="Resource"/>
-      </node>
     </node>
     <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="29" tag="ErrorBinding">
-      <node text="Controllers" imageindex="2" tag="">
         <node text="UrlDataAccessControl" imageindex="30" tag="ErrorController"/>
         <node text="AdConverter" imageindex="30" tag="Controller"/>
-      </node>
-      <node text="Resources" imageindex="2" tag="">
         <node text="url: float" imageindex="31" tag="ErrorResource"/>
         <node text="Resource7: string" imageindex="23" tag="Resource"/>
-      </node>
     </node>
   <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
-      <node text="Controllers" imageindex="2" tag="">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
         <node text="AdUpdate" imageindex="3" tag="Controller"/>
-      </node>
-      <node text="Resources" imageindex="2" tag="">
         <node text="shortName: string" imageindex="22" tag="Resource"/>
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
         <node text="Resource5: dictionary" imageindex="23" tag="Resource"/>
-      </node>
     </node>
   </node>
 </TreeView>

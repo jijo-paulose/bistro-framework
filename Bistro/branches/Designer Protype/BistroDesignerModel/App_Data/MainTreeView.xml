@@ -36,13 +36,13 @@
         <node text="Resource3: string" imageindex="23" tag="Resource"/>
       </node>
     </node>
-    <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="29" tag="Binding">
+    <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="29" tag="ErrorBinding">
       <node text="Controllers" imageindex="2" tag="">
-        <node text="UrlDataAccessControl" imageindex="30" tag="Controller"/>
+        <node text="UrlDataAccessControl" imageindex="30" tag="ErrorController"/>
         <node text="AdConverter" imageindex="3" tag="Controller"/>
       </node>
       <node text="Resources" imageindex="2" tag="">
-        <node text="Resource6: float" imageindex="31" tag="Resource"/>
+        <node text="Resource6: float" imageindex="31" tag="ErrorResource"/>
         <node text="Resource7: string" imageindex="23" tag="Resource"/>
       </node>
     </node>

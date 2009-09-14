@@ -195,6 +195,7 @@ namespace TreeViewSerialization
             this.textBox1.Size = new System.Drawing.Size(186, 20);
             this.textBox1.TabIndex = 1;
             this.textBox1.Text = "<search>";
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // button1
             // 
@@ -389,19 +390,26 @@ namespace TreeViewSerialization
             foreach (TreeNode child in treeNodeCollection)
             {
 
-            //Match with Contains
-            if (child.Text.ToLower().Contains(searchText.ToLower()))
-            
-            //Strict match
-            //if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
+                //Strict match
+                //if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
+                
+                //Match with Contains
+                if (child.Text.ToLower().Contains(searchText.ToLower()) || IsErrorTag(child, searchText))
                 {
                     findNodes.Add(child);
                 }
-                else
-                {
-                    FindTreeNode(child.Nodes, searchText, ref findNodes);
-                }
+                FindTreeNode(child.Nodes, searchText, ref findNodes);
             }
+        }
+
+        //Func. draws the erroneous nodes
+        private bool IsErrorTag(TreeNode child, string searchText) {
+            Regex Parser = new Regex(searchText.ToLower());
+            Match match = Parser.Match(child.Tag.ToString().ToLower());
+            if (match.Success)
+                return true;
+            return false;
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -423,6 +431,13 @@ namespace TreeViewSerialization
                 Count++;
             }
             
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (findNodes != null)
+                findNodes.Clear();
+            Count = 0;
         }  
 	}
 }

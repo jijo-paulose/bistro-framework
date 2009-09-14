@@ -247,7 +247,7 @@ namespace TreeViewSerialization
         {
             this.treeView1.Nodes.Clear();
             //To show the old version, you must change the name on MainTreeViewOld.xml
-            serializer.DeserializeTreeView(this.treeView1, GetAppPath(Application.StartupPath) + "MainTreeView.xml");
+            serializer.DeserializeTreeView(this.treeView1, GetAppPath(Application.StartupPath) + "MainTreeViewOld.xml");
             serializer.myForm = this;
         }
 

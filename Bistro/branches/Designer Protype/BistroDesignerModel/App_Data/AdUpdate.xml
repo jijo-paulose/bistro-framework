@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-    <node text="Bindings" imageindex="6" tag="">
+    <!--<node text="Bindings" imageindex="6" tag="">-->
       <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
-    </node>
-    <node text="Resources" imageindex="6" tag="">
+    <!--</node>-->
+    <!--<node text="Resources" imageindex="6" tag="">-->
       <node text="Resource2: string" imageindex="1" tag="Resource"/>
       <node text="Resource5: dictionary" imageindex="0" tag="Resource"/>
-    </node>
+    <!--</node>-->
 </TreeView>
 
 

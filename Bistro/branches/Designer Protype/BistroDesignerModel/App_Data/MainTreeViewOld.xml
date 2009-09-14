@@ -22,6 +22,12 @@
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
         <node text="Resource3: string" imageindex="23" tag="Resource"/>
     </node>
+    <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="29" tag="ErrorBinding">
+      <node text="UrlDataAccessControl" imageindex="30" tag="ErrorController"/>
+      <node text="AdConverter" imageindex="30" tag="ErrorController"/>
+      <node text="url: float" imageindex="31" tag="ErrorResource"/>
+      <node text="Resource7: string" imageindex="23" tag="Resource"/>
+    </node>
     <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
         <node text="AdUpdate" imageindex="3" tag="Controller"/>

@@ -28,6 +28,8 @@ namespace TreeViewSerialization
         private int Count = 0;
         private List<TreeNode> findNodes = null;
         private Button button1;
+        private Label label1;
+        private Label label2;
         TreeViewDeSerializer serializer = new TreeViewDeSerializer();
         
 		public Form1()
@@ -74,6 +76,8 @@ namespace TreeViewSerialization
             this.panel1 = new System.Windows.Forms.Panel();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -132,10 +136,10 @@ namespace TreeViewSerialization
             this.treeView2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeView2.ImageIndex = 0;
             this.treeView2.ImageList = this.imageList1;
-            this.treeView2.Location = new System.Drawing.Point(0, 0);
+            this.treeView2.Location = new System.Drawing.Point(0, -1);
             this.treeView2.Name = "treeView2";
             this.treeView2.SelectedImageIndex = 0;
-            this.treeView2.Size = new System.Drawing.Size(393, 294);
+            this.treeView2.Size = new System.Drawing.Size(391, 250);
             this.treeView2.TabIndex = 4;
             // 
             // treeView1
@@ -149,10 +153,10 @@ namespace TreeViewSerialization
             this.treeView1.HideSelection = false;
             this.treeView1.ImageIndex = 18;
             this.treeView1.ImageList = this.imageList1;
-            this.treeView1.Location = new System.Drawing.Point(0, 37);
+            this.treeView1.Location = new System.Drawing.Point(0, 66);
             this.treeView1.Name = "treeView1";
             this.treeView1.SelectedImageIndex = 7;
-            this.treeView1.Size = new System.Drawing.Size(393, 247);
+            this.treeView1.Size = new System.Drawing.Size(393, 258);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
@@ -172,19 +176,21 @@ namespace TreeViewSerialization
             // 
             this.splitContainer1.Panel2.Controls.Add(this.treeView2);
             this.splitContainer1.Size = new System.Drawing.Size(393, 582);
-            this.splitContainer1.SplitterDistance = 284;
+            this.splitContainer1.SplitterDistance = 327;
             this.splitContainer1.TabIndex = 5;
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.textBox1);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.MinimumSize = new System.Drawing.Size(390, 35);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(393, 35);
+            this.panel1.Size = new System.Drawing.Size(393, 60);
             this.panel1.TabIndex = 6;
             // 
             // textBox1
@@ -207,6 +213,23 @@ namespace TreeViewSerialization
             this.button1.Text = "Find";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(45, 37);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(45, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Binding:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(97, 37);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(0, 13);
+            this.label2.TabIndex = 3;
             // 
             // Form1
             // 
@@ -257,6 +280,16 @@ namespace TreeViewSerialization
             string item = String.Empty;
 
             #region Define Controllers
+            if (e.Node.Text.Contains("c1"))
+            {
+                item = "c1.xml";
+            }
+            
+            if (e.Node.Text.Contains("c2"))
+            {
+                item = "c2.xml";
+            } 
+            
             if (e.Node.Text.Contains("DefaultController"))
             {
                 item = "DefaultController.xml";
@@ -332,35 +365,60 @@ namespace TreeViewSerialization
             #endregion
 
             #region Define Bindings
+            
+            string txtBinding = String.Empty;
+            if (e.Node.Text == "[ANY]/a/*/b/c")
+            {
+                txtBinding = e.Node.Text;
+            }
+
+            if (e.Node.Text == "[ANY]/a/z/*/c")
+            {
+                txtBinding = e.Node.Text;
+            }
+
+            if (e.Node.Text == "[GET]/a/z/b/c")
+            {
+                txtBinding = e.Node.Text;
+            }
+
             if (e.Node.Text == "[ANY]/?")
             {
+                txtBinding = e.Node.Text;
                 item = "Binding1.xml";
             }
 
             if (e.Node.Text == "[ANY]/?/byId/{postingId}" || e.Node.Text == "/byId/{postingId}")
             {
+                txtBinding = "[ANY]/?/byId/{postingId}";
                 item = "Binding2.xml";
             }
 
             if (e.Node.Text == "[ANY]/?/byname/{shortName}" || e.Node.Text == "/byname/{shortName}")
             {
+                txtBinding = "[ANY]/?/byname/{shortName}";
                 item = "Binding3.xml";
             }
 
             if (e.Node.Text == "[GET]/posting/ad/byname/{shortName}")
             {
+                txtBinding = e.Node.Text;
                 item = "Binding4.xml";
             }
 
             if (e.Node.Text == "[POST]/posting/ad/byname/{shortName}")
             {
+                txtBinding = e.Node.Text;
                 item = "Binding5.xml";
             }
 
             if (e.Node.Text == "[GET]/posting/adconvert//byurl/{url}")
             {
+                txtBinding = e.Node.Text;
                 item = "Binding6.xml";
             }
+
+            label2.Text = txtBinding;
             #endregion
 
             if (!string.IsNullOrEmpty(item))

@@ -4,8 +4,8 @@
     <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="5" tag="Binding"/>
   <!--</node>-->
   <!--<node text="Resources" imageindex="6" tag="">-->
-    <node text="url: float" imageindex="0" tag="Resource"/>
-    <node text="Resource7: string" imageindex="1" tag="Resource"/>
+    <node text="url: float" imageindex="0" tag="ResourceBottom"/>
+    <node text="Resource7: string" imageindex="1" tag="ResourceBottom"/>
   <!--</node>-->
   <node text="Execution order for the controllers could not be determined because of a resource reference loop" imageindex="9" tag=""/>
 </TreeView>

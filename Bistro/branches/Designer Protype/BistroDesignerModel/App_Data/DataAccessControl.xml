@@ -7,8 +7,8 @@
       <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
     <!--</node>-->
     <!--<node text="Resources" imageindex="6" tag="">-->
-      <node text="Resource2: string" imageindex="0" tag="Resource"/>
-      <node text="shortName: string" imageindex="1" tag="Resource"/>
-      <node text="postingId: string" imageindex="1" tag="Resource"/>
+      <node text="Resource2: string" imageindex="0" tag="ResourceBottom"/>
+      <node text="shortName: string" imageindex="1" tag="ResourceBottom"/>
+      <node text="postingId: string" imageindex="1" tag="ResourceBottom"/>
     <!--</node>-->
 </TreeView> 

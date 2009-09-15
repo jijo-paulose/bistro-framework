@@ -131,6 +131,8 @@
     <Content Include="App_Data\Binding4.xml" />
     <Content Include="App_Data\Binding5.xml" />
     <Content Include="App_Data\Binding6.xml" />
+    <Content Include="App_Data\c1.xml" />
+    <Content Include="App_Data\c2.xml" />
     <Content Include="App_Data\DataAccessControl.xml" />
     <Content Include="App_Data\AdDisplay.xml" />
     <Content Include="App_Data\AdUpdate.xml" />

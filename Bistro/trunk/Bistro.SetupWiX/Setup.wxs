@@ -3,7 +3,7 @@
   <?define ProductVersion="0.9.1" ?>
   <?define ProductVersionTitle="0.9.1.0" ?>
   <?define UpgradeCode="{EB7EA168-9F1A-45EF-8EDB-06AC4E4C69D6}"?>
-  <Product Id="6E90F27B-DF9C-4E32-8A47-E4D526B3D249" Name="Bistro $(var.ProductVersionTitle)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Hill30" UpgradeCode="$(var.UpgradeCode)">
+  <Product Id="FDEC07EB-0817-4B10-850C-3DDC05AAD540" Name="Bistro $(var.ProductVersionTitle)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Hill30" UpgradeCode="$(var.UpgradeCode)">
     <Package InstallerVersion="200" Compressed="yes" />
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
     <Upgrade Id="$(var.UpgradeCode)">
@@ -32,6 +32,7 @@
             <Component Id="BistroAssemblies" Guid="5739EC31-4EA2-4252-A451-14DDF02B2556">
               <File Id="Bistro.Core.dll" Name="$(var.Bistro.Core.TargetFileName)" Source="$(var.Bistro.Core.TargetPath)" DiskId="1" />
               <File Id="Bistro.Extensions.dll" Name="$(var.Bistro.Extensions.TargetFileName)" Source="$(var.Bistro.Extensions.TargetPath)" DiskId="1" />
+              <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="..\lib\Newtonsoft.Json.dll" />
             </Component>
             <Component Id="Readme" Guid="5F247096-2032-4548-AFEE-687203A14C7E">
               <File Id="Readme.txt" Name="Readme.txt" ShortName="README.TXT" Source="Readme.txt" />

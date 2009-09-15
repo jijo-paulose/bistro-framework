@@ -74,10 +74,10 @@ namespace TreeViewSerialization
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -193,6 +193,23 @@ namespace TreeViewSerialization
             this.panel1.Size = new System.Drawing.Size(393, 60);
             this.panel1.TabIndex = 6;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(97, 37);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(0, 13);
+            this.label2.TabIndex = 3;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(45, 37);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(45, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Binding:";
+            // 
             // textBox1
             // 
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -202,6 +219,7 @@ namespace TreeViewSerialization
             this.textBox1.TabIndex = 1;
             this.textBox1.Text = "<search>";
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
             // button1
             // 
@@ -213,23 +231,6 @@ namespace TreeViewSerialization
             this.button1.Text = "Find";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(45, 37);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(45, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Binding:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(97, 37);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(0, 13);
-            this.label2.TabIndex = 3;
             // 
             // Form1
             // 
@@ -472,6 +473,11 @@ namespace TreeViewSerialization
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (sender.GetType().Name == "TextBox")
+            {
+                button1.Select();
+            }
+
             if (Count == 0)
             {   
                 if(findNodes != null)        
@@ -496,6 +502,15 @@ namespace TreeViewSerialization
             if (findNodes != null)
                 findNodes.Clear();
             Count = 0;
-        }  
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyValue == 13)
+            {
+                this.button1_Click(sender,new EventArgs());
+            }
+        }
+ 
 	}
 }

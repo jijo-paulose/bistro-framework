@@ -30,25 +30,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bistro.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Bistro.Core, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Bistro\BistroCore\bin\Bistro.Core.dll</HintPath>
+      <HintPath>..\lib\Bistro.Core.dll</HintPath>
     </Reference>
     <Reference Include="Bistro.FSharpExtensions, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\FSharpExtensions\Bistro.FSharpExtensions\bin\Bistro.FSharpExtensions.dll</HintPath>
+      <HintPath>..\lib\Bistro.FSharpExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="NDjango.BistroIntegration, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NDjango.BistroIntegration, Version=0.9.1.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\NDjango\Integration\Bistro\bin\NDjango.BistroIntegration.dll</HintPath>
+      <HintPath>..\lib\NDjango.BistroIntegration.dll</HintPath>
     </Reference>
-    <Reference Include="NDjango.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NDjango.Core, Version=0.9.1.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\NDjango\NDjango\NDjangoParser\bin\NDjango.Core.dll</HintPath>
+      <HintPath>..\lib\NDjango.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NDjango.Filters, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NDjango.Filters, Version=0.9.1.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\NDjango\NDjango\NDjangoParserFilters\bin\NDjango.Filters.dll</HintPath>
+      <HintPath>..\lib\NDjango.Filters.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -93,7 +93,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>4338</DevelopmentServerPort>
+          <DevelopmentServerPort>3378</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

@@ -30,18 +30,18 @@
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bistro.Core, Version=0.9.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Bistro.Core, Version=0.9.1.0, Culture=neutral, PublicKeyToken=null">
       <Name>Bistro.Core</Name>
       <AssemblyName>Bistro.Core.dll</AssemblyName>
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Bistro\BistroCore\bin\Bistro.Core.dll</HintPath>
+      <HintPath>..\lib\Bistro.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Bistro.FSharpExtensions, Version=0.9.0.0, Culture=neutral, PublicKeyToken=null">
       <Name>Bistro.FSharpExtensions</Name>
       <AssemblyName>Bistro.FSharpExtensions.dll</AssemblyName>
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\FSharpExtensions\Bistro.FSharpExtensions\bin\Bistro.FSharpExtensions.dll</HintPath>
+      <HintPath>..\lib\Bistro.FSharpExtensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />

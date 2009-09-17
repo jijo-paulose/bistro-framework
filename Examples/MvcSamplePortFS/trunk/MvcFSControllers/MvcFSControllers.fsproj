@@ -31,16 +31,18 @@
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bistro.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Bistro.Core, Version=0.9.0.0, Culture=neutral, PublicKeyToken=null">
       <Name>Bistro.Core</Name>
       <AssemblyName>Bistro.Core.dll</AssemblyName>
-      <HintPath>..\..\..\Bistro\BistroCore\bin\Bistro.Core.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Bistro.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Bistro.FSharpExtensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Bistro.FSharpExtensions, Version=0.9.0.0, Culture=neutral, PublicKeyToken=null">
       <Name>Bistro.FSharpExtensions</Name>
       <AssemblyName>Bistro.FSharpExtensions.dll</AssemblyName>
-      <HintPath>..\..\..\FSharpExtensions\Bistro.FSharpExtensions\bin\Bistro.FSharpExtensions.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Bistro.FSharpExtensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

@@ -31,6 +31,9 @@ namespace TreeViewSerialization
         private Label label1;
         private Label label2;
         TreeViewDeSerializer serializer = new TreeViewDeSerializer();
+        string txtBinding = String.Empty;
+        string selectedTreeNode = String.Empty;
+
         
 		public Form1()
 		{
@@ -141,6 +144,7 @@ namespace TreeViewSerialization
             this.treeView2.SelectedImageIndex = 0;
             this.treeView2.Size = new System.Drawing.Size(393, 259);
             this.treeView2.TabIndex = 4;
+            this.treeView2.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView2_AfterSelect);
             // 
             // treeView1
             // 
@@ -281,6 +285,26 @@ namespace TreeViewSerialization
             string item = String.Empty;
 
             #region Define Controllers
+            if (e.Node.Text.Contains("c3"))
+            {
+                item = "c3.xml";
+            } 
+
+            if (e.Node.Text.Contains("c4"))
+            {
+                item = "c4.xml";
+            }
+            
+            if (e.Node.Text.Contains("c5"))
+            {
+                item = "c5.xml";
+            }
+            
+            if (e.Node.Text.Contains("c6"))
+            {
+                item = "c6.xml";
+            } 
+
             if (e.Node.Text.Contains("c1"))
             {
                 item = "c1.xml";
@@ -367,7 +391,22 @@ namespace TreeViewSerialization
 
             #region Define Bindings
             
-            string txtBinding = String.Empty;
+            if (e.Node.Text == "[ANY]/*/add")
+            {
+                txtBinding = e.Node.Text;
+            }
+            if (e.Node.Text == "/resume/add")
+            {
+                txtBinding = "[ANY]/resume/add";
+            }
+            if (e.Node.Text == "/request/add")
+            {
+                txtBinding = "[ANY]/request/add";
+            }
+            if (e.Node.Text == "[GET]/request/new/add")
+            {
+                txtBinding = e.Node.Text;
+            }
             if (e.Node.Text == "[ANY]/a/*/b/c")
             {
                 txtBinding = e.Node.Text;
@@ -441,7 +480,7 @@ namespace TreeViewSerialization
 
         }
 
-        public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText, ref List<TreeNode> findNodes)
+        public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText, ref List<TreeNode> findNodes, bool mode)
         {   
             if (findNodes == null){
                 findNodes = new List<TreeNode>();
@@ -453,19 +492,35 @@ namespace TreeViewSerialization
                 //if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
                 
                 //Match with Contains
-                if (child.Text.ToLower().Contains(searchText.ToLower()) || IsErrorTag(child, searchText))
+                if (mode)
                 {
-                    findNodes.Add(child);
+                    if (child.Text.ToLower().Contains(searchText.ToLower()) || IsErrorTag(child, searchText))
+                        findNodes.Add(child);
                 }
-                FindTreeNode(child.Nodes, searchText, ref findNodes);
+                else
+                {
+                    if (IsCurrentNodeText(child, searchText) || IsErrorTag(child, searchText))
+                        findNodes.Add(child);
+                }
+                FindTreeNode(child.Nodes, searchText, ref findNodes, mode);
             }
         }
 
-        //Func. draws the erroneous nodes
+        //Func. represents the erroneous nodes
         private bool IsErrorTag(TreeNode child, string searchText) {
-            Regex Parser = new Regex(searchText.ToLower());
-            Match match = Parser.Match(child.Tag.ToString().ToLower());
+            if (child.Tag.ToString().ToLower().Contains(searchText.ToLower()))
+                return true;
+            return false;
+
+        }
+
+        private bool IsCurrentNodeText(TreeNode child, string searchText)
+        {
+            Regex Parser = new Regex(child.Text.ToString().ToLower());
+            Match match = Parser.Match(searchText.ToLower());
             if (match.Success)
+                return true;
+            if (child.Text.ToString().ToLower() == searchText.ToLower())
                 return true;
             return false;
 
@@ -482,7 +537,7 @@ namespace TreeViewSerialization
             {   
                 if(findNodes != null)        
                     findNodes.Clear();
-                FindTreeNode(treeView1.Nodes, textBox1.Text, ref findNodes);
+                FindTreeNode(treeView1.Nodes, textBox1.Text, ref findNodes, true);
             }
             if (Count < findNodes.Count)
                 this.treeView1.SelectedNode = findNodes[Count];
@@ -511,6 +566,16 @@ namespace TreeViewSerialization
                 this.button1_Click(sender,new EventArgs());
             }
         }
- 
+
+        public void goToBinding(object sender, EventArgs args) {
+            FindTreeNode(treeView1.Nodes, serializer.SelectedTreeNode, ref findNodes, false);
+            this.treeView1.SelectedNode = findNodes[findNodes.Count-1];
+        }
+
+        private void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            serializer.SelectedTreeNode = e.Node.Text;
+        }
+
 	}
 }

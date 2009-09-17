@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<TreeView>
+  <node text="[ANY]/*/add" imageindex="5" tag="Binding" fontstyle="Bold"/>
+  <node text="[ANY]/resume/add" imageindex="5" tag="Binding"/>
+  <node text="[ANY]/request/add" imageindex="5" tag="Binding"/>
+</TreeView>

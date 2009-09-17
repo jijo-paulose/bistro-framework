@@ -12,6 +12,7 @@ namespace TreeViewSerialization
 	public class TreeViewDeSerializer
 	{
         public Form1 myForm;
+        private string selectedTreeNode = String.Empty;
 		// Xml tag for node, e.g. 'node' in case of <node></node>
 		private const string XmlNodeTag = "node";
         // Xml attributes for node e.g. <node text="DataAccessControl" imageindex="6" tag="Controller"></node>
@@ -21,7 +22,7 @@ namespace TreeViewSerialization
         private const string XmlNodeMarkAtt = "mark";
         private const string XmlNodeImageIndexAtt = "imageindex";
 
-
+        public string SelectedTreeNode { set { selectedTreeNode = value; } get { return selectedTreeNode; } }
         public TreeViewDeSerializer()
 		{
 			//
@@ -163,7 +164,7 @@ namespace TreeViewSerialization
             if (null == contextMenu ||string.IsNullOrEmpty(mode))
                 return null;
             if (mode == "Binding")
-                contextMenu.Items.Add(new ToolStripMenuItem("Go to Binding", null, new EventHandler(ShowBindings), "Bindings"));
+                contextMenu.Items.Add(new ToolStripMenuItem("Go to Binding", null, new EventHandler(myForm.goToBinding), "Bindings"));
             if (mode == "ResourceBottom")
                 contextMenu.Items.Add(new ToolStripMenuItem("Go to Source", null, new EventHandler(ShowResource), "Resource"));
             if (mode == "ControllerBottom" || mode == "Controller")

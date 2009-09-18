@@ -417,7 +417,7 @@ namespace TreeViewSerialization
                 txtBinding = e.Node.Text;
             }
 
-            if (e.Node.Text == "[GET]/a/z/b/c")
+            if (e.Node.Text == "[ANY]/a/z/b/c")
             {
                 txtBinding = e.Node.Text;
             }

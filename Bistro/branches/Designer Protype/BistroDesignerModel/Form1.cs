@@ -144,7 +144,7 @@ namespace TreeViewSerialization
             this.treeView2.SelectedImageIndex = 0;
             this.treeView2.Size = new System.Drawing.Size(393, 259);
             this.treeView2.TabIndex = 4;
-            this.treeView2.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView2_AfterSelect);
+            this.treeView2.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView2_NodeMouseClick);
             // 
             // treeView1
             // 
@@ -572,7 +572,7 @@ namespace TreeViewSerialization
             this.treeView1.SelectedNode = findNodes[findNodes.Count-1];
         }
 
-        private void treeView2_AfterSelect(object sender, TreeViewEventArgs e)
+        private void treeView2_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             serializer.SelectedTreeNode = e.Node.Text;
         }

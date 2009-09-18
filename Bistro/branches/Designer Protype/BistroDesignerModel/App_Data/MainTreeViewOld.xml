@@ -6,11 +6,17 @@
         <node text="DefaultController" imageindex="3" tag="Controller"/>
       <node text="/byId/{postingId}" imageindex="5" tag="">
           <node text="DataAccessControl" imageindex="3" tag="Controller"/>
+          <!--new-->
+          <node text="DefaultController" imageindex="3" tag="Controller"/>
+          <!--new-->
           <node text="postingId: string" imageindex="24" tag="Resource"/>
           <node text="Resource2: string" imageindex="23" tag="Resource"/>
       </node>
       <node text="/byname/{shortName}" imageindex="5" tag="">
           <node text="DataAccessControl" imageindex="3" tag="Controller"/>
+          <!--new-->
+          <node text="DefaultController" imageindex="3" tag="Controller"/>
+          <!--new-->
           <node text="shortName: string" imageindex="22" tag="Resource"/>
           <node text="Resource2: string" imageindex="23" tag="Resource"/>
       </node>
@@ -19,9 +25,15 @@
       <node text="c3" imageindex="3" tag="Controller"/>
       <node text="/resume/add" imageindex="5" tag="">
         <node text="c4" imageindex="3" tag="Controller"/>
+        <!--new-->
+        <node text="c3" imageindex="3" tag="Controller"/>
+        <!--new-->
       </node>
       <node text="/request/add" imageindex="5" tag="">
         <node text="c5" imageindex="3" tag="Controller"/>
+        <!--new-->
+        <node text="c3" imageindex="3" tag="Controller"/>
+        <!--new-->
       </node>
     </node>
     <node text="[ANY]/a/*/b/c" imageindex="5" tag="">
@@ -37,6 +49,9 @@
     <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
         <node text="AdDisplay" imageindex="3" tag="Controller"/>
+        <!--new-->
+        <node text="DefaultController" imageindex="3" tag="Controller"/>
+        <!--new-->
         <node text="shortName: string" imageindex="22" tag="Resource"/>
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
         <node text="Resource3: string" imageindex="23" tag="Resource"/>
@@ -53,6 +68,9 @@
     <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
         <node text="AdUpdate" imageindex="3" tag="Controller"/>
+        <!--new-->
+        <node text="DefaultController" imageindex="3" tag="Controller"/>
+        <!--new-->
         <node text="shortName: string" imageindex="22" tag="Resource"/>
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
         <node text="Resource5: dictionary" imageindex="23" tag="Resource"/>

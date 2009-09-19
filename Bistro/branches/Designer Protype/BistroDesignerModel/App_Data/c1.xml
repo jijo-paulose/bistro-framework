@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="[ANY]/a/*/b/c" imageindex="5" tag="Binding" fontstyle="Bold"/>
-  <node text="[ANY]/a/z/b/c" imageindex="5" tag="Binding"/>
+  <node text="[ANY]/a/*/b/c" imageindex="5" tag="GotoBinding" fontstyle="Bold"/>
+  <node text="[ANY]/a/z/b/c" imageindex="5" tag="GotoBinding"/>
 </TreeView>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
   <!--<node text="Bindings" imageindex="6" tag="">-->
-    <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="5" tag="Binding"/>
+    <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="5" tag="GotoBinding"/>
   <!--</node>-->
   <!--<node text="Resources" imageindex="6" tag="">-->
     <node text="url: float" imageindex="0" tag="ResourceBottom"/>

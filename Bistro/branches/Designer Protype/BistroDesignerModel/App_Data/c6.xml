@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
-  <node text="[GET]/request/new/add" imageindex="5" tag="Binding"/>
+  <node text="[GET]/request/new/add" imageindex="5" tag="GotoBinding"/>
 </TreeView>

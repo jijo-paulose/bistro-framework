@@ -33,6 +33,8 @@ namespace TreeViewSerialization
         TreeViewDeSerializer serializer = new TreeViewDeSerializer();
         string txtBinding = String.Empty;
         string selectedTreeNode = String.Empty;
+        private Stack stack = new Stack();
+
 
         
 		public Form1()
@@ -283,96 +285,48 @@ namespace TreeViewSerialization
         {
             treeView2.Nodes.Clear();
             string item = String.Empty;
-
             #region Define Controllers
-            if (e.Node.Text.Contains("c3"))
+            if (e.Node.Tag.ToString() == "Controller")
             {
-                item = "c3.xml";
-            } 
-
-            if (e.Node.Text.Contains("c4"))
-            {
-                item = "c4.xml";
-            }
-            
-            if (e.Node.Text.Contains("c5"))
-            {
-                item = "c5.xml";
-            }
-            
-            if (e.Node.Text.Contains("c6"))
-            {
-                item = "c6.xml";
-            } 
-
-            if (e.Node.Text.Contains("c1"))
-            {
-                item = "c1.xml";
-            }
-            
-            if (e.Node.Text.Contains("c2"))
-            {
-                item = "c2.xml";
-            } 
-            
-            if (e.Node.Text.Contains("DefaultController"))
-            {
-                item = "DefaultController.xml";
-            }
-
-            if (e.Node.Text == "DataAccessControl") {
-                item = "DataAccessControl.xml";
-            }
-
-            if (e.Node.Text == "AdDisplay")
-            {
-                item = "AdDisplay.xml";
-            }
-
-            if (e.Node.Text == "AdUpdate")
-            {
-                item = "AdUpdate.xml";
-            }
-
-            if (e.Node.Text == "UrlDataAccessControl")
-            {
-                item = "UrlDataAccessControl.xml";
-            }
-
-            if (e.Node.Text == "AdConverter")
-            {
-                item = "AdConverter.xml";
+                txtBinding = GetBindingPath(e.Node);
+                item = e.Node.Text + ".xml";
             }
             #endregion
 
             #region Define Resources
             if (e.Node.Text.Contains("Resource1"))
             {
+                txtBinding = GetBindingPath(e.Node);
                 item = "Resource1.xml";
             }
-            
+
             if (e.Node.Text.Contains("Resource2"))
             {
+                txtBinding = GetBindingPath(e.Node);
                 item = "Resource2.xml";
             }
 
             if (e.Node.Text.Contains("Resource3"))
             {
+                txtBinding = GetBindingPath(e.Node);
                 item = "Resource3.xml";
             }
 
-            if (e.Node.Text.Contains ("Resource5"))
+            if (e.Node.Text.Contains("Resource5"))
             {
+                txtBinding = GetBindingPath(e.Node);
                 item = "Resource5.xml";
             }
 
             if (e.Node.Text.Contains("url"))
             {
+                txtBinding = GetBindingPath(e.Node);
                 item = "Resource6.xml";
             }
 
             if (e.Node.Text.Contains("Resource7"))
             {
+                txtBinding = GetBindingPath(e.Node);
                 item = "Resource7.xml";
             }
 
@@ -380,10 +334,12 @@ namespace TreeViewSerialization
             {
                 if (e.Node.Text.Contains("postingId"))
                 {
+                    txtBinding = GetBindingPath(e.Node);
                     item = "postingId.xml";
                 }
                 if (e.Node.Text.Contains("shortName"))
                 {
+                    txtBinding = GetBindingPath(e.Node);
                     item = "shortName.xml";
                 }
             }
@@ -430,13 +386,13 @@ namespace TreeViewSerialization
 
             if (e.Node.Text == "[ANY]/?/byId/{postingId}" || e.Node.Text == "/byId/{postingId}")
             {
-                txtBinding = "[ANY]/?/byId/{postingId}";
+                txtBinding = GetBindingPath(e.Node);
                 item = "Binding2.xml";
             }
 
             if (e.Node.Text == "[ANY]/?/byname/{shortName}" || e.Node.Text == "/byname/{shortName}")
             {
-                txtBinding = "[ANY]/?/byname/{shortName}";
+                txtBinding = GetBindingPath(e.Node);
                 item = "Binding3.xml";
             }
 
@@ -465,6 +421,37 @@ namespace TreeViewSerialization
                 ShowInfoTreeView(this.treeView2, item);
         }
 
+        private string GetBindingPath(TreeNode node) {
+            string value = string.Empty;
+            if (node == null)
+                return string.Empty;
+            if (node.Tag.ToString() == "Binding" || node.Tag.ToString() == "ErrorBinding")
+            {
+                stack.Push(node.Text);
+                if (node.Parent.Tag.ToString() == "Binding" || node.Parent.Tag.ToString() == "ErrorBinding")
+                {
+                    stack.Push(node.Parent.Text);
+                }
+                StringBuilder sb = new StringBuilder(); 
+                while (stack.Count > 0) {
+                    string current = stack.Pop().ToString();
+                    if (current == "[ANY]/*/add" && stack.Count > 0)
+                    {
+                        return GetControlBind(current, stack.Pop().ToString());
+                    }
+                    else
+                    {
+                        sb = sb.Append(current);
+                    }
+                }
+                return sb.ToString();
+            }
+            else {
+                value = GetBindingPath(node.Parent);
+            }
+            return value;
+        }
+
         private void ShowInfoTreeView(TreeView treeView, string item)
         {
             treeView.Nodes.Clear();
@@ -479,6 +466,15 @@ namespace TreeViewSerialization
          @"app_data\");
 
         }
+
+
+		private string GetControlBind(string input, string input1)
+		{
+			return Regex.Replace(input,
+		 @"/.*/add",
+		 input1);
+
+		}
 
         public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText, ref List<TreeNode> findNodes, bool mode)
         {   

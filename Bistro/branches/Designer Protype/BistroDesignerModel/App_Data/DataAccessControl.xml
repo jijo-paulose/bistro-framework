@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <TreeView>
     <!--<node text="Bindings" imageindex="6" tag="">-->
-      <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="Binding" fontstyle="Bold"/>
-      <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="Binding" fontstyle="Bold"/>
-      <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
-      <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding"/>
+      <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="GotoBinding" fontstyle="Bold"/>
+      <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="GotoBinding" fontstyle="Bold"/>
+      <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="GotoBinding"/>
+      <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="GotoBinding"/>
     <!--</node>-->
     <!--<node text="Resources" imageindex="6" tag="">-->
       <node text="Resource2: string" imageindex="0" tag="ResourceBottom"/>

@@ -163,7 +163,7 @@ namespace TreeViewSerialization
         {
             if (null == contextMenu ||string.IsNullOrEmpty(mode))
                 return null;
-            if (mode == "Binding")
+            if (mode == "GotoBinding")
                 contextMenu.Items.Add(new ToolStripMenuItem("Go to Binding", null, new EventHandler(myForm.goToBinding), "Bindings"));
             if (mode == "ResourceBottom")
                 contextMenu.Items.Add(new ToolStripMenuItem("Go to Source", null, new EventHandler(ShowResource), "Resource"));

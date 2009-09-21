@@ -465,8 +465,13 @@ namespace TreeViewSerialization
 
             if (node.Tag.ToString() == "Binding" || node.Tag.ToString() == "ErrorBinding")
             {
-                Match match = Regex.Match(node.Text, @"\[(\w+[^*|^?])|\/(\w+)");
-                stack.Push(match.Value);
+                MatchCollection match = Regex.Matches(node.Text, @"\[(\w+[^*|^?])|\/(\w+)");
+                StringBuilder sb = new StringBuilder();
+                foreach (Match item in match)
+                {
+                    sb.Append(item.Value);
+                }
+                stack.Push(sb.ToString());
                 GetStackOfBinding(node.Parent);
             }
         }

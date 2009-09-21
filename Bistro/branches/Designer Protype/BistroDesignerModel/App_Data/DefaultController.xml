@@ -12,6 +12,8 @@
       <node text="[ANY]/request/add" imageindex="5" tag="GotoBinding"/>
       <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="GotoBinding"/>
       <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="GotoBinding"/>
-    <!--</node>-->
+  <node text="[GET]/request/new/add" imageindex="5" tag="GotoBinding"/>
+  <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="5" tag="GotoBinding"/>
+  <!--</node>-->
 </TreeView>
 

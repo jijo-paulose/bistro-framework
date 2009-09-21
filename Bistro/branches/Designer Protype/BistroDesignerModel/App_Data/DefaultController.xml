@@ -2,8 +2,14 @@
 <TreeView>
     <!--<node text="Bindings" imageindex="6" tag="">-->
       <node text="[ANY]/?" imageindex="5" tag="GotoBinding" fontstyle="Bold"/>
-      <node text="[ANY]/?/byId/{postingId}" imageindex="5" tag="GotoBinding"/>
-      <node text="[ANY]/?/byName/{shortName}" imageindex="5" tag="GotoBinding"/>
+      <node text="[ANY]/byId/{postingId}" imageindex="5" tag="GotoBinding"/>
+      <node text="[ANY]/byName/{shortName}" imageindex="5" tag="GotoBinding"/>
+      <node text="[ANY]/*/add" imageindex="5" tag="GotoBinding"/>
+      <node text="[ANY]/a/*/b/c" imageindex="5" tag="GotoBinding"/>
+      <node text="[ANY]/a/z/*/c" imageindex="5" tag="GotoBinding"/>
+      <node text="[ANY]/a/z/b/c" imageindex="5" tag="GotoBinding"/>
+      <node text="[ANY]/resume/add" imageindex="5" tag="GotoBinding"/>
+      <node text="[ANY]/request/add" imageindex="5" tag="GotoBinding"/>
       <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="GotoBinding"/>
       <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="GotoBinding"/>
     <!--</node>-->

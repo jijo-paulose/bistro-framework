@@ -286,7 +286,7 @@ namespace TreeViewSerialization
             treeView2.Nodes.Clear();
             string item = String.Empty;
             #region Define Controllers
-            if (e.Node.Tag.ToString() == "Controller")
+            if (e.Node.Tag.ToString().Contains ("Controller"))
             {
                 txtBinding = GetBindingPath(e.Node);
                 item = e.Node.Text + ".xml";
@@ -347,35 +347,53 @@ namespace TreeViewSerialization
 
             #region Define Bindings
             
-            if (e.Node.Text == "[ANY]/*/add")
+            if (e.Node.Text == "/*/add")
             {
-                txtBinding = e.Node.Text;
+                txtBinding = GetBindingPath(e.Node);
+                //txtBinding = e.Node.Text;
             }
             if (e.Node.Text == "/resume/add")
             {
-                txtBinding = "[ANY]/resume/add";
+                txtBinding = GetBindingPath(e.Node);
+                //txtBinding = "[ANY]/resume/add";
             }
             if (e.Node.Text == "/request/add")
             {
-                txtBinding = "[ANY]/request/add";
+                txtBinding = GetBindingPath(e.Node);
+                //txtBinding = "[ANY]/request/add";
             }
-            if (e.Node.Text == "[GET]/request/new/add")
+            
+            if (e.Node.Text == "[GET]/request")
             {
                 txtBinding = e.Node.Text;
             }
-            if (e.Node.Text == "[ANY]/a/*/b/c")
+            
+            if (e.Node.Text == "/new")
             {
-                txtBinding = e.Node.Text;
-            }
-
-            if (e.Node.Text == "[ANY]/a/z/*/c")
-            {
-                txtBinding = e.Node.Text;
+                txtBinding = GetBindingPath(e.Node);
             }
 
-            if (e.Node.Text == "[ANY]/a/z/b/c")
+            if (e.Node.Text == "/add")
             {
-                txtBinding = e.Node.Text;
+                txtBinding = GetBindingPath(e.Node);
+            } 
+            
+            if (e.Node.Text == "/a/*/b/c")
+            {
+                txtBinding = GetBindingPath(e.Node);
+                //txtBinding = e.Node.Text;
+            }
+
+            if (e.Node.Text == "/a/z/*/c")
+            {
+                txtBinding = GetBindingPath(e.Node);
+                //txtBinding = e.Node.Text;
+            }
+
+            if (e.Node.Text == "/a/z/b/c")
+            {
+                txtBinding = GetBindingPath(e.Node);
+                //txtBinding = e.Node.Text;
             }
 
             if (e.Node.Text == "[ANY]/?")
@@ -428,16 +446,13 @@ namespace TreeViewSerialization
             if (node.Tag.ToString() == "Binding" || node.Tag.ToString() == "ErrorBinding")
             {
                 stack.Push(node.Text);
-                if (node.Parent.Tag.ToString() == "Binding" || node.Parent.Tag.ToString() == "ErrorBinding")
-                {
-                    stack.Push(node.Parent.Text);
-                }
+                GetStackOfBinding(node.Parent);
                 StringBuilder sb = new StringBuilder(); 
                 while (stack.Count > 0) {
                     string current = stack.Pop().ToString();
-                    if (current == "[ANY]/*/add" && stack.Count > 0)
+                    if (current == "/add" && stack.Count > 0)
                     {
-                        return GetControlBind(current, stack.Pop().ToString());
+                        return sb.ToString() + GetControlBind(current, stack.Pop().ToString());
                     }
                     else
                     {
@@ -452,6 +467,17 @@ namespace TreeViewSerialization
             return value;
         }
 
+        private void GetStackOfBinding(TreeNode node) {
+
+            if (node.Tag.ToString() == "Binding" || node.Tag.ToString() == "ErrorBinding")
+            {
+                Match match = Regex.Match(node.Text, @"\[(\w+[^*|^?])|\/(\w+)");
+                stack.Push(match.Value);
+                GetStackOfBinding(node.Parent);
+            }
+        }
+        
+       
         private void ShowInfoTreeView(TreeView treeView, string item)
         {
             treeView.Nodes.Clear();
@@ -471,10 +497,16 @@ namespace TreeViewSerialization
 		private string GetControlBind(string input, string input1)
 		{
 			return Regex.Replace(input,
-		 @"/.*/add",
+		 @"/add",
 		 input1);
 
 		}
+        
+        //private string GetBindingPath(string text)
+        //{
+        //    Match match = Regex.Match(text, @"(\w+[^*|?]*)");
+        //    return match.Value;
+        //}
 
         public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText, ref List<TreeNode> findNodes, bool mode)
         {   

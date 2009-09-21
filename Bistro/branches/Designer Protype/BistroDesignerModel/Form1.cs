@@ -350,17 +350,14 @@ namespace TreeViewSerialization
             if (e.Node.Text == "/*/add")
             {
                 txtBinding = GetBindingPath(e.Node);
-                //txtBinding = e.Node.Text;
             }
             if (e.Node.Text == "/resume/add")
             {
                 txtBinding = GetBindingPath(e.Node);
-                //txtBinding = "[ANY]/resume/add";
             }
             if (e.Node.Text == "/request/add")
             {
                 txtBinding = GetBindingPath(e.Node);
-                //txtBinding = "[ANY]/request/add";
             }
             
             if (e.Node.Text == "[GET]/request")
@@ -381,19 +378,16 @@ namespace TreeViewSerialization
             if (e.Node.Text == "/a/*/b/c")
             {
                 txtBinding = GetBindingPath(e.Node);
-                //txtBinding = e.Node.Text;
             }
 
             if (e.Node.Text == "/a/z/*/c")
             {
                 txtBinding = GetBindingPath(e.Node);
-                //txtBinding = e.Node.Text;
             }
 
             if (e.Node.Text == "/a/z/b/c")
             {
                 txtBinding = GetBindingPath(e.Node);
-                //txtBinding = e.Node.Text;
             }
 
             if (e.Node.Text == "[ANY]/?")
@@ -502,12 +496,6 @@ namespace TreeViewSerialization
 
 		}
         
-        //private string GetBindingPath(string text)
-        //{
-        //    Match match = Regex.Match(text, @"(\w+[^*|?]*)");
-        //    return match.Value;
-        //}
-
         public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText, ref List<TreeNode> findNodes, bool mode)
         {   
             if (findNodes == null){
@@ -516,9 +504,6 @@ namespace TreeViewSerialization
             foreach (TreeNode child in treeNodeCollection)
             {
 
-                //Strict match
-                //if (child.Text.ToLower().CompareTo(searchText.ToLower())== 0)
-                
                 //Match with Contains
                 if (mode)
                 {

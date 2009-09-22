@@ -475,7 +475,18 @@ namespace TreeViewSerialization
                 GetStackOfBinding(node.Parent);
             }
         }
-        
+
+        private string ConcatBinding(TreeNode node) {
+            StringBuilder sb = new StringBuilder();
+            if (node.Tag.ToString() == "Binding" || node.Tag.ToString() == "ErrorBinding")
+            {
+                stack.Push(node.Text);
+                sb.Append(ConcatBinding(node.Parent));
+            }
+            while (stack.Count > 0)
+                sb.Append(stack.Pop().ToString());
+            return sb.ToString();
+        }
        
         private void ShowInfoTreeView(TreeView treeView, string item)
         {
@@ -534,12 +545,33 @@ namespace TreeViewSerialization
 
         private bool IsCurrentNodeText(TreeNode child, string searchText)
         {
-            Regex Parser = new Regex(child.Text.ToString().ToLower());
-            Match match = Parser.Match(searchText.ToLower());
-            if (match.Success)
+            string value = ConcatBinding(child);
+            //[ANY]/?
+            if (value.ToLower() == searchText.ToLower())
+            {
                 return true;
-            if (child.Text.ToString().ToLower() == searchText.ToLower())
-                return true;
+            }
+            else {
+                //regex patern "/([?])"
+                //[ANY]/?/*/add -> [ANY]/*/add
+                value = Regex.Replace(value, @"/([?])", "");
+                if (value.ToLower() == searchText.ToLower())
+                {
+                    return true;
+                }
+                else
+                {
+                    //regex patern "/([*|?])/(add)|/([?])"
+                    //[ANY]/?/*/add/request/add -> [ANY]/request/add
+                    //[ANY]/?/a/*/b/c -> [ANY]/a/*/b/c
+                    //[ANY]/?/a/z/*/c -> [ANY]/a/z/*/c
+                    //[ANY]/?/a/z/b/c -> [ANY]/a/z/b/c
+                    //[GET]/posting/ad/byname/{shortName} -> [GET]/posting/ad/byname/{shortName}
+                    value = Regex.Replace(value, @"/([*|?])/(add)|/([?])", "");
+                    if (value.ToLower() == searchText.ToLower())
+                        return true;
+                }
+            }
             return false;
 
         }

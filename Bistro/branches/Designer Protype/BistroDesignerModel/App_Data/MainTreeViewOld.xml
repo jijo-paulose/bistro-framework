@@ -3,61 +3,61 @@
   <node text="zzz-NoRecruiters-WFS" imageindex="4" tag="root">
 
     <node text="[ANY]/?" imageindex="5" tag="Binding">
-        <node text="DefaultController" imageindex="3" tag="Controller"/>
+      <node text="DefaultController" imageindex="3" tag="Controller"/>
       <node text="/byId/{postingId}" imageindex="5" tag="Binding">
-          <node text="DataAccessControl" imageindex="3" tag="Controller"/>
-          <!--new-->
-          <node text="DefaultController" imageindex="3" tag="Controller"/>
-          <!--new-->
-          <node text="postingId: string" imageindex="24" tag="Resource"/>
-          <node text="Resource2: string" imageindex="23" tag="Resource"/>
+        <node text="DataAccessControl" imageindex="3" tag="Controller"/>
+        <!--new-->
+        <node text="DefaultController" imageindex="3" tag="Controller"/>
+        <!--new-->
+        <node text="postingId: string" imageindex="24" tag="Resource"/>
+        <node text="Resource2: string" imageindex="23" tag="Resource"/>
       </node>
       <node text="/byname/{shortName}" imageindex="5" tag="Binding">
-          <node text="DataAccessControl" imageindex="3" tag="Controller"/>
+        <node text="DataAccessControl" imageindex="3" tag="Controller"/>
+        <!--new-->
+        <node text="DefaultController" imageindex="3" tag="Controller"/>
+        <!--new-->
+        <node text="shortName: string" imageindex="22" tag="Resource"/>
+        <node text="Resource2: string" imageindex="23" tag="Resource"/>
+      </node>
+      <!--<node text="[ANY]/*/add" imageindex="5" tag="Binding">-->
+      <node text="/*/add" imageindex="5" tag="Binding">
+        <node text="c3" imageindex="3" tag="Controller"/>
+        <node text="DefaultController" imageindex="3" tag="Controller"/>
+        <node text="/resume/add" imageindex="5" tag="Binding">
+          <node text="c4" imageindex="3" tag="Controller"/>
           <!--new-->
+          <node text="c3" imageindex="3" tag="Controller"/>
           <node text="DefaultController" imageindex="3" tag="Controller"/>
           <!--new-->
-          <node text="shortName: string" imageindex="22" tag="Resource"/>
-          <node text="Resource2: string" imageindex="23" tag="Resource"/>
-      </node>
-    <!--<node text="[ANY]/*/add" imageindex="5" tag="Binding">-->
-      <node text="/*/add" imageindex="5" tag="Binding">
-      <node text="c3" imageindex="3" tag="Controller"/>
-      <node text="DefaultController" imageindex="3" tag="Controller"/>
-        <node text="/resume/add" imageindex="5" tag="Binding">
-        <node text="c4" imageindex="3" tag="Controller"/>
-        <!--new-->
-        <node text="c3" imageindex="3" tag="Controller"/>
-        <node text="DefaultController" imageindex="3" tag="Controller"/>
+        </node>
+        <node text="/request/add" imageindex="5" tag="Binding">
+          <node text="c5" imageindex="3" tag="Controller"/>
           <!--new-->
+          <node text="c3" imageindex="3" tag="Controller"/>
+          <node text="DefaultController" imageindex="3" tag="Controller"/>
+          <!--new-->
+        </node>
       </node>
-      <node text="/request/add" imageindex="5" tag="Binding">
-        <node text="c5" imageindex="3" tag="Controller"/>
-        <!--new-->
-        <node text="c3" imageindex="3" tag="Controller"/>
-        <node text="DefaultController" imageindex="3" tag="Controller"/>
-        <!--new-->
-      </node>
-    </node>
-    <!--<node text="[ANY]/a/*/b/c" imageindex="5" tag="Binding">-->
+      <!--<node text="[ANY]/a/*/b/c" imageindex="5" tag="Binding">-->
+
       <node text="/a/*/b/c" imageindex="5" tag="Binding">
-      <node text="c1" imageindex="3" tag="Controller"/>
-      <node text="DefaultController" imageindex="3" tag="Controller"/>
-      </node>
-    <!--<node text="[ANY]/a/z/*/c" imageindex="5" tag="Binding">-->
-      <node text="/a/z/*/c" imageindex="5" tag="Binding">
-      <node text="c2" imageindex="3" tag="Controller"/>
-      <node text="DefaultController" imageindex="3" tag="Controller"/>
-      </node>
-    <!--<node text="[ANY]/a/z/b/c" imageindex="5" tag="Binding">-->
-      <node text="/a/z/b/c" imageindex="5" tag="Binding">
-      <node text="c1" imageindex="3" tag="Controller"/>
-      <node text="c2" imageindex="3" tag="Controller"/>
-      <node text="DefaultController" imageindex="3" tag="Controller"/>
+        <node text="c1" imageindex="3" tag="Controller"/>
+        <node text="DefaultController" imageindex="3" tag="Controller"/>
+        <node text="/z/*/c" imageindex="5" tag="Binding">
+          <node text="c2" imageindex="3" tag="Controller"/>
+          <node text="DefaultController" imageindex="3" tag="Controller"/>
+          <node text="/b/c" imageindex="5" tag="Binding">
+            <node text="c1" imageindex="3" tag="Controller"/>
+            <node text="c2" imageindex="3" tag="Controller"/>
+            <node text="DefaultController" imageindex="3" tag="Controller"/>
+          </node>
+        </node>
       </node>
     </node>
 
-    <node text="[GET]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
+    <node text="[GET]/?" imageindex="5" tag="Binding">
+      <node text="/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
         <node text="AdDisplay" imageindex="3" tag="Controller"/>
         <!--new-->
@@ -66,23 +66,26 @@
         <node text="shortName: string" imageindex="22" tag="Resource"/>
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
         <node text="Resource3: string" imageindex="23" tag="Resource"/>
-    </node>
-    <node text="[GET]/posting/adconvert//byurl/{url}" imageindex="29" tag="ErrorBinding">
-      <node text="UrlDataAccessControl" imageindex="30" tag="ErrorController"/>
-      <node text="AdConverter" imageindex="30" tag="ErrorController"/>
-      <node text="DefaultController" imageindex="3" tag="Controller"/>
-      <node text="url: float" imageindex="31" tag="ErrorResource"/>
-      <node text="Resource7: string" imageindex="23" tag="Resource"/>
-    </node>
-    <node text="[GET]/request" imageindex="5" tag="Binding">
-      <node text="/new" imageindex="5" tag="Binding">
-        <node text="/add" imageindex="5" tag="Binding">
-          <node text="c6" imageindex="3" tag="Controller"/>
-          <node text="DefaultController" imageindex="3" tag="Controller"/>
+      </node>
+      <node text="/posting/adconvert//byurl/{url}" imageindex="29" tag="ErrorBinding">
+        <node text="UrlDataAccessControl" imageindex="30" tag="ErrorController"/>
+        <node text="AdConverter" imageindex="30" tag="ErrorController"/>
+        <node text="DefaultController" imageindex="3" tag="Controller"/>
+        <node text="url: float" imageindex="31" tag="ErrorResource"/>
+        <node text="Resource7: string" imageindex="23" tag="Resource"/>
+      </node>
+      <node text="/request" imageindex="5" tag="Binding">
+        <node text="/new" imageindex="5" tag="Binding">
+          <node text="/add" imageindex="5" tag="Binding">
+            <node text="c6" imageindex="3" tag="Controller"/>
+            <node text="DefaultController" imageindex="3" tag="Controller"/>
+          </node>
         </node>
       </node>
-      </node>
-      <node text="[POST]/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
+    </node>
+
+    <node text="[POST]/?" imageindex="5" tag="Binding">
+      <node text="/posting/ad/byname/{shortName}" imageindex="5" tag="Binding">
         <node text="DataAccessControl" imageindex="3" tag="Controller"/>
         <node text="AdUpdate" imageindex="3" tag="Controller"/>
         <!--new-->
@@ -91,6 +94,7 @@
         <node text="shortName: string" imageindex="22" tag="Resource"/>
         <node text="Resource2: string" imageindex="23" tag="Resource"/>
         <node text="Resource5: dictionary" imageindex="23" tag="Resource"/>
+      </node>
     </node>
   </node>
 </TreeView>

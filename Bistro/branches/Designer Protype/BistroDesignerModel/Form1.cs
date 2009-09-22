@@ -288,6 +288,7 @@ namespace TreeViewSerialization
             #region Define Controllers
             if (e.Node.Tag.ToString().Contains ("Controller"))
             {
+                stack.Clear();
                 txtBinding = GetBindingPath(e.Node);
                 item = e.Node.Text + ".xml";
             }
@@ -360,9 +361,9 @@ namespace TreeViewSerialization
                 txtBinding = GetBindingPath(e.Node);
             }
             
-            if (e.Node.Text == "[GET]/request")
+            if (e.Node.Text == "/request")
             {
-                txtBinding = e.Node.Text;
+                txtBinding = GetBindingPath(e.Node);
             }
             
             if (e.Node.Text == "/new")
@@ -380,17 +381,29 @@ namespace TreeViewSerialization
                 txtBinding = GetBindingPath(e.Node);
             }
 
-            if (e.Node.Text == "/a/z/*/c")
+            if (e.Node.Text == "/z/*/c")
             {
-                txtBinding = GetBindingPath(e.Node);
+                txtBinding = "[ANY]/a/z/*/c";
             }
 
-            if (e.Node.Text == "/a/z/b/c")
+            if (e.Node.Text == "/b/c")
             {
-                txtBinding = GetBindingPath(e.Node);
+                txtBinding = "[ANY]/a/z/b/c";
             }
 
             if (e.Node.Text == "[ANY]/?")
+            {
+                txtBinding = e.Node.Text;
+                item = "Binding1.xml";
+            }
+            
+            if (e.Node.Text == "[GET]/?")
+            {
+                txtBinding = e.Node.Text;
+                item = "Binding1.xml";
+            }
+
+            if (e.Node.Text == "[POST]/?")
             {
                 txtBinding = e.Node.Text;
                 item = "Binding1.xml";
@@ -408,15 +421,15 @@ namespace TreeViewSerialization
                 item = "Binding3.xml";
             }
 
-            if (e.Node.Text == "[GET]/posting/ad/byname/{shortName}")
+            if (e.Node.Text == "/posting/ad/byname/{shortName}")
             {
-                txtBinding = e.Node.Text;
+                txtBinding = GetBindingPath(e.Node);
                 item = "Binding4.xml";
             }
 
-            if (e.Node.Text == "[POST]/posting/ad/byname/{shortName}")
+            if (e.Node.Text == "/posting/ad/byname/{shortName}")
             {
-                txtBinding = e.Node.Text;
+                txtBinding = GetBindingPath(e.Node);
                 item = "Binding5.xml";
             }
 
@@ -447,6 +460,10 @@ namespace TreeViewSerialization
                     if (current == "/add" && stack.Count > 0)
                     {
                         return sb.ToString() + GetControlBind(current, stack.Pop().ToString());
+                    }
+                    else if (current == "/a/b/c") {
+                            return sb.ToString() + GetControlBind1(current, stack.Pop().ToString());
+
                     }
                     else
                     {
@@ -511,6 +528,23 @@ namespace TreeViewSerialization
 		 input1);
 
 		}
+
+        private string GetControlBind1(string input, string input1)
+        {
+            if (input1 == "/z/c") { 
+                return "/a/z/b/c";
+            }
+            return Regex.Replace(input,
+         @"(/b/c)",
+         input1);
+
+        }
+
+        private string GetControlBind2()
+        {
+            return "[ANY]/a/z/b/c";
+
+        }
         
         public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText, ref List<TreeNode> findNodes, bool mode)
         {   

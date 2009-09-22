@@ -383,12 +383,12 @@ namespace TreeViewSerialization
 
             if (e.Node.Text == "/z/*/c")
             {
-                txtBinding = "[ANY]/a/z/*/c";
+                txtBinding = GetBindingPath(e.Node);
             }
 
             if (e.Node.Text == "/b/c")
             {
-                txtBinding = "[ANY]/a/z/b/c";
+                txtBinding = GetBindingPath(e.Node);
             }
 
             if (e.Node.Text == "[ANY]/?")
@@ -457,13 +457,12 @@ namespace TreeViewSerialization
                 StringBuilder sb = new StringBuilder(); 
                 while (stack.Count > 0) {
                     string current = stack.Pop().ToString();
-                    if (current == "/add" && stack.Count > 0)
+                    if (current.Contains("*") && stack.Count > 0)
                     {
-                        return sb.ToString() + GetControlBind(current, stack.Pop().ToString());
+                        sb.Append(GetControlBind(current, stack.Pop().ToString()));
                     }
-                    else if (current == "/a/b/c") {
-                            return sb.ToString() + GetControlBind1(current, stack.Pop().ToString());
-
+                    else if (sb.ToString().Contains("*")) {
+                       return GetControlBind(sb.ToString(), current);
                     }
                     else
                     {
@@ -482,7 +481,7 @@ namespace TreeViewSerialization
 
             if (node.Tag.ToString() == "Binding" || node.Tag.ToString() == "ErrorBinding")
             {
-                MatchCollection match = Regex.Matches(node.Text, @"\[(\w+[^*|^?])|\/(\w+)");
+                MatchCollection match = Regex.Matches(node.Text, @"\[(\w+[^?])|\/[*]\/(\w+)|\/(\w+)\/[*]\/(\w+)|\/(\w+)");
                 StringBuilder sb = new StringBuilder();
                 foreach (Match item in match)
                 {
@@ -524,28 +523,12 @@ namespace TreeViewSerialization
 		private string GetControlBind(string input, string input1)
 		{
 			return Regex.Replace(input,
-		 @"/add",
+         @"(/[*]/\w+)(/\w+)|(/[*]/\w+)",
 		 input1);
 
 		}
 
-        private string GetControlBind1(string input, string input1)
-        {
-            if (input1 == "/z/c") { 
-                return "/a/z/b/c";
-            }
-            return Regex.Replace(input,
-         @"(/b/c)",
-         input1);
-
-        }
-
-        private string GetControlBind2()
-        {
-            return "[ANY]/a/z/b/c";
-
-        }
-        
+       
         public void FindTreeNode(TreeNodeCollection treeNodeCollection, string searchText, ref List<TreeNode> findNodes, bool mode)
         {   
             if (findNodes == null){

@@ -562,7 +562,14 @@ namespace TreeViewSerialization
 
         private bool IsCurrentNodeText(TreeNode child, string searchText)
         {
-            string value = ConcatBinding(child);
+            string value = Regex.Replace(searchText, @"\[\w+\]", "");
+
+            if (value.ToLower() == child.Text.ToLower())
+            {
+                return true;
+            } 
+            
+            value = ConcatBinding(child);
             //[ANY]/?
             if (value.ToLower() == searchText.ToLower())
             {
@@ -584,7 +591,11 @@ namespace TreeViewSerialization
                     //[ANY]/?/a/z/*/c -> [ANY]/a/z/*/c
                     //[ANY]/?/a/z/b/c -> [ANY]/a/z/b/c
                     //[GET]/posting/ad/byname/{shortName} -> [GET]/posting/ad/byname/{shortName}
-                    value = Regex.Replace(value, @"/([*|?])/(add)|/([?])", "");
+                    //value = Regex.Replace(value, @"/([*|?])/w+|/([?])|(/[*]/\w+)(/\w+)|(/[*]/\w+)", "");
+                    if (searchText.ToString().Contains("*")) {
+                        value = GetControlBind(value, "");
+                        searchText = GetControlBind(searchText, ""); 
+                    }
                     if (value.ToLower() == searchText.ToLower())
                         return true;
                 }

@@ -141,10 +141,10 @@ namespace TreeViewSerialization
             this.treeView2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeView2.ImageIndex = 0;
             this.treeView2.ImageList = this.imageList1;
-            this.treeView2.Location = new System.Drawing.Point(0, 1);
+            this.treeView2.Location = new System.Drawing.Point(-2, 1);
             this.treeView2.Name = "treeView2";
             this.treeView2.SelectedImageIndex = 0;
-            this.treeView2.Size = new System.Drawing.Size(393, 259);
+            this.treeView2.Size = new System.Drawing.Size(395, 290);
             this.treeView2.TabIndex = 4;
             this.treeView2.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView2_NodeMouseClick);
             // 
@@ -159,10 +159,10 @@ namespace TreeViewSerialization
             this.treeView1.HideSelection = false;
             this.treeView1.ImageIndex = 18;
             this.treeView1.ImageList = this.imageList1;
-            this.treeView1.Location = new System.Drawing.Point(0, 66);
+            this.treeView1.Location = new System.Drawing.Point(-1, 38);
             this.treeView1.Name = "treeView1";
             this.treeView1.SelectedImageIndex = 7;
-            this.treeView1.Size = new System.Drawing.Size(393, 262);
+            this.treeView1.Size = new System.Drawing.Size(394, 250);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
@@ -182,7 +182,7 @@ namespace TreeViewSerialization
             // 
             this.splitContainer1.Panel2.Controls.Add(this.treeView2);
             this.splitContainer1.Size = new System.Drawing.Size(393, 582);
-            this.splitContainer1.SplitterDistance = 327;
+            this.splitContainer1.SplitterDistance = 287;
             this.splitContainer1.TabIndex = 5;
             // 
             // panel1
@@ -196,7 +196,7 @@ namespace TreeViewSerialization
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.MinimumSize = new System.Drawing.Size(390, 35);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(393, 60);
+            this.panel1.Size = new System.Drawing.Size(393, 35);
             this.panel1.TabIndex = 6;
             // 
             // label2
@@ -219,7 +219,7 @@ namespace TreeViewSerialization
             // textBox1
             // 
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.Location = new System.Drawing.Point(42, 8);
+            this.textBox1.Location = new System.Drawing.Point(39, 7);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(186, 20);
             this.textBox1.TabIndex = 1;

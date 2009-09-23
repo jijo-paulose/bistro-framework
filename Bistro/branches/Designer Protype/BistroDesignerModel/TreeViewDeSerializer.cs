@@ -21,6 +21,7 @@ namespace TreeViewSerialization
 		private const string XmlNodeTagAtt = "tag";
         private const string XmlNodeMarkAtt = "mark";
         private const string XmlNodeImageIndexAtt = "imageindex";
+        private const string XmlNodeToolTip = "tooltiptext";
 
         public string SelectedTreeNode { set { selectedTreeNode = value; } get { return selectedTreeNode; } }
         public TreeViewDeSerializer()
@@ -102,6 +103,7 @@ namespace TreeViewSerialization
 			finally
 			{
                 // enabling redrawing of treeview after all nodes are added
+                treeView.ShowNodeToolTips = true;
 				treeView.EndUpdate();      
                 reader.Close();	
 			}
@@ -138,8 +140,14 @@ namespace TreeViewSerialization
                 }
                 node.NodeFont = new Font("Font", 10, fontStyle);
             }
+                
+            if (propertyName == XmlNodeToolTip)
+            {
+                node.ToolTipText = value;
+            }
+            
             if (propertyName == XmlNodeMarkAtt) {
-                node.BackColor = System.Drawing.Color.FromName(value);
+                node.ForeColor = System.Drawing.Color.FromName(value);
             }
 			if (propertyName == XmlNodeTextAtt)
 			{                
@@ -155,7 +163,6 @@ namespace TreeViewSerialization
 				node.Tag = value;
                 node.ContextMenuStrip = GetContextMenu(new ContextMenuStrip(), value); 
 			}
-
 		}
 
        
@@ -166,31 +173,31 @@ namespace TreeViewSerialization
             if (mode == "GotoBinding")
                 contextMenu.Items.Add(new ToolStripMenuItem("Go to Binding", null, new EventHandler(myForm.goToBinding), "Bindings"));
             if (mode == "ResourceBottom")
-                contextMenu.Items.Add(new ToolStripMenuItem("Go to Source", null, new EventHandler(ShowResource), "Resource"));
+                contextMenu.Items.Add(new ToolStripMenuItem("View Source", null, new EventHandler(ShowResource), "Resource"));
             if (mode == "ControllerBottom" || mode == "Controller")
-                contextMenu.Items.Add(new ToolStripMenuItem("Go to Source", null, new EventHandler(ShowSource), "ShowSource"));
+                contextMenu.Items.Add(new ToolStripMenuItem("View Source", null, new EventHandler(ShowSource), "ShowSource"));
 
             return contextMenu;
         }
 
         protected void ShowBindings(object sender, EventArgs args)
         {
-            MessageBox.Show("Binding Message");
+            MessageBox.Show("Binding");
         }
 
         protected void ShowProperties(object sender, EventArgs args)
         {
-            MessageBox.Show("Properties Message");
+            MessageBox.Show("Properties");
         }
 
         protected void ShowSource(object sender, EventArgs args)
         {
-            MessageBox.Show("Source Message");
+            MessageBox.Show("Source");
         }
 
         protected void ShowResource(object sender, EventArgs args)
         {
-            MessageBox.Show("Resource Message");
+            MessageBox.Show("Resource");
         }
                 
 	}

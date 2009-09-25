@@ -60,6 +60,22 @@ namespace Bistro.UnitTests.Tests.Data
         }
     }
 
+    [Bind("post /format-xml")]
+    public class FormatXmlControllerError : AbstractController
+    {
+        [FormField,Request, FormatAs(Format.Xml)]
+        protected SimpleTuple input;
+
+        public override void DoProcessRequest(IExecutionContext context)
+        {
+            if (input == null)
+                return;
+
+            context.Response.Return(input.foo + " " + input.baz);
+        }
+    }
+
+
     [Bind("get /format/custom")]
     public class ResponseConfigurerController : AbstractController
     {

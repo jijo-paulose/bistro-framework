@@ -59,9 +59,8 @@
     <Compile Include="Methods\ControllerType.cs" />
     <Compile Include="Methods\DependencyGraph.cs" />
     <Compile Include="Methods\Engine.cs" />
-    <Compile Include="Methods\Generation\BindingsGroup.cs" />
+    <Compile Include="Methods\Generation\MethodUrlsSubset.cs" />
     <Compile Include="Methods\Generation\GenBinding.cs" />
-    <Compile Include="Methods\Generation\GroupMatcher.cs" />
     <Compile Include="Methods\Reflection\ITypeInfo.cs" />
     <Compile Include="Methods\Resource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

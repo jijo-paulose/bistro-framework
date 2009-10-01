@@ -34,11 +34,25 @@ namespace Bistro.Engine.Methods.Generation
         }
         #endregion
 
-        internal MatchResult Match(BindingsGroup group, GenBinding newBinding)
+        internal MatchResult Match(MethodUrlsSubset group, GenBinding newBinding)
         {
+            #region MatchPart
+
+
+
+            #endregion
+
+
+            #region NoMatchPart
+
+
+
+            #endregion
+
+
             return MatchResult.BothOptions;
 
-
+            
         }
 
 

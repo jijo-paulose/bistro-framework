@@ -13,6 +13,7 @@ namespace Bistro.Methods
 {
     public class Engine
     {
+
         Binding root;
 
         public Engine()
@@ -20,10 +21,14 @@ namespace Bistro.Methods
             root = new Binding(this);
         }
 
+        #region Old functionality
+
+
         public void ProcessControllers(List<string> removed, List<ITypeInfo> controllers)
         {
             ///
-            ProcessControllersAlternative( controllers);
+            if (controllers.Count>0)
+                ProcessControllersAlternative( controllers);
             ///
 
             ControllerType type;
@@ -112,41 +117,66 @@ namespace Bistro.Methods
             }
         }
 
+        #endregion
+
+
+
+
+
+
+
+        #region Groups
+
+
 
         public void ProcessControllersAlternative(List<ITypeInfo> controllers)
         {
-            allBindings = new List<GenBinding>();
+            allBindings = new List<IEnumerable<GenBinding>>();
             controllers.ForEach(controller => CreateGenBindings(controller));
 
             CreateGroups();
-
-
-
 
         }
 
         private void CreateGroups()
         {
-            BindingsGroup firstGroup = new BindingsGroup(allBindings);
-            allGroups = new List<BindingsGroup>();
+            MethodUrlsSubset firstGroup = new MethodUrlsSubset();
+            List<MethodUrlsSubset> allGroups = new List<MethodUrlsSubset>();
 
-            List<BindingsGroup> newBindingGroups = new List<BindingsGroup>();
+            List<MethodUrlsSubset> newBindingGroups;
             allGroups.Add(firstGroup);
-            for (int i = 0; i < allBindings.Count; i++)
+            foreach(IEnumerable<GenBinding> bindingsPair in allBindings)
             {
 
-                newBindingGroups.Clear();
+                newBindingGroups = new List<MethodUrlsSubset>();
 
-                foreach(BindingsGroup group in allGroups)
+                foreach(MethodUrlsSubset group in allGroups)
                 {
-                    BindingsGroup newGroup = group.ForkWithNewBinding();
-                    if (newGroup != null)
-                        newBindingGroups.Add(newGroup);
+                    foreach (GenBinding binding in bindingsPair)
+                    {
+                        MethodUrlsSubset newGroup = group.ApplyBinding(binding);
+                        if (newGroup != null)
+                            newBindingGroups.Add(newGroup);
+                    }
                 }
 
-                allGroups.AddRange(newBindingGroups);
+                allGroups = newBindingGroups;
 
             }
+            StringBuilder sb = new StringBuilder();
+
+            foreach (MethodUrlsSubset subset in allGroups)
+            {
+                sb.AppendLine("New subset!!!!!!!!!!!!!!!");
+                foreach (var binding in subset.BindingsList)
+                {
+                    sb.AppendFormat("MatchStatus:{0}   Url:{1}\r\n", binding.MatchStatus, binding.InitialUrl);
+                }
+            }
+
+            string result = sb.ToString();
+
+
         }
 
 
@@ -161,8 +191,7 @@ namespace Bistro.Methods
 
             foreach (string binding in bindings)
             {
-                // ToDo: Implement controllers bind to each pattern
-                allBindings.Add(new GenBinding(binding, classInfo.FullName));
+                allBindings.Add(new GenBinding[2] {new GenBinding(binding, classInfo.FullName, true),new GenBinding(binding, classInfo.FullName, false)});
             }
 
         }
@@ -170,9 +199,8 @@ namespace Bistro.Methods
 
 
         
-        #region Groups stuff
-        private List<GenBinding> allBindings;
-        private List<BindingsGroup> allGroups;
+        private List<IEnumerable<GenBinding>> allBindings;
+//        private List<MethodUrlsSet> allGroups;
 
         #endregion
 

@@ -1904,6 +1904,38 @@ namespace Bistro.Tests
                 );
             #endregion
 
+            #region Imported - GET/hi/... - 2 - 1
+            NewTest(
+                "Imported - GET/hi/... - 2 - 1",
+                Types(
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/notnow")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                Node("GET /hi/*/world", Controllers(),
+                        Node("/*/now", "hiController4", "hiController3"),
+                        Node("/?/now", "hiController3"),
+                        Node("/a", Controllers("hiController7", "hiController6"),
+                            Node("/*", "hiController7", "hiController6")//,
+                            )
+                    )
+                );
+            #endregion
+
+
             #region Imported - GET/hi/... - 3
             NewTest(
                 "Imported - GET/hi/... - 3",
@@ -2055,6 +2087,62 @@ namespace Bistro.Tests
                         Node("/?",Controllers("DataRoot"),
                             Node("/withpaging/{linesPerPage}/{pageNumber}", Controllers("WithPaging","DataRoot" ))),
                         Node("/client/id",Controllers(),
+                            Node("/*/providers/id/*", Controllers("DataRoot", "ProvidersData", "ProvidersRender")),
+                            Node("/{clientId}/providers/id/{dataId}", Controllers("DataRoot", "ProvidersData", "ProvidersRender"),
+                                Node("/withpaging/{linesPerPage}/{pageNumber}", Controllers("DataRoot", "ProvidersData", "WithPaging", "ProvidersRender"))),
+                            Node("/11/providers/id/{dataId}", Controllers("DataRoot", "ProvidersData", "BlueCrossProvidersData", "ProvidersRender"),
+                                Node("/withpaging/{linesPerPage}/{pageNumber}", Controllers("DataRoot", "ProvidersData", "BlueCrossProvidersData", "WithPaging", "ProvidersRender")))
+                            )
+                        )
+                    );
+            #endregion
+
+            #region Imported - DataQPaging - 2
+            NewTest(
+                "Imported - DataQPaging - 2",
+                Types(
+                    //Type("DataRoot",
+                    //    Attributes(BindAttribute("GET /data/?")),
+                    //    Field("dataRoot", "Boolean", RequestAttribute)
+                    //    ),
+                    Type("ProvidersData",
+                        Attributes(
+//                            BindAttribute("GET /data/client/id/{clientId}/providers/id/{dataId}"),
+                            BindAttribute("GET /data/client/id/{clientId}/providers/id/{dataId}/withpaging/{linesPerPage}/{pageNumber}")
+                        ),
+                        Field("dataRoot", "Boolean", RequestAttribute, RequiresAttribute),
+                        Field("dataSource", "Boolean", RequestAttribute)
+                        ),
+                    Type("BlueCrossProvidersData",
+                        Attributes(
+//                            BindAttribute("GET /data/client/id/11/providers/id/{dataId}"),
+                            BindAttribute("GET /data/client/id/11/providers/id/{dataId}/withpaging/{linesPerPage}/{pageNumber}")
+                        ),
+                        Field("dataSource", "Boolean", RequestAttribute, RequiresAttribute),
+                        Field("dataSourceCustom", "Boolean", RequestAttribute),
+                        Field("dataId", "int")
+                        )//,
+                    //Type("WithPaging",
+                    //    Attributes(
+                    //        BindAttribute("GET /data/?/withpaging/{linesPerPage}/{pageNumber}")
+                    //    ),
+                    //    Field("dataSource", "Boolean", RequestAttribute, DependsOnAttribute),
+                    //    Field("dataSourceCustom", "Boolean", RequestAttribute, DependsOnAttribute),
+                    //    Field("withPaging", "Boolean", RequestAttribute)
+                    //    ),
+                    //Type("ProvidersRender",
+                    //    Attributes(
+                    //        BindAttribute("GET /data/client/id/*/providers/id/*")
+                    //    ),
+                    //    Field("dataSource", "Boolean", RequestAttribute, RequiresAttribute),
+                    //    Field("dataSourceCustom", "Boolean", RequestAttribute, DependsOnAttribute),
+                    //    Field("withPaging", "Boolean", RequestAttribute, DependsOnAttribute)
+                    //    )
+                    ),
+                    Node("GET /data", Controllers(),
+                        Node("/?", Controllers("DataRoot"),
+                            Node("/withpaging/{linesPerPage}/{pageNumber}", Controllers("WithPaging", "DataRoot"))),
+                        Node("/client/id", Controllers(),
                             Node("/*/providers/id/*", Controllers("DataRoot", "ProvidersData", "ProvidersRender")),
                             Node("/{clientId}/providers/id/{dataId}", Controllers("DataRoot", "ProvidersData", "ProvidersRender"),
                                 Node("/withpaging/{linesPerPage}/{pageNumber}", Controllers("DataRoot", "ProvidersData", "WithPaging", "ProvidersRender"))),

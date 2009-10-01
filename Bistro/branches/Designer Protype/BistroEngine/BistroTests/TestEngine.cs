@@ -5,7 +5,7 @@ using Bistro.Methods;
 
 namespace Bistro.Tests
 {
-    internal class TestEngine : Engine
+    internal class TestEngine : Bistro.Methods.Engine
     {
         public class ControllerEventArgs : EventArgs
         {

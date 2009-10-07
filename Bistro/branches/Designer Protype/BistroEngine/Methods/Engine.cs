@@ -14,10 +14,6 @@ namespace Bistro.Methods
     public class Engine
     {
 
-        /// <summary>
-        /// A list of accepted REST verbs
-        /// </summary>
-        private static ICollection<string> BistroVerbs = new List<string>(new string[] { "GET", "POST", "PUT", "DELETE", "HEAD", "EVENT" });
 
         Binding root;
 
@@ -253,9 +249,6 @@ namespace Bistro.Methods
                         }
                     }
 
-
-
-
                 }
                 else
                 {
@@ -264,11 +257,6 @@ namespace Bistro.Methods
             }
 
 
-
-            //foreach (string binding in bindings)
-            //{
-            //    allBindings.Add(new GenBinding[2] {new GenBinding(binding, classInfo.FullName, true),new GenBinding(binding, classInfo.FullName, false)});
-            //}
 
         }
 

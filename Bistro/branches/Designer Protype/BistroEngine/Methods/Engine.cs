@@ -14,6 +14,11 @@ namespace Bistro.Methods
     public class Engine
     {
 
+        /// <summary>
+        /// A list of accepted REST verbs
+        /// </summary>
+        private static ICollection<string> BistroVerbs = new List<string>(new string[] { "GET", "POST", "PUT", "DELETE", "HEAD", "EVENT" });
+
         Binding root;
 
         public Engine()
@@ -131,26 +136,54 @@ namespace Bistro.Methods
 
         public void ProcessControllersAlternative(List<ITypeInfo> controllers)
         {
-            allBindings = new List<IEnumerable<GenBinding>>();
+            allBindings = new Dictionary<BindVerb,List<IEnumerable<GenBinding>>>();
+            foreach (BindVerb verb in Enum.GetValues(typeof(BindVerb)))
+            {
+                allBindings.Add(verb, new List<IEnumerable<GenBinding>>());
+            }
+
             controllers.ForEach(controller => CreateGenBindings(controller));
 
-            CreateGroups();
+            StringBuilder sb = new StringBuilder();
+
+
+
+            foreach (BindVerb verb in Enum.GetValues(typeof(BindVerb)))
+            {
+                List<MethodUrlsSubset> allGroups = CreateGroups(verb);
+
+                sb.AppendFormat("NEXT VERB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:{0}\r\n", verb.ToString());
+
+                foreach (MethodUrlsSubset subset in allGroups)
+                {
+                    sb.AppendLine("New subset!!!!!!!!!!!!!!!");
+                    foreach (var binding in subset.BindingsList)
+                    {
+                        sb.AppendFormat("MatchStatus:{0}   Url:{1}\r\n", binding.MatchStatus, binding.InitialUrl);
+                    }
+                }
+
+            }
+
+            string result = sb.ToString();
+
 
         }
 
-        private void CreateGroups()
+        private List<MethodUrlsSubset> CreateGroups(BindVerb verb)
         {
             MethodUrlsSubset firstGroup = new MethodUrlsSubset();
             List<MethodUrlsSubset> allGroups = new List<MethodUrlsSubset>();
 
             List<MethodUrlsSubset> newBindingGroups;
             allGroups.Add(firstGroup);
-            foreach(IEnumerable<GenBinding> bindingsPair in allBindings)
+            List<IEnumerable<GenBinding>> bindingsForVerb = allBindings[verb];
+            foreach (IEnumerable<GenBinding> bindingsPair in bindingsForVerb)
             {
 
                 newBindingGroups = new List<MethodUrlsSubset>();
 
-                foreach(MethodUrlsSubset group in allGroups)
+                foreach (MethodUrlsSubset group in allGroups)
                 {
                     foreach (GenBinding binding in bindingsPair)
                     {
@@ -163,19 +196,8 @@ namespace Bistro.Methods
                 allGroups = newBindingGroups;
 
             }
-            StringBuilder sb = new StringBuilder();
 
-            foreach (MethodUrlsSubset subset in allGroups)
-            {
-                sb.AppendLine("New subset!!!!!!!!!!!!!!!");
-                foreach (var binding in subset.BindingsList)
-                {
-                    sb.AppendFormat("MatchStatus:{0}   Url:{1}\r\n", binding.MatchStatus, binding.InitialUrl);
-                }
-            }
-
-            string result = sb.ToString();
-
+            return allGroups;
 
         }
 
@@ -186,64 +208,81 @@ namespace Bistro.Methods
 
             List<string> bindings = new List<string>();
             foreach (IAttributeInfo attribute in classInfo.Attributes)
-                if (attribute.Type == typeof(BindAttribute).FullName && attribute.Parameters.Count > 0)
-                    bindings.Add(attribute.Parameters[0].AsString());
-
-            foreach (string binding in bindings)
             {
-                allBindings.Add(new GenBinding[2] {new GenBinding(binding, classInfo.FullName, true),new GenBinding(binding, classInfo.FullName, false)});
+                if (attribute.Type == typeof(BindAttribute).FullName && attribute.Parameters.Count > 0)
+                {
+                    bindings.Add(attribute.Parameters[0].AsString());
+                }
             }
+
+            foreach (string item in bindings)
+            {
+                Match match = bindingParser.Match(item);
+                if (match.Success)
+                {
+                    string methodUrl = match.Groups["binding"].Captures[0].Value;
+                    string verb;
+                    switch (methodUrl[0])
+                    {
+                        case '?':
+                        case '/':
+                            verb = "*";
+                            break;
+                        default:
+                            verb = methodUrl.Substring(0, methodUrl.IndexOfAny(new char[] { ' ', '/', '?' }));
+                            methodUrl = methodUrl.Substring(methodUrl.IndexOfAny(new char[] { '/', '?' }));
+                            break;
+
+                    }
+
+                    if (verb == "*")
+                    {
+                        foreach (BindVerb bindVerb in Enum.GetValues(typeof(BindVerb)))
+                        {
+                            AddNewBinding(bindVerb, methodUrl, classInfo);
+                        }
+                    }
+                    else
+                    {
+                        foreach (BindVerb bindVerb in Enum.GetValues(typeof(BindVerb)))
+                        {
+                            if (verb.ToUpper() == bindVerb.ToString().ToUpper())
+                            {
+                                AddNewBinding(bindVerb, methodUrl, classInfo);
+                            }
+                        }
+                    }
+
+
+
+
+                }
+                else
+                {
+                    RaiseInvalidBinding(null, item);
+                }
+            }
+
+
+
+            //foreach (string binding in bindings)
+            //{
+            //    allBindings.Add(new GenBinding[2] {new GenBinding(binding, classInfo.FullName, true),new GenBinding(binding, classInfo.FullName, false)});
+            //}
 
         }
 
 
+        private void AddNewBinding(BindVerb verb, string bindUrl,ITypeInfo classInfo)
+        {
+            allBindings[verb].Add(new GenBinding[2] { new GenBinding(bindUrl, classInfo.FullName, true, verb), new GenBinding(bindUrl, classInfo.FullName, false, verb) });
+        }
+
 
         
-        private List<IEnumerable<GenBinding>> allBindings;
-//        private List<MethodUrlsSet> allGroups;
+        private Dictionary<BindVerb,List<IEnumerable<GenBinding>>> allBindings;
 
         #endregion
-
-        #region Patterns stuff
-
-
-
-        //private void CreateBasePatterns(ITypeInfo classInfo)
-        //{
-
-        //    List<string> bindings = new List<string>();
-        //    foreach (IAttributeInfo attribute in classInfo.Attributes)
-        //        if (attribute.Type == typeof(BindAttribute).FullName && attribute.Parameters.Count > 0)
-        //            bindings.Add(attribute.Parameters[0].AsString());
-
-        //    foreach (string binding in bindings)
-        //    {
-        //        // ToDo: Implement controllers bind to each pattern
-        //        AllPatterns.Add(new Pattern(binding, classInfo.FullName));
-        //    }
-
-        //}
-
-        //private void GenerateAllPatterns()
-        //{
-        //    List<Pattern> newPtrns = new List<Pattern>();
-        //    foreach (Pattern ptrn1 in AllPatterns)
-        //    {
-        //        foreach (Pattern ptrn2 in AllPatterns)
-        //        {
-        //            if (ptrn1 != ptrn2)
-        //            {
-        //                newPtrns = ProcessPair(ptrn1, ptrn2, newPtrns);
-        //            }
-        //        }
-        //    }
-        //}
-
-
-
-
-        #endregion
-
 
     }
 }

@@ -11,8 +11,6 @@ namespace Bistro.Engine.Methods.Generation
         internal MethodUrlsSubset()
         {
             bindingsList = new List<GenBinding>();
-
-
         }
 
         private MethodUrlsSubset(List<GenBinding> oldBindingsList, GenBinding newBinding)
@@ -20,7 +18,6 @@ namespace Bistro.Engine.Methods.Generation
             bindingsList = new List<GenBinding>(oldBindingsList);
             bindingsList.Add(newBinding);
         }
-
 
 
         #region private members
@@ -44,7 +41,7 @@ namespace Bistro.Engine.Methods.Generation
         internal MethodUrlsSubset ApplyBinding(GenBinding newBinding)
         {
 
-            if (!newBinding.MatchWithSubSet(this))
+            if (!newBinding.MatchWithSubset(this))
             {
                 return null;
             }

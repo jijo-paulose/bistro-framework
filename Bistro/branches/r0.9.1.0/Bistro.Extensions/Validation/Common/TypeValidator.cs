@@ -44,7 +44,7 @@ namespace Bistro.Extensions.Validation.Common
             bool fail = false;
 
             string stringTarget = target as string;
-            if (stringTarget == null)
+            if (String.IsNullOrEmpty(stringTarget))
                 return true;
             switch (type) 
             {

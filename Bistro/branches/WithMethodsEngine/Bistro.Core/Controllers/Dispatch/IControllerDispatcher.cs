@@ -50,5 +50,11 @@ namespace Bistro.Controllers.Dispatch
         /// </summary>
         /// <param name="info">The info.</param>
         void RegisterController(ControllerDescriptor info);
+
+        /// <summary>
+        /// This method must be called after controllers registration
+        /// In case of the default ControllerManager it will be called from the Load method and CurrentDomain_AssemblyLoad method.
+        /// </summary>
+        void ProcessControllers();
     }
 }

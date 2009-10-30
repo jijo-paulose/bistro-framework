@@ -31,6 +31,7 @@ using Bistro.Controllers.Dispatch;
 using System.Reflection;
 using Bistro.Configuration.Logging;
 using System.Text.RegularExpressions;
+using Bistro.MethodsEngine;
 
 namespace Bistro.Controllers.Dispatch
 {
@@ -75,20 +76,35 @@ namespace Bistro.Controllers.Dispatch
             PathCalculation
         }
 
-        /// <summary>
-        /// Mapping of urls to bind points
-        /// </summary>
+        ///// <summary>
+        ///// Mapping of urls to bind points
+        ///// </summary>
         Dictionary<string, List<BindPointDescriptor>> map = new Dictionary<string, List<BindPointDescriptor>>();
+
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ControllerDispatcher"/> class.
         /// </summary>
-        public ControllerDispatcher(Application application) { logger = application.LoggerFactory.GetLogger(GetType()); }
+        public ControllerDispatcher(Application application) 
+        {
+            logger = application.LoggerFactory.GetLogger(GetType());
+            engine = new Engine(logger);
+        }
 
         /// <summary>
         /// Our logger
         /// </summary>
         private readonly ILogger logger;
+
+        /// <summary>
+        /// Engine to process bindings
+        /// </summary>
+        private Engine engine;
+
+
+
+
 
         /// <summary>
         /// Registers the controller with the dispatcher.
@@ -119,256 +135,273 @@ namespace Bistro.Controllers.Dispatch
             }
         }
 
-        /// <summary>
-        /// Normalizes the url and splits it by slashes, not presenting a blank element if the 
-        /// url begins with a slash
-        /// </summary>
-        /// <param name="url">The URL.</param>
-        /// <returns></returns>
-        private string[] smartUrlSplit(string url)
+        public virtual void ProcessControllers()
         {
-            // trim any excess whitespace, and also the leading /
-            string workingCopy = url.Trim().TrimStart('/');
+            foreach (var pair in map)
+            {
+                
 
-            return BindPointUtilities.GetBindComponents(url);
+
+            }
+
         }
 
-        /// <summary>
-        /// Gets an ordered list of controller types that should service the given url. The ordering
-        /// is defined by the priority value marked on the class
-        /// </summary>
-        /// <param name="requestUrl">The request URL.</param>
-        /// <param name="bindPoint">The bind point.</param>
-        /// <returns></returns>
         public virtual ControllerInvocationInfo[] GetControllers(string requestUrl)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            var controllers = GetFullControllerList(requestUrl);
-            logger.Report(Messages.PathCalculation, sw.ElapsedMilliseconds.ToString(), map.Count.ToString());
-
-            var securityControllers = new List<ControllerInvocationInfo>();
-
-            int i = 0;
-            while (i < controllers.Count)
-                if (typeof(ISecurityController).IsAssignableFrom(controllers[i].BindPoint.Controller.ControllerType as Type))
-                {
-                    securityControllers.Add(controllers[i]);
-                    controllers.RemoveAt(i);
-                }
-                else
-                    i++;
-
-            // we can't just sort, because the standard sort may re-arrange the existing order.
-            // we just want to move all security controllers to the top of the chain
-            controllers.InsertRange(0, securityControllers);
-
-            return controllers.ToArray();
+            return null;
         }
 
-        /// <summary>
-        /// Gets the full controller list.
-        /// </summary>
-        /// <param name="requestUrl">The request URL.</param>
-        /// <returns></returns>
-        private List<ControllerInvocationInfo> GetFullControllerList(string requestUrl)
-        {
-            Func<List<ControllerInvocationInfo>> init = () => new List<ControllerInvocationInfo>();
-            var before = init();
-            var payload = init();
-            var after = init();
-            var teardown = init();
 
-            // make sure the match is only done based on url component, and not the parameters
-            // if there are any parameters, they'll be handled later
-            string[] splitQueryString = requestUrl.Split('?');
-            string[] requestComponents = smartUrlSplit(splitQueryString[0]);
+        ///// <summary>
+        ///// Normalizes the url and splits it by slashes, not presenting a blank element if the 
+        ///// url begins with a slash
+        ///// </summary>
+        ///// <param name="url">The URL.</param>
+        ///// <returns></returns>
+        //private string[] smartUrlSplit(string url)
+        //{
+        //    // trim any excess whitespace, and also the leading /
+        //    string workingCopy = url.Trim().TrimStart('/');
 
-            foreach (string bindPoint in map.Keys)
-            {
-                int matchDepth;
-                Dictionary<string, string> parameterValues = new Dictionary<string, string>();
+        //    return BindPointUtilities.GetBindComponents(url);
+        //}
 
-                if (!Match(requestComponents, smartUrlSplit(bindPoint), out matchDepth, parameterValues))
-                    continue;
+        ///// <summary>
+        ///// Gets an ordered list of controller types that should service the given url. The ordering
+        ///// is defined by the priority value marked on the class
+        ///// </summary>
+        ///// <param name="requestUrl">The request URL.</param>
+        ///// <param name="bindPoint">The bind point.</param>
+        ///// <returns></returns>
+        //public virtual ControllerInvocationInfo[] GetControllers(string requestUrl)
+        //{
+        //    Stopwatch sw = new Stopwatch();
+        //    sw.Start();
 
-                foreach (BindPointDescriptor descriptor in map[bindPoint])
-                {
-                    List<ControllerInvocationInfo> list = before;
-                    switch (descriptor.ControllerBindType)
-                    {
-                        case BindType.Before:
-                            list = before;
-                            break;
-                        case BindType.Payload:
-                            list = payload;
-                            break;
-                        case BindType.After:
-                            list = after;
-                            break;
-                        case BindType.Teardown:
-                            list = teardown;
-                            break;
-                    }
+        //    var controllers = GetFullControllerList(requestUrl);
+        //    logger.Report(Messages.PathCalculation, sw.ElapsedMilliseconds.ToString(), map.Count.ToString());
 
-                    // if there are query string parameters, populate them by name, and not positionally
-                    if (splitQueryString.Length == 2)   
-                    {
-                        // if there are any errant leading or trailing ampersands, get rid of them
-                        string[] queryStringParameters = CleanQueryString(splitQueryString[1]).Split('&', '=');
-                        for (int i = 0; i + 1 < queryStringParameters.Length; i += 2)
-                            if (descriptor.ParameterFields.ContainsKey(queryStringParameters[i]) && !parameterValues.ContainsKey(queryStringParameters[i]))
-                                parameterValues.Add(queryStringParameters[i], queryStringParameters[i + 1]);
-                    }
+        //    var securityControllers = new List<ControllerInvocationInfo>();
 
-                    list.Add(new ControllerInvocationInfo(descriptor, parameterValues, matchDepth));
-                }
-            }
+        //    int i = 0;
+        //    while (i < controllers.Count)
+        //        if (typeof(ISecurityController).IsAssignableFrom(controllers[i].BindPoint.Controller.ControllerType as Type))
+        //        {
+        //            securityControllers.Add(controllers[i]);
+        //            controllers.RemoveAt(i);
+        //        }
+        //        else
+        //            i++;
 
-            Func<int, int, int> nonZero = (a, b) => a == 0 ? b : a;
-            Comparison<ControllerInvocationInfo> compare =
-                (x, y) => nonZero(x.MatchDepth.CompareTo(y.MatchDepth), y.BindPoint.Priority.CompareTo(x.BindPoint.Priority));
+        //    // we can't just sort, because the standard sort may re-arrange the existing order.
+        //    // we just want to move all security controllers to the top of the chain
+        //    controllers.InsertRange(0, securityControllers);
 
-            before.Sort(compare);
-            payload.Sort(compare);
-            after.Sort(compare);
-            teardown.Sort(compare);
+        //    return controllers.ToArray();
+        //}
 
-            after.InsertRange(0, payload);
-            after.InsertRange(0, before);
-            after.AddRange(teardown);
+        ///// <summary>
+        ///// Gets the full controller list.
+        ///// </summary>
+        ///// <param name="requestUrl">The request URL.</param>
+        ///// <returns></returns>
+        //private List<ControllerInvocationInfo> GetFullControllerList(string requestUrl)
+        //{
+        //    Func<List<ControllerInvocationInfo>> init = () => new List<ControllerInvocationInfo>();
+        //    var before = init();
+        //    var payload = init();
+        //    var after = init();
+        //    var teardown = init();
 
-            new DependencyHelper().EnforceDependencies(after);
+        //    // make sure the match is only done based on url component, and not the parameters
+        //    // if there are any parameters, they'll be handled later
+        //    string[] splitQueryString = requestUrl.Split('?');
+        //    string[] requestComponents = smartUrlSplit(splitQueryString[0]);
 
-            StringBuilder path = new StringBuilder();
-            foreach (ControllerInvocationInfo info in after)
-                path.Append(info.BindPoint.Controller.ControllerTypeName).Append(" based on ").Append(info.BindPoint.Target).Append("\r\n");
+        //    foreach (string bindPoint in map.Keys)
+        //    {
+        //        int matchDepth;
+        //        Dictionary<string, string> parameterValues = new Dictionary<string, string>();
 
-            logger.Report(Messages.ExecutionPath, requestUrl, path.ToString());
+        //        if (!Match(requestComponents, smartUrlSplit(bindPoint), out matchDepth, parameterValues))
+        //            continue;
 
-            return after;
-        }
+        //        foreach (BindPointDescriptor descriptor in map[bindPoint])
+        //        {
+        //            List<ControllerInvocationInfo> list = before;
+        //            switch (descriptor.ControllerBindType)
+        //            {
+        //                case BindType.Before:
+        //                    list = before;
+        //                    break;
+        //                case BindType.Payload:
+        //                    list = payload;
+        //                    break;
+        //                case BindType.After:
+        //                    list = after;
+        //                    break;
+        //                case BindType.Teardown:
+        //                    list = teardown;
+        //                    break;
+        //            }
 
-        /// <summary>
-        /// Cleans query strings of leading and duplicate ampersands
-        /// </summary>
-        /// <param name="queryString">the query string</param>
-        /// <returns></returns>
-        protected virtual string CleanQueryString(string queryString)
-        {
-            return
-                dupedAmpRE.Replace(
-                    trailingAmpRE.Replace(
-                        leadingAmpRE.Replace(queryString, String.Empty),
-                        String.Empty),
-                    String.Empty);
-        }
+        //            // if there are query string parameters, populate them by name, and not positionally
+        //            if (splitQueryString.Length == 2)   
+        //            {
+        //                // if there are any errant leading or trailing ampersands, get rid of them
+        //                string[] queryStringParameters = CleanQueryString(splitQueryString[1]).Split('&', '=');
+        //                for (int i = 0; i + 1 < queryStringParameters.Length; i += 2)
+        //                    if (descriptor.ParameterFields.ContainsKey(queryStringParameters[i]) && !parameterValues.ContainsKey(queryStringParameters[i]))
+        //                        parameterValues.Add(queryStringParameters[i], queryStringParameters[i + 1]);
+        //            }
 
-        /// <summary>
-        /// Matches the specified request URL.
-        /// </summary>
-        /// <param name="requestUrl">The request URL.</param>
-        /// <param name="bindPoint">The bind point.</param>
-        /// <param name="matchDepth">The match depth.</param>
-        /// <param name="parameterValues">The parameter values.</param>
-        /// <returns></returns>
-        private bool Match(string[] requestUrl, string[] bindPoint, out int matchDepth, Dictionary<string, string> parameterValues)
-        {
-            int requestIndex = 0;
-            int bindIndex = 0;
-            matchDepth = 0;
+        //            list.Add(new ControllerInvocationInfo(descriptor, parameterValues, matchDepth));
+        //        }
+        //    }
 
-            while (bindIndex < bindPoint.Length)
-            {
-                // if there are more bind components than there are url components, we don't have a match.
-                // however, if all the remaining bind components are parameter components, it is a match
-                // and we simply set all of the values to null.
-                if (requestIndex >= requestUrl.Length)
-                {
-                    List<string> possibleNulls = new List<string>(bindPoint.Length - bindIndex);
-                    for (int i = bindIndex; i < bindPoint.Length; i++)
-                    {
-                        if (!(IsParameterComponent(bindPoint[i])))
-                            return false;
+        //    Func<int, int, int> nonZero = (a, b) => a == 0 ? b : a;
+        //    Comparison<ControllerInvocationInfo> compare =
+        //        (x, y) => nonZero(x.MatchDepth.CompareTo(y.MatchDepth), y.BindPoint.Priority.CompareTo(x.BindPoint.Priority));
 
-                        possibleNulls.Add(bindPoint[i].TrimStart('{').TrimEnd('}'));
-                    }
+        //    before.Sort(compare);
+        //    payload.Sort(compare);
+        //    after.Sort(compare);
+        //    teardown.Sort(compare);
 
-                    foreach (string nullParameter in possibleNulls)
-                        parameterValues.Add(nullParameter, null);
+        //    after.InsertRange(0, payload);
+        //    after.InsertRange(0, before);
+        //    after.AddRange(teardown);
 
-                    return true;
-                }
+        //    new DependencyHelper().EnforceDependencies(after);
 
-                string bindComponent = bindPoint[bindIndex];
-                matchDepth = requestIndex;
+        //    StringBuilder path = new StringBuilder();
+        //    foreach (ControllerInvocationInfo info in after)
+        //        path.Append(info.BindPoint.Controller.ControllerTypeName).Append(" based on ").Append(info.BindPoint.Target).Append("\r\n");
 
-                // local wildcard means that the current component doesn't matter. accept and move on.
-                if (bindComponent == localWildCard)
-                {
-                    requestIndex++;
-                    bindIndex++;
+        //    logger.Report(Messages.ExecutionPath, requestUrl, path.ToString());
 
-                    continue;
-                }
+        //    return after;
+        //}
 
-                // same as local wild card, but we need to capture the value as a parameter
-                if (bindComponent.StartsWith("{") && bindComponent.EndsWith("}"))
-                {
-                    parameterValues.Add(bindComponent.Trim('{', '}'), requestUrl[requestIndex]);
-                    requestIndex++;
-                    bindIndex++;
+        ///// <summary>
+        ///// Cleans query strings of leading and duplicate ampersands
+        ///// </summary>
+        ///// <param name="queryString">the query string</param>
+        ///// <returns></returns>
+        //protected virtual string CleanQueryString(string queryString)
+        //{
+        //    return
+        //        dupedAmpRE.Replace(
+        //            trailingAmpRE.Replace(
+        //                leadingAmpRE.Replace(queryString, String.Empty),
+        //                String.Empty),
+        //            String.Empty);
+        //}
 
-                    continue;
-                }
+        ///// <summary>
+        ///// Matches the specified request URL.
+        ///// </summary>
+        ///// <param name="requestUrl">The request URL.</param>
+        ///// <param name="bindPoint">The bind point.</param>
+        ///// <param name="matchDepth">The match depth.</param>
+        ///// <param name="parameterValues">The parameter values.</param>
+        ///// <returns></returns>
+        //private bool Match(string[] requestUrl, string[] bindPoint, out int matchDepth, Dictionary<string, string> parameterValues)
+        //{
+        //    int requestIndex = 0;
+        //    int bindIndex = 0;
+        //    matchDepth = 0;
 
-                // global wild card means that the requestUrl from this point forward can have any value (including {})
-                // we need to stop once we match the next component
-                if (bindComponent.Equals(globalWildCard))
-                {
-                    // the global wild card is the end of the bind string. we have a match.
-                    if (bindIndex + 1 == bindPoint.Length)
-                        return true;
+        //    while (bindIndex < bindPoint.Length)
+        //    {
+        //        // if there are more bind components than there are url components, we don't have a match.
+        //        // however, if all the remaining bind components are parameter components, it is a match
+        //        // and we simply set all of the values to null.
+        //        if (requestIndex >= requestUrl.Length)
+        //        {
+        //            List<string> possibleNulls = new List<string>(bindPoint.Length - bindIndex);
+        //            for (int i = bindIndex; i < bindPoint.Length; i++)
+        //            {
+        //                if (!(IsParameterComponent(bindPoint[i])))
+        //                    return false;
 
-                    bindIndex++;
-                    bindComponent = bindPoint[bindIndex];
+        //                possibleNulls.Add(bindPoint[i].TrimStart('{').TrimEnd('}'));
+        //            }
 
-                    // scan through the request structure to find the next matching component
-                    // e.g. - bindPoint "/hello/?/you" should match request /hello/how/are/you
-                    // skipping the "/how/are" piece, and resume the match on "/you". However,
-                    // the same bind point should not match request "/hello/world", as there is 
-                    // no trailing "you". note that this disallows the syntax "/hello/?/*" and 
-                    // "/hello/?/?", but does allow "/hello/?/something/*", and so on.
-                    while (requestIndex < requestUrl.Length && requestUrl[requestIndex] != bindComponent)
-                        requestIndex++;
+        //            foreach (string nullParameter in possibleNulls)
+        //                parameterValues.Add(nullParameter, null);
 
-                    // ran out of url components while looking for trailing match. no match.
-                    if (requestIndex == requestUrl.Length)
-                        return false;
-                }
+        //            return true;
+        //        }
 
-                if (!bindComponent.Equals(requestUrl[requestIndex], StringComparison.OrdinalIgnoreCase))
-                    return false;
+        //        string bindComponent = bindPoint[bindIndex];
+        //        matchDepth = requestIndex;
 
-                requestIndex++;
-                bindIndex++;
-            }
+        //        // local wildcard means that the current component doesn't matter. accept and move on.
+        //        if (bindComponent == localWildCard)
+        //        {
+        //            requestIndex++;
+        //            bindIndex++;
 
-            return true;
-        }
+        //            continue;
+        //        }
 
-        /// <summary>
-        /// Determines whether the component denotes a parameter component.
-        /// </summary>
-        /// <param name="component">The component.</param>
-        /// <returns>
-        /// 	<c>true</c> if the component denotes a parameter component; otherwise, <c>false</c>.
-        /// </returns>
-        private bool IsParameterComponent(string bindComponent)
-        {
-            return bindComponent.StartsWith("{") && bindComponent.EndsWith("}");
-        }
+        //        // same as local wild card, but we need to capture the value as a parameter
+        //        if (bindComponent.StartsWith("{") && bindComponent.EndsWith("}"))
+        //        {
+        //            parameterValues.Add(bindComponent.Trim('{', '}'), requestUrl[requestIndex]);
+        //            requestIndex++;
+        //            bindIndex++;
+
+        //            continue;
+        //        }
+
+        //        // global wild card means that the requestUrl from this point forward can have any value (including {})
+        //        // we need to stop once we match the next component
+        //        if (bindComponent.Equals(globalWildCard))
+        //        {
+        //            // the global wild card is the end of the bind string. we have a match.
+        //            if (bindIndex + 1 == bindPoint.Length)
+        //                return true;
+
+        //            bindIndex++;
+        //            bindComponent = bindPoint[bindIndex];
+
+        //            // scan through the request structure to find the next matching component
+        //            // e.g. - bindPoint "/hello/?/you" should match request /hello/how/are/you
+        //            // skipping the "/how/are" piece, and resume the match on "/you". However,
+        //            // the same bind point should not match request "/hello/world", as there is 
+        //            // no trailing "you". note that this disallows the syntax "/hello/?/*" and 
+        //            // "/hello/?/?", but does allow "/hello/?/something/*", and so on.
+        //            while (requestIndex < requestUrl.Length && requestUrl[requestIndex] != bindComponent)
+        //                requestIndex++;
+
+        //            // ran out of url components while looking for trailing match. no match.
+        //            if (requestIndex == requestUrl.Length)
+        //                return false;
+        //        }
+
+        //        if (!bindComponent.Equals(requestUrl[requestIndex], StringComparison.OrdinalIgnoreCase))
+        //            return false;
+
+        //        requestIndex++;
+        //        bindIndex++;
+        //    }
+
+        //    return true;
+        //}
+
+        ///// <summary>
+        ///// Determines whether the component denotes a parameter component.
+        ///// </summary>
+        ///// <param name="component">The component.</param>
+        ///// <returns>
+        ///// 	<c>true</c> if the component denotes a parameter component; otherwise, <c>false</c>.
+        ///// </returns>
+        //private bool IsParameterComponent(string bindComponent)
+        //{
+        //    return bindComponent.StartsWith("{") && bindComponent.EndsWith("}");
+        //}
 
         /// <summary>
         /// Determines whether the specified url has a controller explicitly bound to it

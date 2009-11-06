@@ -108,7 +108,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
 
             AppDomain.CurrentDomain.AssemblyLoad += new AssemblyLoadEventHandler(CurrentDomain_AssemblyLoad);
 
-            dispatcherFactory.GetDispatcherInstance().ProcessControllers();
+//            dispatcherFactory.GetDispatcherInstance().ProcessControllers();
             loaded = true;
         }
 
@@ -121,7 +121,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
         {
             LoadAssembly(args.LoadedAssembly);
 
-            dispatcherFactory.GetDispatcherInstance().ProcessControllers();
+//            dispatcherFactory.GetDispatcherInstance().ProcessControllers();
         }
 
         /// <summary>

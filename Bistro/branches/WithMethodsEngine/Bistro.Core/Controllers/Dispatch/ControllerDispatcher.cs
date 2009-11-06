@@ -23,7 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
-using BindPointDescriptor = Bistro.Controllers.Descriptor.ControllerDescriptor.BindPointDescriptor;
+
 using Bistro.Controllers.Descriptor;
 using System.Diagnostics;
 using Bistro.Controllers.Security;
@@ -79,7 +79,7 @@ namespace Bistro.Controllers.Dispatch
         ///// <summary>
         ///// Mapping of urls to bind points
         ///// </summary>
-        Dictionary<string, List<BindPointDescriptor>> map = new Dictionary<string, List<BindPointDescriptor>>();
+//        Dictionary<string, List<BindPointDescriptor>> map = new Dictionary<string, List<BindPointDescriptor>>();
 
 
 
@@ -112,46 +112,39 @@ namespace Bistro.Controllers.Dispatch
         /// <param name="info">The controller info.</param>
         public virtual void RegisterController(ControllerDescriptor info)
         {
-            foreach (BindPointDescriptor bindPoint in info.Targets)
-            {
-                List<BindPointDescriptor> descriptors = null;
+            //foreach (BindPointDescriptor bindPoint in info.Targets)
+            //{
+            //    List<BindPointDescriptor> descriptors = null;
 
-                if (!map.TryGetValue(bindPoint.Target, out descriptors))
-                {
-                    descriptors = new List<BindPointDescriptor>();
-                    map.Add(bindPoint.Target, descriptors);
-                }
+            //    if (!map.TryGetValue(bindPoint.Target, out descriptors))
+            //    {
+            //        descriptors = new List<BindPointDescriptor>();
+            //        map.Add(bindPoint.Target, descriptors);
+            //    }
 
-                int i = 0;
-                foreach (BindPointDescriptor comparedBindPoint in descriptors)
-                {
-                    if (comparedBindPoint.Priority > bindPoint.Priority)
-                        break;
+            //    int i = 0;
+            //    foreach (BindPointDescriptor comparedBindPoint in descriptors)
+            //    {
+            //        if (comparedBindPoint.Priority > bindPoint.Priority)
+            //            break;
 
-                    i++;
-                }
+            //        i++;
+            //    }
 
-                descriptors.Insert(i, bindPoint);
-            }
+            //    descriptors.Insert(i, bindPoint);
+            //}
+
+            engine.RegisterController(info);
         }
 
-        public virtual void ProcessControllers()
-        {
-            foreach (var pair in map)
-            {
-                
 
-
-            }
-
-        }
 
         public virtual ControllerInvocationInfo[] GetControllers(string requestUrl)
         {
-            return null;
+            return engine.GetControllers(requestUrl).ToArray();
         }
 
-
+        #region Matching
         ///// <summary>
         ///// Normalizes the url and splits it by slashes, not presenting a blank element if the 
         ///// url begins with a slash
@@ -391,6 +384,8 @@ namespace Bistro.Controllers.Dispatch
         //    return true;
         //}
 
+        #endregion
+
         ///// <summary>
         ///// Determines whether the component denotes a parameter component.
         ///// </summary>
@@ -412,7 +407,8 @@ namespace Bistro.Controllers.Dispatch
         /// </returns>
         public bool HasExactBind(string requestUrl)
         {
-            return map.ContainsKey(requestUrl);
+            return engine.HasExactBind(requestUrl);
+            
         }
     }
 }

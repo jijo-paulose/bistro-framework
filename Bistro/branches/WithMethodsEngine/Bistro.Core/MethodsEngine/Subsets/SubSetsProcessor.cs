@@ -5,25 +5,45 @@ using System.Text;
 using Bistro.Controllers.Descriptor;
 using Bistro.MethodsEngine.Reflection;
 using System.Text.RegularExpressions;
+using Bistro.Configuration.Logging;
 
 namespace Bistro.MethodsEngine.Subsets
 {
+
     internal class SubSetsProcessor
     {
+
+
+        enum Errors
+        {
+            [DefaultMessage("Error processing link - method not found: {0}")]
+            ErrorMethodNotFound
+        }
+
+
+
         internal SubSetsProcessor(Engine _engine)
         {
             engine = _engine;
+            allMethods = new List<MethodUrlsSubset>();
+            allBindings = new List<GenBindingTuple>();
+            // We need to have at least one empty method. Otherwise it's impossible to create new non-empty methods.
+            allMethods.Add(new MethodUrlsSubset());
+
+
         }
 
         #region Groups
 
         #region Private fields
 
+
+
         private Regex bindingParser = new Regex(@"^\s*(?'binding'(\w*\s*)((\?|/|(/(\*|(\w|-)+|\{\w+}|\?/((\w|-)+|\{\w+})))*(/\?)?)(?:\?(?:(?:\w|-|=)+|\{\w+})(?:\&(?:(?:\w|-|=)+|\{\w+}))*|)))\s*$", RegexOptions.Compiled | RegexOptions.Singleline);
 
 
-        private Dictionary<BindVerb, List<IEnumerable<GenBinding>>> allBindings;
-        private Dictionary<BindVerb, List<MethodUrlsSubset>> allMethods;
+        private List<GenBindingTuple> allBindings;
+        private List<MethodUrlsSubset> allMethods;
 
         private Engine engine;
 
@@ -31,82 +51,45 @@ namespace Bistro.MethodsEngine.Subsets
 
 
 
-        //public MethodUrlsSubset GetMethodByUrl(string url)
-        //{
-        //    var splittedUrl = smartUrlSplit(url);
-
-        //    if (splittedUrl.Length == 0)
-        //        throw new ApplicationException("Invalid (empty) url");
 
 
 
-
-
-
-
-
-        //}
-
-
-
-
-
-
-
-        //private void SortSubsets()
-        //{
-        //    foreach (var methodsList in allMethods)
-        //    {
-        //        foreach (var method in methodsList.Value)
-        //        {
-        //            method.AddParticipates();
-        //        }
-        //        allBindings[methodsList.Key].Sort((x, y) => x.First(bind => bind.MatchStatus).ParticipatesCount.CompareTo(y.First(bind => bind.MatchStatus).ParticipatesCount));
-        //    }
-        //}
-
-
-
-
-
-        public void ProcessControllers(List<ITypeInfo> controllers)
+        public void AddNewBinding(string verbNormalizedUrl)
         {
+            allBindings.Add(new GenBindingTuple(verbNormalizedUrl,engine));
+            allMethods = CreateNewMethodsLevel();
 
-            allMethods = new Dictionary<BindVerb, List<MethodUrlsSubset>>();
+        }
 
-            allBindings = new Dictionary<BindVerb, List<IEnumerable<GenBinding>>>();
-            foreach (BindVerb verb in Enum.GetValues(typeof(BindVerb)))
+
+        internal MethodUrlsSubset GetMethodByUrl(string requestUrl)
+        {
+            // Compare with each Binding
+            Dictionary<GenBinding,GenBinding> bindingsToSearch = new Dictionary<GenBinding,GenBinding>();
+            foreach (GenBindingTuple tuple in allBindings)
             {
-                allBindings.Add(verb, new List<IEnumerable<GenBinding>>());
+                GenBinding tempBind = tuple.TryMatchUrl(requestUrl);
+                bindingsToSearch.Add(tempBind,tempBind);
             }
 
-            controllers.ForEach(controller => CreateGenBindings(controller));
 
-            StringBuilder sb = new StringBuilder();
-
-
-
-            foreach (BindVerb verb in Enum.GetValues(typeof(BindVerb)))
+            // Compare result with each method
+            foreach (MethodUrlsSubset subset in allMethods)
             {
-                List<MethodUrlsSubset> allGroups = CreateGroups(verb);
-                allMethods.Add(verb, allGroups);
-
-                //sb.AppendFormat("NEXT VERB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:{0}\r\n", verb.ToString());
-
-                //foreach (MethodUrlsSubset subset in allGroups)
-                //{
-                //    sb.AppendLine("New subset!!!!!!!!!!!!!!!");
-                //    foreach (var binding in subset.BindingsList)
-                //    {
-                //        sb.AppendFormat("MatchStatus:{0}   Url:{1}\r\n", binding.MatchStatus, binding.InitialUrl);
-                //    }
-                //}
-
+                bool notFound = false;
+                foreach (GenBinding bind in subset.BindingsList)
+                {
+                    if (bindingsToSearch.ContainsKey(bind))
+                        continue;
+                    notFound = true;
+                }
+                if (notFound)
+                    continue;
+                return subset;
             }
-            //SortSubsets();
-            //string result = sb.ToString();
-
-
+            engine.Logger.Report(Errors.ErrorMethodNotFound, requestUrl);
+            //throw new ApplicationException("Method not found - see log for details");
+            return null;
         }
 
 
@@ -128,105 +111,29 @@ namespace Bistro.MethodsEngine.Subsets
 
 
 
-
-        private List<MethodUrlsSubset> CreateGroups(BindVerb verb)
+        private List<MethodUrlsSubset> CreateNewMethodsLevel()
         {
-            MethodUrlsSubset firstGroup = new MethodUrlsSubset();
-            List<MethodUrlsSubset> allGroups = new List<MethodUrlsSubset>();
-
-            List<MethodUrlsSubset> newBindingGroups;
-            allGroups.Add(firstGroup);
-            List<IEnumerable<GenBinding>> bindingsForVerb = allBindings[verb];
-            foreach (IEnumerable<GenBinding> bindingsPair in bindingsForVerb)
+            List<MethodUrlsSubset> newBindingMethods = allMethods;
+            List<MethodUrlsSubset> oldBindingMethods;
+            foreach (GenBindingTuple tuple in allBindings.Where(tpl => !tpl.Processed))
             {
-
-                newBindingGroups = new List<MethodUrlsSubset>();
-
-                foreach (MethodUrlsSubset group in allGroups)
+                oldBindingMethods = newBindingMethods;
+                newBindingMethods = new List<MethodUrlsSubset>();
+                
+                foreach (MethodUrlsSubset group in allMethods)
                 {
-                    foreach (GenBinding binding in bindingsPair)
-                    {
-                        MethodUrlsSubset newGroup = group.ApplyBinding(binding);
-                        if (newGroup != null)
-                            newBindingGroups.Add(newGroup);
-                    }
-                }
+                    MethodUrlsSubset newGroupTrue = group.ApplyBinding(tuple.PositiveBind);
+                    MethodUrlsSubset newGroupFalse = group.ApplyBinding(tuple.NegativeBind);
+                    tuple.MarkProcessed();
 
-                allGroups = newBindingGroups;
-
-            }
-
-            return allGroups;
-
-        }
-
-
-
-        private void CreateGenBindings(ITypeInfo classInfo)
-        {
-
-            List<string> bindings = new List<string>();
-            foreach (IAttributeInfo attribute in classInfo.Attributes)
-            {
-                if (attribute.Type == typeof(BindAttribute).FullName && attribute.Parameters.Count > 0)
-                {
-                    bindings.Add(attribute.Parameters[0].AsString());
+                    if (newGroupTrue != null)
+                        newBindingMethods.Add(newGroupTrue);
+                    if (newGroupFalse != null)
+                        newBindingMethods.Add(newGroupFalse);
                 }
             }
-
-            foreach (string item in bindings)
-            {
-                Match match = bindingParser.Match(item);
-                if (match.Success)
-                {
-                    string methodUrl = match.Groups["binding"].Captures[0].Value;
-                    string verb;
-                    switch (methodUrl[0])
-                    {
-                        case '?':
-                        case '/':
-                            verb = "*";
-                            break;
-                        default:
-                            verb = methodUrl.Substring(0, methodUrl.IndexOfAny(new char[] { ' ', '/', '?' }));
-                            methodUrl = methodUrl.Substring(methodUrl.IndexOfAny(new char[] { '/', '?' }));
-                            break;
-
-                    }
-
-                    if (verb == "*")
-                    {
-                        foreach (BindVerb bindVerb in Enum.GetValues(typeof(BindVerb)))
-                        {
-                            AddNewBinding(bindVerb, methodUrl, classInfo);
-                        }
-                    }
-                    else
-                    {
-                        foreach (BindVerb bindVerb in Enum.GetValues(typeof(BindVerb)))
-                        {
-                            if (verb.ToUpper() == bindVerb.ToString().ToUpper())
-                            {
-                                AddNewBinding(bindVerb, methodUrl, classInfo);
-                            }
-                        }
-                    }
-
-                }
-                else
-                {
-                    engine.RaiseInvalidBinding(null, item);
-                }
-            }
-
-
-
-        }
-
-
-        private void AddNewBinding(BindVerb verb, string bindUrl, ITypeInfo classInfo)
-        {
-            allBindings[verb].Add(new GenBinding[2] { new GenBinding(bindUrl, classInfo.FullName, true, verb), new GenBinding(bindUrl, classInfo.FullName, false, verb) });
+//            allMethods = newBindingMethods;
+            return newBindingMethods;
         }
 
 
@@ -235,9 +142,6 @@ namespace Bistro.MethodsEngine.Subsets
         #endregion
 
         #endregion
-
-
-
 
 
     }

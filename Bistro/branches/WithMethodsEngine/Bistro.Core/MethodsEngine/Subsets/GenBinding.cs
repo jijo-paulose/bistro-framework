@@ -4,24 +4,53 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Bistro.Controllers.Descriptor;
+using Bistro.Configuration.Logging;
 
 namespace Bistro.MethodsEngine.Subsets
 {
+    internal class GenBindingTuple
+    {
+        internal GenBindingTuple(string _verbNormalizedUrl,Engine _engine)
+        {
+            PositiveBind = new GenBinding(_verbNormalizedUrl, true, _engine);
+            NegativeBind = new GenBinding(_verbNormalizedUrl, false, _engine);
+            Processed = false;
+
+            engine = _engine;
+        }
+
+        internal GenBinding TryMatchUrl(string url)
+        {
+            return PositiveBind.TryMatchUrl(url) ? PositiveBind : NegativeBind;
+        }
+
+
+        internal void MarkProcessed () 
+        {
+            Processed = true;
+        }
+
+        private Engine engine;
+
+        internal bool Processed { get; private set; }
+        internal GenBinding PositiveBind { get; set; }
+        internal GenBinding NegativeBind { get; set; }
+    }
+
 
     internal class GenBinding
     {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="_url"></param> -> bindingString
-        /// <param name="_controller"></param>
+        /// <param name="_verbNormalizedUrl">binding in the form VERB/URL</param>
         /// <param name="_matchStatus"></param>
-        /// <param name="_verb"></param>
-        internal GenBinding(string _url, string _controller, bool _matchStatus, BindVerb _verb)
+        internal GenBinding(string _verbNormalizedUrl, bool _matchStatus, Engine _engine)
         {
-            initialUrl = _url;
-            initialController = _controller;
+            engine = _engine;
+            initialUrl = _verbNormalizedUrl;
             matchStatus = _matchStatus;
+
 
             items = GetSplitItems(initialUrl);
 
@@ -40,11 +69,14 @@ namespace Bistro.MethodsEngine.Subsets
         private List<List<string>> items;
         private string initialUrl;
 
-        private BindVerb verb;
+        private int totalLength = 0;
+        private int lengthWithoutEndParams = 0;
+
+        private Engine engine;
+
+//        private BindVerb verb;
 
 
-
-        private string initialController;
 
         private bool matchStatus;
 
@@ -63,7 +95,25 @@ namespace Bistro.MethodsEngine.Subsets
             foreach (string preSplitItem in preSplitItems)
             {
                 var splitItems = subSplitRegex.Split(preSplitItem).Where(inputStr => inputStr != string.Empty);
+                totalLength = totalLength + splitItems.Count();
                 tempItems.Add(new List<string>(splitItems));
+            }
+            lengthWithoutEndParams = totalLength;
+            bool brk = false;
+            for (int i = (tempItems.Count - 1); i >= 0; i--)
+            {
+                for (int j = tempItems[i].Count - 1; j >= 0; j--)
+                {
+                    if (wildCardRegex.IsMatch(tempItems[i][j]))
+                        lengthWithoutEndParams--;
+                    else
+                    {
+                        brk = true;
+                        break;
+                    }
+                }
+                if (brk)
+                    break;
             }
             return tempItems;
         }
@@ -71,15 +121,21 @@ namespace Bistro.MethodsEngine.Subsets
 
         #endregion
 
+        enum Errors
+        {
+            [DefaultMessage("Error splitting incoming url: {0}")]
+            ErrorSplittingUrl
+        }
 
+        enum Messages
+        {
+            [DefaultMessage("Matching url: {0}")]
+            MessageMatchingUrl
+        }
 
 
         #region Internal properties
-        internal BindVerb Verb
-        {
-            get { return verb; }
-            set { verb = value; }
-        }
+
         internal string InitialUrl
         {
             get { return initialUrl; }
@@ -95,6 +151,8 @@ namespace Bistro.MethodsEngine.Subsets
 
         #region Internal methods
 
+
+        #region Participates
         internal void AddParticipant(MethodUrlsSubset newParticipant)
         {
             participatesIn.Add(newParticipant);
@@ -106,6 +164,83 @@ namespace Bistro.MethodsEngine.Subsets
             {
                 return participatesIn.Count;
             }
+        }
+
+        #endregion
+
+
+        internal bool TryMatchUrl(string requestUrl)
+        {
+            engine.Logger.Report(Messages.MessageMatchingUrl, requestUrl);
+
+            var requestItems = GetSplitItems(initialUrl);
+
+            //if (requestItems.Count != 1)
+            //{
+            //    engine.Logger.Report(Errors.ErrorSplittingUrl, requestUrl);
+            //    return false;
+            //}
+
+
+            string[] splitQueryString = requestUrl.Split('?');
+            string[] requestComponents = smartUrlSplit(splitQueryString[0]);
+
+            // if there are more bind components than there are url components, we don't have a match.
+            if (requestComponents.Length < lengthWithoutEndParams)
+                return false;
+
+            List<string> firstPart = items[0];
+
+            bool firstItemMatchImpossible = false;
+            for (int i = 0; i < firstPart.Count; i++)
+            {
+                if ((wildCardRegex.IsMatch(firstPart[i])) || (firstPart[i] == requestComponents[i]))
+                    continue;
+
+                firstItemMatchImpossible = true;
+                break;
+            }
+
+            if (firstItemMatchImpossible)
+                return false;
+
+            int positionInMatchPart = firstPart.Count;
+
+            var currentMatchPartEnum = items.GetEnumerator();
+            currentMatchPartEnum.MoveNext();
+
+            List<string> currentMatchPart = (currentMatchPartEnum.MoveNext()) ? currentMatchPartEnum.Current : null;
+
+            while (currentMatchPart != null)
+            {
+                if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Length)
+                {
+                    bool placed = true;
+                    for (int i = 0; i < currentMatchPart.Count; i++)
+                    {
+                        if (wildCardRegex.IsMatch(currentMatchPart[i]))
+                            continue;
+                        if (currentMatchPart[i] == requestComponents[i + positionInMatchPart])
+                            continue;
+                        placed = false;
+                        break;
+                    }
+
+                    if (placed)
+                    {
+                        positionInMatchPart = positionInMatchPart + currentMatchPart.Count;
+                        currentMatchPartEnum.MoveNext();
+                        currentMatchPart = currentMatchPartEnum.Current;
+                    }
+                    else 
+                        positionInMatchPart++;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -271,6 +406,23 @@ namespace Bistro.MethodsEngine.Subsets
             return true;
 
         }
+
+
+        #region from the old ControllerDispatcher
+        /// <summary>
+        /// Normalizes the url and splits it by slashes, not presenting a blank element if the 
+        /// url begins with a slash
+        /// </summary>
+        /// <param name="url">The URL.</param>
+        /// <returns></returns>
+        private string[] smartUrlSplit(string url)
+        {
+            // trim any excess whitespace, and also the leading /
+            string workingCopy = url.Trim().TrimStart('/');
+
+            return BindPointUtilities.GetBindComponents(url);
+        }
+        #endregion
 
 
         #endregion

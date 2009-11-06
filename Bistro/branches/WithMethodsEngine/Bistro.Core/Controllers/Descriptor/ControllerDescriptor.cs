@@ -435,7 +435,7 @@ namespace Bistro.Controllers.Descriptor
                 (attrib) => {
                     if (DefaultTemplates.ContainsKey(attrib.RenderType))
                         throw new ConfigurationErrorsException(
-                            String.Format("Multilpe RenderWith attributes specified for {0} on controller {1}",
+                            String.Format("Multiple RenderWith attributes specified for {0} on controller {1}",
                                             attrib.RenderType,
                                             GetType().FullName));
 

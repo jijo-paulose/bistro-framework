@@ -58,7 +58,7 @@ namespace Bistro
         /// <summary>
         /// Name of the unhandled exception event
         /// </summary>
-        public const string UnhandledException = "GET" + SystemEvents + ApplicationEvents + "/exception";
+        public const string UnhandledException = "EVENT" + SystemEvents + ApplicationEvents + "/exception";
 
         /// <summary>
         /// Gets or sets the application instance.

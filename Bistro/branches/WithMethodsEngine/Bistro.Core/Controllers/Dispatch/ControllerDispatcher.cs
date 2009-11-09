@@ -141,7 +141,7 @@ namespace Bistro.Controllers.Dispatch
 
         public virtual ControllerInvocationInfo[] GetControllers(string requestUrl)
         {
-            return engine.GetControllers(requestUrl).ToArray();
+            return engine.GetControllers(requestUrl);
         }
 
         #region Matching
@@ -291,14 +291,14 @@ namespace Bistro.Controllers.Dispatch
         //            String.Empty);
         //}
 
-        ///// <summary>
-        ///// Matches the specified request URL.
-        ///// </summary>
-        ///// <param name="requestUrl">The request URL.</param>
-        ///// <param name="bindPoint">The bind point.</param>
-        ///// <param name="matchDepth">The match depth.</param>
-        ///// <param name="parameterValues">The parameter values.</param>
-        ///// <returns></returns>
+        /// <summary>
+        /// Matches the specified request URL.
+        /// </summary>
+        /// <param name="requestUrl">The request URL.</param>
+        /// <param name="bindPoint">The bind point.</param>
+        /// <param name="matchDepth">The match depth.</param>
+        /// <param name="parameterValues">The parameter values.</param>
+        /// <returns></returns>
         //private bool Match(string[] requestUrl, string[] bindPoint, out int matchDepth, Dictionary<string, string> parameterValues)
         //{
         //    int requestIndex = 0;

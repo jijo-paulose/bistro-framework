@@ -14,13 +14,20 @@ namespace Bistro.MethodsEngine
     internal class Engine
     {
 
+        enum Errors
+        {
+            [DefaultMessage("Binding not found in the map: {0} ")]
+            BindingNotFound
+        }
+
+
+
         Dictionary<string, List<BindPointDescriptor>> map = new Dictionary<string, List<BindPointDescriptor>>();
         private SubSetsProcessor processor;
 
         internal Engine(ILogger logger)
         {
             Logger = logger;
-//            root = new Binding(this);
             processor = new SubSetsProcessor(this);
         }
 
@@ -68,25 +75,34 @@ namespace Bistro.MethodsEngine
 
         }
 
-
-        public List<ControllerInvocationInfo> GetControllers(string requestUrl)
+        /// <summary>
+        /// This method should be used by SubSetsProcessor to retrieve IControllerTypeInfos associated with GenBindings
+        /// </summary>
+        /// <param name="binding"></param>
+        /// <returns></returns>
+        internal List<IBindPointDescriptor> GetTypesByBinding(GenBinding binding)
         {
+            if (map.ContainsKey(binding.InitialUrl))
+            {
+                return map[binding.InitialUrl].OfType<IBindPointDescriptor>().ToList();
+            }
+            Logger.Report(Errors.BindingNotFound, binding.InitialUrl);
+            throw new ApplicationException("Binding not found");
+            
+        }
 
-            List<ControllerInvocationInfo> retList = new List<ControllerInvocationInfo>();
 
+
+
+        public ControllerInvocationInfo[] GetControllers(string requestUrl)
+        {
             MethodUrlsSubset urlSubSet = processor.GetMethodByUrl(requestUrl);
 
-            var genBindings = urlSubSet.BindingsList.Where(ctr => ctr.MatchStatus);
+           
 
-            foreach (var binding in genBindings)
-            {
-                foreach(var bindPoint in map[binding.InitialUrl])
-                {
-                    retList.Add(new ControllerInvocationInfo(bindPoint,new Dictionary<string,string>(),1));
-                }
-            }
+            var retList = urlSubSet.BindPointsList.Select(bpd => new ControllerInvocationInfo((BindPointDescriptor)bpd, new Dictionary<string, string>()));
 
-            return retList;
+            return retList.ToArray();
         }
 
 
@@ -96,15 +112,15 @@ namespace Bistro.MethodsEngine
         {
         }
 
-        internal virtual void RaiseResourceLoop(string methodUrl, IEnumerable<Controller> controllers, params string[] args)
+        internal virtual void RaiseResourceLoop(string methodUrl, IEnumerable<IControllerTypeInfo> controllers, params string[] args)
         {
         }
 
-        internal virtual void RaiseMissingProvider(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
+        internal virtual void RaiseMissingProvider(string resName, IEnumerable<IControllerTypeInfo> controllers, params string[] args)
         {
         }
 
-        internal virtual void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<ControllerType> controllers, params string[] args)
+        internal virtual void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<IControllerTypeInfo> controllers, params string[] args)
         {
         }
 

@@ -28,7 +28,7 @@ namespace Bistro.MethodsEngine.Subsets
             allMethods = new List<MethodUrlsSubset>();
             allBindings = new List<GenBindingTuple>();
             // We need to have at least one empty method. Otherwise it's impossible to create new non-empty methods.
-            allMethods.Add(new MethodUrlsSubset());
+            allMethods.Add(new MethodUrlsSubset(_engine));
 
 
         }

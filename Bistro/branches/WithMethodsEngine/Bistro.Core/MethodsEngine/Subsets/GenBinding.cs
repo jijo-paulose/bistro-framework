@@ -5,12 +5,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Bistro.Controllers.Descriptor;
 using Bistro.Configuration.Logging;
+using Bistro.MethodsEngine.Reflection;
 
 namespace Bistro.MethodsEngine.Subsets
 {
     internal class GenBindingTuple
     {
-        internal GenBindingTuple(string _verbNormalizedUrl,Engine _engine)
+        internal GenBindingTuple(string _verbNormalizedUrl ,Engine _engine)
         {
             PositiveBind = new GenBinding(_verbNormalizedUrl, true, _engine);
             NegativeBind = new GenBinding(_verbNormalizedUrl, false, _engine);
@@ -50,11 +51,11 @@ namespace Bistro.MethodsEngine.Subsets
             engine = _engine;
             initialUrl = _verbNormalizedUrl;
             matchStatus = _matchStatus;
+//            controllerTypeInfo = _controllerTypeInfo;
 
+            items = GetSplitItems(initialUrl,out totalLength,out lengthWithoutEndParams);
 
-            items = GetSplitItems(initialUrl);
-
-            participatesIn = new List<MethodUrlsSubset>();
+            //participatesIn = new List<MethodUrlsSubset>();
         }
 
 
@@ -63,7 +64,8 @@ namespace Bistro.MethodsEngine.Subsets
         private static Regex subSplitRegex = new Regex(@"/", RegexOptions.Compiled);
         private static Regex wildCardRegex = new Regex(@"\A(?:\*|{[^}]+})\z", RegexOptions.Compiled);
 
-        private List<MethodUrlsSubset> participatesIn;
+        private IControllerTypeInfo controllerTypeInfo;
+        //private List<MethodUrlsSubset> participatesIn;
 
 
         private List<List<string>> items;
@@ -88,17 +90,18 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         /// <param name="splitUrl"></param>
         /// <returns></returns>
-        private List<List<string>> GetSplitItems(string splitUrl)
+        private List<List<string>> GetSplitItems(string splitUrl, out int totalLengthLocal,out int lengthWithoutEnd)
         {
+            totalLengthLocal = 0;
             var preSplitItems = splitRegex.Split(splitUrl);
             var tempItems = new List<List<string>>(preSplitItems.Length);
             foreach (string preSplitItem in preSplitItems)
             {
                 var splitItems = subSplitRegex.Split(preSplitItem).Where(inputStr => inputStr != string.Empty);
-                totalLength = totalLength + splitItems.Count();
+                totalLengthLocal = totalLengthLocal + splitItems.Count();
                 tempItems.Add(new List<string>(splitItems));
             }
-            lengthWithoutEndParams = totalLength;
+            lengthWithoutEnd = totalLengthLocal;
             bool brk = false;
             for (int i = (tempItems.Count - 1); i >= 0; i--)
             {
@@ -153,27 +156,35 @@ namespace Bistro.MethodsEngine.Subsets
 
 
         #region Participates
-        internal void AddParticipant(MethodUrlsSubset newParticipant)
-        {
-            participatesIn.Add(newParticipant);
-        }
+        //internal void AddParticipant(MethodUrlsSubset newParticipant)
+        //{
+        //    participatesIn.Add(newParticipant);
+        //}
 
-        internal int ParticipatesCount
-        {
-            get
-            {
-                return participatesIn.Count;
-            }
-        }
+        //internal int ParticipatesCount
+        //{
+        //    get
+        //    {
+        //        return participatesIn.Count;
+        //    }
+        //}
 
         #endregion
+
+
+        internal List<IBindPointDescriptor> GetBindPoints()
+        {
+            return engine.GetTypesByBinding(this);
+        }
 
 
         internal bool TryMatchUrl(string requestUrl)
         {
             engine.Logger.Report(Messages.MessageMatchingUrl, requestUrl);
 
-            var requestItems = GetSplitItems(initialUrl);
+            int a,b;
+
+            var requestItems = GetSplitItems(initialUrl,out a, out b);
 
             //if (requestItems.Count != 1)
             //{

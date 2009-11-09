@@ -46,7 +46,7 @@ namespace Bistro.Controllers
         /// <summary>
         /// The depth of final match component within the url
         /// </summary>
-        internal int MatchDepth;
+//        internal int MatchDepth;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ControllerInstanceInfo"/> struct.
@@ -56,12 +56,12 @@ namespace Bistro.Controllers
         /// <param name="matchDepth">The match depth.</param>
         public ControllerInvocationInfo(
             ControllerDescriptor.BindPointDescriptor controller,
-            Dictionary<string, string> parameters,
-            int matchDepth)
+            Dictionary<string, string> parameters)//,
+            //int matchDepth)
         {
             BindPoint = controller;
             Parameters = parameters;
-            MatchDepth = matchDepth;
+//            MatchDepth = matchDepth;
         }
 
         /// <summary>

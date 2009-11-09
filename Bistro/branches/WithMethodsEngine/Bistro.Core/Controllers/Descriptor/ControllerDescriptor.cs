@@ -29,6 +29,9 @@ using System.Text.RegularExpressions;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers.OutputHandling;
 using System.Configuration;
+using Bistro.MethodsEngine.Reflection;
+using Bistro.Controllers.Descriptor.Wrappers;
+using Bistro.Controllers.Security;
 
 namespace Bistro.Controllers.Descriptor
 {
@@ -156,13 +159,13 @@ namespace Bistro.Controllers.Descriptor
     /// Manages information about a single controller. All bind matches for the same controller
     /// will be represented within a single descriptor class.
     /// </summary>
-    public class ControllerDescriptor: IComparable
+    public class ControllerDescriptor: IComparable, IControllerTypeInfo
     {
         /// <summary>
         /// A single bind point. This struct maintains a many to one relationship with a single 
         /// controller class and describes the contents of all Bind attributes attached to it.
         /// </summary>
-        public struct BindPointDescriptor
+        public struct BindPointDescriptor : IBindPointDescriptor
         {
             /// <summary>
             /// Gets or sets the target bind url.
@@ -191,6 +194,16 @@ namespace Bistro.Controllers.Descriptor
             public Dictionary<string, MemberInfo> ParameterFields { get; private set; }
 
             public ControllerDescriptor Controller { get; private set; }
+
+            public IControllerTypeInfo ControllerInfo
+            {
+                get
+                {
+                    return Controller;
+                }
+            }
+
+
 
             /// <summary>
             /// Initializes a new instance of the <see cref="BindPoint"/> struct.
@@ -300,8 +313,16 @@ namespace Bistro.Controllers.Descriptor
         enum Exceptions
         {
             [DefaultMessage("{0}.{1} is a duplicate field or property. Check the base classes of the controller for members with the same name.")]
-            DuplicateField
+            DuplicateField,
+            [DefaultMessage("Resource {0} was not found in the controller descriptor {1}")]
+            ResourceNotFound
         }
+
+        /// <summary>
+        /// Dictionary to store memberWrappers
+        /// </summary>
+        private Dictionary<string, MemberWrapper> membersWrappers;
+
 
         /// <summary>
         /// A list of bind points linked to this controller.
@@ -343,6 +364,17 @@ namespace Bistro.Controllers.Descriptor
         /// </summary>
         public Dictionary<string, CookieFieldDescriptor> CookieFields { get; protected set; }
 
+
+        public bool IsSecurity
+        {
+            get
+            {
+                return (typeof(ISecurityController).IsAssignableFrom(ControllerType as Type));
+            }
+        }
+
+
+
         /// <summary>
         /// The controller type
         /// </summary>
@@ -359,6 +391,29 @@ namespace Bistro.Controllers.Descriptor
         /// </summary>
         /// <value>The default template.</value>
         public Dictionary<RenderType, string> DefaultTemplates { get; private set;}
+
+        /// <summary>
+        /// Collection to enumerate MemberInfo wrappers of members with FormField attribute
+        /// </summary>
+        public Dictionary<string, IMemberInfo> FormFieldsList { get; private set; }
+
+        /// <summary>
+        /// Collection to enumerate MemberInfo wrappers of members with RequestField attribute
+        /// </summary>
+        public Dictionary<string, IMemberInfo> RequestFieldsList { get; private set; }
+
+        /// <summary>
+        /// Collection to enumerate MemberInfo wrappers of members with SessionField attribute
+        /// </summary>
+        public Dictionary<string, IMemberInfo> SessionFieldsList { get; private set; }
+
+        /// <summary>
+        /// Collection to enumerate MemberInfo wrappers of members with CookieField attribute
+        /// </summary>
+        public Dictionary<string, IMemberInfo> CookieFieldsList { get; private set; }
+
+
+
 
         /// <summary>
         /// Our logger
@@ -380,6 +435,12 @@ namespace Bistro.Controllers.Descriptor
             SessionFields = new Dictionary<string, MemberInfo>();
             CookieFields = new Dictionary<string, CookieFieldDescriptor>();
             DefaultTemplates = new Dictionary<RenderType, string>();
+
+            membersWrappers = new Dictionary<string, MemberWrapper>();
+            FormFieldsList = new Dictionary<string, IMemberInfo>();
+            RequestFieldsList = new Dictionary<string, IMemberInfo>();
+            SessionFieldsList = new Dictionary<string, IMemberInfo>();
+            CookieFieldsList = new Dictionary<string, IMemberInfo>();
 
             this.logger = logger;
         }
@@ -506,6 +567,8 @@ namespace Bistro.Controllers.Descriptor
                     {
                         try
                         {
+                            MemberWrapper mw = new MemberWrapper(member);
+                            membersWrappers.Add(mw.Name, mw);
                             // all fields that are not marked as required or depends-on are defaulted to "provided"
                             if ((!IsMarked(member, typeof(RequiresAttribute), true) &&
                                 !IsMarked(member, typeof(DependsOnAttribute), true)) &&
@@ -523,16 +586,16 @@ namespace Bistro.Controllers.Descriptor
                                 (attribute) => { var name = attribute.Name ?? member.Name; if (!Provides.Contains(name)) Provides.Add(name); }, null);
 
                             IterateAttributes<CookieFieldAttribute>(member, true,
-                                (attribute) => { CookieFields.Add(attribute.Name ?? member.Name, new CookieFieldDescriptor(member, attribute.Outbound)); }, null);
+                                (attribute) => { CookieFields.Add(attribute.Name ?? member.Name, new CookieFieldDescriptor(member, attribute.Outbound)); CookieFieldsList.Add(attribute.Name ?? member.Name, mw); }, null);
 
                             IterateAttributes<FormFieldAttribute>(member, true,
-                                (attribute) => { FormFields.Add(attribute.Name ?? member.Name, member); }, null);
+                                (attribute) => { FormFields.Add(attribute.Name ?? member.Name, member); FormFieldsList.Add(attribute.Name ?? member.Name, mw); }, null);
 
                             IterateAttributes<RequestAttribute>(member, true,
-                                (attribute) => { RequestFields.Add(attribute.Name ?? member.Name, member); }, null);
+                                (attribute) => { RequestFields.Add(attribute.Name ?? member.Name, member); RequestFieldsList.Add(attribute.Name ?? member.Name, mw); }, null);
 
                             IterateAttributes<SessionAttribute>(member, true,
-                                (attribute) => { SessionFields.Add(attribute.Name ?? member.Name, member); }, null);
+                                (attribute) => { SessionFields.Add(attribute.Name ?? member.Name, member); SessionFieldsList.Add(attribute.Name ?? member.Name, mw); }, null);
                         }
                         catch (ArgumentException ex)
                         {
@@ -650,5 +713,17 @@ namespace Bistro.Controllers.Descriptor
 
             return o.ControllerTypeName.CompareTo(ControllerTypeName);
         }
+
+
+        public string GetResourceType(string resourceName)
+        {
+            if (membersWrappers.ContainsKey(resourceName))
+            {
+                return membersWrappers[resourceName].Type;
+            }
+            logger.Report(Exceptions.ResourceNotFound,resourceName,ControllerTypeName);
+            throw new ApplicationException(String.Format("Resource {0} not found in the controller {1}.",resourceName,ControllerTypeName));
+        }
+
     }
 }

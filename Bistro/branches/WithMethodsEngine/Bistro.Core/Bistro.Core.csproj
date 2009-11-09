@@ -64,6 +64,7 @@
     <Compile Include="Controllers\Descriptor\ControllerDescriptor.cs" />
     <Compile Include="Controllers\Descriptor\Data\FormatAsAttribute.cs" />
     <Compile Include="Controllers\Descriptor\Data\RenderWithAttribute.cs" />
+    <Compile Include="Controllers\Descriptor\Wrappers\MemberWrapper.cs" />
     <Compile Include="Controllers\Dispatch\ControllerDispatcher.cs" />
     <Compile Include="Controllers\ControllerHandler.cs" />
     <Compile Include="Controllers\ControllerManager.cs" />
@@ -122,8 +123,12 @@
     <Compile Include="Http\WebException.cs" />
     <Compile Include="MethodsEngine\Controller.cs" />
     <Compile Include="MethodsEngine\ControllerType.cs" />
+    <Compile Include="MethodsEngine\DependencyGraph.cs" />
     <Compile Include="MethodsEngine\Engine.cs" />
+    <Compile Include="MethodsEngine\Reflection\IBindPointDesciptor.cs" />
+    <Compile Include="MethodsEngine\Reflection\IControllerTypeInfo.cs" />
     <Compile Include="MethodsEngine\Reflection\ITypeInfo.cs" />
+    <Compile Include="MethodsEngine\Resource.cs" />
     <Compile Include="MethodsEngine\Subsets\GenBinding.cs" />
     <Compile Include="MethodsEngine\Subsets\MethodUrlsSubset.cs" />
     <Compile Include="MethodsEngine\Subsets\SubSetsProcessor.cs" />

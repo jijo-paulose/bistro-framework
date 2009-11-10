@@ -1,4 +1,24 @@
-﻿using System;
+﻿/****************************************************************************
+ * 
+ *  Bistro Framework Copyright © 2003-2009 Hill30 Inc
+ *
+ *  This file is part of Bistro Framework.
+ *
+ *  Bistro Framework is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Bistro Framework is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Bistro Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *  
+ ***************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,41 +27,39 @@ using System.Reflection;
 
 namespace Bistro.Controllers.Descriptor.Wrappers
 {
+    /// <summary>
+    /// Class to store information from a MemberInfo.(properties and fields) Useful for methods engine.
+    /// </summary>
     public class MemberWrapper : IMemberInfo
     {
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="memberInfo">MemberInfo to wrap around</param>
         public MemberWrapper(MemberInfo memberInfo)
         {
-            name = memberInfo.Name;
-            typeName = memberInfo.ReflectedType.FullName;
+            Name = memberInfo.Name;
+            Type = memberInfo.ReflectedType.FullName;
         }
 
 
-        private string name;
-        private string typeName;
-
-
-        #region IMemberInfo Members
-
+        /// <summary>
+        /// Member name
+        /// </summary>
         public string Name
         {
-            get { return name; }
+            get;
+            private set;
         }
 
+        /// <summary>
+        /// Type name
+        /// </summary>
         public string Type
         {
-            get { return typeName; }
+            get;
+            private set;
         }
 
-        #endregion
-
-        #region IHasAttributes Members
-
-        public IEnumerable<IAttributeInfo> Attributes
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        #endregion
     }
 }

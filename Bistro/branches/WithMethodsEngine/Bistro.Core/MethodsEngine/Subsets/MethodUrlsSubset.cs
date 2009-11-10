@@ -1,4 +1,24 @@
-﻿using System;
+﻿/****************************************************************************
+ * 
+ *  Bistro Framework Copyright © 2003-2009 Hill30 Inc
+ *
+ *  This file is part of Bistro Framework.
+ *
+ *  Bistro Framework is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Bistro Framework is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Bistro Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *  
+ ***************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +31,7 @@ namespace Bistro.MethodsEngine.Subsets
     {
         internal MethodUrlsSubset(Engine _engine)
         {
-            bindPointsList = new List<IBindPointDescriptor>();
+            bindPointsList = new List<IMethodsBindPointDesc>();
             bindingsList = new List<GenBinding>();
             engine = _engine;
         }
@@ -19,13 +39,13 @@ namespace Bistro.MethodsEngine.Subsets
         private MethodUrlsSubset(Engine _engine, List<GenBinding> oldBindingsList, GenBinding newBinding)
         {
             engine = _engine;
-            bindPointsList = new List<IBindPointDescriptor>();
+            bindPointsList = new List<IMethodsBindPointDesc>();
             bindingsList = new List<GenBinding>(oldBindingsList);
             bindingsList.Add(newBinding);
 
             foreach (GenBinding binding in bindingsList.Where(bind => bind.MatchStatus))
             {
-                foreach (IBindPointDescriptor bindPointInfo in binding.GetBindPoints())
+                foreach (IMethodsBindPointDesc bindPointInfo in binding.GetBindPoints())
                 {
                     if (!bindPointsList.Contains(bindPointInfo))
                     {
@@ -43,11 +63,11 @@ namespace Bistro.MethodsEngine.Subsets
         private void ScanResources()
         {
             resources = new Dictionary<string,Resource>();
-            foreach (IBindPointDescriptor bindPoint in bindPointsList)
+            foreach (IMethodsBindPointDesc bindPoint in bindPointsList)
             {
-                foreach (string resName in bindPoint.ControllerInfo.Provides
-                                        .Concat(bindPoint.ControllerInfo.Requires)
-                                        .Concat(bindPoint.ControllerInfo.DependsOn))
+                foreach (string resName in bindPoint.ControllerMethodDesc.Provides
+                                        .Concat(bindPoint.ControllerMethodDesc.Requires)
+                                        .Concat(bindPoint.ControllerMethodDesc.DependsOn))
                 {
                     if (!resources.ContainsKey(resName))
                     {
@@ -64,13 +84,13 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         private void SortBindPoints()
         {
-            Func<List<IBindPointDescriptor>> init = () => new List<IBindPointDescriptor>();
+            Func<List<IMethodsBindPointDesc>> init = () => new List<IMethodsBindPointDesc>();
             var before = init();
             var payload = init();
             var after = init();
             var teardown = init();
 
-            foreach (IBindPointDescriptor descriptor in bindPointsList)
+            foreach (IMethodsBindPointDesc descriptor in bindPointsList)
             {
                 switch (descriptor.ControllerBindType)
                 {
@@ -90,7 +110,7 @@ namespace Bistro.MethodsEngine.Subsets
 
             }
 
-            Comparison<IBindPointDescriptor> priorityComparison = 
+            Comparison<IMethodsBindPointDesc> priorityComparison = 
                 (x,y) => x.Priority.CompareTo(y.Priority);
 
             before.Sort(priorityComparison);
@@ -108,25 +128,25 @@ namespace Bistro.MethodsEngine.Subsets
             {
                 resource.Validate();
 
-                foreach (IBindPointDescriptor providingBindPoint in resource.Providers)
+                foreach (IMethodsBindPointDesc providingBindPoint in resource.Providers)
                 {
-                    foreach (IBindPointDescriptor consumer in resource.Dependents)
+                    foreach (IMethodsBindPointDesc consumer in resource.Dependents)
                         graph.AddEdge(consumer, providingBindPoint);
-                    foreach (IBindPointDescriptor consumer in resource.RequiredBy)
+                    foreach (IMethodsBindPointDesc consumer in resource.RequiredBy)
                         graph.AddEdge(consumer, providingBindPoint);
                 }
             }
             if (!graph.TopologicalSort())
             {
-                engine.RaiseResourceLoop(string.Empty, before.Select(bpd => bpd.ControllerInfo));
+                engine.RaiseResourceLoop(string.Empty, before.Select(bpd => bpd.ControllerMethodDesc));
             }
 
 
-            var securityControllers = new List<IBindPointDescriptor>();
+            var securityControllers = new List<IMethodsBindPointDesc>();
 
             int i = 0;
             while (i < before.Count)
-                if (before[i].ControllerInfo.IsSecurity)
+                if (before[i].ControllerMethodDesc.IsSecurity)
             {
                 securityControllers.Add(before[i]);
                 before.RemoveAt(i);
@@ -156,7 +176,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// <summary>
         /// BindPoints list associated with bindings.
         /// </summary>
-        private List<IBindPointDescriptor> bindPointsList;
+        private List<IMethodsBindPointDesc> bindPointsList;
 
         #endregion
 
@@ -167,7 +187,7 @@ namespace Bistro.MethodsEngine.Subsets
             get { return bindingsList; }
         }
 
-        internal List<IBindPointDescriptor> BindPointsList
+        internal List<IMethodsBindPointDesc> BindPointsList
         {
             get { return bindPointsList; }
         }
@@ -182,16 +202,13 @@ namespace Bistro.MethodsEngine.Subsets
 
             if (newBinding.MatchWithSubset(this))
             {
-                return new MethodUrlsSubset(engine,bindingsList, newBinding);
+                return new MethodUrlsSubset(engine, bindingsList, newBinding);
             }
 
             return null;
         }
 
 
-
-
         #endregion
-
     }
 }

@@ -28,6 +28,7 @@ using Bistro.Controllers.Descriptor;
 using System.Xml;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers.Dispatch;
+using Bistro.Interfaces;
 
 namespace Bistro.Controllers
 {
@@ -81,7 +82,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
         /// <summary>
         /// The full listing of all controller descriptors known to the sysetm
         /// </summary>
-        private List<ControllerDescriptor> controllers = new List<ControllerDescriptor>();
+        private List<IControllerDescriptor> controllers = new List<IControllerDescriptor>();
 
         /// <summary>
         /// Indicates whether loading has finished
@@ -161,7 +162,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
             if (t.IsAbstract)
                 return;
 
-            ControllerDescriptor descriptor = ControllerDescriptor.CreateDescriptor(t, logger);
+            IControllerDescriptor descriptor = ControllerDescriptor.CreateDescriptor(t, logger);
             RegisterController(descriptor);
         }
 
@@ -169,7 +170,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
         /// Registers the controller.
         /// </summary>
         /// <param name="descriptor">The descriptor.</param>
-        public virtual void RegisterController(ControllerDescriptor descriptor)
+        public virtual void RegisterController(IControllerDescriptor descriptor)
         {
             handlers.Add(descriptor.ControllerType, handlerFactory.CreateControllerHandler(descriptor));
             dispatcherFactory.GetDispatcherInstance().RegisterController(descriptor);

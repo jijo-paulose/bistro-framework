@@ -30,6 +30,9 @@ using Bistro.Configuration.Logging;
 namespace Bistro.MethodsEngine.Subsets
 {
 
+    /// <summary>
+    /// 
+    /// </summary>
     internal class SubSetsProcessor
     {
 

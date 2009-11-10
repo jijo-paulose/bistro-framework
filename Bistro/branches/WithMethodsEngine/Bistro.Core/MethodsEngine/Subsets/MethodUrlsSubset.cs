@@ -27,8 +27,17 @@ using Bistro.Controllers.Descriptor;
 
 namespace Bistro.MethodsEngine.Subsets
 {
+    /// <summary>
+    /// Class, representing a part of the url field. It contains one of two GenBindings for every binding in the engine.
+    /// Hence, there's information on how this urlsubset relates to the bindings.
+    /// </summary>
     public class MethodUrlsSubset
     {
+
+        /// <summary>
+        /// Initializes a new empty instance of the <see cref="MethodUrlsSubset"/> class.
+        /// </summary>
+        /// <param name="_engine">The engine.</param>
         internal MethodUrlsSubset(Engine _engine)
         {
             bindPointsList = new List<IMethodsBindPointDesc>();
@@ -36,6 +45,13 @@ namespace Bistro.MethodsEngine.Subsets
             engine = _engine;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MethodUrlsSubset"/> class. 
+        /// Copies contents of the old bindings list and adds new to the new list GenBinding.
+        /// </summary>
+        /// <param name="_engine">The engine.</param>
+        /// <param name="oldBindingsList">Old bindings list.</param>
+        /// <param name="newBinding">The new binding.</param>
         private MethodUrlsSubset(Engine _engine, List<GenBinding> oldBindingsList, GenBinding newBinding)
         {
             engine = _engine;
@@ -60,6 +76,9 @@ namespace Bistro.MethodsEngine.Subsets
 
         }
 
+        /// <summary>
+        /// Scans resources and creates a new dictionary
+        /// </summary>
         private void ScanResources()
         {
             resources = new Dictionary<string,Resource>();
@@ -164,12 +183,19 @@ namespace Bistro.MethodsEngine.Subsets
 
 
         #region private members
+        /// <summary>
+        /// Engine stored here.
+        /// </summary>
         private Engine engine;
+
+        /// <summary>
+        /// Dictionary of resources
+        /// </summary>
         private Dictionary<string, Resource> resources;
 
 
         /// <summary>
-        /// List of bindings involved in this Method
+        /// List of bindings involved in this method subset.
         /// </summary>
         private List<GenBinding> bindingsList;
 
@@ -182,21 +208,30 @@ namespace Bistro.MethodsEngine.Subsets
 
         #region internal members
 
+        /// <summary>
+        /// Gets the bindings list.
+        /// </summary>
+        /// <value>The bindings list.</value>
         internal List<GenBinding> BindingsList
         {
             get { return bindingsList; }
         }
 
+        /// <summary>
+        /// Gets the bind points list.
+        /// </summary>
+        /// <value>The bind points list.</value>
         internal List<IMethodsBindPointDesc> BindPointsList
         {
             get { return bindPointsList; }
         }
 
+
         /// <summary>
-        /// This method is called for each binding and returns newly-constructed SubSet, consists of matching groups
+        /// This method is called for each binding and returns newly-constructed SubSet, consisting of matching/not matching GenBindings.
         /// </summary>
-        /// <param name="newBinding"></param>
-        /// <returns></returns>
+        /// <param name="newBinding">new binding</param>
+        /// <returns>newly-created method.</returns>
         internal MethodUrlsSubset ApplyBinding(GenBinding newBinding)
         {
 

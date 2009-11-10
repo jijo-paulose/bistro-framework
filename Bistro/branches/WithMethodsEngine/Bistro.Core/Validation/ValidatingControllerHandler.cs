@@ -5,6 +5,7 @@ using System.Text;
 using Bistro.Controllers;
 using Bistro.Controllers.Descriptor;
 using Bistro.Configuration.Logging;
+using Bistro.Interfaces;
 
 namespace Bistro.Validation
 {
@@ -28,7 +29,7 @@ namespace Bistro.Validation
         /// </summary>
         /// <param name="descriptor"></param>
         /// <param name="logger"></param>
-        protected internal ValidatingControllerHandler(Application application, ControllerDescriptor descriptor, ILogger logger)
+        protected internal ValidatingControllerHandler(Application application, IControllerDescriptor descriptor, ILogger logger)
             : base(application, descriptor, logger)
         {
             try

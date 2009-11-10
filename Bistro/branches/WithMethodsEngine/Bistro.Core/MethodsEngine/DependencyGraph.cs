@@ -1,8 +1,29 @@
-﻿using System;
+﻿/****************************************************************************
+ * 
+ *  Bistro Framework Copyright © 2003-2009 Hill30 Inc
+ *
+ *  This file is part of Bistro Framework.
+ *
+ *  Bistro Framework is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Bistro Framework is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Bistro Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *  
+ ***************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Bistro.MethodsEngine.Reflection;
+using Bistro.Controllers.Descriptor;
 
 namespace Bistro.MethodsEngine
 {
@@ -16,7 +37,7 @@ namespace Bistro.MethodsEngine
             /// </summary>
             /// <param name="graph"></param>
             /// <param name="bindPoint"></param>
-            public Vertex(DependencyGraph graph, IBindPointDescriptor bindPoint)
+            public Vertex(DependencyGraph graph, IMethodsBindPointDesc bindPoint)
             {
                 this.graph = graph;
                 this.bindPoint = bindPoint;
@@ -27,13 +48,12 @@ namespace Bistro.MethodsEngine
             }
 
             public List<Vertex> Children { get { return children; } }
-            IBindPointDescriptor bindPoint;
+            IMethodsBindPointDesc bindPoint;
             List<Vertex> children;
             bool visited;
             public bool isRoot;
             public int index;
             DependencyGraph graph;
-            int seqNumber;
 
             /// <summary>
             /// 
@@ -59,17 +79,17 @@ namespace Bistro.MethodsEngine
         #endregion
 
 
-        Dictionary<IBindPointDescriptor, Vertex> vertices = new Dictionary<IBindPointDescriptor, Vertex>();
-        List<IBindPointDescriptor> listToSort;
+        Dictionary<IMethodsBindPointDesc, Vertex> vertices = new Dictionary<IMethodsBindPointDesc, Vertex>();
+        List<IMethodsBindPointDesc> listToSort;
         int vertexCount = 0;
-        public DependencyGraph(List<IBindPointDescriptor> vertices)
+        public DependencyGraph(List<IMethodsBindPointDesc> vertices)
         {
             listToSort = vertices;
-            foreach (IBindPointDescriptor bindPoint in vertices)
+            foreach (IMethodsBindPointDesc bindPoint in vertices)
                 this.vertices.Add(bindPoint, new Vertex(this, bindPoint));
         }
 
-        internal void AddEdge(IBindPointDescriptor providingBindPoint, IBindPointDescriptor consumingBindPoint)
+        internal void AddEdge(IMethodsBindPointDesc providingBindPoint, IMethodsBindPointDesc consumingBindPoint)
         {
             Vertex endpoint = vertices[consumingBindPoint];
             Vertex startpoint = vertices[providingBindPoint];
@@ -93,7 +113,7 @@ namespace Bistro.MethodsEngine
                         return false;
             if (vertexCount == vertices.Count)
             {
-                Comparison<IBindPointDescriptor> vertexCompare =
+                Comparison<IMethodsBindPointDesc> vertexCompare =
                     (left, right) => vertices[left].index.CompareTo(vertices[right].index);
                 listToSort.Sort(vertexCompare);
 

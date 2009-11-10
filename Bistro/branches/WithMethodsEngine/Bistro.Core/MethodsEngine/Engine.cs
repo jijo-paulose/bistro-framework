@@ -1,4 +1,24 @@
-﻿using System;
+﻿/****************************************************************************
+ * 
+ *  Bistro Framework Copyright © 2003-2009 Hill30 Inc
+ *
+ *  This file is part of Bistro Framework.
+ *
+ *  Bistro Framework is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Bistro Framework is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Bistro Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *  
+ ***************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +28,7 @@ using Bistro.MethodsEngine.Reflection;
 using Bistro.Controllers.Descriptor;
 using BindPointDescriptor = Bistro.Controllers.Descriptor.ControllerDescriptor.BindPointDescriptor;
 using Bistro.Controllers;
+using Bistro.Interfaces;
 
 namespace Bistro.MethodsEngine
 {
@@ -36,7 +57,7 @@ namespace Bistro.MethodsEngine
 
 
 
-        internal void RegisterController(ControllerDescriptor info)
+        internal void RegisterController(IControllerDescriptor info)
         {
             List<string> newBindUrls = new List<string>();
             foreach (BindPointDescriptor bindPoint in info.Targets)
@@ -80,11 +101,11 @@ namespace Bistro.MethodsEngine
         /// </summary>
         /// <param name="binding"></param>
         /// <returns></returns>
-        internal List<IBindPointDescriptor> GetTypesByBinding(GenBinding binding)
+        internal List<IMethodsBindPointDesc> GetTypesByBinding(GenBinding binding)
         {
             if (map.ContainsKey(binding.InitialUrl))
             {
-                return map[binding.InitialUrl].OfType<IBindPointDescriptor>().ToList();
+                return map[binding.InitialUrl].OfType<IMethodsBindPointDesc>().ToList();
             }
             Logger.Report(Errors.BindingNotFound, binding.InitialUrl);
             throw new ApplicationException("Binding not found");
@@ -108,19 +129,19 @@ namespace Bistro.MethodsEngine
 
 
 
-        internal virtual void RaiseInvalidBinding(ControllerType controller, params string[] args)
+        //internal virtual void RaiseInvalidBinding(ControllerType controller, params string[] args)
+        //{
+        //}
+
+        internal virtual void RaiseResourceLoop(string methodUrl, IEnumerable<IMethodsControllerDesc> controllers, params string[] args)
         {
         }
 
-        internal virtual void RaiseResourceLoop(string methodUrl, IEnumerable<IControllerTypeInfo> controllers, params string[] args)
+        internal virtual void RaiseMissingProvider(string resName, IEnumerable<IMethodsControllerDesc> controllers, params string[] args)
         {
         }
 
-        internal virtual void RaiseMissingProvider(string resName, IEnumerable<IControllerTypeInfo> controllers, params string[] args)
-        {
-        }
-
-        internal virtual void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<IControllerTypeInfo> controllers, params string[] args)
+        internal virtual void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<IMethodsControllerDesc> controllers, params string[] args)
         {
         }
 

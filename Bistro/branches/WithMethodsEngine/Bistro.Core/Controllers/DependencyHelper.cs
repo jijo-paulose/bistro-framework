@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Bistro.Controllers.Descriptor;
+using Bistro.Interfaces;
 
 namespace Bistro.Controllers
 {
@@ -204,7 +205,7 @@ namespace Bistro.Controllers
 
             foreach (ControllerInvocationInfo controller in sortedList)
             {
-                ControllerDescriptor info = controller.BindPoint.Controller;
+                IControllerDescriptor info = controller.BindPoint.Controller;
                 foreach (string req in info.Requires)
                     getAndCreateList(req, requirements).Add(controller);
                 foreach (string dep in info.DependsOn)

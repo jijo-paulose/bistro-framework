@@ -21,6 +21,7 @@
 
 using System;
 using Bistro.Controllers.Descriptor;
+using Bistro.Interfaces;
 namespace Bistro.Controllers.Dispatch
 {
     /// <summary>
@@ -49,7 +50,7 @@ namespace Bistro.Controllers.Dispatch
         /// Registers the controller with the dispatcher.
         /// </summary>
         /// <param name="info">The info.</param>
-        void RegisterController(ControllerDescriptor info);
+        void RegisterController(IControllerDescriptor info);
 
     }
 }

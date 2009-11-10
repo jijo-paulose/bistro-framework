@@ -1,4 +1,24 @@
-﻿using System;
+﻿/****************************************************************************
+ * 
+ *  Bistro Framework Copyright © 2003-2009 Hill30 Inc
+ *
+ *  This file is part of Bistro Framework.
+ *
+ *  Bistro Framework is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Bistro Framework is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Bistro Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *  
+ ***************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +29,16 @@ using Bistro.MethodsEngine.Reflection;
 
 namespace Bistro.MethodsEngine.Subsets
 {
+    /// <summary>
+    /// Class containing two genbindings - with positive and negative match for specific bind url.
+    /// </summary>
     internal class GenBindingTuple
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenBindingTuple"/> class.
+        /// </summary>
+        /// <param name="_verbNormalizedUrl">The bind url with verb in form verb/url (i.e. GET/a/b/c/).</param>
+        /// <param name="_engine">The methods engine.</param>
         internal GenBindingTuple(string _verbNormalizedUrl ,Engine _engine)
         {
             PositiveBind = new GenBinding(_verbNormalizedUrl, true, _engine);
@@ -20,75 +48,140 @@ namespace Bistro.MethodsEngine.Subsets
             engine = _engine;
         }
 
+        /// <summary>
+        /// Tries the match an specific URL to the positive binding.
+        /// </summary>
+        /// <param name="url">The URL.</param>
+        /// <returns>GenBinding with the appropriate matchstatus.</returns>
         internal GenBinding TryMatchUrl(string url)
         {
             return PositiveBind.TryMatchUrl(url) ? PositiveBind : NegativeBind;
         }
 
 
-        internal void MarkProcessed () 
+        /// <summary>
+        /// Marks that this tuple has been processed by the algorithm.
+        /// </summary>
+        internal void MarkProcessed() 
         {
             Processed = true;
         }
 
+        /// <summary>
+        /// field to store the link to the engine
+        /// </summary>
         private Engine engine;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="GenBindingTuple"/> is processed.
+        /// </summary>
+        /// <value><c>true</c> if processed; otherwise, <c>false</c>.</value>
         internal bool Processed { get; private set; }
-        internal GenBinding PositiveBind { get; set; }
-        internal GenBinding NegativeBind { get; set; }
+
+        /// <summary>
+        /// Gets the positive bind object.
+        /// </summary>
+        /// <value>The positive bind object.</value>
+        internal GenBinding PositiveBind { get; private set; }
+
+        /// <summary>
+        /// Gets the negative bind object.
+        /// </summary>
+        /// <value>The negative bind object.</value>
+        internal GenBinding NegativeBind { get; private set; }
     }
 
 
+    /// <summary>
+    /// Class, which represents a half of the url field. It contains a bind url and match status, which sets - 
+    /// whether this half contains urls mathching that bind, or not.
+    /// </summary>
     internal class GenBinding
     {
         /// <summary>
-        /// 
+        /// Error messages
         /// </summary>
-        /// <param name="_verbNormalizedUrl">binding in the form VERB/URL</param>
-        /// <param name="_matchStatus"></param>
+        enum Errors
+        {
+            [DefaultMessage("Error splitting incoming url: {0}")]
+            ErrorSplittingUrl
+        }
+
+        /// <summary>
+        /// Information messages
+        /// </summary>
+        enum Messages
+        {
+            [DefaultMessage("Matching url: {0}")]
+            MessageMatchingUrl
+        }
+
+        /// <summary>
+        /// The only constructor, which splits url to the items.
+        /// </summary>
+        /// <param name="_verbNormalizedUrl">The bind url with verb in form verb/url (i.e. GET/a/b/c/).</param>
+        /// <param name="_matchStatus">status - whether target half of the url field must match this bind, or not.</param>
         internal GenBinding(string _verbNormalizedUrl, bool _matchStatus, Engine _engine)
         {
             engine = _engine;
-            initialUrl = _verbNormalizedUrl;
-            matchStatus = _matchStatus;
-//            controllerTypeInfo = _controllerTypeInfo;
+            InitialUrl = _verbNormalizedUrl;
+            MatchStatus = _matchStatus;
 
-            items = GetSplitItems(initialUrl,out totalLength,out lengthWithoutEndParams);
+            items = GetSplitItems(InitialUrl, out totalLength, out lengthWithoutEndParams);
 
-            //participatesIn = new List<MethodUrlsSubset>();
         }
 
 
         #region Private members
+        /// <summary>
+        /// Regex, which splits url by questionmarks placed near / (or surrounded by /)
+        /// </summary>
         private static Regex splitRegex = new Regex(@"/\?/|\?/|/\?", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Regex, which splits a string by /
+        /// </summary>
         private static Regex subSplitRegex = new Regex(@"/", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Regex to test for wildcards
+        /// </summary>
         private static Regex wildCardRegex = new Regex(@"\A(?:\*|{[^}]+})\z", RegexOptions.Compiled);
 
-        private IControllerTypeInfo controllerTypeInfo;
-        //private List<MethodUrlsSubset> participatesIn;
 
 
+        /// <summary>
+        /// contains url splitted by ? ar first level, and by / on the second.
+        /// </summary>
         private List<List<string>> items;
-        private string initialUrl;
 
+
+        /// <summary>
+        /// Total length in facets.
+        /// </summary>
         private int totalLength = 0;
+
+        /// <summary>
+        /// Total length in facets, excluding parameters in the end (like /a/b/c/{aaa}/{bbb} - length = 3) 
+        /// </summary>
         private int lengthWithoutEndParams = 0;
 
+        /// <summary>
+        /// link to the engine stored here.
+        /// </summary>
         private Engine engine;
 
-//        private BindVerb verb;
-
-
-
-        private bool matchStatus;
 
         #endregion
 
         #region private methods
+
         /// <summary>
-        /// 
+        /// Gets the url split to the facets (at first - by ?, then by /)
         /// </summary>
-        /// <param name="splitUrl"></param>
+        /// <param name="splitUrl">The bind (or simple) URL to split.</param>
+        /// <param name="totalLengthLocal">The total length local.</param>
+        /// <param name="lengthWithoutEnd">The length without end parameters (like /a/b/c/{aaa}/{bbb} - length = 3).</param>
         /// <returns></returns>
         private List<List<string>> GetSplitItems(string splitUrl, out int totalLengthLocal,out int lengthWithoutEnd)
         {
@@ -124,30 +217,27 @@ namespace Bistro.MethodsEngine.Subsets
 
         #endregion
 
-        enum Errors
-        {
-            [DefaultMessage("Error splitting incoming url: {0}")]
-            ErrorSplittingUrl
-        }
 
-        enum Messages
-        {
-            [DefaultMessage("Matching url: {0}")]
-            MessageMatchingUrl
-        }
 
 
         #region Internal properties
 
+        /// <summary>
+        /// initial(not splitted) bind url stored here.
+        /// </summary>
         internal string InitialUrl
         {
-            get { return initialUrl; }
-            set { initialUrl = value; }
+            get;
+            set;
         }
 
+        /// <summary>
+        /// Match status (true/false)
+        /// </summary>
         internal bool MatchStatus
         {
-            get { return matchStatus; }
+            get;
+            private set;
         }
 
         #endregion
@@ -155,42 +245,35 @@ namespace Bistro.MethodsEngine.Subsets
         #region Internal methods
 
 
-        #region Participates
-        //internal void AddParticipant(MethodUrlsSubset newParticipant)
-        //{
-        //    participatesIn.Add(newParticipant);
-        //}
-
-        //internal int ParticipatesCount
-        //{
-        //    get
-        //    {
-        //        return participatesIn.Count;
-        //    }
-        //}
-
-        #endregion
-
-
-        internal List<IBindPointDescriptor> GetBindPoints()
+        /// <summary>
+        /// Gets the bind points for this binding from the engine.
+        /// </summary>
+        /// <returns></returns>
+        internal List<IMethodsBindPointDesc> GetBindPoints()
         {
             return engine.GetTypesByBinding(this);
         }
 
 
+
+        /// <summary>
+        /// Tries to match URL to bind URL (NOT to the half of the URL field).
+        /// </summary>
+        /// <param name="requestUrl">The request URL.</param>
+        /// <returns>result of the match</returns>
         internal bool TryMatchUrl(string requestUrl)
         {
             engine.Logger.Report(Messages.MessageMatchingUrl, requestUrl);
 
             int a,b;
 
-            var requestItems = GetSplitItems(initialUrl,out a, out b);
+            var requestItems = GetSplitItems(InitialUrl, out a, out b);
 
-            //if (requestItems.Count != 1)
-            //{
-            //    engine.Logger.Report(Errors.ErrorSplittingUrl, requestUrl);
-            //    return false;
-            //}
+            if (requestItems.Count != 1)
+            {
+                engine.Logger.Report(Errors.ErrorSplittingUrl, requestUrl);
+                throw new ApplicationException(String.Format("Error splitting the url {0}", requestUrl));
+            }
 
 
             string[] splitQueryString = requestUrl.Split('?');
@@ -254,12 +337,12 @@ namespace Bistro.MethodsEngine.Subsets
             return true;
         }
 
+
         /// <summary>
-        /// 
+        /// Matches this half of the url field with the method subset of bind urls.
         /// </summary>
-        /// <param name="methodUrlsSubset"></param>
+        /// <param name="methodUrlsSubset">The method subset of bind urls.</param>
         /// <returns></returns>
-        /// 
         internal bool MatchWithSubset(MethodUrlsSubset methodUrlsSubset)
         {
             List<GenBinding> newList = new List<GenBinding>(methodUrlsSubset.BindingsList);
@@ -296,11 +379,13 @@ namespace Bistro.MethodsEngine.Subsets
 
         }
 
+
         /// <summary>
-        /// 
+        /// Compares this Genbinding with another GenBinding for intersection. Both must have match status set to true 
+        /// for this part of algorithm to work properly
         /// </summary>
-        /// <param name="matchBind"></param>
-        /// <returns></returns>
+        /// <param name="matchBind">Another GenBinding object.</param>
+        /// <returns>Result of the evaluation. true/false</returns>
         private bool CompareWithMatch(GenBinding matchBind)
         {
             if (!matchBind.MatchStatus || !this.MatchStatus)
@@ -325,12 +410,13 @@ namespace Bistro.MethodsEngine.Subsets
             return true;
         }
 
+
         /// <summary>
-        /// 
+        /// Compares two GenBindings with different match statuses for intersection
         /// </summary>
-        /// <param name="matchBind"></param>
-        /// <param name="noMatchBind"></param>
-        /// <returns></returns>
+        /// <param name="matchBind">The match bind object.</param>
+        /// <param name="noMatchBind">The no match bind object.</param>
+        /// <returns>Result of the evaluation. true/false</returns>
         private static bool CompareMatchAndNoMatch(GenBinding matchBind, GenBinding noMatchBind)
         {
             if (!matchBind.MatchStatus && noMatchBind.MatchStatus)

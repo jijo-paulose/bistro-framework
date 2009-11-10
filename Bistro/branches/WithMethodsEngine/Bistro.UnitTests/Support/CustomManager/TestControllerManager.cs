@@ -6,6 +6,7 @@ using Bistro.Controllers;
 using Bistro.UnitTests.Support.Reflection;
 using Bistro.Controllers.Descriptor;
 using Bistro.Controllers.Descriptor.Data;
+using Bistro.Interfaces;
 
 namespace Bistro.UnitTests.Support.CustomManager
 {
@@ -89,7 +90,7 @@ namespace Bistro.UnitTests.Support.CustomManager
 
 
 
-                ControllerDescriptor testDescriptor = ControllerDescriptor.CreateDescriptorRaw(
+                IControllerDescriptor testDescriptor = ControllerDescriptor.CreateDescriptorRaw(
                     new TestMemberInfo(typeInfo.FullName),
                     dependsOnTemp,
                     requiresTemp,
@@ -116,7 +117,7 @@ namespace Bistro.UnitTests.Support.CustomManager
             // also do nothing here - we'll handle all the test load in the Load()
         }
 
-        public override void RegisterController(Bistro.Controllers.Descriptor.ControllerDescriptor descriptor)
+        public override void RegisterController(IControllerDescriptor descriptor)
         {
             dispatcherFactory.GetDispatcherInstance().RegisterController(descriptor);
         }

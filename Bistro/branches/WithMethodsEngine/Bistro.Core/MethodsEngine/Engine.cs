@@ -154,8 +154,6 @@ namespace Bistro.MethodsEngine
         {
             MethodUrlsSubset urlSubSet = processor.GetMethodByUrl(requestUrl);
 
-           
-
             var retList = urlSubSet.BindPointsList.Select(bpd => new ControllerInvocationInfo((BindPointDescriptor)bpd, new Dictionary<string, string>()));
 
             return retList.ToArray();

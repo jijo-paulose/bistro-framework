@@ -31,7 +31,7 @@ namespace Bistro.MethodsEngine.Subsets
 {
 
     /// <summary>
-    /// 
+    /// This class is responsible for handling of all the url subsets and bindings registered in the engine.
     /// </summary>
     internal class SubSetsProcessor
     {
@@ -45,29 +45,37 @@ namespace Bistro.MethodsEngine.Subsets
 
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SubSetsProcessor"/> class.
+        /// </summary>
+        /// <param name="_engine">The engine.</param>
         internal SubSetsProcessor(Engine _engine)
         {
             engine = _engine;
             allMethods = new List<MethodUrlsSubset>();
             allBindings = new List<GenBindingTuple>();
-            // We need to have at least one empty method. Otherwise it's impossible to create new non-empty methods.
+            // We need to have at least one empty method. Otherwise it will be impossible to create new non-empty methods.
             allMethods.Add(new MethodUrlsSubset(_engine));
 
 
         }
 
-        #region Groups
-
         #region Private fields
 
 
-
-        private Regex bindingParser = new Regex(@"^\s*(?'binding'(\w*\s*)((\?|/|(/(\*|(\w|-)+|\{\w+}|\?/((\w|-)+|\{\w+})))*(/\?)?)(?:\?(?:(?:\w|-|=)+|\{\w+})(?:\&(?:(?:\w|-|=)+|\{\w+}))*|)))\s*$", RegexOptions.Compiled | RegexOptions.Singleline);
-
-
+        /// <summary>
+        /// list to store all the binding tuples(positive/negative).
+        /// </summary>
         private List<GenBindingTuple> allBindings;
+
+        /// <summary>
+        /// List to store all the methods.
+        /// </summary>
         private List<MethodUrlsSubset> allMethods;
 
+        /// <summary>
+        /// Link to the engine.
+        /// </summary>
         private Engine engine;
 
         #endregion
@@ -75,8 +83,10 @@ namespace Bistro.MethodsEngine.Subsets
 
 
 
-
-
+        /// <summary>
+        /// Creates new binding tuple from the binding URL and executes new level of methods creation to replace old methods list.
+        /// </summary>
+        /// <param name="verbNormalizedUrl">The verb normalized URL.</param>
         public void AddNewBinding(string verbNormalizedUrl)
         {
             allBindings.Add(new GenBindingTuple(verbNormalizedUrl,engine));
@@ -85,6 +95,11 @@ namespace Bistro.MethodsEngine.Subsets
         }
 
 
+        /// <summary>
+        /// Searches and gets the method by an URL.
+        /// </summary>
+        /// <param name="requestUrl">The request URL.</param>
+        /// <returns></returns>
         internal MethodUrlsSubset GetMethodByUrl(string requestUrl)
         {
             // Compare with each Binding
@@ -134,6 +149,10 @@ namespace Bistro.MethodsEngine.Subsets
 
 
 
+        /// <summary>
+        /// Creates a new methods level for each unprocessed GenBindingTuple iteratively.
+        /// </summary>
+        /// <returns>Methods list after the last iteration.</returns>
         private List<MethodUrlsSubset> CreateNewMethodsLevel()
         {
             List<MethodUrlsSubset> newBindingMethods = allMethods;
@@ -155,17 +174,12 @@ namespace Bistro.MethodsEngine.Subsets
                         newBindingMethods.Add(newGroupFalse);
                 }
             }
-//            allMethods = newBindingMethods;
+
             return newBindingMethods;
         }
 
 
-
-
         #endregion
-
-        #endregion
-
 
     }
 }

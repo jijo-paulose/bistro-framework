@@ -32,6 +32,9 @@ using Bistro.Interfaces;
 
 namespace Bistro.MethodsEngine
 {
+    /// <summary>
+    /// Main methods engine class.
+    /// </summary>
     internal class Engine
     {
 
@@ -43,20 +46,40 @@ namespace Bistro.MethodsEngine
 
 
 
-        Dictionary<string, List<BindPointDescriptor>> map = new Dictionary<string, List<BindPointDescriptor>>();
+        /// <summary>
+        /// map of the binding urls to the list of the bind points.
+        /// </summary>
+        private Dictionary<string, List<BindPointDescriptor>> map = new Dictionary<string, List<BindPointDescriptor>>();
+
+
+        /// <summary>
+        /// url sebsets processor.
+        /// </summary>
         private SubSetsProcessor processor;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Engine"/> class.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
         internal Engine(ILogger logger)
         {
             Logger = logger;
             processor = new SubSetsProcessor(this);
         }
 
-        internal ILogger Logger {get;set;}
+        /// <summary>
+        /// Gets or sets the logger.
+        /// </summary>
+        /// <value>The logger.</value>
+        internal ILogger Logger { get; private set; }
 
 
 
 
+        /// <summary>
+        /// Registers the controller in the engine.
+        /// </summary>
+        /// <param name="info">The controller descriptor.</param>
         internal void RegisterController(IControllerDescriptor info)
         {
             List<string> newBindUrls = new List<string>();
@@ -90,6 +113,13 @@ namespace Bistro.MethodsEngine
 
         }
 
+        /// <summary>
+        /// Determines whether the request url has exact bind in the <c>map</c>
+        /// </summary>
+        /// <param name="requestUrl">The request URL.</param>
+        /// <returns>
+        /// 	<c>true</c> if the request url has exact bind in the map; otherwise, <c>false</c>.
+        /// </returns>
         public bool HasExactBind(string requestUrl)
         {
             return map.ContainsKey(requestUrl);
@@ -97,10 +127,10 @@ namespace Bistro.MethodsEngine
         }
 
         /// <summary>
-        /// This method should be used by SubSetsProcessor to retrieve IControllerTypeInfos associated with GenBindings
+        /// This method should be used by SubSetsProcessor to retrieve Bind Points associated with GenBindings
         /// </summary>
-        /// <param name="binding"></param>
-        /// <returns></returns>
+        /// <param name="binding">binding to use for search</param>
+        /// <returns>List of associated bind points found in the map</returns>
         internal List<IMethodsBindPointDesc> GetTypesByBinding(GenBinding binding)
         {
             if (map.ContainsKey(binding.InitialUrl))
@@ -115,6 +145,11 @@ namespace Bistro.MethodsEngine
 
 
 
+        /// <summary>
+        /// Gets the array of ControllerInvocationInfo objects for the url.
+        /// </summary>
+        /// <param name="requestUrl">The request URL.</param>
+        /// <returns></returns>
         public ControllerInvocationInfo[] GetControllers(string requestUrl)
         {
             MethodUrlsSubset urlSubSet = processor.GetMethodByUrl(requestUrl);

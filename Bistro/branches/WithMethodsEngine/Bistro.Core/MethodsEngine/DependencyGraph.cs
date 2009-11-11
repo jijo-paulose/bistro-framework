@@ -27,6 +27,9 @@ using Bistro.Controllers.Descriptor;
 
 namespace Bistro.MethodsEngine
 {
+    /// <summary>
+    /// Class, implementing topological sorting algorithm for Bind Points.
+    /// </summary>
     internal class DependencyGraph
     {
         #region Vertex
@@ -79,9 +82,26 @@ namespace Bistro.MethodsEngine
         #endregion
 
 
+        /// <summary>
+        /// Dictionary to link Bind points to vertices
+        /// </summary>
         Dictionary<IMethodsBindPointDesc, Vertex> vertices = new Dictionary<IMethodsBindPointDesc, Vertex>();
+
+        /// <summary>
+        /// initial list of bind points.
+        /// </summary>
         List<IMethodsBindPointDesc> listToSort;
+
+
+        /// <summary>
+        /// total vertices count.
+        /// </summary>
         int vertexCount = 0;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DependencyGraph"/> class.
+        /// </summary>
+        /// <param name="vertices">List of the bind points.</param>
         public DependencyGraph(List<IMethodsBindPointDesc> vertices)
         {
             listToSort = vertices;
@@ -89,6 +109,11 @@ namespace Bistro.MethodsEngine
                 this.vertices.Add(bindPoint, new Vertex(this, bindPoint));
         }
 
+        /// <summary>
+        /// Adds the edge to the graph.
+        /// </summary>
+        /// <param name="providingBindPoint">The providing bind point.</param>
+        /// <param name="consumingBindPoint">The consuming bind point.</param>
         internal void AddEdge(IMethodsBindPointDesc providingBindPoint, IMethodsBindPointDesc consumingBindPoint)
         {
             Vertex endpoint = vertices[consumingBindPoint];
@@ -100,10 +125,11 @@ namespace Bistro.MethodsEngine
             }
         }
 
+
         /// <summary>
-        /// 
+        /// Sorts listToSort if that's possible
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if sort succeeded, otherwise - false</returns>
         internal bool TopologicalSort()
         {
             int index = 0;

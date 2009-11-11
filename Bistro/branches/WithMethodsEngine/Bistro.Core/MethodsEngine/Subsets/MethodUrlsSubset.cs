@@ -61,7 +61,7 @@ namespace Bistro.MethodsEngine.Subsets
 
             foreach (GenBinding binding in bindingsList.Where(bind => bind.MatchStatus))
             {
-                foreach (IMethodsBindPointDesc bindPointInfo in binding.GetBindPoints())
+                foreach (IMethodsBindPointDesc bindPointInfo in engine.GetTypesByBinding(binding))
                 {
                     if (!bindPointsList.Contains(bindPointInfo))
                     {

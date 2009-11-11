@@ -246,17 +246,6 @@ namespace Bistro.MethodsEngine.Subsets
 
 
         /// <summary>
-        /// Gets the bind points for this binding from the engine.
-        /// </summary>
-        /// <returns></returns>
-        internal List<IMethodsBindPointDesc> GetBindPoints()
-        {
-            return engine.GetTypesByBinding(this);
-        }
-
-
-
-        /// <summary>
         /// Tries to match URL to bind URL (NOT to the half of the URL field).
         /// </summary>
         /// <param name="requestUrl">The request URL.</param>

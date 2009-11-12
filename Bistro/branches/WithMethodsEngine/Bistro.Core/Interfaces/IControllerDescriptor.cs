@@ -99,7 +99,7 @@ namespace Bistro.Interfaces
         /// Gets the BindPointDescriptors.
         /// </summary>
         /// <value>The BindPointDescriptors.</value>
-        List<IBindPointDescriptor> Targets { get; }
+        IEnumerable<IBindPointDescriptor> Targets { get; }
 
         /// <summary>
         /// Populates the descriptor contents.

@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
@@ -222,23 +223,13 @@ namespace Bistro.Controllers.Descriptor
         /// <summary>
         /// A list of bind points linked to this controller.
         /// </summary>
-        public List<IBindPointDescriptor> Targets 
+        public IEnumerable<IBindPointDescriptor> Targets 
         {
             get
             {
-                return targets.ConvertAll(converter1);
+                return targets.Select(bpd => (IBindPointDescriptor)bpd);
             }
         }
-
-        /// <summary>
-        /// converter to overcome difficulties with generics
-        /// </summary>
-        private static Converter<BindPointDescriptor, IBindPointDescriptor> converter1 = new Converter<BindPointDescriptor, IBindPointDescriptor>(bpd => bpd);
-
-        /// <summary>
-        /// converter to overcome difficulties with generics
-        /// </summary>
-        private static Converter<BindPointDescriptor, IMethodsBindPointDesc> converter2 = new Converter<BindPointDescriptor, IMethodsBindPointDesc>(bpd => bpd);
 
         /// <summary>
         /// A list of context variables that affect the operation of this controller
@@ -644,7 +635,7 @@ namespace Bistro.Controllers.Descriptor
         {
             get 
             {
-                return targets.ConvertAll(converter2);
+                return targets.Select(bpd => (IMethodsBindPointDesc)bpd);
             }
         }
 

@@ -41,7 +41,9 @@ namespace Bistro.MethodsEngine
         enum Errors
         {
             [DefaultMessage("Binding not found in the map: {0} ")]
-            BindingNotFound
+            BindingNotFound,
+            [DefaultMessage("Controller type {0} does not support IMethodsBindPointDesc")]
+            InterfaceNotSupported
         }
 
 
@@ -49,7 +51,7 @@ namespace Bistro.MethodsEngine
         /// <summary>
         /// map of the binding urls to the list of the bind points.
         /// </summary>
-        private Dictionary<string, List<BindPointDescriptor>> map = new Dictionary<string, List<BindPointDescriptor>>();
+        private Dictionary<string, List<IMethodsBindPointDesc>> map = new Dictionary<string, List<IMethodsBindPointDesc>>();
 
 
         /// <summary>
@@ -75,27 +77,37 @@ namespace Bistro.MethodsEngine
 
 
 
+        internal void RegisterController(IControllerDescriptor info)
+        {
+            IMethodsControllerDesc infoNew = info as IMethodsControllerDesc;
+            if (infoNew == null)
+            {
+                Logger.Report(Errors.InterfaceNotSupported, info.ControllerTypeName);
+            }
+
+            RegisterController(infoNew);
+        }
 
         /// <summary>
         /// Registers the controller in the engine.
         /// </summary>
         /// <param name="info">The controller descriptor.</param>
-        internal void RegisterController(IControllerDescriptor info)
+        internal void RegisterController(IMethodsControllerDesc info)
         {
             List<string> newBindUrls = new List<string>();
-            foreach (BindPointDescriptor bindPoint in info.Targets)
+            foreach (IMethodsBindPointDesc bindPoint in info.Targets)
             {
-                List<BindPointDescriptor> descriptors = null;
+                List<IMethodsBindPointDesc> descriptors = null;
 
                 if (!map.TryGetValue(bindPoint.Target, out descriptors))
                 {
-                    descriptors = new List<BindPointDescriptor>();
+                    descriptors = new List<IMethodsBindPointDesc>();
                     map.Add(bindPoint.Target, descriptors);
                     newBindUrls.Add(bindPoint.Target);
                 }
 
                 int i = 0;
-                foreach (BindPointDescriptor comparedBindPoint in descriptors)
+                foreach (IMethodsBindPointDesc comparedBindPoint in descriptors)
                 {
                     if (comparedBindPoint.Priority > bindPoint.Priority)
                         break;
@@ -135,7 +147,7 @@ namespace Bistro.MethodsEngine
         {
             if (map.ContainsKey(binding.InitialUrl))
             {
-                return map[binding.InitialUrl].OfType<IMethodsBindPointDesc>().ToList();
+                return map[binding.InitialUrl];
             }
             Logger.Report(Errors.BindingNotFound, binding.InitialUrl);
             throw new ApplicationException("Binding not found");

@@ -54,6 +54,6 @@ namespace Bistro.MethodsEngine.Reflection
         /// Gets the controller descriptor with information required by the methods engine.
         /// </summary>
         /// <value>The controller descriptor.</value>
-        IMethodsControllerDesc ControllerMethodDesc { get; }
+        IMethodsControllerDesc Controller { get; }
     }
 }

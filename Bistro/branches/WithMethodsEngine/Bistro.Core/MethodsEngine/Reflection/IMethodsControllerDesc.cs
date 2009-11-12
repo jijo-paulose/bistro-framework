@@ -58,29 +58,6 @@ namespace Bistro.MethodsEngine.Reflection
         /// <value>The provides resources names.</value>
         List<string> Provides { get; }
 
-        /// <summary>
-        /// Gets resources marked as FormField.
-        /// </summary>
-        /// <value>Resources marked as FormField.</value>
-        Dictionary<string, IMemberInfo> FormFieldsList { get; }
-
-        /// <summary>
-        /// Gets resources marked as Request.
-        /// </summary>
-        /// <value>Resources marked as Request.</value>
-        Dictionary<string, IMemberInfo> RequestFieldsList { get; }
-
-        /// <summary>
-        /// Gets resources marked as Session.
-        /// </summary>
-        /// <value>Resources marked as Session.</value>
-        Dictionary<string, IMemberInfo> SessionFieldsList { get; }
-
-        /// <summary>
-        /// Gets the dictionary with the cookie fields.
-        /// </summary>
-        /// <value>The cookie fields dictionary.</value>
-        Dictionary<string, IMemberInfo> CookieFieldsList { get; }
 
         /// <summary>
         /// Gets a value indicating - whether controller is a security controller - useful for methods engine
@@ -101,7 +78,7 @@ namespace Bistro.MethodsEngine.Reflection
         /// Gets the list of bind points linked to this controller.
         /// </summary>
         /// <value>The list of bind points linked to this controller.</value>
-        List<IMethodsBindPointDesc> TargetsForMethod { get; }
+        IEnumerable<IMethodsBindPointDesc> Targets { get; }
 
     }
 }

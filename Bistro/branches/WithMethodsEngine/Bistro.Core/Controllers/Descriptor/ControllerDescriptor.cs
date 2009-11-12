@@ -167,7 +167,7 @@ namespace Bistro.Controllers.Descriptor
             /// <summary>
             /// Return controller description as an interface appropriate for methods engine
             /// </summary>
-            public IMethodsControllerDesc ControllerMethodDesc
+            IMethodsControllerDesc IMethodsBindPointDesc.Controller
             {
                 get { return controller; }
             }
@@ -603,27 +603,6 @@ namespace Bistro.Controllers.Descriptor
 
         #region IMethodsControllerDesc Members
 
-
-        /// <summary>
-        /// Collection to enumerate MemberInfo wrappers of members with FormField attribute
-        /// </summary>
-        public Dictionary<string, IMemberInfo> FormFieldsList { get; private set; }
-
-        /// <summary>
-        /// Collection to enumerate MemberInfo wrappers of members with RequestField attribute
-        /// </summary>
-        public Dictionary<string, IMemberInfo> RequestFieldsList { get; private set; }
-
-        /// <summary>
-        /// Collection to enumerate MemberInfo wrappers of members with SessionField attribute
-        /// </summary>
-        public Dictionary<string, IMemberInfo> SessionFieldsList { get; private set; }
-
-        /// <summary>
-        /// Collection to enumerate MemberInfo wrappers of members with CookieField attribute
-        /// </summary>
-        public Dictionary<string, IMemberInfo> CookieFieldsList { get; private set; }
-
         /// <summary>
         /// Gets a value indicating - whether controller is a security controller - useful for methods engine
         /// </summary>
@@ -661,7 +640,7 @@ namespace Bistro.Controllers.Descriptor
         /// A list of bind points linked to this controller for methods engine.
         /// </summary>
         /// <value>The list of bind points linked to this controller.</value>
-        public List<IMethodsBindPointDesc> TargetsForMethod
+        IEnumerable<IMethodsBindPointDesc> IMethodsControllerDesc.Targets
         {
             get 
             {

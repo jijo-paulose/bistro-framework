@@ -131,7 +131,7 @@ namespace Bistro.MethodsEngine
         internal void Validate()
         {
             if (providers.Count == 0 && requiredBy.Count > 0)
-                engine.RaiseMissingProvider(this.name, dependents.Concat(requiredBy).Select((bpd) => bpd.ControllerMethodDesc));
+                engine.RaiseMissingProvider(this.name, dependents.Concat(requiredBy).Select((bpd) => bpd.Controller));
             string resourceType = null;
 
             resourceType = ValidateResourceType(Providers, resourceType);
@@ -150,10 +150,10 @@ namespace Bistro.MethodsEngine
         {
             foreach (IMethodsBindPointDesc bindPoint in bindPoints)
                 if (type == null)
-                    type = bindPoint.ControllerMethodDesc.GetResourceType(name);
+                    type = bindPoint.Controller.GetResourceType(name);
                 else
-                    if (type != bindPoint.ControllerMethodDesc.GetResourceType(name))
-                        engine.RaiseInconsistentResourceType(bindPoint.Target, this.name, providers.Concat(dependents).Concat(requiredBy).Select((bpd) => bpd.ControllerMethodDesc));
+                    if (type != bindPoint.Controller.GetResourceType(name))
+                        engine.RaiseInconsistentResourceType(bindPoint.Target, this.name, providers.Concat(dependents).Concat(requiredBy).Select((bpd) => bpd.Controller));
             return type;
         }
 

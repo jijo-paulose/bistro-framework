@@ -84,9 +84,9 @@ namespace Bistro.MethodsEngine.Subsets
             resources = new Dictionary<string,Resource>();
             foreach (IMethodsBindPointDesc bindPoint in bindPointsList)
             {
-                foreach (string resName in bindPoint.ControllerMethodDesc.Provides
-                                        .Concat(bindPoint.ControllerMethodDesc.Requires)
-                                        .Concat(bindPoint.ControllerMethodDesc.DependsOn))
+                foreach (string resName in bindPoint.Controller.Provides
+                                        .Concat(bindPoint.Controller.Requires)
+                                        .Concat(bindPoint.Controller.DependsOn))
                 {
                     if (!resources.ContainsKey(resName))
                     {
@@ -157,7 +157,7 @@ namespace Bistro.MethodsEngine.Subsets
             }
             if (!graph.TopologicalSort())
             {
-                engine.RaiseResourceLoop(string.Empty, before.Select(bpd => bpd.ControllerMethodDesc));
+                engine.RaiseResourceLoop(string.Empty, before.Select(bpd => bpd.Controller));
             }
 
 
@@ -165,7 +165,7 @@ namespace Bistro.MethodsEngine.Subsets
 
             int i = 0;
             while (i < before.Count)
-                if (before[i].ControllerMethodDesc.IsSecurity)
+                if (before[i].Controller.IsSecurity)
             {
                 securityControllers.Add(before[i]);
                 before.RemoveAt(i);

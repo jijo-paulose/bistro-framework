@@ -212,12 +212,16 @@ namespace Bistro.Controllers.Descriptor
             UnspecifiedScope
         }
 
+        private enum Warnings
+        {
+            [DefaultMessage("Resource {0} was not found in the controller descriptor {1}")]
+            ResourceNotFound
+        }
+
         private enum Exceptions
         {
             [DefaultMessage("{0}.{1} is a duplicate field or property. Check the base classes of the controller for members with the same name.")]
-            DuplicateField,
-            [DefaultMessage("Resource {0} was not found in the controller descriptor {1}")]
-            ResourceNotFound
+            DuplicateField
         }
 
         /// <summary>
@@ -619,8 +623,10 @@ namespace Bistro.Controllers.Descriptor
             {
                 return membersWrappers[resourceName].Type;
             }
-            logger.Report(Exceptions.ResourceNotFound, resourceName, ControllerTypeName);
-            throw new ApplicationException(String.Format("Resource {0} not found in the controller {1}.", resourceName, ControllerTypeName));
+              
+            // Next string works very slow.
+            //logger.Report(Warnings.ResourceNotFound, resourceName, ControllerTypeName);
+            return "dummyType";
         }
 
         #endregion

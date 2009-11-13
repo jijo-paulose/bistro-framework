@@ -140,7 +140,7 @@ namespace Bistro.MethodsEngine
             if (vertexCount == vertices.Count)
             {
                 Comparison<IMethodsBindPointDesc> vertexCompare =
-                    (left, right) => vertices[left].index.CompareTo(vertices[right].index);
+                    (left, right) => vertices[right].index.CompareTo(vertices[left].index);
                 listToSort.Sort(vertexCompare);
 
                 return true;

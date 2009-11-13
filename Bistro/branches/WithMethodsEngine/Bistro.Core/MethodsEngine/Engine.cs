@@ -121,6 +121,7 @@ namespace Bistro.MethodsEngine
             {
                 processor.AddNewBinding(bindUrl);
             }
+            processor.UpdateBindPoints();
 
 
         }

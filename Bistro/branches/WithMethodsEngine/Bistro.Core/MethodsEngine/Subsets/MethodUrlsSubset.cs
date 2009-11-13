@@ -55,10 +55,22 @@ namespace Bistro.MethodsEngine.Subsets
         private MethodUrlsSubset(Engine _engine, List<GenBinding> oldBindingsList, GenBinding newBinding)
         {
             engine = _engine;
-            bindPointsList = new List<IMethodsBindPointDesc>();
+            
             bindingsList = new List<GenBinding>(oldBindingsList);
             bindingsList.Add(newBinding);
 
+
+
+//            UpdateBindPoints();
+        }
+
+
+        /// <summary>
+        /// Updates bind point information
+        /// </summary>
+        internal void UpdateBindPoints()
+        {
+            bindPointsList = new List<IMethodsBindPointDesc>();
             foreach (GenBinding binding in bindingsList.Where(bind => bind.MatchStatus))
             {
                 foreach (IMethodsBindPointDesc bindPointInfo in engine.GetTypesByBinding(binding))
@@ -69,12 +81,12 @@ namespace Bistro.MethodsEngine.Subsets
                     }
                 }
             }
-
             ScanResources();
 
             SortBindPoints();
 
         }
+
 
         /// <summary>
         /// Scans resources and creates a new dictionary

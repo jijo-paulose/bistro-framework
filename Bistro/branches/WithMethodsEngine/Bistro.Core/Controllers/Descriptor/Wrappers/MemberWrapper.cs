@@ -42,6 +42,16 @@ namespace Bistro.Controllers.Descriptor.Wrappers
             Type = memberInfo.ReflectedType.FullName;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemberWrapper"/> class.
+        /// </summary>
+        /// <param name="_name">The _name.</param>
+        /// <param name="_type">The _type.</param>
+        public MemberWrapper(string _name, string _type)
+        {
+            Name = _name;
+            Type = _type;
+        }
 
         /// <summary>
         /// Member name

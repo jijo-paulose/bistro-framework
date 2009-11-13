@@ -96,16 +96,36 @@ namespace Bistro.MethodsEngine.Subsets
             resources = new Dictionary<string,Resource>();
             foreach (IMethodsBindPointDesc bindPoint in bindPointsList)
             {
-                foreach (string resName in bindPoint.Controller.Provides
-                                        .Concat(bindPoint.Controller.Requires)
-                                        .Concat(bindPoint.Controller.DependsOn))
+                foreach (string resName in bindPoint.Controller.Provides)
                 {
-                    if (!resources.ContainsKey(resName))
-                    {
-                        resources.Add(resName,new Resource(engine,resName));
-                    }
+                    Resource res = AddResource(resName);
+                    res.AddProvider(bindPoint);
+                }
+                foreach (string resName in bindPoint.Controller.DependsOn)
+                {
+                    Resource res = AddResource(resName);
+                    res.AddDependents(bindPoint);
+                }
+                foreach (string resName in bindPoint.Controller.Requires)
+                {
+                    Resource res = AddResource(resName);
+                    res.AddRequiredBy(bindPoint);
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates resource if it does not exist in the collection.
+        /// </summary>
+        /// <param name="resName">Resource name</param>
+        /// <returns>Resource from the resources collection</returns>
+        private Resource AddResource(string resName)
+        {
+            if (!resources.ContainsKey(resName))
+            {
+                resources.Add(resName, new Resource(engine, resName));
+            }
+            return resources[resName];
         }
 
 

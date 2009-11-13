@@ -130,6 +130,17 @@ namespace Bistro.MethodsEngine.Subsets
             return null;
         }
 
+        /// <summary>
+        /// Updates bindpoints information in methods.
+        /// </summary>
+        internal void UpdateBindPoints()
+        {
+            foreach(MethodUrlsSubset subset in allMethods)
+            {
+                subset.UpdateBindPoints();
+            }
+        }
+
 
         #region Private methods
 

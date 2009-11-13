@@ -256,15 +256,6 @@ namespace Bistro.MethodsEngine.Subsets
 
             int a,b;
 
-            var requestItems = GetSplitItems(InitialUrl, out a, out b);
-
-            if (requestItems.Count != 1)
-            {
-                engine.Logger.Report(Errors.ErrorSplittingUrl, requestUrl);
-                throw new ApplicationException(String.Format("Error splitting the url {0}", requestUrl));
-            }
-
-
             string[] splitQueryString = requestUrl.Split('?');
             string[] requestComponents = smartUrlSplit(splitQueryString[0]);
 

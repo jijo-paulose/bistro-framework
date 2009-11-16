@@ -135,8 +135,8 @@ namespace Bistro.MethodsEngine
                 }
 
                 return nonZero(bindType.CompareTo(other.bindType),
-                               nonZero(priority.CompareTo(other.priority),
-                                    nonZero(bindLength.CompareTo(other.bindLength), ctrTypeName.CompareTo(other.ctrTypeName))));
+                               nonZero(other.priority.CompareTo(this.priority),
+                                    nonZero(bindLength.CompareTo(other.bindLength), this.ctrTypeName.CompareTo(other.ctrTypeName))));
             }
 
             #endregion
@@ -169,6 +169,7 @@ namespace Bistro.MethodsEngine
             private bool visited;
             public bool isRoot;
             public int index;
+            public int ParentCount = 0;
             internal DependencyGraph Graph;
 
 
@@ -191,6 +192,14 @@ namespace Bistro.MethodsEngine
                         return -1;
                 visited = false;
                 return index;
+            }
+
+            internal void IncreaseParents()
+            {
+                foreach (Vertex child in children)
+                {
+                    child.ParentCount++;
+                }
             }
         }
         #endregion
@@ -261,6 +270,9 @@ namespace Bistro.MethodsEngine
                         return false;
             if (vertexCount == vertices.Count)
             {
+                foreach (Vertex vrt in vertices.Values)
+                    vrt.IncreaseParents();
+
 
                 listSorted = new List<IMethodsBindPointDesc>();
 
@@ -272,12 +284,18 @@ namespace Bistro.MethodsEngine
                     listSorted.Add(nextChildrenToSort.Values[0].BindPoint);
 
                     Vertex vrt = nextChildrenToSort.Values[0];
+
                     nextChildrenToSort.RemoveAt(0);
+
                     foreach (Vertex vrtNew in vrt.Children)
                     {
-                        VertexKey vrtNewKey = new VertexKey(vrtNew);
-                        if (!nextChildrenToSort.ContainsKey(vrtNewKey))
-                            nextChildrenToSort.Add(vrtNewKey,vrtNew);
+                        vrtNew.ParentCount--;
+                        if (vrtNew.ParentCount == 0)
+                        {
+                            VertexKey vrtNewKey = new VertexKey(vrtNew);
+                            if (!nextChildrenToSort.ContainsKey(vrtNewKey))
+                                nextChildrenToSort.Add(vrtNewKey, vrtNew);
+                        }
                     }
                 }
                 return true;

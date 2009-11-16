@@ -154,9 +154,9 @@ namespace Bistro.MethodsEngine.Subsets
                 foreach (IMethodsBindPointDesc providingBindPoint in resource.Providers)
                 {
                     foreach (IMethodsBindPointDesc consumer in resource.Dependents)
-                        graph.AddEdge(consumer, providingBindPoint);
+                        graph.AddEdge(providingBindPoint, consumer);
                     foreach (IMethodsBindPointDesc consumer in resource.RequiredBy)
-                        graph.AddEdge(consumer, providingBindPoint);
+                        graph.AddEdge(providingBindPoint, consumer);
                 }
             }
             if (!graph.TopologicalSort(out bindPointsList))

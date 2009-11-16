@@ -50,6 +50,14 @@ namespace Bistro.MethodsEngine.Reflection
         /// <value>The priority.</value>
         int Priority { get; }
 
+
+        /// <summary>
+        /// Gets the length of the bind in facets.
+        /// </summary>
+        /// <value>The length of the bind in facets.</value>
+        int BindLength { get; }
+
+
         /// <summary>
         /// Gets the controller descriptor with information required by the methods engine.
         /// </summary>

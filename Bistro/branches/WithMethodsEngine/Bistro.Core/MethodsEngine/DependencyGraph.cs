@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using Bistro.MethodsEngine.Reflection;
 using Bistro.Controllers.Descriptor;
+using Bistro.Configuration.Logging;
 
 namespace Bistro.MethodsEngine
 {
@@ -32,8 +33,118 @@ namespace Bistro.MethodsEngine
     /// </summary>
     internal class DependencyGraph
     {
+
+        /// <summary>
+        /// Class, which allows sorting of Bind points by priority, before/payload/after/teardown and bind length
+        /// </summary>
+        public class VertexKey : IComparable<VertexKey>
+        {
+
+            enum Errors 
+            {
+                [DefaultMessage("Same controller name in graph: {0}")]
+                SameControllerName
+            }
+
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="VertexKey"/> class.
+            /// </summary>
+            /// <param name="_vertex">The vertex.</param>
+            public VertexKey(Vertex _vertex)
+            {
+                bindPoint = _vertex.BindPoint;
+                vertex = _vertex;
+            }
+
+            /// <summary>
+            /// corresponding bindpoint.
+            /// </summary>
+            private IMethodsBindPointDesc bindPoint;
+
+            /// <summary>
+            /// corresponding vertex
+            /// </summary>
+            private Vertex vertex;
+
+            /// <summary>
+            /// Gets the controller type name.
+            /// </summary>
+            /// <value>The controller type name.</value>
+            private string ctrTypeName
+            {
+                get { return bindPoint.Controller.ControllerTypeName; }
+            }
+
+            /// <summary>
+            /// Gets the bindpoint priority.
+            /// </summary>
+            /// <value>The bindpoint priority.</value>
+            private int priority
+            {
+                get { return bindPoint.Priority; }
+            }
+
+            /// <summary>
+            /// Gets the bind type.
+            /// </summary>
+            /// <value>The bind type.</value>
+            private BindType bindType
+            {
+                get { return bindPoint.ControllerBindType; }
+            }
+
+            /// <summary>
+            /// Gets the length of the bind in facets.
+            /// </summary>
+            /// <value>The length of the bind in facets.</value>
+            private int bindLength
+            {
+                get { return bindPoint.BindLength; }
+            }
+
+        
+            #region IComparable<VertexKey> Members
+
+            /// <summary>
+            /// Compares the current object with another object of the same type.
+            /// </summary>
+            /// <param name="other">An object to compare with this object.</param>
+            /// <returns>
+            /// A 32-bit signed integer that indicates the relative order of the objects being compared. The return value has the following meanings:
+            /// Value
+            /// Meaning
+            /// Less than zero
+            /// This object is less than the <paramref name="other"/> parameter.
+            /// Zero
+            /// This object is equal to <paramref name="other"/>.
+            /// Greater than zero
+            /// This object is greater than <paramref name="other"/>.
+            /// </returns>
+            public int CompareTo(VertexKey other)
+            {
+                if (this.vertex == other.vertex)
+                    return 0;// vertexes are unique.
+
+                Func<int, int, int> nonZero = (a, b) => a == 0 ? b : a;
+
+                if (ctrTypeName == other.ctrTypeName)
+                {
+                    vertex.Graph.Engine.Logger.Report(Errors.SameControllerName, ctrTypeName);
+                    throw new ApplicationException(String.Format("Same controller type name found in graph: {0}", ctrTypeName));
+                }
+
+                return nonZero(bindType.CompareTo(other.bindType),
+                               nonZero(priority.CompareTo(other.priority),
+                                    nonZero(bindLength.CompareTo(other.bindLength), ctrTypeName.CompareTo(other.ctrTypeName))));
+            }
+
+            #endregion
+        }
+
+
         #region Vertex
-        class Vertex
+        public class Vertex
         {
             /// <summary>
             /// 
@@ -42,7 +153,7 @@ namespace Bistro.MethodsEngine
             /// <param name="bindPoint"></param>
             public Vertex(DependencyGraph graph, IMethodsBindPointDesc bindPoint)
             {
-                this.graph = graph;
+                this.Graph = graph;
                 this.bindPoint = bindPoint;
                 children = new List<Vertex>();
                 isRoot = true;
@@ -51,12 +162,15 @@ namespace Bistro.MethodsEngine
             }
 
             public List<Vertex> Children { get { return children; } }
-            IMethodsBindPointDesc bindPoint;
-            List<Vertex> children;
-            bool visited;
+            internal IMethodsBindPointDesc BindPoint { get { return bindPoint; } }
+
+            private IMethodsBindPointDesc bindPoint;
+            private List<Vertex> children;
+            private bool visited;
             public bool isRoot;
             public int index;
-            DependencyGraph graph;
+            internal DependencyGraph Graph;
+
 
             /// <summary>
             /// 
@@ -69,7 +183,7 @@ namespace Bistro.MethodsEngine
                     return -1;  // we ran into a loop
                 visited = true;
                 if (this.index == -1)
-                    graph.vertexCount++;
+                    Graph.vertexCount++;
 //                this.seqNumber = this.index = ++index;
                 this.index = ++index;
                 foreach (Vertex child in children)
@@ -99,15 +213,21 @@ namespace Bistro.MethodsEngine
         int vertexCount = 0;
 
         /// <summary>
+        /// Bistro Engine
+        /// </summary>
+        internal Engine Engine;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DependencyGraph"/> class.
         /// </summary>
         /// <param name="vertices">List of the bind points.</param>
-        public DependencyGraph(List<IMethodsBindPointDesc> vertices)
+        public DependencyGraph(Engine _engine, List<IMethodsBindPointDesc> vertices)
         {
+            Engine = _engine;
             listToSort = vertices;
             foreach (IMethodsBindPointDesc bindPoint in vertices)
                 this.vertices.Add(bindPoint, new Vertex(this, bindPoint));
-        }
+        } 
 
         /// <summary>
         /// Adds the edge to the graph.
@@ -130,8 +250,10 @@ namespace Bistro.MethodsEngine
         /// Sorts listToSort if that's possible
         /// </summary>
         /// <returns>true if sort succeeded, otherwise - false</returns>
-        internal bool TopologicalSort()
+        internal bool TopologicalSort(out List<IMethodsBindPointDesc> listSorted)
         {
+            listSorted = listToSort;
+
             int index = 0;
             foreach (Vertex origin in vertices.Values)
                 if (origin.isRoot)
@@ -139,10 +261,25 @@ namespace Bistro.MethodsEngine
                         return false;
             if (vertexCount == vertices.Count)
             {
-                Comparison<IMethodsBindPointDesc> vertexCompare =
-                    (left, right) => vertices[right].index.CompareTo(vertices[left].index);
-                listToSort.Sort(vertexCompare);
 
+                listSorted = new List<IMethodsBindPointDesc>();
+
+                SortedList<VertexKey, Vertex> nextChildrenToSort =
+                    vertices.Values.Where(a => a.isRoot).Aggregate(new SortedList<VertexKey, Vertex>(), (acc, vert) => { acc.Add(new VertexKey(vert), vert); return acc; });
+
+                while (nextChildrenToSort.Count != 0)
+                {
+                    listSorted.Add(nextChildrenToSort.Values[0].BindPoint);
+
+                    Vertex vrt = nextChildrenToSort.Values[0];
+                    nextChildrenToSort.RemoveAt(0);
+                    foreach (Vertex vrtNew in vrt.Children)
+                    {
+                        VertexKey vrtNewKey = new VertexKey(vrtNew);
+                        if (!nextChildrenToSort.ContainsKey(vrtNewKey))
+                            nextChildrenToSort.Add(vrtNewKey,vrtNew);
+                    }
+                }
                 return true;
             }
             return false;

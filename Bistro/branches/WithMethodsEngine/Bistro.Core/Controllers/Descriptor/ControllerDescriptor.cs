@@ -66,6 +66,13 @@ namespace Bistro.Controllers.Descriptor
             /// </summary>
             private string[] targetComponents;
 
+
+            /// <summary>
+            /// Gets the length of the bind in facets.
+            /// </summary>
+            /// <value>The length of the bind in facets.</value>
+            public int BindLength { get; private set; }
+
             /// <summary>
             /// Gets or sets the controller bind type.
             /// </summary>
@@ -105,7 +112,7 @@ namespace Bistro.Controllers.Descriptor
                 : this()
             {
                 targetComponents = BindPointUtilities.GetBindComponents(target);
-
+                BindLength = targetComponents.Length;
                 controller = _controller;
                 Target = BindPointUtilities.GetBindPath(target);
                 ControllerBindType = bindType;

@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using Bistro.MethodsEngine.Reflection;
 using Bistro.Controllers.Descriptor;
+using Bistro.Configuration.Logging;
 
 namespace Bistro.MethodsEngine.Subsets
 {
@@ -33,6 +34,13 @@ namespace Bistro.MethodsEngine.Subsets
     /// </summary>
     public class MethodUrlsSubset
     {
+
+        enum Messages
+        {
+            [DefaultMessage("ControllersList sorted \r\n{0}\r\n---------------------\r\n")]
+            ListSorted
+        }
+
 
         /// <summary>
         /// Initializes a new empty instance of the <see cref="MethodUrlsSubset"/> class.
@@ -135,45 +143,9 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         private void SortBindPoints()
         {
-            Func<List<IMethodsBindPointDesc>> init = () => new List<IMethodsBindPointDesc>();
-            var before = init();
-            var payload = init();
-            var after = init();
-            var teardown = init();
 
-            foreach (IMethodsBindPointDesc descriptor in bindPointsList)
-            {
-                switch (descriptor.ControllerBindType)
-                {
-                    case BindType.Before:
-                        before.Add(descriptor);
-                        break;
-                    case BindType.Payload:
-                        payload.Add(descriptor);
-                        break;
-                    case BindType.After:
-                        after.Add(descriptor);
-                        break;
-                    case BindType.Teardown:
-                        teardown.Add(descriptor);
-                        break;
-                }
 
-            }
-
-            Comparison<IMethodsBindPointDesc> priorityComparison = 
-                (x,y) => x.Priority.CompareTo(y.Priority);
-
-            before.Sort(priorityComparison);
-            after.Sort(priorityComparison);
-            payload.Sort(priorityComparison);
-            teardown.Sort(priorityComparison);
-
-            before.AddRange(payload);
-            before.AddRange(after);
-            before.AddRange(teardown);
-
-            DependencyGraph graph = new DependencyGraph(before);
+            DependencyGraph graph = new DependencyGraph(engine, bindPointsList);
 
             foreach (Resource resource in resources.Values)
             {
@@ -187,30 +159,33 @@ namespace Bistro.MethodsEngine.Subsets
                         graph.AddEdge(consumer, providingBindPoint);
                 }
             }
-            if (!graph.TopologicalSort())
+            if (!graph.TopologicalSort(out bindPointsList))
             {
-                engine.RaiseResourceLoop(string.Empty, before.Select(bpd => bpd.Controller));
+                engine.RaiseResourceLoop(string.Empty, bindPointsList.Select(bpd => bpd.Controller));
             }
 
+            StringBuilder tempsb = bindPointsList.Aggregate(new StringBuilder(),(oldStr,bpd) => oldStr.Append(bpd.Controller.ControllerTypeName).Append(":").Append(bpd.Target).Append("\r\n"));
+            
+
+            engine.Logger.Report(Messages.ListSorted,tempsb.ToString());
 
             var securityControllers = new List<IMethodsBindPointDesc>();
 
             int i = 0;
-            while (i < before.Count)
-                if (before[i].Controller.IsSecurity)
+            while (i < bindPointsList.Count)
+                if (bindPointsList[i].Controller.IsSecurity)
             {
-                securityControllers.Add(before[i]);
-                before.RemoveAt(i);
+                securityControllers.Add(bindPointsList[i]);
+                bindPointsList.RemoveAt(i);
             }
             else
                 i++;
 
             // we can't just sort, because the standard sort may re-arrange the existing order.
             // we just want to move all security controllers to the top of the chain
-            before.InsertRange(0, securityControllers);
+            bindPointsList.InsertRange(0, securityControllers);
 
 
-            bindPointsList = before;
         }
 
 

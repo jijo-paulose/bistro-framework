@@ -103,6 +103,22 @@ namespace Bistro.UnitTests.Tests
                 );
             #endregion
 
+            #region controller ordering - 1 - NEW
+            NewTestWithUrl(
+                "controller ordering - 1 - NEW",
+                Types(
+                    Type("Controller1", BindAttribute("/default")),
+                    Type("Controller2", BindAttribute("/default"))
+                    ),
+                    UrlTest("GET /default", "GET /default", "Controller1", "Controller2"),
+                    UrlTest("POST /default", "POST /default", "Controller1", "Controller2"),
+                    UrlTest("PUT /default", "PUT /default", "Controller1", "Controller2"),
+                    UrlTest("DELETE /default", "DELETE /default", "Controller1", "Controller2"),
+                    UrlTest("HEAD /default", "HEAD /default", "Controller1", "Controller2")
+                //Node("* /default", "Controller2", "Controller1")
+                );
+            #endregion
+
             #region controller ordering - 1
             NewTestWithUrl(
                 "controller ordering - 1",

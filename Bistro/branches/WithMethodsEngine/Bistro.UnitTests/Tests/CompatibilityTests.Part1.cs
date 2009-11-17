@@ -925,6 +925,42 @@ namespace Bistro.UnitTests.Tests
             );
             #endregion
 
+            #region tree - one controller - 2 bindings (flat) - NEW
+            NewTestWithUrl(
+                "tree - one controller - 2 bindings (flat) - NEW",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/"),
+                        BindAttribute("/path1"))
+                    )),
+                //Node("* /", "Controller1"),
+                //Node("* /path1", "Controller1")
+                UrlTest("GET /path1/anotherpath", "GET /path1/anotherpath", "Controller1"),
+                UrlTest("POST /path1/anotherpath", "POST /path1/anotherpath", "Controller1"),
+                UrlTest("PUT /path1/anotherpath", "PUT /path1/anotherpath", "Controller1"),
+                UrlTest("DELETE /path1/anotherpath", "DELETE /path1/anotherpath", "Controller1"),
+                UrlTest("HEAD /path1/anotherpath", "HEAD /path1/anotherpath", "Controller1"),
+                UrlTest("GET /anotherpath", "GET /anotherpath", "Controller1"),
+                UrlTest("POST /anotherpath", "POST /anotherpath", "Controller1"),
+                UrlTest("PUT /anotherpath", "PUT /anotherpath", "Controller1"),
+                UrlTest("DELETE /anotherpath", "DELETE /anotherpath", "Controller1"),
+                UrlTest("HEAD /anotherpath", "HEAD /anotherpath", "Controller1"),
+                UrlTest("GET /", "GET /", "Controller1"),
+                UrlTest("POST /", "POST /", "Controller1"),
+                UrlTest("PUT /", "PUT /", "Controller1"),
+                UrlTest("DELETE /", "DELETE /", "Controller1"),
+                UrlTest("HEAD /", "HEAD /", "Controller1"),
+                UrlTest("GET /path1", "GET /path1", "Controller1"),
+                UrlTest("POST /path1", "POST /path1", "Controller1"),
+                UrlTest("PUT /path1", "PUT /path1", "Controller1"),
+                UrlTest("DELETE /path1", "DELETE /path1", "Controller1"),
+                UrlTest("HEAD /path1", "HEAD /path1", "Controller1")
+
+            );
+            #endregion
+
+
             #region Imported - home/root
             NewTestWithUrl(
                 "Imported - home/root",
@@ -957,6 +993,40 @@ namespace Bistro.UnitTests.Tests
 //                Node("* /?", "HomeUrlController2", "HomeUrlController1") // Actually that's not so good - controllers may come in any order here.
                 );
             #endregion
+
+            #region Imported - home/root - NEW
+            NewTestWithUrl(
+                "Imported - home/root - NEW",
+                Types(
+                    Type(
+                        "HomeUrlController1",
+                        BindAttribute("/?")
+                    ),
+                    Type(
+                        "HomeUrlController2",
+                        BindAttribute("/?")
+                    )
+                ),
+                UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("GET /bbb124", "GET /bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("POST /abcde/edcba/aaaa123/bbb124", "POST /abcde/edcba/aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("POST /bbb124", "POST /bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("POST /aaaa123/bbb124", "POST /aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("PUT /abcde/edcba/aaaa123/bbb124", "PUT /abcde/edcba/aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("PUT /bbb124", "PUT /bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("PUT /aaaa123/bbb124", "PUT /aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("DELETE /abcde/edcba/aaaa123/bbb124", "DELETE /abcde/edcba/aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("DELETE /bbb124", "DELETE /bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("DELETE /aaaa123/bbb124", "DELETE /aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("HEAD /abcde/edcba/aaaa123/bbb124", "HEAD /abcde/edcba/aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("HEAD /bbb124", "HEAD /bbb124", "HomeUrlController1", "HomeUrlController2"),
+                UrlTest("HEAD /aaaa123/bbb124", "HEAD /aaaa123/bbb124", "HomeUrlController1", "HomeUrlController2")
+
+//                Node("* /?", "HomeUrlController2", "HomeUrlController1") // Actually that's not so good - controllers may come in any order here.
+                );
+            #endregion
+
 
             #region Imported - /hello/...
             NewTestWithUrl("Imported - /hello/...",
@@ -1075,6 +1145,78 @@ namespace Bistro.UnitTests.Tests
                 UrlTest("PUT /order/world/new", "PUT /order/world/new", "OrderController5", "OrderController7", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6"),
                 UrlTest("DELETE /order/world/new", "DELETE /order/world/new", "OrderController5", "OrderController7", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6"),
                 UrlTest("HEAD /order/world/new", "HEAD /order/world/new", "OrderController5", "OrderController7", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6")
+                //Node("* /order/world/new", "OrderController7", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6")
+            );
+            #endregion
+
+            #region Imported - /order/world/new - NEW
+            NewTestWithUrl("Imported - /order/world/new - NEW",
+                Types(
+                    Type(
+                        "OrderController1",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c1", "string", SessionAttribute),
+                        Field("c2", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController2",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c2", "string", SessionAttribute),
+                        Field("c5", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController3",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c3", "string", SessionAttribute),
+                        Field("c2", "string", SessionAttribute, RequiresAttribute),
+                        Field("c4", "string", SessionAttribute, RequiresAttribute),
+                        Field("c5", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController4",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c4", "string", SessionAttribute),
+                        Field("c1", "string", SessionAttribute, RequiresAttribute),
+                        Field("c2", "string", SessionAttribute, RequiresAttribute),
+                        Field("c5", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController5",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c5", "string", SessionAttribute)
+                    ),
+                    Type(
+                        "OrderController6",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c6", "string", SessionAttribute),
+                        Field("c3", "string", SessionAttribute, RequiresAttribute),
+                        Field("c7", "string", SessionAttribute, RequiresAttribute)
+                    ),
+                    Type(
+                        "OrderController7",
+                        Attributes(
+                            BindAttribute("/order/world/new")
+                            ),
+                        Field("c7", "string", SessionAttribute)
+                    )
+                ),
+                UrlTest("GET /order/world/new", "GET /order/world/new", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController7", "OrderController6"),
+                UrlTest("POST /order/world/new", "POST /order/world/new", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController7", "OrderController6"),
+                UrlTest("PUT /order/world/new", "PUT /order/world/new", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController7", "OrderController6"),
+                UrlTest("DELETE /order/world/new", "DELETE /order/world/new", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController7", "OrderController6"),
+                UrlTest("HEAD /order/world/new", "HEAD /order/world/new", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController7", "OrderController6")
                 //Node("* /order/world/new", "OrderController7", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6")
             );
             #endregion

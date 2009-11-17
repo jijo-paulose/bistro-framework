@@ -1004,6 +1004,44 @@ namespace Bistro.UnitTests.Tests
                 );
             #endregion
 
+            #region Imported - Paging-simple - NEW
+            NewTestWithUrl(
+                "Imported - Paging-simple - NEW",
+                Types(
+                    Type("DataRoot",
+                        Attributes(BindAttribute("GET /a/?"))
+                        ),
+                    Type("WithPaging",
+                        Attributes(
+                            BindAttribute("GET /a/?/c3")
+                        )
+                        ),
+                    Type("Data14sRender",
+                        Attributes(
+                            BindAttribute("GET /a/b/c2")
+                        )
+                        ),
+                    Type("Data14sRenderBis",
+                        Attributes(
+                            BindAttribute("GET /a/b/c1")
+                        )
+                        )
+                    ),
+                    UrlTest("special - GET /a/b/c2/c3", "GET /a/b/c2/c3", "DataRoot", "Data14sRender", "WithPaging"),
+                    UrlTest("GET /a", "GET /a", "DataRoot"),
+                    UrlTest("GET /a/abcde/edcba/aaaa123/bbb124", "GET /a/abcde/edcba/aaaa123/bbb124", "DataRoot"),
+                    UrlTest("GET /a/bbb124", "GET /a/bbb124", "DataRoot"),
+                    UrlTest("GET /a/aaaa123/bbb124", "GET /a/aaaa123/bbb124", "DataRoot"),
+                    UrlTest("GET /a/c3", "GET /a/c3", "DataRoot", "WithPaging"),
+                    UrlTest("GET /a/abcde/edcba/aaaa123/bbb124/c3", "GET /a/abcde/edcba/aaaa123/bbb124/c3", "DataRoot", "WithPaging" ),
+                    UrlTest("GET /a/bbb124/c3", "GET /a/bbb124/c3", "DataRoot", "WithPaging"),
+                    UrlTest("GET /a/aaaa123/bbb124/c3", "GET /a/aaaa123/bbb124/c3", "DataRoot", "WithPaging"),
+                    UrlTest("GET /a/b/c2", "GET /a/b/c2", "DataRoot", "Data14sRender"),
+                    UrlTest("GET /a/b/c1", "GET /a/b/c1", "DataRoot", "Data14sRenderBis")
+                );
+            #endregion
+
+
             #region tree - single controller
             NewTestWithUrl(
                 "tree - single controller",
@@ -1093,6 +1131,40 @@ namespace Bistro.UnitTests.Tests
                 );
             #endregion
 
+            #region tree - one controller - 3 bindings (tree) - NEW
+            NewTestWithUrl(
+                "tree - one controller - 3 bindings (tree) - NEW",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                    )),
+                    UrlTest("GET /default", "GET /default", "Controller1"),
+                    UrlTest("POST /default", "POST /default", "Controller1"),
+                    UrlTest("PUT /default", "PUT /default", "Controller1"),
+                    UrlTest("DELETE /default", "DELETE /default", "Controller1"),
+                    UrlTest("HEAD /default", "HEAD /default", "Controller1"),
+                    UrlTest("GET /path2", "GET /path2", "Controller1"),
+                    UrlTest("POST /path2", "POST /path2", "Controller1"),
+                    UrlTest("PUT /path2", "PUT /path2", "Controller1"),
+                    UrlTest("DELETE /path2", "DELETE /path2", "Controller1"),
+                    UrlTest("HEAD /path2", "HEAD /path2", "Controller1"),
+                    UrlTest("GET /path2/more", "GET /path2/more", "Controller1"),
+                    UrlTest("POST /path2/more", "POST /path2/more", "Controller1"),
+                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1"),
+                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1"),
+                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1")
+
+                //Node("* /default", "Controller1"),
+                //Node("* /path2", Controllers("Controller1"),
+                //    Node("/more", "Controller1")
+                //    )
+                );
+            #endregion
+
+
             #region tree - one generic one specific
             NewTestWithUrl(
                 "tree - one generic one specific",
@@ -1120,6 +1192,56 @@ namespace Bistro.UnitTests.Tests
                     UrlTest("PUT /path2/more", "PUT /path2/more", "Controller2", "Controller1", "Controller1"),
                     UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller2", "Controller1", "Controller1"),
                     UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("GET /bbb124", "GET /bbb124", "Controller2"),
+                    UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "Controller2"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124", "POST /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("POST /bbb124", "POST /bbb124", "Controller2"),
+                    UrlTest("POST /aaaa123/bbb124", "POST /aaaa123/bbb124", "Controller2"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124", "PUT /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("PUT /bbb124", "PUT /bbb124", "Controller2"),
+                    UrlTest("PUT /aaaa123/bbb124", "PUT /aaaa123/bbb124", "Controller2"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124", "DELETE /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("DELETE /bbb124", "DELETE /bbb124", "Controller2"),
+                    UrlTest("DELETE /aaaa123/bbb124", "DELETE /aaaa123/bbb124", "Controller2"),
+                    UrlTest("HEAD /abcde/edcba/aaaa123/bbb124", "HEAD /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("HEAD /bbb124", "HEAD /bbb124", "Controller2"),
+                    UrlTest("HEAD /aaaa123/bbb124", "HEAD /aaaa123/bbb124", "Controller2")
+                //Node("* /default", "Controller2", "Controller1"),
+                //Node("* /path2", Controllers("Controller2", "Controller1"),
+                //    Node("/more", "Controller2", "Controller1")
+                //    ),
+                //Node("* /?", "Controller2")
+                );
+            #endregion
+
+            #region tree - one generic one specific - NEW
+            NewTestWithUrl(
+                "tree - one generic one specific - NEW",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                        ),
+                    Type("Controller2", BindAttribute("/?"))
+                    ),
+                    UrlTest("GET /default", "GET /default", "Controller1", "Controller2"),
+                    UrlTest("POST /default", "POST /default", "Controller1", "Controller2"),
+                    UrlTest("PUT /default", "PUT /default", "Controller1", "Controller2"),
+                    UrlTest("DELETE /default", "DELETE /default", "Controller1", "Controller2"),
+                    UrlTest("HEAD /default", "HEAD /default", "Controller1", "Controller2"),
+                    UrlTest("GET /path2", "GET /path2", "Controller1", "Controller2"),
+                    UrlTest("POST /path2", "POST /path2", "Controller1", "Controller2"),
+                    UrlTest("PUT /path2", "PUT /path2", "Controller1", "Controller2"),
+                    UrlTest("DELETE /path2", "DELETE /path2", "Controller1", "Controller2"),
+                    UrlTest("HEAD /path2", "HEAD /path2", "Controller1", "Controller2"),
+                    UrlTest("GET /path2/more", "GET /path2/more", "Controller1", "Controller2"),
+                    UrlTest("POST /path2/more", "POST /path2/more", "Controller1", "Controller2"),
+                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller2"),
+                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller2"),
+                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller2"),
                     UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "Controller2"),
                     UrlTest("GET /bbb124", "GET /bbb124", "Controller2"),
                     UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "Controller2"),
@@ -1182,6 +1304,43 @@ namespace Bistro.UnitTests.Tests
                 );
             #endregion
 
+            #region tree - one generic one specific - reversed - NEW
+            NewTestWithUrl(
+                "tree - one generic one specific - reversed - NEW",
+                Types(
+                    Type("Controller2", BindAttribute("?")),
+                    Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                        )
+                    ),
+                    UrlTest("test special", "GET /anytestpath", "Controller2"),
+                    UrlTest("GET /default", "GET /default", "Controller1", "Controller2"),
+                    UrlTest("POST /default", "POST /default", "Controller1", "Controller2"),
+                    UrlTest("PUT /default", "PUT /default", "Controller1", "Controller2"),
+                    UrlTest("DELETE /default", "DELETE /default", "Controller1", "Controller2"),
+                    UrlTest("HEAD /default", "HEAD /default", "Controller1", "Controller2"),
+                    UrlTest("GET /path2", "GET /path2", "Controller1", "Controller2"),
+                    UrlTest("POST /path2", "POST /path2", "Controller1", "Controller2"),
+                    UrlTest("PUT /path2", "PUT /path2", "Controller1", "Controller2"),
+                    UrlTest("DELETE /path2", "DELETE /path2", "Controller1", "Controller2"),
+                    UrlTest("HEAD /path2", "HEAD /path2", "Controller1", "Controller2"),
+                    UrlTest("GET /path2/more", "GET /path2/more", "Controller1", "Controller2"),
+                    UrlTest("POST /path2/more", "POST /path2/more", "Controller1", "Controller2"),
+                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller2"),
+                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller2"),
+                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller2")
+                //Node("* ?", "Controller2"),
+                //Node("* /default", "Controller1", "Controller2"),
+                //Node("* /path2", Controllers("Controller1", "Controller2"),
+                //    Node("/more", "Controller1", "Controller2")
+                //    )
+                );
+            #endregion
+
             #region Cross-bindings
             NewTestWithUrl(
                 "Cross-bindings",
@@ -1195,6 +1354,24 @@ namespace Bistro.UnitTests.Tests
                     UrlTest("GET /a/bbb/b/c/tail", "GET /a/bbb/b/c/tail", "Controller1"),
                     UrlTest("GET /a/z/bbb/c/tail", "GET /a/z/bbb/c/tail", "Controller2"),
                     UrlTest("GET /a/z/b/c/tail", "GET /a/z/b/c/tail", "Controller2", "Controller1")
+                    );
+
+
+            #endregion
+
+            #region Cross-bindings - NEW
+            NewTestWithUrl(
+                "Cross-bindings - NEW",
+                Types(
+                    Type("Controller1", BindAttribute("/a/*/b/c")),
+                    Type("Controller2", BindAttribute("/a/z/*/c"))
+                    ),
+                    UrlTest("GET /a/bbb/b/c", "GET /a/bbb/b/c", "Controller1"),
+                    UrlTest("GET /a/z/bbb/c", "GET /a/z/bbb/c", "Controller2"),
+                    UrlTest("GET /a/z/b/c", "GET /a/z/b/c", "Controller1", "Controller2"),
+                    UrlTest("GET /a/bbb/b/c/tail", "GET /a/bbb/b/c/tail", "Controller1"),
+                    UrlTest("GET /a/z/bbb/c/tail", "GET /a/z/bbb/c/tail", "Controller2"),
+                    UrlTest("GET /a/z/b/c/tail", "GET /a/z/b/c/tail", "Controller1", "Controller2")
                     );
 
 

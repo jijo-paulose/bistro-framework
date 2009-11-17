@@ -89,9 +89,9 @@ namespace Bistro.MethodsEngine.Subsets
                     }
                 }
             }
-            ScanResources();
-
             CleanBindPoints();
+
+            ScanResources();
 
             SortBindPoints();
 

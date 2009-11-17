@@ -91,8 +91,30 @@ namespace Bistro.MethodsEngine.Subsets
             }
             ScanResources();
 
+            CleanBindPoints();
+
             SortBindPoints();
 
+        }
+
+
+        /// <summary>
+        /// Cleans the bind points.
+        /// </summary>
+        private void CleanBindPoints()
+        {
+            int i = 0;
+            List<IMethodsControllerDesc> ctrlist = new List<IMethodsControllerDesc>();
+            while (i < bindPointsList.Count)
+                if (ctrlist.Contains(bindPointsList[i].Controller))
+                {
+                    bindPointsList.RemoveAt(i);
+                }
+                else
+                {
+                    ctrlist.Add(bindPointsList[i].Controller);
+                    i++;
+                }
         }
 
 

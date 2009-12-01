@@ -111,9 +111,10 @@ namespace Bistro.Controllers
                 (mbr) => 
                 {
                     var attributes = mbr.GetCustomAttributes(typeof(FormatAsAttribute), false) as FormatAsAttribute[];
-                    if (attributes.Length != 1)
+                    // Field can be Request and FormField at the same time. In that case - it will be added twice into the collection.
+                    if ((attributes.Length != 1) || (formatters.ContainsKey(mbr)))
                         return;
-
+                    
                     formatters.Add(mbr, application.FormatManagerFactory.GetManagerInstance().GetFormatterByFormat(attributes[0].FormatName));
                 }
             );

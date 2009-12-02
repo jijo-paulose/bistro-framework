@@ -350,6 +350,7 @@ namespace Bistro.Controllers
         /// <returns></returns>
         private object Coerce(object value, MemberInfo field, Type type)
         {
+            Func<Type, Type> NullableExtractor = xType => (xType.IsGenericType && (xType.GetGenericTypeDefinition() == typeof(Nullable<>)) && !xType.ContainsGenericParameters) ? xType.GetGenericArguments()[0] : xType;
             // if it's the same, no worries
             if (type.IsAssignableFrom(value.GetType()))
                 return value;
@@ -357,7 +358,7 @@ namespace Bistro.Controllers
             // try the ChangeType option
             else if (type.IsValueType || 
                 (application.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter() == null && !formatters.ContainsKey(field)))
-                return Convert.ChangeType(value, type);
+                return Convert.ChangeType(value, NullableExtractor(type));
             else
             {
                 IWebFormatter formatter;

@@ -350,15 +350,24 @@ namespace Bistro.Controllers
         /// <returns></returns>
         private object Coerce(object value, MemberInfo field, Type type)
         {
-            Func<Type, Type> NullableExtractor = xType => (xType.IsGenericType && (xType.GetGenericTypeDefinition() == typeof(Nullable<>)) && !xType.ContainsGenericParameters) ? xType.GetGenericArguments()[0] : xType;
             // if it's the same, no worries
             if (type.IsAssignableFrom(value.GetType()))
                 return value;
             // if it's a value type, or we don't have a formatter that can take care of it, 
             // try the ChangeType option
-            else if (type.IsValueType || 
+            else if (type.IsValueType ||
                 (application.FormatManagerFactory.GetManagerInstance().GetDefaultFormatter() == null && !formatters.ContainsKey(field)))
-                return Convert.ChangeType(value, NullableExtractor(type));
+            {
+                //Nullable<ValueType> is a value-type too, but Convert.ChangeType will fail to convert value to such type.
+                //Controller's field can be of such type.
+                //Extracting it's ValueType from the Nullable<> generic parameter and converting to that type - resolves that problem.
+                return Convert.ChangeType(
+                    value,
+                    (type.IsGenericType
+                        && (type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        && !type.ContainsGenericParameters)
+                            ? type.GetGenericArguments()[0] : type);
+            }
             else
             {
                 IWebFormatter formatter;

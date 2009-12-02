@@ -130,13 +130,8 @@ namespace Bistro.Entity
         /// </returns>
         public bool CanMap(MemberAccessor source, MemberAccessor target)
         {
-            Func<Type, Type> NullableExtractor = xType => (xType.IsGenericType && (xType.GetGenericTypeDefinition() == typeof(Nullable<>)) && !xType.ContainsGenericParameters ) ? xType.GetGenericArguments()[0] : xType;
-
-            Type sourceType = NullableExtractor(source.TargetType);
-            Type targetType = NullableExtractor(target.TargetType);
-
-            return (sourceType.IsAssignableFrom(targetType) &&
-                    targetType.IsAssignableFrom(sourceType));
+            return (source.TargetType.IsAssignableFrom(target.TargetType) &&
+                    target.TargetType.IsAssignableFrom(source.TargetType));
         }
 
         /// <summary>

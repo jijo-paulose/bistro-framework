@@ -35,7 +35,10 @@ namespace Bistro.UnitTests.Tests.Data
     [ValidateWith(typeof(SimpleEntityValidator))]
     public class SimpleEntity: ISimpleEntity
     {
-        public string foo { get; set; }
+
+		public int? nullableInt { get; set; }
+		public bool? nullableBool { get; set; }
+		public string foo { get; set; }
         public string bar { get; set; }
         public string baz { get; set; }
         public string extra { get; set; }
@@ -59,7 +62,7 @@ namespace Bistro.UnitTests.Tests.Data
         public EntityControllerValidator() { ByMapping(); }
     }
 
-    [Bind("/entityTest?{Foo}&{bar}&{thirdField}&{extra}&{unwrap}")]
+    [Bind("/entityTest?{Foo}&{bar}&{thirdField}&{extra}&{unwrap}&{nullableInt}&{nullableBool}")]
     [ValidateWith(typeof(EntityControllerValidator))]
     [MapsWith(typeof(TestMapper))]
     public class EntityController : AbstractController, IMappable, IValidatable
@@ -69,6 +72,12 @@ namespace Bistro.UnitTests.Tests.Data
             Foo,
             bar,
             thirdField;
+
+		[FormField]
+		public int? nullableInt;
+
+		[FormField]
+		public bool? nullableBool;
 
         public string extra;
 

@@ -183,7 +183,7 @@ namespace Bistro.Http
         /// </summary>
         protected virtual void LoadFactories(SectionHandler section)
         {
-            if (Application.Instance == null || !Application.Instance.Initialized)
+            if (Application.Instance == null)
                 Application.Initialize(section);
 
             application = Application.Instance;

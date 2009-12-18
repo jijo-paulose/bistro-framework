@@ -133,14 +133,9 @@ namespace Bistro.UnitTests.Tests
         [TestFixtureSetUp]
         public void setup()
         {
-
             initSh = new SectionHandler();
-
             initSh.ControllerManagerFactory = "Bistro.UnitTests.Support.CustomManager.TestControllerManagerFactory, Bistro.UnitTests";
             initSh.Application = "Bistro.UnitTests.Support.CustomManager.TestApplication, Bistro.UnitTests";
-
-
-
 
         }
 
@@ -151,8 +146,7 @@ namespace Bistro.UnitTests.Tests
         public void Cleanup() 
         {
             TestApplication app = Application.Instance as TestApplication;
-            app.ResetApp();
-
+			app.InitAfter(initSh);
         }
 
 

@@ -143,29 +143,29 @@ namespace Bistro.Entity
         {
             var finalFlags = bindingFlags | BindingFlags.Instance;
 
-            typeof(TController).GetMembers(finalFlags)
-                .ToList()
-                .ForEach(
-                    ambControllerMember =>
-                    {
-                        if (ambControllerMember.MemberType != MemberTypes.Field && ambControllerMember.MemberType != MemberTypes.Property)
-                            return;
-                        
-                        var ambEntityMember = typeof(TEntity).GetMember(ambControllerMember.Name, finalFlags);
+            var aaa = typeof(TController).GetMembers(finalFlags)
+                .ToList();
+            aaa.ForEach(
+                ambControllerMember =>
+                {
+                    if (ambControllerMember.MemberType != MemberTypes.Field && ambControllerMember.MemberType != MemberTypes.Property)
+                        return;
+                    
+                    var ambEntityMember = typeof(TEntity).GetMember(ambControllerMember.Name, finalFlags);
 
-                        if (ambEntityMember == null || ambEntityMember.Length != 1 ||
-                            (ambEntityMember[0].MemberType != MemberTypes.Field && ambEntityMember[0].MemberType != MemberTypes.Property))
-                            return;
+                    if (ambEntityMember == null || ambEntityMember.Length != 1 ||
+                        (ambEntityMember[0].MemberType != MemberTypes.Field && ambEntityMember[0].MemberType != MemberTypes.Property))
+                        return;
 
-                        var entityMember = new MemberAccessor(ambEntityMember[0]);
-                        var controllerMember = new MemberAccessor(ambControllerMember);
+                    var entityMember = new MemberAccessor(ambEntityMember[0]);
+                    var controllerMember = new MemberAccessor(ambControllerMember);
 
-                        if (!CanMap(controllerMember, entityMember))
-                            return;
+                    if (!CanMap(controllerMember, entityMember))
+                        return;
 
-                        AddMapping(controllerMember, entityMember);
-                    }
-                );
+                    AddMapping(controllerMember, entityMember);
+                }
+            );
 
             return this;
         }

@@ -99,13 +99,16 @@ namespace Bistro.UnitTests.Tests
 
         #region Url tests creation methods
 
-        private UrlControllersTest UrlTest(string name, string url, params string[] controllers)
-        {
-            url = url.Replace(" ", "");
-            return new UrlControllersTest(name, url, controllers);
-        }
+		private UrlControllersTest UrlTest(string name, string url, params object[] controllersGroups)
+		{
+			url = url.Replace(" ", "");
+			return new UrlControllersTest(name, url, controllersGroups);
+		}
 
-
+		private UrlGroup UrlGrp(params string[] controllers)
+		{
+			return new UrlGroup(controllers);
+		}
 
 
         #endregion

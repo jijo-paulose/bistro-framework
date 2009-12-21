@@ -981,7 +981,7 @@ namespace Bistro.UnitTests.Tests
                         )
                         )
                     ),
-                    UrlTest("special - GET /a/b/c2/c3", "GET /a/b/c2/c3", "WithPaging", "DataRoot", "Data14sRender"),
+                    UrlTest("special - GET /a/b/c2/c3", "GET /a/b/c2/c3", UrlGrp("WithPaging", "DataRoot", "Data14sRender")),
                     UrlTest("GET /a", "GET /a"),
                     UrlTest("GET /a/abcde/edcba/aaaa123/bbb124", "GET /a/abcde/edcba/aaaa123/bbb124", "DataRoot"),
                     UrlTest("GET /a/bbb124", "GET /a/bbb124", "DataRoot"),

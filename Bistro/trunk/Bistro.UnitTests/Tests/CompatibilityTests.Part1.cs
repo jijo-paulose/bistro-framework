@@ -249,7 +249,7 @@ namespace Bistro.UnitTests.Tests
                         )
 
                     ),
-                    UrlTest("badTest - GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true", "GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true", "DefaultController", "SignInDisplay", "DataAccessControl", "Untag", "Tag"),
+                    UrlTest("badTest - GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true", "GET /auth/signin/byname/ShortNameValue/without-tag/tagValue/with-tag/tagListValue/postings/ContentTypeValue?originalRequest=origReqValue&firstTime=true", "DefaultController", UrlGrp("SignInDisplay", "DataAccessControl"), UrlGrp("Untag", "Tag")),
                     UrlTest("GET /auth/signin/byname/ShortNameValue?originalRequest=origReqValue", "GET /auth/signin/byname/ShortNameValue?originalRequest=origReqValue", "DefaultController", "SignInDisplay", "DataAccessControl"),
                     UrlTest("GET /auth/signin/byname?originalRequest=origReqValue", "GET /auth/signin/byname?originalRequest=origReqValue", "DefaultController", "DataAccessControl", "SignInDisplay"),
 

@@ -29,13 +29,14 @@ using Bistro.Controllers.Descriptor;
 using BindPointDescriptor = Bistro.Controllers.Descriptor.ControllerDescriptor.BindPointDescriptor;
 using Bistro.Controllers;
 using Bistro.Interfaces;
+using Bistro.Controllers.Dispatch;
 
 namespace Bistro.MethodsEngine
 {
     /// <summary>
     /// Main methods engine class.
     /// </summary>
-    internal class Engine
+	internal class Engine : IControllerDispatcher
     {
 
         enum Errors
@@ -63,9 +64,9 @@ namespace Bistro.MethodsEngine
         /// Initializes a new instance of the <see cref="Engine"/> class.
         /// </summary>
         /// <param name="logger">The logger.</param>
-        internal Engine(ILogger logger)
+        internal Engine(Application application)
         {
-            Logger = logger;
+			Logger = application.LoggerFactory.GetLogger(GetType());
             processor = new SubSetsProcessor(this);
         }
 
@@ -77,7 +78,7 @@ namespace Bistro.MethodsEngine
 
 
 
-        internal void RegisterController(IControllerDescriptor info)
+        public void RegisterController(IControllerDescriptor info)
         {
             IMethodsControllerDesc infoNew = info as IMethodsControllerDesc;
             if (infoNew == null)

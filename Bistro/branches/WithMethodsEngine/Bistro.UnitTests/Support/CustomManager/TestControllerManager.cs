@@ -53,8 +53,6 @@ namespace Bistro.UnitTests.Support.CustomManager
 
                 foreach (IMemberInfo memberInfo in allMembers)
                 {
-
-
                     if (!HasAttribute(memberInfo, typeof(RequiresAttribute).FullName) &&
                         !HasAttribute(memberInfo, typeof(DependsOnAttribute).FullName) &&
                         (HasAttribute(memberInfo, typeof(SessionAttribute).FullName) ||

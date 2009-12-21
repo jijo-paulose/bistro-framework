@@ -15,5 +15,6 @@ namespace Bistro.UnitTests.Support.CustomManager
 		{
 			InitializeAfter(configuration);
 		}
+
     }
 }

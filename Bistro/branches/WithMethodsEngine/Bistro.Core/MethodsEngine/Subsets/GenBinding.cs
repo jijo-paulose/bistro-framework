@@ -148,6 +148,11 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         private static Regex wildCardRegex = new Regex(@"\A(?:\*|{[^}]+})\z", RegexOptions.Compiled);
 
+        /// <summary>
+        /// Regex to test for parameters
+        /// </summary>
+		private static Regex paramsRegex = new Regex(@"\A(?:{[^}]+})\z", RegexOptions.Compiled);
+
 
 
         /// <summary>
@@ -200,8 +205,9 @@ namespace Bistro.MethodsEngine.Subsets
             {
                 for (int j = tempItems[i].Count - 1; j >= 0; j--)
                 {
-                    if (wildCardRegex.IsMatch(tempItems[i][j]))
-                        lengthWithoutEndParams--;
+					// {params} items should not be included in the length.
+                    if (paramsRegex.IsMatch(tempItems[i][j]))
+                        lengthWithoutEnd--;
                     else
                     {
                         brk = true;

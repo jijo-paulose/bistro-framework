@@ -68,7 +68,6 @@
     <Compile Include="Interfaces\IBindPointDescriptor.cs" />
     <Compile Include="Interfaces\IControllerDescriptor.cs" />
     <Compile Include="Controllers\Descriptor\Wrappers\MemberWrapper.cs" />
-    <Compile Include="Controllers\Dispatch\ControllerDispatcher.cs" />
     <Compile Include="Controllers\ControllerHandler.cs" />
     <Compile Include="Controllers\ControllerManager.cs" />
     <Compile Include="Controllers\Descriptor\BindAttribute.cs" />

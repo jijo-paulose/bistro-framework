@@ -68,14 +68,9 @@ namespace Bistro.Http
         private MethodDispatcher methodDispatcher;
 
         /// <summary>
-        /// The application object
-        /// </summary>
-        private Application application;
-
-        /// <summary>
         /// mutex handle
         /// </summary>
-        static object moduleLock = new object();
+        protected static object moduleLock = new object();
 
         /// <summary>
         /// List of directories that will be ignored
@@ -99,12 +94,10 @@ namespace Bistro.Http
 		public virtual void Init(HttpApplication context) {
 
             context.PostResolveRequestCache += new EventHandler(context_PostResolveRequestCache);
-			lock (moduleLock) {
-                SectionHandler section = (ConfigurationManager.GetSection("bistro") as SectionHandler) ?? new SectionHandler();
+            SectionHandler section = (ConfigurationManager.GetSection("bistro") as SectionHandler) ?? new SectionHandler();
 
-                LoadFactories(section);
-                LoadUrlRules(section);
-			}
+            LoadFactories(section);
+            LoadUrlRules(section);
 		}
 
         /// <summary>
@@ -183,12 +176,15 @@ namespace Bistro.Http
         /// </summary>
         protected virtual void LoadFactories(SectionHandler section)
         {
-            if (Application.Instance == null)
-                Application.Initialize(section);
+			lock (moduleLock)
+			{
+				if (Application.Instance == null)
+					Application.Initialize(section);
+			}
 
-            application = Application.Instance;
-            logger = application.LoggerFactory.GetLogger(GetType());
-            methodDispatcher = new MethodDispatcher(application);
+            var _application = Application.Instance;
+            logger = _application.LoggerFactory.GetLogger(GetType());
+            methodDispatcher = new MethodDispatcher(_application);
         }
 
         /// <summary>

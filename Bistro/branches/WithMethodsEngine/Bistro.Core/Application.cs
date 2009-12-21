@@ -64,7 +64,7 @@ namespace Bistro
         /// Gets or sets the application instance.
         /// </summary>
         /// <value>The instance.</value>
-        public static Application Instance { get; protected set; }
+		public static Application Instance { get; private set; }
 
         /// <summary>
         /// The application root directory

@@ -110,11 +110,11 @@ namespace Bistro.UnitTests.Tests
                     Type("Controller1", BindAttribute("/default")),
                     Type("Controller2", BindAttribute("/default"))
                     ),
-                    UrlTest("GET /default", "GET /default", "Controller2", "Controller1"),
-                    UrlTest("POST /default", "POST /default", "Controller2", "Controller1"),
-                    UrlTest("PUT /default", "PUT /default", "Controller2", "Controller1"),
-                    UrlTest("DELETE /default", "DELETE /default", "Controller2", "Controller1"),
-                    UrlTest("HEAD /default", "HEAD /default", "Controller2", "Controller1")
+                    UrlTest("GET /default", "GET /default", UrlGrp("Controller2", "Controller1")),
+                    UrlTest("POST /default", "POST /default", UrlGrp("Controller2", "Controller1")),
+                    UrlTest("PUT /default", "PUT /default", UrlGrp("Controller2", "Controller1")),
+                    UrlTest("DELETE /default", "DELETE /default", UrlGrp("Controller2", "Controller1")),
+                    UrlTest("HEAD /default", "HEAD /default", UrlGrp("Controller2", "Controller1"))
                 //Node("* /default", "Controller2", "Controller1")
                 );
             #endregion

@@ -938,21 +938,21 @@ namespace Bistro.UnitTests.Tests
                         BindAttribute("/?")
                     )
                 ),
-                UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("GET /bbb124", "GET /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("POST /abcde/edcba/aaaa123/bbb124", "POST /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("POST /bbb124", "POST /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("POST /aaaa123/bbb124", "POST /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("PUT /abcde/edcba/aaaa123/bbb124", "PUT /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("PUT /bbb124", "PUT /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("PUT /aaaa123/bbb124", "PUT /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("DELETE /abcde/edcba/aaaa123/bbb124", "DELETE /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("DELETE /bbb124", "DELETE /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("DELETE /aaaa123/bbb124", "DELETE /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("HEAD /abcde/edcba/aaaa123/bbb124", "HEAD /abcde/edcba/aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("HEAD /bbb124", "HEAD /bbb124", "HomeUrlController2", "HomeUrlController1"),
-                UrlTest("HEAD /aaaa123/bbb124", "HEAD /aaaa123/bbb124", "HomeUrlController2", "HomeUrlController1")
+                UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("GET /bbb124", "GET /bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("POST /abcde/edcba/aaaa123/bbb124", "POST /abcde/edcba/aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("POST /bbb124", "POST /bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("POST /aaaa123/bbb124", "POST /aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("PUT /abcde/edcba/aaaa123/bbb124", "PUT /abcde/edcba/aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("PUT /bbb124", "PUT /bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("PUT /aaaa123/bbb124", "PUT /aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("DELETE /abcde/edcba/aaaa123/bbb124", "DELETE /abcde/edcba/aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("DELETE /bbb124", "DELETE /bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("DELETE /aaaa123/bbb124", "DELETE /aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("HEAD /abcde/edcba/aaaa123/bbb124", "HEAD /abcde/edcba/aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("HEAD /bbb124", "HEAD /bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1")),
+                UrlTest("HEAD /aaaa123/bbb124", "HEAD /aaaa123/bbb124", UrlGrp("HomeUrlController2", "HomeUrlController1"))
 
 //                Node("* /?", "HomeUrlController2", "HomeUrlController1") // Actually that's not so good - controllers may come in any order here.
                 );

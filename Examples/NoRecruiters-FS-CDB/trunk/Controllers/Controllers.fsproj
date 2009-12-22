@@ -44,6 +44,10 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core" />
+    <Reference Include="NDjango.Core">
+      <HintPath>C:\development\NoRecruiters-FS-CDB\lib\NDjango.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>C:\Development\NoRecruiters-FS-CDB\lib\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -52,9 +56,13 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base.fs" />
+    <Compile Include="Enums.fs" />
+    <Compile Include="Home.fs" />
+    <Compile Include="Filters.fs" />
+    <Compile Include="Postings.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

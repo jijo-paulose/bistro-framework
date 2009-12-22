@@ -13,4 +13,4 @@ namespace NoRecruiters.Controllers
     module Base =
         [<Bind("?"); RenderWith("Views/index.django"); ReflectedDefinition>]
         let helloC (ctx: ictx) = 
-            "hello world" |> named "test"
+            "hello world" |> named "Message"

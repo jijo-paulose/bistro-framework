@@ -183,6 +183,35 @@ namespace Bistro.UnitTests.Tests
                 );
             #endregion
 
+			#region controller root test
+			NewTestWithUrl(
+				"controller root test",
+				Types(
+					Type("Controller1", Attributes(BindAttribute("GET/"))),
+					Type("Controller2", Attributes(BindAttribute("GET/?"))),
+					Type("Controller3", Attributes(BindAttribute("GET/aaa")))
+					),
+					UrlTest("GET /", "GET /", UrlGrp("Controller1","Controller2")),
+					UrlTest("GET /bbb", "GET /bbb", "Controller2"),
+					UrlTest("GET /aaa", "GET /aaa", UrlGrp("Controller2", "Controller3"))
+
+				);
+			#endregion
+
+			#region controller root test
+			NewTestWithUrl(
+				"controller root test - 2",
+				Types(
+					Type("Controller1", Attributes(BindAttribute("GET/data"))),
+					Type("Controller2", Attributes(BindAttribute("GET/data/?"))),
+					Type("Controller3", Attributes(BindAttribute("GET/data/aaa")))
+					),
+					UrlTest("GET /data", "GET /data", "Controller1"),
+					UrlTest("GET /data/bbb", "GET /data/bbb", UrlGrp("Controller1", "Controller2")),
+					UrlTest("GET /data/aaa", "GET /data/aaa", UrlGrp("Controller1", "Controller2", "Controller3"))
+
+				);
+			#endregion
 
 
         }

@@ -260,13 +260,22 @@ namespace Bistro.MethodsEngine.Subsets
         {
             engine.Logger.Report(Messages.MessageMatchingUrl, requestUrl);
 
-            int a,b;
 
-            string[] splitQueryString = requestUrl.Split('?');
-            string[] requestComponents = smartUrlSplit(splitQueryString[0]);
+            List<string> splitQueryString = requestUrl.Split('?').ToList();
+            List<string> requestComponents = smartUrlSplit(splitQueryString[0]).Where(str => str != String.Empty).ToList();
+			
+			//special case for root match / /
+			// Check that we have only bind verb 
+			if ((requestComponents.Count == 1) || (lengthWithoutEndParams == 1 && this.items.Count == 1))
+			{
+				// return true if bind verb is equal with request's bind verb
+				return ((requestComponents.Count == 1) &&(lengthWithoutEndParams == 1) && (this.items.Count == 1) && (requestComponents[0] == this.items[0][0]));
+			}
+
+
 
             // if there are more bind components than there are url components, we don't have a match.
-            if (requestComponents.Length < lengthWithoutEndParams)
+            if (requestComponents.Count < lengthWithoutEndParams)
                 return false;
 
             List<string> firstPart = items[0];
@@ -293,7 +302,7 @@ namespace Bistro.MethodsEngine.Subsets
 
             while (currentMatchPart != null)
             {
-                if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Length)
+                if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Count)
                 {
                     bool placed = true;
                     for (int i = 0; i < currentMatchPart.Count; i++)
@@ -331,6 +340,8 @@ namespace Bistro.MethodsEngine.Subsets
         /// <returns></returns>
         internal bool MatchWithSubset(MethodUrlsSubset methodUrlsSubset)
         {
+			if (CheckForRoot())
+				return true;
             List<GenBinding> newList = new List<GenBinding>(methodUrlsSubset.BindingsList);
             IEnumerable<GenBinding> matchBindings = newList.Where(binding => binding.MatchStatus);
             IEnumerable<GenBinding> noMatchBindings = newList.Where(binding => !binding.MatchStatus);
@@ -339,13 +350,17 @@ namespace Bistro.MethodsEngine.Subsets
             {
                 foreach (GenBinding binding in matchBindings)
                 {
+					if (binding.CheckForRoot())
+						continue;
                     if (!CompareWithMatch(binding))
                         return false;
                 }
 
                 foreach (GenBinding binding in noMatchBindings)
                 {
-                    if (!CompareMatchAndNoMatch(this, binding))
+					if (binding.CheckForRoot())
+						continue;
+					if (!CompareMatchAndNoMatch(this, binding))
                         return false;
                 }
 
@@ -354,7 +369,9 @@ namespace Bistro.MethodsEngine.Subsets
             {
                 foreach (GenBinding binding in matchBindings)
                 {
-                    if (!CompareMatchAndNoMatch(binding, this))
+					if (binding.CheckForRoot())
+						continue;
+					if (!CompareMatchAndNoMatch(binding, this))
                         return false;
                 }
 
@@ -365,6 +382,15 @@ namespace Bistro.MethodsEngine.Subsets
 
         }
 
+
+		/// <summary>
+		/// Checks for root. "VERB/"
+		/// </summary>
+		/// <returns></returns>
+		private bool CheckForRoot()
+		{
+			return (this.items.Count == 1 && this.items[0].Count == 1);
+		}
 
         /// <summary>
         /// Compares this Genbinding with another GenBinding for intersection. Both must have match status set to true 

@@ -68,8 +68,6 @@ namespace Bistro.MethodsEngine.Subsets
             bindingsList.Add(newBinding);
 
 
-
-//            UpdateBindPoints();
         }
 
 

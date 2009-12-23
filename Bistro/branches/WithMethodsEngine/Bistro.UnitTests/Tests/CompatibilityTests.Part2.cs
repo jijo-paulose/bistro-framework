@@ -10,88 +10,88 @@ namespace Bistro.UnitTests.Tests
 		private void SubSource2()
 		{
 
-			#region Imported - GET/hi/...
-			NewTestWithUrl(
-				"Imported - GET/hi/...",
-				Types(
-					Type(
-						"hiController1",
-						BindAttribute("GET /hi/new/world/a")
-					),
-					Type(
-						"hiController2",
-						BindAttribute("GET /hi/new/*/*/now")
-					),
-					Type(
-						"hiController3",
-						BindAttribute("GET /hi/*/world/?/now")
-					),
-					Type(
-						"hiController4",
-						BindAttribute("GET /hi/*/world/*/now")
-					),
-					Type(
-						"hiController5",
-						BindAttribute("GET /hi/*/world/a/now")
-					),
-					Type(
-						"hiController6",
-						BindAttribute("GET /hi/*/world/a")
-					),
-					Type(
-						"hiController7",
-						BindAttribute("GET /hi/*/world/a/*")
-					)
-				),
-				UrlTest("special - GET /hi/old/world/a/notnow", "GET /hi/new/world/a/notnow", UrlGrp("hiController6", "hiController1", "hiController7")),
-				UrlTest("special - GET /hi/new/world/b/now", "GET /hi/new/world/b/now", UrlGrp("hiController3", "hiController4", "hiController2")),
-				UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", UrlGrp("hiController3", "hiController6", "hiController1", "hiController7", "hiController5", "hiController2", "hiController4")),
-				UrlTest("GET /hi/new/world/a", "GET /hi/new/world/a", UrlGrp("hiController6", "hiController1")),
-				UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/aaaaa/testvalue/now", "GET /hi/new/aaaaa/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/aaaaa/now", "GET /hi/new/abcde/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/abcde/now", "GET /hi/new/abcde/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/testvalue/now", "GET /hi/new/abcde/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/aaaaa/now", "GET /hi/new/testvalue/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/abcde/now", "GET /hi/new/testvalue/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/testvalue/now", "GET /hi/new/testvalue/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now", "GET /hi/aaaaa/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/now", "GET /hi/abcde/world/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/bbb124/now", "GET /hi/abcde/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now", "GET /hi/abcde/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/now", "GET /hi/testvalue/world/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/bbb124/now", "GET /hi/testvalue/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now", "GET /hi/testvalue/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/a/now", "GET /hi/aaaaa/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController4", "hiController5")),
-				UrlTest("GET /hi/abcde/world/a/now", "GET /hi/abcde/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController4", "hiController5")),
-				UrlTest("GET /hi/testvalue/world/a/now", "GET /hi/testvalue/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController4", "hiController5")),
-				UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
-				UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
-				UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
-				UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", UrlGrp("hiController6", "hiController7"))
+            #region Imported - GET/hi/...
+            NewTestWithUrl(
+                "Imported - GET/hi/...",
+                Types(
+                    Type(
+                        "hiController1",
+                        BindAttribute("GET /hi/new/world/a")
+                    ),
+                    Type(
+                        "hiController2",
+                        BindAttribute("GET /hi/new/*/*/now")
+                    ),
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/now")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController5",
+                        BindAttribute("GET /hi/*/world/a/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("special - GET /hi/old/world/a/notnow", "GET /hi/new/world/a/notnow", UrlGrp("hiController6", "hiController1", "hiController7")),
+                UrlTest("special - GET /hi/new/world/b/now", "GET /hi/new/world/b/now", UrlGrp("hiController3", "hiController4", "hiController2")),
+                UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", UrlGrp("hiController3", "hiController6", "hiController1", "hiController7", "hiController5", "hiController2", "hiController4")),
+                UrlTest("GET /hi/new/world/a", "GET /hi/new/world/a", UrlGrp("hiController6", "hiController1")),
+                UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/aaaaa/testvalue/now", "GET /hi/new/aaaaa/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/aaaaa/now", "GET /hi/new/abcde/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/abcde/now", "GET /hi/new/abcde/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/testvalue/now", "GET /hi/new/abcde/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/aaaaa/now", "GET /hi/new/testvalue/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/abcde/now", "GET /hi/new/testvalue/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/testvalue/now", "GET /hi/new/testvalue/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now", "GET /hi/aaaaa/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/now", "GET /hi/abcde/world/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/bbb124/now", "GET /hi/abcde/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now", "GET /hi/abcde/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/now", "GET /hi/testvalue/world/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/bbb124/now", "GET /hi/testvalue/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now", "GET /hi/testvalue/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/a/now", "GET /hi/aaaaa/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController4", "hiController5")),
+                UrlTest("GET /hi/abcde/world/a/now", "GET /hi/abcde/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController4", "hiController5")),
+                UrlTest("GET /hi/testvalue/world/a/now", "GET /hi/testvalue/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController4", "hiController5")),
+                UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
+                UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
+                UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", UrlGrp("hiController6", "hiController7"))
 
 				//Node("GET /hi", Controllers(),
 				//    Node("/*/world", Controllers(),
@@ -112,39 +112,39 @@ namespace Bistro.UnitTests.Tests
 
 			//We need more complicated tests - with complex url AND parameters to sort by.
 
-			#region Imported - GET/hi/... - 0
-			NewTestWithUrl(
-				"Imported - GET/hi/... - 0",
-				Types(
-					Type(
-						"hiController4",
-						BindAttribute("GET /hi/*/world/*/now")
-					),
-					Type(
-						"hiController7",
-						BindAttribute("GET /hi/*/world/a/*")
-					)
-				),
-				UrlTest("special - GET /hi/aaaa/world/a/now", "GET /hi/aaaa/world/a/now", UrlGrp("hiController4", "hiController7")),
-				UrlTest("special - GET /hi/aaaa/world/a/now/aaa", "GET /hi/aaaa/world/a/now/aaa", UrlGrp("hiController7", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
-				UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
-				UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", "hiController4"),
-				UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", "hiController4"),
-				UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", "hiController4"),
-				UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", "hiController4"),
-				UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", "hiController4"),
-				UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", "hiController4"),
-				UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", "hiController4"),
-				UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", "hiController7"),
-				UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", "hiController7"),
-				UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", "hiController7"),
-				UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", "hiController7"),
-				UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", "hiController7"),
-				UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", "hiController7"),
-				UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", "hiController7"),
-				UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", "hiController7"),
-				UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", "hiController7")
+            #region Imported - GET/hi/... - 0
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 0",
+                Types(
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("special - GET /hi/aaaa/world/a/now", "GET /hi/aaaa/world/a/now", UrlGrp("hiController4", "hiController7")),
+                UrlTest("special - GET /hi/aaaa/world/a/now/aaa", "GET /hi/aaaa/world/a/now/aaa", UrlGrp("hiController7", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", "hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", "hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", "hiController7")
 
 				//Node("GET /hi/*/world", Controllers(),
 				//    Node("/*/now", "hiController4"),
@@ -153,76 +153,76 @@ namespace Bistro.UnitTests.Tests
 				);
 			#endregion
 
-			#region Imported - GET/hi/... - 1
-			NewTestWithUrl(
-				"Imported - GET/hi/... - 1",
-				Types(
-					Type(
-						"hiController2",
-						BindAttribute("GET /hi/new/*/*/now")
-					),
-					Type(
-						"hiController3",
-						BindAttribute("GET /hi/*/world/?/now")
-					),
-					Type(
-						"hiController4",
-						BindAttribute("GET /hi/*/world/*/now")
-					),
-					Type(
-						"hiController6",
-						BindAttribute("GET /hi/*/world/a")
-					),
-					Type(
-						"hiController7",
-						BindAttribute("GET /hi/*/world/a/*")
-					)
-				),
-				UrlTest("special - GET /hi/new/world/a1/a2/now", "GET /hi/new/world/a1/a2/now", "hiController3"),
-				UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController2", "hiController4")),
-				UrlTest("special - GET /hi/new/world/bb/now", "GET /hi/new/world/bb/now", UrlGrp("hiController3", "hiController4", "hiController2")),
-				UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/aaaaa/testvalue/now", "GET /hi/new/aaaaa/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/aaaaa/now", "GET /hi/new/abcde/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/abcde/now", "GET /hi/new/abcde/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/testvalue/now", "GET /hi/new/abcde/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/aaaaa/now", "GET /hi/new/testvalue/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/abcde/now", "GET /hi/new/testvalue/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/testvalue/now", "GET /hi/new/testvalue/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now", "GET /hi/aaaaa/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/now", "GET /hi/abcde/world/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/bbb124/now", "GET /hi/abcde/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now", "GET /hi/abcde/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/now", "GET /hi/testvalue/world/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/bbb124/now", "GET /hi/testvalue/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now", "GET /hi/testvalue/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
-				UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
-				UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
-				UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", UrlGrp("hiController6", "hiController7"))
+            #region Imported - GET/hi/... - 1
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 1",
+                Types(
+                    Type(
+                        "hiController2",
+                        BindAttribute("GET /hi/new/*/*/now")
+                    ),
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/now")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("special - GET /hi/new/world/a1/a2/now", "GET /hi/new/world/a1/a2/now", "hiController3"),
+                UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController2", "hiController4")),
+                UrlTest("special - GET /hi/new/world/bb/now", "GET /hi/new/world/bb/now", UrlGrp("hiController3", "hiController4", "hiController2")),
+                UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/aaaaa/testvalue/now", "GET /hi/new/aaaaa/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/aaaaa/now", "GET /hi/new/abcde/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/abcde/now", "GET /hi/new/abcde/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/testvalue/now", "GET /hi/new/abcde/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/aaaaa/now", "GET /hi/new/testvalue/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/abcde/now", "GET /hi/new/testvalue/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/testvalue/now", "GET /hi/new/testvalue/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now", "GET /hi/aaaaa/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/now", "GET /hi/abcde/world/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/bbb124/now", "GET /hi/abcde/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now", "GET /hi/abcde/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/now", "GET /hi/testvalue/world/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/bbb124/now", "GET /hi/testvalue/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now", "GET /hi/testvalue/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
+                UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
+                UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", UrlGrp("hiController6", "hiController7"))
 
 				//Node("GET /hi", Controllers(),
 				//    Node("/*/world", Controllers(),
@@ -238,63 +238,63 @@ namespace Bistro.UnitTests.Tests
 				);
 			#endregion
 
-			#region Imported - GET/hi/... - 2
-			NewTestWithUrl(
-				"Imported - GET/hi/... - 2",
-				Types(
-					Type(
-						"hiController3",
-						BindAttribute("GET /hi/*/world/?/now")
-					),
-					Type(
-						"hiController4",
-						BindAttribute("GET /hi/*/world/*/now")
-					),
-					Type(
-						"hiController6",
-						BindAttribute("GET /hi/*/world/a")
-					),
-					Type(
-						"hiController7",
-						BindAttribute("GET /hi/*/world/a/*")
-					)
-				),
-				UrlTest("special GET /hi/testvalue/world/a/bbb/ccc", "GET /hi/testvalue/world/a/bbb/ccc", UrlGrp("hiController6", "hiController7")),
-				UrlTest("special GET /hi/testvalue/world/a/bbb", "GET /hi/testvalue/world/a/bbb", UrlGrp("hiController6", "hiController7")),
-				UrlTest("special GET /hi/testvalue/world/a/now", "GET /hi/testvalue/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now", "GET /hi/aaaaa/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/now", "GET /hi/abcde/world/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/bbb124/now", "GET /hi/abcde/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now", "GET /hi/abcde/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/now", "GET /hi/testvalue/world/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/bbb124/now", "GET /hi/testvalue/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now", "GET /hi/testvalue/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
-				UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
-				UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
-				UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", UrlGrp("hiController6", "hiController7"))
+            #region Imported - GET/hi/... - 2
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 2",
+                Types(
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/now")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("special GET /hi/testvalue/world/a/bbb/ccc", "GET /hi/testvalue/world/a/bbb/ccc", UrlGrp("hiController6", "hiController7")),
+                UrlTest("special GET /hi/testvalue/world/a/bbb", "GET /hi/testvalue/world/a/bbb", UrlGrp("hiController6", "hiController7")),
+                UrlTest("special GET /hi/testvalue/world/a/now", "GET /hi/testvalue/world/a/now", UrlGrp("hiController6", "hiController3", "hiController7", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now", "GET /hi/aaaaa/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/now", "GET /hi/abcde/world/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/bbb124/now", "GET /hi/abcde/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now", "GET /hi/abcde/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/now", "GET /hi/testvalue/world/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/bbb124/now", "GET /hi/testvalue/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now", "GET /hi/testvalue/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
+                UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
+                UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", UrlGrp("hiController6", "hiController7"))
 
 				//Node("GET /hi/*/world", Controllers(),
 				//        Node("/*/now", "hiController4", "hiController3"),
@@ -306,32 +306,32 @@ namespace Bistro.UnitTests.Tests
 				);
 			#endregion
 
-			#region Imported - GET/hi/... - 3
-			NewTestWithUrl(
-				"Imported - GET/hi/... - 3",
-				Types(
-					Type(
-						"hiController4",
-						BindAttribute("GET /*/now")
-					),
-					Type(
-						"hiController6",
-						BindAttribute("GET /a")
-					),
-					Type(
-						"hiController7",
-						BindAttribute("GET /a/*")
-					)
-				),
-				UrlTest("special - GET /a/now/aaa", "GET /a/now/aaa", UrlGrp("hiController6", "hiController7", "hiController4")),
-				UrlTest("special - GET /a/now", "GET /a/now", UrlGrp("hiController6", "hiController7", "hiController4")),
-				UrlTest("GET /aaaaa/now", "GET /aaaaa/now", "hiController4"),
-				UrlTest("GET /abcde/now", "GET /abcde/now", "hiController4"),
-				UrlTest("GET /testvalue/now", "GET /testvalue/now", "hiController4"),
-				UrlTest("GET /a", "GET /a", "hiController6"),
-				UrlTest("GET /a/aaaaa", "GET /a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /a/abcde", "GET /a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /a/testvalue", "GET /a/testvalue", UrlGrp("hiController6", "hiController7"))
+            #region Imported - GET/hi/... - 3
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 3",
+                Types(
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /a/*")
+                    )
+                ),
+                UrlTest("special - GET /a/now/aaa", "GET /a/now/aaa", UrlGrp("hiController6", "hiController7", "hiController4")),
+                UrlTest("special - GET /a/now", "GET /a/now", UrlGrp("hiController6", "hiController7", "hiController4")),
+                UrlTest("GET /aaaaa/now", "GET /aaaaa/now", "hiController4"),
+                UrlTest("GET /abcde/now", "GET /abcde/now", "hiController4"),
+                UrlTest("GET /testvalue/now", "GET /testvalue/now", "hiController4"),
+                UrlTest("GET /a", "GET /a", "hiController6"),
+                UrlTest("GET /a/aaaaa", "GET /a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /a/abcde", "GET /a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /a/testvalue", "GET /a/testvalue", UrlGrp("hiController6", "hiController7"))
 
 				//Node("GET /*/now", "hiController4"),
 				//Node("GET /a", Controllers("hiController7", "hiController6"),
@@ -340,130 +340,130 @@ namespace Bistro.UnitTests.Tests
 				);
 			#endregion
 
-			#region Imported - GET/hi/... - 4
-			NewTestWithUrl(
-				"Imported - GET/hi/... - 4",
-				Types(
-					Type(
-						"hiController4",
-						BindAttribute("GET /hi/*/world/*/now")
-					),
-					Type(
-						"hiController6",
-						BindAttribute("GET /hi/*/world/a")
-					),
-					Type(
-						"hiController7",
-						BindAttribute("GET /hi/*/world/a/*")
-					)
-				),
-				UrlTest("special - GET /hi/anyvalue/world/a/now/aaa", "GET /hi/anyvalue/world/a/now/aaa", UrlGrp("hiController6", "hiController7", "hiController4")),
-				UrlTest("special - GET /hi/anyvalue/world/a/now", "GET /hi/anyvalue/world/a/now", UrlGrp("hiController6", "hiController7", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
-				UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
-				UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", "hiController4"),
-				UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", "hiController4"),
-				UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", "hiController4"),
-				UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", "hiController4"),
-				UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", "hiController4"),
-				UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", "hiController4"),
-				UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", "hiController4"),
-				UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
-				UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
-				UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
-				UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", UrlGrp("hiController6", "hiController7")),
-				UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", UrlGrp("hiController6", "hiController7"))
-				//Node("GET /hi/*/world", Controllers(),
-				//        Node("/*/now", "hiController4"),
-				//        Node("/a", Controllers("hiController7", "hiController6"),
-				//            Node("/*", "hiController7", "hiController6")
-				//            )
-				//    )
-				);
-			#endregion
+            #region Imported - GET/hi/... - 4
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 4",
+                Types(
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController6",
+                        BindAttribute("GET /hi/*/world/a")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("special - GET /hi/anyvalue/world/a/now/aaa", "GET /hi/anyvalue/world/a/now/aaa", UrlGrp("hiController6", "hiController7", "hiController4")),
+                UrlTest("special - GET /hi/anyvalue/world/a/now", "GET /hi/anyvalue/world/a/now", UrlGrp("hiController6", "hiController7", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", "hiController4"),
+                UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/a", "GET /hi/aaaaa/world/a", "hiController6"),
+                UrlTest("GET /hi/abcde/world/a", "GET /hi/abcde/world/a", "hiController6"),
+                UrlTest("GET /hi/testvalue/world/a", "GET /hi/testvalue/world/a", "hiController6"),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", UrlGrp("hiController6", "hiController7")),
+                UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", UrlGrp("hiController6", "hiController7"))
+                //Node("GET /hi/*/world", Controllers(),
+                //        Node("/*/now", "hiController4"),
+                //        Node("/a", Controllers("hiController7", "hiController6"),
+                //            Node("/*", "hiController7", "hiController6")
+                //            )
+                //    )
+                );
+            #endregion
 
-			#region Imported - GET/hi/... - 5
-			NewTestWithUrl(
-				"Imported - GET/hi/... - 5",
-				Types(
-					Type(
-						"hiController2",
-						BindAttribute("GET /hi/new/*/*/now")
-					),
-					Type(
-						"hiController3",
-						BindAttribute("GET /hi/*/world/?/now")
-					),
-					Type(
-						"hiController4",
-						BindAttribute("GET /hi/*/world/*/now")
-					),
-					Type(
-						"hiController7",
-						BindAttribute("GET /hi/*/world/a/*")
-					)
-				),
-				UrlTest("special - GET /hi/old/world/b/now", "GET /hi/old/world/b/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("special - GET /hi/old/world/a/now", "GET /hi/old/world/a/now", UrlGrp("hiController3", "hiController7", "hiController4")),
-				UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", UrlGrp("hiController3", "hiController7", "hiController4", "hiController2")),
-				UrlTest("special - GET /hi/new/world/testvalue/now", "GET /hi/new/world/testvalue/now", UrlGrp("hiController3", "hiController4", "hiController2")),
-				UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/aaaaa/testvalue/now", "GET /hi/new/aaaaa/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/aaaaa/now", "GET /hi/new/abcde/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/abcde/now", "GET /hi/new/abcde/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/abcde/testvalue/now", "GET /hi/new/abcde/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/aaaaa/now", "GET /hi/new/testvalue/aaaaa/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/abcde/now", "GET /hi/new/testvalue/abcde/now", "hiController2"),
-				UrlTest("GET /hi/new/testvalue/testvalue/now", "GET /hi/new/testvalue/testvalue/now", "hiController2"),
-				UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", "hiController3", "hiController4"),
-				UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now", "GET /hi/aaaaa/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/now", "GET /hi/abcde/world/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/abcde/world/bbb124/now", "GET /hi/abcde/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now", "GET /hi/abcde/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/now", "GET /hi/testvalue/world/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/testvalue/world/bbb124/now", "GET /hi/testvalue/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now", "GET /hi/testvalue/world/aaaa123/bbb124/now", "hiController3"),
-				UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
-				UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", "hiController7"),
-				UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", "hiController7"),
-				UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", "hiController7"),
-				UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", "hiController7"),
-				UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", "hiController7"),
-				UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", "hiController7"),
-				UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", "hiController7"),
-				UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", "hiController7"),
-				UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", "hiController7")
-				//Node("GET /hi", Controllers(),
-				//    Node("/*/world", Controllers(),
-				//        Node("/*/now", "hiController4", "hiController3"),
-				//        Node("/?/now", "hiController3"),
-				//        Node("/a/*", "hiController7")
-				//        ),
-				//    Node("/new/*/*/now", "hiController2"
-				//        )
-				//    )
-				);
-			#endregion
+            #region Imported - GET/hi/... - 5
+            NewTestWithUrl(
+                "Imported - GET/hi/... - 5",
+                Types(
+                    Type(
+                        "hiController2",
+                        BindAttribute("GET /hi/new/*/*/now")
+                    ),
+                    Type(
+                        "hiController3",
+                        BindAttribute("GET /hi/*/world/?/now")
+                    ),
+                    Type(
+                        "hiController4",
+                        BindAttribute("GET /hi/*/world/*/now")
+                    ),
+                    Type(
+                        "hiController7",
+                        BindAttribute("GET /hi/*/world/a/*")
+                    )
+                ),
+                UrlTest("special - GET /hi/old/world/b/now", "GET /hi/old/world/b/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("special - GET /hi/old/world/a/now", "GET /hi/old/world/a/now", UrlGrp("hiController3", "hiController7", "hiController4")),
+                UrlTest("special - GET /hi/new/world/a/now", "GET /hi/new/world/a/now", UrlGrp("hiController3", "hiController7", "hiController4", "hiController2")),
+                UrlTest("special - GET /hi/new/world/testvalue/now", "GET /hi/new/world/testvalue/now", UrlGrp("hiController3", "hiController4", "hiController2")),
+                UrlTest("GET /hi/new/aaaaa/aaaaa/now", "GET /hi/new/aaaaa/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/aaaaa/abcde/now", "GET /hi/new/aaaaa/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/aaaaa/testvalue/now", "GET /hi/new/aaaaa/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/aaaaa/now", "GET /hi/new/abcde/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/abcde/now", "GET /hi/new/abcde/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/abcde/testvalue/now", "GET /hi/new/abcde/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/aaaaa/now", "GET /hi/new/testvalue/aaaaa/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/abcde/now", "GET /hi/new/testvalue/abcde/now", "hiController2"),
+                UrlTest("GET /hi/new/testvalue/testvalue/now", "GET /hi/new/testvalue/testvalue/now", "hiController2"),
+                UrlTest("GET /hi/aaaaa/world/now", "GET /hi/aaaaa/world/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/aaaaa/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/bbb124/now", "GET /hi/aaaaa/world/bbb124/now", "hiController3", "hiController4"),
+                UrlTest("GET /hi/aaaaa/world/aaaa123/bbb124/now", "GET /hi/aaaaa/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/now", "GET /hi/abcde/world/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/abcde/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/abcde/world/bbb124/now", "GET /hi/abcde/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/aaaa123/bbb124/now", "GET /hi/abcde/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/now", "GET /hi/testvalue/world/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "GET /hi/testvalue/world/abcde/edcba/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/testvalue/world/bbb124/now", "GET /hi/testvalue/world/bbb124/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/aaaa123/bbb124/now", "GET /hi/testvalue/world/aaaa123/bbb124/now", "hiController3"),
+                UrlTest("GET /hi/aaaaa/world/aaaaa/now", "GET /hi/aaaaa/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/abcde/now", "GET /hi/aaaaa/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/testvalue/now", "GET /hi/aaaaa/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/aaaaa/now", "GET /hi/abcde/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/abcde/now", "GET /hi/abcde/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/abcde/world/testvalue/now", "GET /hi/abcde/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/aaaaa/now", "GET /hi/testvalue/world/aaaaa/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/abcde/now", "GET /hi/testvalue/world/abcde/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/testvalue/world/testvalue/now", "GET /hi/testvalue/world/testvalue/now", UrlGrp("hiController3", "hiController4")),
+                UrlTest("GET /hi/aaaaa/world/a/aaaaa", "GET /hi/aaaaa/world/a/aaaaa", "hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/abcde", "GET /hi/aaaaa/world/a/abcde", "hiController7"),
+                UrlTest("GET /hi/aaaaa/world/a/testvalue", "GET /hi/aaaaa/world/a/testvalue", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/aaaaa", "GET /hi/abcde/world/a/aaaaa", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/abcde", "GET /hi/abcde/world/a/abcde", "hiController7"),
+                UrlTest("GET /hi/abcde/world/a/testvalue", "GET /hi/abcde/world/a/testvalue", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/aaaaa", "GET /hi/testvalue/world/a/aaaaa", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/abcde", "GET /hi/testvalue/world/a/abcde", "hiController7"),
+                UrlTest("GET /hi/testvalue/world/a/testvalue", "GET /hi/testvalue/world/a/testvalue", "hiController7")
+                //Node("GET /hi", Controllers(),
+                //    Node("/*/world", Controllers(),
+                //        Node("/*/now", "hiController4", "hiController3"),
+                //        Node("/?/now", "hiController3"),
+                //        Node("/a/*", "hiController7")
+                //        ),
+                //    Node("/new/*/*/now", "hiController2"
+                //        )
+                //    )
+                );
+            #endregion
 
 			#region Imported - DependsOn/Requires
 			NewTestWithUrl(
@@ -958,40 +958,40 @@ namespace Bistro.UnitTests.Tests
 					);
 			#endregion
 
-			#region Imported - Paging-simple
-			NewTestWithUrl(
-				"Imported - Paging-simple",
-				Types(
-					Type("DataRoot",
-						Attributes(BindAttribute("GET /a/?"))
-						),
-					Type("WithPaging",
-						Attributes(
-							BindAttribute("GET /a/?/c3")
-						)
-						),
-					Type("Data14sRender",
-						Attributes(
-							BindAttribute("GET /a/b/c2")
-						)
-						),
-					Type("Data14sRenderBis",
-						Attributes(
-							BindAttribute("GET /a/b/c1")
-						)
-						)
-					),
-					UrlTest("special - GET /a/b/c2/c3", "GET /a/b/c2/c3", UrlGrp("WithPaging", "DataRoot", "Data14sRender")),
-					UrlTest("GET /a", "GET /a"),
-					UrlTest("GET /a/abcde/edcba/aaaa123/bbb124", "GET /a/abcde/edcba/aaaa123/bbb124", "DataRoot"),
-					UrlTest("GET /a/bbb124", "GET /a/bbb124", "DataRoot"),
-					UrlTest("GET /a/aaaa123/bbb124", "GET /a/aaaa123/bbb124", "DataRoot"),
-					UrlTest("GET /a/c3", "GET /a/c3", "WithPaging", "DataRoot"),
-					UrlTest("GET /a/abcde/edcba/aaaa123/bbb124/c3", "GET /a/abcde/edcba/aaaa123/bbb124/c3", "WithPaging", "DataRoot"),
-					UrlTest("GET /a/bbb124/c3", "GET /a/bbb124/c3", "WithPaging", "DataRoot"),
-					UrlTest("GET /a/aaaa123/bbb124/c3", "GET /a/aaaa123/bbb124/c3", "WithPaging", "DataRoot"),
-					UrlTest("GET /a/b/c2", "GET /a/b/c2", "DataRoot", "Data14sRender"),
-					UrlTest("GET /a/b/c1", "GET /a/b/c1", "DataRoot", "Data14sRenderBis")
+            #region Imported - Paging-simple
+            NewTestWithUrl(
+                "Imported - Paging-simple",
+                Types(
+                    Type("DataRoot",
+                        Attributes(BindAttribute("GET /a/?"))
+                        ),
+                    Type("WithPaging",
+                        Attributes(
+                            BindAttribute("GET /a/?/c3")
+                        )
+                        ),
+                    Type("Data14sRender",
+                        Attributes(
+                            BindAttribute("GET /a/b/c2")
+                        )
+                        ),
+                    Type("Data14sRenderBis",
+                        Attributes(
+                            BindAttribute("GET /a/b/c1")
+                        )
+                        )
+                    ),
+                    UrlTest("special - GET /a/b/c2/c3", "GET /a/b/c2/c3", UrlGrp("WithPaging", "DataRoot", "Data14sRender")),
+                    UrlTest("GET /a", "GET /a"),
+                    UrlTest("GET /a/abcde/edcba/aaaa123/bbb124", "GET /a/abcde/edcba/aaaa123/bbb124", "DataRoot"),
+                    UrlTest("GET /a/bbb124", "GET /a/bbb124", "DataRoot"),
+                    UrlTest("GET /a/aaaa123/bbb124", "GET /a/aaaa123/bbb124", "DataRoot"),
+                    UrlTest("GET /a/c3", "GET /a/c3", "WithPaging", "DataRoot"),
+                    UrlTest("GET /a/abcde/edcba/aaaa123/bbb124/c3", "GET /a/abcde/edcba/aaaa123/bbb124/c3", "WithPaging", "DataRoot"),
+                    UrlTest("GET /a/bbb124/c3", "GET /a/bbb124/c3", "WithPaging", "DataRoot"),
+                    UrlTest("GET /a/aaaa123/bbb124/c3", "GET /a/aaaa123/bbb124/c3", "WithPaging", "DataRoot"),
+                    UrlTest("GET /a/b/c2", "GET /a/b/c2", "DataRoot", "Data14sRender"),
+                    UrlTest("GET /a/b/c1", "GET /a/b/c1", "DataRoot", "Data14sRenderBis")
 
 					//Node("GET /a", Controllers(),// is empty because it's not a method node
 				//    Node("/?", Controllers("DataRoot"),
@@ -1182,20 +1182,20 @@ namespace Bistro.UnitTests.Tests
 				);
 			#endregion
 
-			#region Cross-bindings
-			NewTestWithUrl(
-				"Cross-bindings",
-				Types(
-					Type("Controller1", BindAttribute("/a/*/b/c")),
-					Type("Controller2", BindAttribute("/a/z/*/c"))
-					),
-					UrlTest("GET /a/bbb/b/c", "GET /a/bbb/b/c", "Controller1"),
-					UrlTest("GET /a/z/bbb/c", "GET /a/z/bbb/c", "Controller2"),
-					UrlTest("GET /a/z/b/c", "GET /a/z/b/c", UrlGrp("Controller2", "Controller1")),
-					UrlTest("GET /a/bbb/b/c/tail", "GET /a/bbb/b/c/tail", "Controller1"),
-					UrlTest("GET /a/z/bbb/c/tail", "GET /a/z/bbb/c/tail", "Controller2"),
-					UrlTest("GET /a/z/b/c/tail", "GET /a/z/b/c/tail", UrlGrp("Controller2", "Controller1"))
-					);
+            #region Cross-bindings
+            NewTestWithUrl(
+                "Cross-bindings",
+                Types(
+                    Type("Controller1", BindAttribute("/a/*/b/c")),
+                    Type("Controller2", BindAttribute("/a/z/*/c"))
+                    ),
+                    UrlTest("GET /a/bbb/b/c", "GET /a/bbb/b/c", "Controller1"),
+                    UrlTest("GET /a/z/bbb/c", "GET /a/z/bbb/c", "Controller2"),
+                    UrlTest("GET /a/z/b/c", "GET /a/z/b/c", UrlGrp("Controller2", "Controller1")),
+                    UrlTest("GET /a/bbb/b/c/tail", "GET /a/bbb/b/c/tail", "Controller1"),
+                    UrlTest("GET /a/z/bbb/c/tail", "GET /a/z/bbb/c/tail", "Controller2"),
+                    UrlTest("GET /a/z/b/c/tail", "GET /a/z/b/c/tail", UrlGrp("Controller2", "Controller1"))
+                    );
 
 
 			#endregion

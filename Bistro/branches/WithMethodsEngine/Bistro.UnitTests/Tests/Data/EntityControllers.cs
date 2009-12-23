@@ -62,11 +62,14 @@ namespace Bistro.UnitTests.Tests.Data
         public EntityControllerValidator() { ByMapping(); }
     }
 
-    [Bind("/entityTest?{Foo}&{bar}&{thirdField}&{extra}&{unwrap}&{nullableInt}&{nullableBool}")]
+    [Bind("/entityTest?{Foo}&{bar}&{thirdField}&{extra}&{unwrap}&{nullableInt}&{nullableBool}&{MyDate}")]
     [ValidateWith(typeof(EntityControllerValidator))]
     [MapsWith(typeof(TestMapper))]
     public class EntityController : AbstractController, IMappable, IValidatable
     {
+		[Request]
+		public DateTime MyDate;
+
         [Request]
         public string
             Foo,

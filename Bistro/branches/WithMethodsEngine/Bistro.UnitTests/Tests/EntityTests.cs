@@ -130,5 +130,16 @@ namespace Bistro.UnitTests.Tests
                 Assert.IsNull(entity.extra, "Field 'extra' should remain null. Issue with Except() method.");
             }
         }
+
+		//[Test]
+		//public void MapsFromDateTime()
+		//{
+		//    var resp = handler.RunForTest("GET/entityTest?MyDate=12%2F14%2F2009");
+
+		//    var contexts = handler.AllContents;
+		//    var dt = contexts["request"]["MyDate"];
+		//    var dt2Compare = new DateTime(2009, 12, 14);
+		//    Assert.AreEqual(dt2Compare, dt);
+		//}
     }
 }

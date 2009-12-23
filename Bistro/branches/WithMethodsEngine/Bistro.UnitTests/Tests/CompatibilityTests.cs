@@ -110,9 +110,7 @@ namespace Bistro.UnitTests.Tests
 			return new UrlGroup(controllers);
 		}
 
-
 		#endregion
-
 
 		List<TestDescriptor> tests = new List<TestDescriptor>();
 

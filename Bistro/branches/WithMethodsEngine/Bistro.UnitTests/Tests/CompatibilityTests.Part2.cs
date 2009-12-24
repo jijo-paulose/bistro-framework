@@ -1060,31 +1060,31 @@ namespace Bistro.UnitTests.Tests
 				);
 			#endregion
 
-			#region tree - one controller - 3 bindings (tree)
-			NewTestWithUrl(
-				"tree - one controller - 3 bindings (tree)",
-				Types(Type(
-					"Controller1",
-					Attributes(
-						BindAttribute("/default"),
-						BindAttribute("/path2"),
-						BindAttribute("/path2/more"))
-					)),
-					UrlTest("GET /default", "GET /default", "Controller1"),
-					UrlTest("POST /default", "POST /default", "Controller1"),
-					UrlTest("PUT /default", "PUT /default", "Controller1"),
-					UrlTest("DELETE /default", "DELETE /default", "Controller1"),
-					UrlTest("HEAD /default", "HEAD /default", "Controller1"),
-					UrlTest("GET /path2", "GET /path2", "Controller1"),
-					UrlTest("POST /path2", "POST /path2", "Controller1"),
-					UrlTest("PUT /path2", "PUT /path2", "Controller1"),
-					UrlTest("DELETE /path2", "DELETE /path2", "Controller1"),
-					UrlTest("HEAD /path2", "HEAD /path2", "Controller1"),
-					UrlTest("GET /path2/more", "GET /path2/more", "Controller1", "Controller1"),
-					UrlTest("POST /path2/more", "POST /path2/more", "Controller1", "Controller1"),
-					UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller1"),
-					UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller1"),
-					UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller1")
+            #region tree - one controller - 3 bindings (tree) - DUPLICATE CONTROLLERS
+            NewTestWithUrl(
+				"tree - one controller - 3 bindings (tree) - DUPLICATE CONTROLLERS",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                    )),
+                    UrlTest("GET /default", "GET /default", "Controller1"),
+                    UrlTest("POST /default", "POST /default", "Controller1"),
+                    UrlTest("PUT /default", "PUT /default", "Controller1"),
+                    UrlTest("DELETE /default", "DELETE /default", "Controller1"),
+                    UrlTest("HEAD /default", "HEAD /default", "Controller1"),
+                    UrlTest("GET /path2", "GET /path2", "Controller1"),
+                    UrlTest("POST /path2", "POST /path2", "Controller1"),
+                    UrlTest("PUT /path2", "PUT /path2", "Controller1"),
+                    UrlTest("DELETE /path2", "DELETE /path2", "Controller1"),
+                    UrlTest("HEAD /path2", "HEAD /path2", "Controller1"),
+                    UrlTest("GET /path2/more", "GET /path2/more", "Controller1", "Controller1"),
+                    UrlTest("POST /path2/more", "POST /path2/more", "Controller1", "Controller1"),
+                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller1"),
+                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller1"),
+                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller1")
 
 				//Node("* /default", "Controller1"),
 				//Node("* /path2", Controllers("Controller1"),
@@ -1093,94 +1093,94 @@ namespace Bistro.UnitTests.Tests
 				);
 			#endregion
 
-			#region tree - one generic one specific
-			NewTestWithUrl(
-				"tree - one generic one specific",
-				Types(Type(
-					"Controller1",
-					Attributes(
-						BindAttribute("/default"),
-						BindAttribute("/path2"),
-						BindAttribute("/path2/more"))
-						),
-					Type("Controller2", BindAttribute("/?"))
-					),
-					UrlTest("GET /default", "GET /default", "Controller2", "Controller1"),
-					UrlTest("POST /default", "POST /default", "Controller2", "Controller1"),
-					UrlTest("PUT /default", "PUT /default", "Controller2", "Controller1"),
-					UrlTest("DELETE /default", "DELETE /default", "Controller2", "Controller1"),
-					UrlTest("HEAD /default", "HEAD /default", "Controller2", "Controller1"),
-					UrlTest("GET /path2", "GET /path2", "Controller2", "Controller1"),
-					UrlTest("POST /path2", "POST /path2", "Controller2", "Controller1"),
-					UrlTest("PUT /path2", "PUT /path2", "Controller2", "Controller1"),
-					UrlTest("DELETE /path2", "DELETE /path2", "Controller2", "Controller1"),
-					UrlTest("HEAD /path2", "HEAD /path2", "Controller2", "Controller1"),
-					UrlTest("GET /path2/more", "GET /path2/more", "Controller2", "Controller1", "Controller1"),
-					UrlTest("POST /path2/more", "POST /path2/more", "Controller2", "Controller1", "Controller1"),
-					UrlTest("PUT /path2/more", "PUT /path2/more", "Controller2", "Controller1", "Controller1"),
-					UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller2", "Controller1", "Controller1"),
-					UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller2", "Controller1", "Controller1"),
-					UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "Controller2"),
-					UrlTest("GET /bbb124", "GET /bbb124", "Controller2"),
-					UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "Controller2"),
-					UrlTest("POST /abcde/edcba/aaaa123/bbb124", "POST /abcde/edcba/aaaa123/bbb124", "Controller2"),
-					UrlTest("POST /bbb124", "POST /bbb124", "Controller2"),
-					UrlTest("POST /aaaa123/bbb124", "POST /aaaa123/bbb124", "Controller2"),
-					UrlTest("PUT /abcde/edcba/aaaa123/bbb124", "PUT /abcde/edcba/aaaa123/bbb124", "Controller2"),
-					UrlTest("PUT /bbb124", "PUT /bbb124", "Controller2"),
-					UrlTest("PUT /aaaa123/bbb124", "PUT /aaaa123/bbb124", "Controller2"),
-					UrlTest("DELETE /abcde/edcba/aaaa123/bbb124", "DELETE /abcde/edcba/aaaa123/bbb124", "Controller2"),
-					UrlTest("DELETE /bbb124", "DELETE /bbb124", "Controller2"),
-					UrlTest("DELETE /aaaa123/bbb124", "DELETE /aaaa123/bbb124", "Controller2"),
-					UrlTest("HEAD /abcde/edcba/aaaa123/bbb124", "HEAD /abcde/edcba/aaaa123/bbb124", "Controller2"),
-					UrlTest("HEAD /bbb124", "HEAD /bbb124", "Controller2"),
-					UrlTest("HEAD /aaaa123/bbb124", "HEAD /aaaa123/bbb124", "Controller2")
-				//Node("* /default", "Controller2", "Controller1"),
-				//Node("* /path2", Controllers("Controller2", "Controller1"),
-				//    Node("/more", "Controller2", "Controller1")
-				//    ),
-				//Node("* /?", "Controller2")
-				);
-			#endregion
+            #region tree - one generic one specific - DUPLICATE CONTROLLERS
+            NewTestWithUrl(
+				"tree - one generic one specific - DUPLICATE CONTROLLERS",
+                Types(Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                        ),
+                    Type("Controller2", BindAttribute("/?"))
+                    ),
+                    UrlTest("GET /default", "GET /default", "Controller2", "Controller1"),
+                    UrlTest("POST /default", "POST /default", "Controller2", "Controller1"),
+                    UrlTest("PUT /default", "PUT /default", "Controller2", "Controller1"),
+                    UrlTest("DELETE /default", "DELETE /default", "Controller2", "Controller1"),
+                    UrlTest("HEAD /default", "HEAD /default", "Controller2", "Controller1"),
+                    UrlTest("GET /path2", "GET /path2", "Controller2", "Controller1"),
+                    UrlTest("POST /path2", "POST /path2", "Controller2", "Controller1"),
+                    UrlTest("PUT /path2", "PUT /path2", "Controller2", "Controller1"),
+                    UrlTest("DELETE /path2", "DELETE /path2", "Controller2", "Controller1"),
+                    UrlTest("HEAD /path2", "HEAD /path2", "Controller2", "Controller1"),
+                    UrlTest("GET /path2/more", "GET /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("POST /path2/more", "POST /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("GET /bbb124", "GET /bbb124", "Controller2"),
+                    UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "Controller2"),
+                    UrlTest("POST /abcde/edcba/aaaa123/bbb124", "POST /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("POST /bbb124", "POST /bbb124", "Controller2"),
+                    UrlTest("POST /aaaa123/bbb124", "POST /aaaa123/bbb124", "Controller2"),
+                    UrlTest("PUT /abcde/edcba/aaaa123/bbb124", "PUT /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("PUT /bbb124", "PUT /bbb124", "Controller2"),
+                    UrlTest("PUT /aaaa123/bbb124", "PUT /aaaa123/bbb124", "Controller2"),
+                    UrlTest("DELETE /abcde/edcba/aaaa123/bbb124", "DELETE /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("DELETE /bbb124", "DELETE /bbb124", "Controller2"),
+                    UrlTest("DELETE /aaaa123/bbb124", "DELETE /aaaa123/bbb124", "Controller2"),
+                    UrlTest("HEAD /abcde/edcba/aaaa123/bbb124", "HEAD /abcde/edcba/aaaa123/bbb124", "Controller2"),
+                    UrlTest("HEAD /bbb124", "HEAD /bbb124", "Controller2"),
+                    UrlTest("HEAD /aaaa123/bbb124", "HEAD /aaaa123/bbb124", "Controller2")
+                //Node("* /default", "Controller2", "Controller1"),
+                //Node("* /path2", Controllers("Controller2", "Controller1"),
+                //    Node("/more", "Controller2", "Controller1")
+                //    ),
+                //Node("* /?", "Controller2")
+                );
+            #endregion
 
 
-			// Note that there's questionmark here, without leading slash
-			#region tree - one generic one specific - reversed
-			NewTestWithUrl(
-				"tree - one generic one specific - reversed",
-				Types(
-					Type("Controller2", BindAttribute("?")),
-					Type(
-					"Controller1",
-					Attributes(
-						BindAttribute("/default"),
-						BindAttribute("/path2"),
-						BindAttribute("/path2/more"))
-						)
-					),
-					UrlTest("test special", "GET /anytestpath", "Controller2"),
-					UrlTest("GET /default", "GET /default", "Controller1", "Controller2"),
-					UrlTest("POST /default", "POST /default", "Controller1", "Controller2"),
-					UrlTest("PUT /default", "PUT /default", "Controller1", "Controller2"),
-					UrlTest("DELETE /default", "DELETE /default", "Controller1", "Controller2"),
-					UrlTest("HEAD /default", "HEAD /default", "Controller1", "Controller2"),
-					UrlTest("GET /path2", "GET /path2", "Controller1", "Controller2"),
-					UrlTest("POST /path2", "POST /path2", "Controller1", "Controller2"),
-					UrlTest("PUT /path2", "PUT /path2", "Controller1", "Controller2"),
-					UrlTest("DELETE /path2", "DELETE /path2", "Controller1", "Controller2"),
-					UrlTest("HEAD /path2", "HEAD /path2", "Controller1", "Controller2"),
-					UrlTest("GET /path2/more", "GET /path2/more", "Controller1", "Controller2", "Controller1"),
-					UrlTest("POST /path2/more", "POST /path2/more", "Controller1", "Controller2", "Controller1"),
-					UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller2", "Controller1"),
-					UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller2", "Controller1"),
-					UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller2", "Controller1")
-				//Node("* ?", "Controller2"),
-				//Node("* /default", "Controller1", "Controller2"),
-				//Node("* /path2", Controllers("Controller1", "Controller2"),
-				//    Node("/more", "Controller1", "Controller2")
-				//    )
-				);
-			#endregion
+            // Note that there's questionmark here, without leading slash
+            #region tree - one generic one specific - reversed - DUPLICATE CONTROLLERS
+            NewTestWithUrl(
+				"tree - one generic one specific - reversed - DUPLICATE CONTROLLERS",
+                Types(
+                    Type("Controller2", BindAttribute("?")),
+                    Type(
+                    "Controller1",
+                    Attributes(
+                        BindAttribute("/default"),
+                        BindAttribute("/path2"),
+                        BindAttribute("/path2/more"))
+                        )
+                    ),
+                    UrlTest("test special", "GET /anytestpath", "Controller2"),
+                    UrlTest("GET /default", "GET /default", "Controller1", "Controller2"),
+                    UrlTest("POST /default", "POST /default", "Controller1", "Controller2"),
+                    UrlTest("PUT /default", "PUT /default", "Controller1", "Controller2"),
+                    UrlTest("DELETE /default", "DELETE /default", "Controller1", "Controller2"),
+                    UrlTest("HEAD /default", "HEAD /default", "Controller1", "Controller2"),
+                    UrlTest("GET /path2", "GET /path2", "Controller1", "Controller2"),
+                    UrlTest("POST /path2", "POST /path2", "Controller1", "Controller2"),
+                    UrlTest("PUT /path2", "PUT /path2", "Controller1", "Controller2"),
+                    UrlTest("DELETE /path2", "DELETE /path2", "Controller1", "Controller2"),
+                    UrlTest("HEAD /path2", "HEAD /path2", "Controller1", "Controller2"),
+                    UrlTest("GET /path2/more", "GET /path2/more", "Controller1", "Controller2", "Controller1"),
+                    UrlTest("POST /path2/more", "POST /path2/more", "Controller1", "Controller2", "Controller1"),
+                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller2", "Controller1"),
+                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller2", "Controller1"),
+                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller2", "Controller1")
+                //Node("* ?", "Controller2"),
+                //Node("* /default", "Controller1", "Controller2"),
+                //Node("* /path2", Controllers("Controller1", "Controller2"),
+                //    Node("/more", "Controller1", "Controller2")
+                //    )
+                );
+            #endregion
 
             #region Cross-bindings
             NewTestWithUrl(

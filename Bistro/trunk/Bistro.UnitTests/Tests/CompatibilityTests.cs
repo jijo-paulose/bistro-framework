@@ -109,7 +109,7 @@ namespace Bistro.UnitTests.Tests
 		/// </summary>
 		/// <param name="groups"></param>
 		/// <returns></returns>
-		private CtrGroupUnordered UrlGrp(params object[] groups)
+		private CtrGroupUnordered CtrUnOrdGrp(params object[] groups)
 		{
 			return new CtrGroupUnordered(groups);
 		}

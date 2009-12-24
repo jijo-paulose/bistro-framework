@@ -110,11 +110,11 @@ namespace Bistro.UnitTests.Tests
                     Type("Controller1", BindAttribute("/default")),
                     Type("Controller2", BindAttribute("/default"))
                     ),
-                    UrlTest("GET /default", "GET /default", UrlGrp("Controller2", "Controller1")),
-                    UrlTest("POST /default", "POST /default", UrlGrp("Controller2", "Controller1")),
-                    UrlTest("PUT /default", "PUT /default", UrlGrp("Controller2", "Controller1")),
-                    UrlTest("DELETE /default", "DELETE /default", UrlGrp("Controller2", "Controller1")),
-                    UrlTest("HEAD /default", "HEAD /default", UrlGrp("Controller2", "Controller1"))
+                    UrlTest("GET /default", "GET /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("POST /default", "POST /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("PUT /default", "PUT /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("DELETE /default", "DELETE /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("HEAD /default", "HEAD /default", CtrUnOrdGrp("Controller2", "Controller1"))
                 //Node("* /default", "Controller2", "Controller1")
                 );
             #endregion
@@ -191,9 +191,9 @@ namespace Bistro.UnitTests.Tests
 					Type("Controller2", Attributes(BindAttribute("GET/?"))),
 					Type("Controller3", Attributes(BindAttribute("GET/aaa")))
 					),
-					UrlTest("GET /", "GET /", UrlGrp("Controller1","Controller2")),
+					UrlTest("GET /", "GET /", CtrUnOrdGrp("Controller1","Controller2")),
 					UrlTest("GET /bbb", "GET /bbb", "Controller2"),
-					UrlTest("GET /aaa", "GET /aaa", UrlGrp("Controller2", "Controller3"))
+					UrlTest("GET /aaa", "GET /aaa", CtrUnOrdGrp("Controller2", "Controller3"))
 
 				);
 			#endregion
@@ -207,8 +207,8 @@ namespace Bistro.UnitTests.Tests
 					Type("Controller3", Attributes(BindAttribute("GET/data/aaa")))
 					),
 					UrlTest("GET /data", "GET /data", "Controller1"),
-					UrlTest("GET /data/bbb", "GET /data/bbb", UrlGrp("Controller1", "Controller2")),
-					UrlTest("GET /data/aaa", "GET /data/aaa", UrlGrp("Controller1", "Controller2", "Controller3"))
+					UrlTest("GET /data/bbb", "GET /data/bbb", CtrUnOrdGrp("Controller1", "Controller2")),
+					UrlTest("GET /data/aaa", "GET /data/aaa", CtrUnOrdGrp("Controller1", "Controller2", "Controller3"))
 
 				);
 			#endregion

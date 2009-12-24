@@ -155,7 +155,7 @@ namespace Bistro.UnitTests.Tests.Compatibility
 			Func<String, ControllerInvocationInfo, String> sumStr = (oldStr, invInfo) => oldStr += "+" + invInfo.BindPoint.Controller.ControllerTypeName;
 
             var ctrlrs = dispatcher.GetControllers(testUrl);
-            Assert.AreEqual(rootGroup.GetCount(), ctrlrs.Length, "Controller queues lengths are different.");
+			Assert.AreEqual(rootGroup.GetCount(), ctrlrs.Length, "Controller queues lengths are different. URL:{0}; Return Controllers:{1} ", testUrl, ctrlrs.Aggregate(String.Empty, sumStr));
 
 			int i = 0;
 			foreach (var controllerInfo in ctrlrs)

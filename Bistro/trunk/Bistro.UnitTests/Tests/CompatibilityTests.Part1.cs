@@ -1070,11 +1070,11 @@ namespace Bistro.UnitTests.Tests
                         Field("c7", "string", SessionAttribute)
                     )
                 ),
-                UrlTest("GET /order/world/new", "GET /order/world/new", "OrderController5", "OrderController7", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6"),
-                UrlTest("POST /order/world/new", "POST /order/world/new", "OrderController5", "OrderController7", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6"),
-                UrlTest("PUT /order/world/new", "PUT /order/world/new", "OrderController5", "OrderController7", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6"),
-                UrlTest("DELETE /order/world/new", "DELETE /order/world/new", "OrderController5", "OrderController7", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6"),
-                UrlTest("HEAD /order/world/new", "HEAD /order/world/new", "OrderController5", "OrderController7", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6")
+                UrlTest("GET /order/world/new", "GET /order/world/new", "OrderController5", CtrUnOrdGrp("OrderController7", CtrOrdGrp("OrderController2", "OrderController1", "OrderController4", "OrderController3")), "OrderController6"),
+				UrlTest("POST /order/world/new", "POST /order/world/new", "OrderController5", CtrUnOrdGrp("OrderController7", CtrOrdGrp("OrderController2", "OrderController1", "OrderController4", "OrderController3")), "OrderController6"),
+				UrlTest("PUT /order/world/new", "PUT /order/world/new", "OrderController5", CtrUnOrdGrp("OrderController7", CtrOrdGrp("OrderController2", "OrderController1", "OrderController4", "OrderController3")), "OrderController6"),
+				UrlTest("DELETE /order/world/new", "DELETE /order/world/new", "OrderController5", CtrUnOrdGrp("OrderController7", CtrOrdGrp("OrderController2", "OrderController1", "OrderController4", "OrderController3")), "OrderController6"),
+                UrlTest("HEAD /order/world/new", "HEAD /order/world/new", "OrderController5", CtrUnOrdGrp("OrderController7", CtrOrdGrp("OrderController2", "OrderController1", "OrderController4", "OrderController3")), "OrderController6")
                 //Node("* /order/world/new", "OrderController7", "OrderController5", "OrderController2", "OrderController1", "OrderController4", "OrderController3", "OrderController6")
             );
             #endregion

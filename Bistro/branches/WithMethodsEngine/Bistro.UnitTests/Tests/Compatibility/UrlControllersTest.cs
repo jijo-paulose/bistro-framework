@@ -150,16 +150,17 @@ namespace Bistro.UnitTests.Tests.Compatibility
         string testUrl;
 		CtrGroupOrdered rootGroup;
 
-		public void Validate(IControllerDispatcher dispatcher)
-		{
-			Func<String,ControllerInvocationInfo,String> sumStr = (oldStr, invInfo) => oldStr += "+" + invInfo.BindPoint.Controller.ControllerTypeName;
-			var ctrlrs = dispatcher.GetControllers(testUrl);
+        public void Validate(IControllerDispatcher dispatcher)
+        {
+			Func<String, ControllerInvocationInfo, String> sumStr = (oldStr, invInfo) => oldStr += "+" + invInfo.BindPoint.Controller.ControllerTypeName;
+
+            var ctrlrs = dispatcher.GetControllers(testUrl);
             Assert.AreEqual(rootGroup.GetCount(), ctrlrs.Length, "Controller queues lengths are different.");
 
 			int i = 0;
 			foreach (var controllerInfo in ctrlrs)
 			{
-				Assert.IsTrue(rootGroup.ValidateNext(controllerInfo.BindPoint.Controller.ControllerTypeName), "Controller names are different at position: {0}", i);
+				Assert.IsTrue(rootGroup.ValidateNext(controllerInfo.BindPoint.Controller.ControllerTypeName), "Controller names are different at position: {0}; Controllers:{1}", i,ctrlrs.Aggregate(String.Empty,sumStr));
 				i++;
 			}
 

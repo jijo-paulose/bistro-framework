@@ -104,10 +104,24 @@ namespace Bistro.UnitTests.Tests
 			url = url.Replace(" ", "");
 			return new UrlControllersTest(name, url, controllersGroups);
 		}
-
-		private UrlGroup UrlGrp(params string[] controllers)
+		/// <summary>
+		/// UnOrdered group
+		/// </summary>
+		/// <param name="groups"></param>
+		/// <returns></returns>
+		private CtrGroupUnordered CtrUnOrdGrp(params object[] groups)
 		{
-			return new UrlGroup(controllers);
+			return new CtrGroupUnordered(groups);
+		}
+
+		/// <summary>
+		/// Ordered group
+		/// </summary>
+		/// <param name="groups"></param>
+		/// <returns></returns>
+		private CtrGroupOrdered CtrOrdGrp(params object[] groups)
+		{
+			return new CtrGroupOrdered(groups);
 		}
 
 		#endregion

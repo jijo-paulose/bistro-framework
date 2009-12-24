@@ -8,79 +8,159 @@ using Bistro.Controllers;
 
 namespace Bistro.UnitTests.Tests.Compatibility
 {
-	internal class UrlGroup
+	internal class CtrGroupCommon
 	{
-		internal UrlGroup(params string[] controllers)
+		internal CtrGroupCommon(params object[] controllersAndGroups)
 		{
-			controllersList = controllers.ToList();
-			if (controllersList.Count == 0)
-				throw new Exception("UrlControllersTest has invalid definition");
+			Processed = false;
 		}
 
-		private List<string> controllersList;
-
-		internal bool CheckEqual(string ctrName)
+		internal virtual bool ValidateNext(string controllerName)
 		{
-			return controllersList.Contains(ctrName);
+			return false;
 		}
 
-		internal int Count
+		protected List<object> groupsList;
+
+		internal int GetCount()
 		{
-			get { return controllersList.Count; }
+			return groupsList.OfType<String>().Count() + groupsList.OfType<CtrGroupCommon>().Sum(grp => grp.GetCount());
 		}
+
+		internal protected bool Processed { get; protected set; }
 
 	}
 
 
-	internal class UrlControllersTest
+	internal class CtrGroupUnordered : CtrGroupCommon
 	{
-		internal UrlControllersTest(string name, string url, params object[] controllers)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="controllers"></param>
+		internal CtrGroupUnordered(params object[] controllers)
 		{
-			testUrl = url;
-			testName = name;
-			testControllers = new List<UrlGroup>(controllers.Length);
-			foreach (object obj in controllers)
+			groupsList = controllers.ToList();
+			if (groupsList.Count ==0)
+				throw new Exception("UrlControllersTest has invalid definition");
+
+			processedGroups = new List<object>();
+		}
+
+		private List<object> processedGroups;
+
+
+
+		internal override bool ValidateNext(string controllerName)
+		{
+			bool retVal = false;
+			if (groupsList.OfType<String>().Contains(controllerName) && (!processedGroups.OfType<String>().Contains(controllerName)))
 			{
-				if (obj is String)
+				processedGroups.Add(controllerName);
+
+
+				retVal = true;
+			}
+			else 
+			{
+				foreach (var group in groupsList.OfType<CtrGroupOrdered>())
 				{
-					testControllers.Add(new UrlGroup(obj as String));
+					if (processedGroups.Contains(group))
+						continue;
+
+					if (group.ValidateNext(controllerName))
+					{
+						if (group.Processed)
+							processedGroups.Add(group);
+						retVal = true;
+						break;
+					}
 				}
-				else if (obj is UrlGroup)
+			}
+			Processed = (processedGroups.Count == groupsList.Count);
+			return retVal;
+		}
+
+
+
+	}
+
+	internal class CtrGroupOrdered : CtrGroupCommon
+	{
+		internal CtrGroupOrdered(params object[] controllers)
+		{
+			nextItem = 0;
+			groupsList = controllers.ToList();
+			if (groupsList == null)
+				throw new Exception("UrlControllersTest has invalid definition");
+		}
+
+		private int nextItem;
+
+		internal override bool ValidateNext(string controllerName)
+		{
+			bool retVal = true;
+			object obj = groupsList[nextItem];
+			if (obj is CtrGroupUnordered)
+			{
+				var ctrUnordered = obj as CtrGroupUnordered;
+				if (!ctrUnordered.ValidateNext(controllerName))
 				{
-					testControllers.Add(obj as UrlGroup);
+					retVal = false;
 				}
 				else
 				{
-					throw new Exception("UrlControllersTest has invalid definition");
+					if (ctrUnordered.Processed)
+						nextItem++;
 				}
+			} else 
+			{
+				String str = obj as String;
+				if (str != controllerName)
+				{
+					retVal = false;
+				}
+				else
+				{
+					nextItem++;
+				}
+
 			}
 
+
+			Processed = (nextItem >= groupsList.Count);
+			return retVal;
 		}
 
-		private string testName;
-		private string testUrl;
-		private List<UrlGroup> testControllers;
+
+
+	}
+
+
+
+    internal class UrlControllersTest
+    {
+        internal UrlControllersTest(string name, string url, params object[] controllers)
+        {
+            testUrl = url;
+
+			rootGroup = new CtrGroupOrdered(controllers);
+        }
+
+        string testUrl;
+		CtrGroupOrdered rootGroup;
 
 		public void Validate(IControllerDispatcher dispatcher)
 		{
 			Func<String,ControllerInvocationInfo,String> sumStr = (oldStr, invInfo) => oldStr += "+" + invInfo.BindPoint.Controller.ControllerTypeName;
 			var ctrlrs = dispatcher.GetControllers(testUrl);
-			int count = testControllers.Sum(group => group.Count);
-			Assert.AreEqual(count, ctrlrs.Length, "Controller queues lengths are different. Test name:{0}; Controllers returned:{1}", testName, 
-				ctrlrs.Aggregate(string.Empty,sumStr ));
-			int i = 0;
-			int j = 0;
+            Assert.AreEqual(rootGroup.GetCount(), ctrlrs.Length, "Controller queues lengths are different.");
 
+			int i = 0;
 			foreach (var controllerInfo in ctrlrs)
 			{
-				if (j == testControllers[i].Count)
-				{
-					j = 0;
-					i++;
-				}
-				Assert.IsTrue(testControllers[i].CheckEqual(controllerInfo.BindPoint.Controller.ControllerTypeName), "Controller names are different at position: {0},{1}; TestName:{2}; ControllersReturned: {3}", i, j, testName, ctrlrs.Aggregate(string.Empty, sumStr));
-				j++;
-
+				Assert.IsTrue(rootGroup.ValidateNext(controllerInfo.BindPoint.Controller.ControllerTypeName), "Controller names are different at position: {0}", i);
+				i++;
 			}
 
 

@@ -1060,9 +1060,9 @@ namespace Bistro.UnitTests.Tests
                 );
             #endregion
 
-            #region tree - one controller - 3 bindings (tree)
+            #region tree - one controller - 3 bindings (tree) - DUPLICATE CONTROLLERS
             NewTestWithUrl(
-                "tree - one controller - 3 bindings (tree)",
+				"tree - one controller - 3 bindings (tree) - DUPLICATE CONTROLLERS",
                 Types(Type(
                     "Controller1",
                     Attributes(
@@ -1093,9 +1093,9 @@ namespace Bistro.UnitTests.Tests
                 );
             #endregion
 
-            #region tree - one generic one specific
+            #region tree - one generic one specific - DUPLICATE CONTROLLERS
             NewTestWithUrl(
-                "tree - one generic one specific",
+				"tree - one generic one specific - DUPLICATE CONTROLLERS",
                 Types(Type(
                     "Controller1",
                     Attributes(
@@ -1145,9 +1145,9 @@ namespace Bistro.UnitTests.Tests
 
 
             // Note that there's questionmark here, without leading slash
-            #region tree - one generic one specific - reversed
+            #region tree - one generic one specific - reversed - DUPLICATE CONTROLLERS
             NewTestWithUrl(
-                "tree - one generic one specific - reversed",
+				"tree - one generic one specific - reversed - DUPLICATE CONTROLLERS",
                 Types(
                     Type("Controller2", BindAttribute("?")),
                     Type(

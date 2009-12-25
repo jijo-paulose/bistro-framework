@@ -187,7 +187,7 @@ namespace Bistro.MethodsEngine.Subsets
             StringBuilder tempsb = bindPointsList.Aggregate(new StringBuilder(),(oldStr,bpd) => oldStr.Append(bpd.Controller.ControllerTypeName).Append(":").Append(bpd.Target).Append("\r\n"));
             
 
-            engine.Logger.Report(Messages.ListSorted,tempsb.ToString());
+//            engine.Logger.Report(Messages.ListSorted,tempsb.ToString());
 
             var securityControllers = new List<IMethodsBindPointDesc>();
 

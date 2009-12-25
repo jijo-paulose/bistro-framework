@@ -269,7 +269,7 @@ namespace Bistro.MethodsEngine.Subsets
 			if ((requestComponents.Count == 1) || (lengthWithoutEndParams == 1 && this.items.Count == 1))
 			{
 				// return true if bind verb is equal with request's bind verb
-				return ((requestComponents.Count == 1) &&(lengthWithoutEndParams == 1) && (this.items.Count == 1) && (requestComponents[0] == this.items[0][0]));
+				return ((requestComponents.Count == 1) && (lengthWithoutEndParams == 1) && ((this.items.Count == 1) ||(this.items.Count == 2)) && (requestComponents[0] == this.items[0][0]));
 			}
 
 

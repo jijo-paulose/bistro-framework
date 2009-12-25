@@ -29,6 +29,7 @@ using System.Xml;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers.Dispatch;
 using Bistro.Interfaces;
+using System.Diagnostics;
 
 namespace Bistro.Controllers
 {
@@ -133,9 +134,16 @@ If this assembly contains controllers, the exception may be caused by assembly v
         {
             try
             {
-                foreach (Type t in assm.GetTypes())
-                    if (t.GetInterface(typeof(IController).Name) != null)
-                        LoadType(t);
+				var aaa = assm.GetTypes();
+				int i = 0;
+				int j = aaa.Length;
+				foreach (Type t in aaa)
+				{
+					if (t.GetInterface(typeof(IController).Name) != null)
+						LoadType(t);
+					Trace.WriteLine(String.Format("------------------------CONTROLLERS PROCESSED: {0} of {1}", i, j));
+					i++;
+				}
             }
             catch (ReflectionTypeLoadException ex)
             {

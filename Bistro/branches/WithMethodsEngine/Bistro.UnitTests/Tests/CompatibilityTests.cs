@@ -154,9 +154,6 @@ namespace Bistro.UnitTests.Tests
 			initSh.ControllerManagerFactory = "Bistro.UnitTests.Support.CustomManager.TestControllerManagerFactory, Bistro.UnitTests";
 			initSh.Application = "Bistro.UnitTests.Support.CustomManager.TestApplication, Bistro.UnitTests";
 
-
-
-
 		}
 
 		/// <summary>
@@ -188,7 +185,10 @@ namespace Bistro.UnitTests.Tests
 			TestDescriptor descriptor = (TestDescriptor)test;
 
 
-			Application.Initialize(initSh);
+			if (Application.Instance == null)
+				Application.Initialize(initSh);
+
+			(Application.Instance as TestApplication).InitAfter(initSh);
 
 			application = Application.Instance;
 			manager = application.ManagerFactory.GetManagerInstance();

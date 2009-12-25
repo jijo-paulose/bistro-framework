@@ -7,6 +7,7 @@ using Bistro.UnitTests.Support.Reflection;
 using Bistro.Controllers.Descriptor;
 using Bistro.Controllers.Descriptor.Data;
 using Bistro.Interfaces;
+using System.Diagnostics;
 
 namespace Bistro.UnitTests.Support.CustomManager
 {
@@ -38,7 +39,8 @@ namespace Bistro.UnitTests.Support.CustomManager
                 };
             #endregion
 
-
+			int i = 0;
+			int j = controllersList.Count();
             foreach (ITypeInfo typeInfo in controllersList)
             {
 
@@ -100,6 +102,7 @@ namespace Bistro.UnitTests.Support.CustomManager
                     bindsTemp,
                     logger);
                 RegisterController(testDescriptor);
+				i++;
             }
         }
 

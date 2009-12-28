@@ -14,10 +14,10 @@ namespace NoRecruiters.Controllers
     open System.Text.RegularExpressions
     open System.Web
     
-    open NoRecruiters.Data.Enums
-    open NoRecruiters.Data.Enums.Content
-    open NoRecruiters.Data.Enums.User
-    open NoRecruiters.Data.Enums.Common
+    open NoRecruiters.Enums
+    open NoRecruiters.Enums.Content
+    open NoRecruiters.Enums.User
+    open NoRecruiters.Enums.Common
     
     module Home =
         [<Bind("/default/{preferenceReset}"); ReflectedDefinition>]

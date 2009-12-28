@@ -1,6 +1,6 @@
 ﻿#light
 
-namespace NoRecruiters.Data.Enums
+namespace NoRecruiters.Enums
 
 open System
 

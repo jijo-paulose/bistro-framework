@@ -3,7 +3,7 @@
 namespace NoRecruiters.Filters
 
 open NDjango.Interfaces
-open NoRecruiters.Data.Enums.Content
+open NoRecruiters.Enums.Content
 
 [<Name("ascontenttype")>]
 type ContentTypeFilter =

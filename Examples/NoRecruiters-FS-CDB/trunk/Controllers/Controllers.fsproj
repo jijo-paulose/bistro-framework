@@ -60,9 +60,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums.fs" />
+    <Compile Include="Data.fs" />
     <Compile Include="Home.fs" />
     <Compile Include="Filters.fs" />
     <Compile Include="Postings.fs" />
+    <Compile Include="Aspects.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FunctionalDivan\FunctionalDivan.fsproj">
+      <Name>FunctionalDivan</Name>
+      <Project>{1d9e1b95-4d9c-4eb3-82c5-a2a037ef8fbb}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

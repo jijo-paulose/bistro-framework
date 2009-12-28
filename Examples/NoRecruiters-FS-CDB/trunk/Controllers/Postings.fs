@@ -14,10 +14,12 @@ namespace NoRecruiters.Controllers
     open System.Text.RegularExpressions
     open System.Web
     
-    open NoRecruiters.Data.Enums
-    open NoRecruiters.Data.Enums.Content
-    open NoRecruiters.Data.Enums.User
-    open NoRecruiters.Data.Enums.Common
+    open NoRecruiters.Enums
+    open NoRecruiters.Enums.Content
+    open NoRecruiters.Enums.User
+    open NoRecruiters.Enums.Common
+    
+    open NoRecruiters.Data
 
     module Search =
         [<Bind("get /postings/{contentType}?{firstTime}"); ReflectedDefinition>]
@@ -28,16 +30,12 @@ namespace NoRecruiters.Controllers
         
         [<Bind("get /postings/{contentType}?{firstTime}")>]
         [<RenderWith("Views/Posting/search.django"); ReflectedDefinition>]
-        let searchC (txtQuery: string form) currentTags =
-            let getCurrentTagsAsCDL = function
-            | Some v ->
-                match v with
-                | [] -> ""
-                | _ -> v |> List.fold (fun s e -> match s with | "" -> e | _ -> s + "," + e) ""
-            | None -> ""
+        let searchC (txtQuery: string form) currentTags contentType =
+            let popularTags = 
+                match currentTags with
+                | Some l ->
+                    Tags.rankedTags 15 |>
+                    List.filter (fun e -> not <| List.exists ((=) e) l) 
+                | None -> Tags.rankedTags 15
             
-            let getPopularTags tags =
-                Tags.RankedTags 15 |>
-                List.filter (fun e -> match tags with | Some v -> not <| List.exists ((=) e) v | None -> true) 
-            
-            Posting.Search txtQuery.Value (getCurrentTagsAsCDL currentTags) (Content.fromString contentType)
+            Postings.search (txtQuery.Value) currentTags (Content.fromString contentType)

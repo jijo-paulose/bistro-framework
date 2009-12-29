@@ -118,116 +118,122 @@ namespace Bistro.Controllers
         {
             logger.Report(Messages.ProcessingRequest, requestPoint);
 
-            try
-            {
-                ControllerInvocationInfo[] controllers = dispatcher.GetControllers(requestPoint);
+			try
+			{
+				ControllerInvocationInfo[] controllers = dispatcher.GetControllers(requestPoint);
 
-                if (controllers.Length == 0)
-                {
-                    logger.Report(Messages.ControllerNotFound, requestPoint);
-                    throw new WebException(StatusCode.NotFound, String.Format("'{0} could not be found", requestPoint));
-                }
+				if (controllers.Length == 0)
+				{
+					logger.Report(Messages.ControllerNotFound, requestPoint);
+					throw new WebException(StatusCode.NotFound, String.Format("'{0} could not be found", requestPoint));
+				}
 
-                bool securityCheckComplete = false;
-                bool securityCheckFailed = false;
-                var failedPermissions = new Dictionary<string, KeyValuePair<FailAction, string>>();
+				bool securityCheckComplete = false;
+				bool securityCheckFailed = false;
+				var failedPermissions = new Dictionary<string, KeyValuePair<FailAction, string>>();
 
-                foreach (ControllerInvocationInfo info in controllers)
-                {
-                    IController controller = manager.GetController(info, context, requestContext);
+				foreach (ControllerInvocationInfo info in controllers)
+				{
+					IController controller = manager.GetController(info, context, requestContext);
 
-                    try
-                    {
-                        // all security controllers are guaranteed to be at the top of the list, in proper order.
-                        // we need to run through all of them, because an inner controller may override the decision 
-                        // of an outer controller. therefore, the final decision is deferred until all security checks
-                        // have passed
-                        if (!securityCheckComplete)
-                        {
-                            ISecurityController securityController = controller as ISecurityController;
-                            if (securityController == null)
-                                securityCheckComplete = true;
-                            else
-                            {
-                                // this needs to run prior to the check
-                                controller.ProcessRequest(context, requestContext);
+					try
+					{
+						// all security controllers are guaranteed to be at the top of the list, in proper order.
+						// we need to run through all of them, because an inner controller may override the decision 
+						// of an outer controller. therefore, the final decision is deferred until all security checks
+						// have passed
+						if (!securityCheckComplete)
+						{
+							ISecurityController securityController = controller as ISecurityController;
+							if (securityController == null)
+								securityCheckComplete = true;
+							else
+							{
+								// this needs to run prior to the check
+								controller.ProcessRequest(context, requestContext);
 
-                                // we only care about the actual return value of the last controller, as intermediate
-                                // results can be overriden by subsequent controllers. discard intermediate return values.
-                                securityCheckFailed = !securityController.HasAccess(requestContext, failedPermissions);
-                            }
-                        }
+								// we only care about the actual return value of the last controller, as intermediate
+								// results can be overriden by subsequent controllers. discard intermediate return values.
+								securityCheckFailed = !securityController.HasAccess(requestContext, failedPermissions);
+							}
+						}
 
-                        // we have to do the check a second time, because the securityCheckComplete flag
-                        // gets set inside the top if. doing this in an else up top would skip the first
-                        // non-security controller
-                        if (securityCheckComplete)
-                        {
-                            if (securityCheckFailed || failedPermissions.Count != 0)
-                            {
-                                StringBuilder builder = new StringBuilder();
-                                foreach (string perm in failedPermissions.Keys)
-                                    builder.AppendLine(perm);
+						// we have to do the check a second time, because the securityCheckComplete flag
+						// gets set inside the top if. doing this in an else up top would skip the first
+						// non-security controller
+						if (securityCheckComplete)
+						{
+							if (securityCheckFailed || failedPermissions.Count != 0)
+							{
+								StringBuilder builder = new StringBuilder();
+								foreach (string perm in failedPermissions.Keys)
+									builder.AppendLine(perm);
 
-                                foreach (KeyValuePair<FailAction, string> kvp in failedPermissions.Values)
-                                    if (kvp.Key == FailAction.Redirect)
-                                    {
-                                        // currently you can only house one transfer request per context, 
-                                        // however, that may change in the future.
-                                        requestContext.ClearTransferRequest();
+								foreach (KeyValuePair<FailAction, string> kvp in failedPermissions.Values)
+									if (kvp.Key == FailAction.Redirect)
+									{
+										// currently you can only house one transfer request per context, 
+										// however, that may change in the future.
+										requestContext.ClearTransferRequest();
 
-                                        // give the fail action target a chance to redirect after re-validating
-                                        requestContext.Transfer(
-                                            kvp.Value +
-                                            (kvp.Value.Contains("?") ? "&" : "?") +
-                                            "originalRequest=" +
-                                            HttpUtility.UrlEncode(requestPoint));
+										// give the fail action target a chance to redirect after re-validating
+										requestContext.Transfer(
+											kvp.Value +
+											(kvp.Value.Contains("?") ? "&" : "?") +
+											"originalRequest=" +
+											HttpUtility.UrlEncode(requestPoint));
 
-                                        logger.Report(Messages.SecurityRedirect, kvp.Value, builder.ToString());
-                                        break;
-                                    }
+										logger.Report(Messages.SecurityRedirect, kvp.Value, builder.ToString());
+										break;
+									}
 
-                                if (!requestContext.TransferRequested)
-                                    throw new WebException(StatusCode.Unauthorized, "Access denied");
-                                else
-                                    // break out of the controller loop. we shouldn't be processing any more
-                                    // controllers for this request, and need to get into whatever the security
-                                    // guys requested
-                                    break;
-                            }
-                            else
-                            {
-                                if (info.BindPoint.Controller.DefaultTemplates.Count > 0)
-                                    requestContext.Response.RenderWith(info.BindPoint.Controller.DefaultTemplates);
+								if (!requestContext.TransferRequested)
+									throw new WebException(StatusCode.Unauthorized, "Access denied");
+								else
+									// break out of the controller loop. we shouldn't be processing any more
+									// controllers for this request, and need to get into whatever the security
+									// guys requested
+									break;
+							}
+							else
+							{
+								if (info.BindPoint.Controller.DefaultTemplates.Count > 0)
+									requestContext.Response.RenderWith(info.BindPoint.Controller.DefaultTemplates);
 
-                                controller.ProcessRequest(context, requestContext);
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        manager.ReturnController(controller, context, requestContext);
-                    }
-                }
+								controller.ProcessRequest(context, requestContext);
+							}
+						}
+					}
+					finally
+					{
+						manager.ReturnController(controller, context, requestContext);
+					}
+				}
 
-                if (requestContext.TransferRequested)
-                {
-                    string transferRequestPoint = BindPointUtilities.VerbQualify(requestContext.TransferTarget, "get");
-                    requestContext.ClearTransferRequest();
+				if (requestContext.TransferRequested)
+				{
+					string transferRequestPoint = BindPointUtilities.VerbQualify(requestContext.TransferTarget, "get");
+					requestContext.ClearTransferRequest();
 
-                    InvokeMethod(context, transferRequestPoint, requestContext);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!IsMethodDefinedExplicitly(Application.UnhandledException))
-                    throw new ApplicationException("Unhandled exception, and no binding to " + Application.UnhandledException + " found.", ex);
+					InvokeMethod(context, transferRequestPoint, requestContext);
+				}
+			}
+			catch (Exception ex)
+			{
+				if (!IsMethodDefinedExplicitly(Application.UnhandledException))
+				{
+					//Special branch for web exception
+					if (ex is WebException)
+						throw ex;
+					else 
+						throw new ApplicationException("Unhandled exception, and no binding to " + Application.UnhandledException + " found.", ex);
+				}
 
-                requestContext.Clear();
-                requestContext.Add("unhandledException", ex);
+				requestContext.Clear();
+				requestContext.Add("unhandledException", ex);
 
-                InvokeMethod(context, Application.UnhandledException, requestContext);
-            }
+				InvokeMethod(context, Application.UnhandledException, requestContext);
+			}
         }
     }
 }

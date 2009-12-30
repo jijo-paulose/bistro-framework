@@ -12,23 +12,33 @@ module Data =
         db "nr"
 
     module Entities =
-        type baseDocument() =
-            inherit Divan.CouchDocument()
+        type tag = {
+            id: string; rev: string;
+            tagText: string
+            safeText: string
+            }
 
-        type tag() =
-            inherit baseDocument()
-            member x.text with get() = "hi"
-
-        type posting() =
-            inherit baseDocument()
-            //override x.WriteJson writer =
-                
-            
-            
+        type posting = {
+            id: string; rev: string;
+            tags: tag list
+            userId: string
+            createdOn: System.DateTime
+            updatedOn: System.DateTime
+            heading: string
+            shortname: string
+            shorttext: string
+            views: int
+            deleted: bool
+            flagged: bool
+            published: bool
+            active: bool
+            contents: string
+            contentType: int
+            }
 
     module Tags =
         let rankedTags num = 
-            selectDocs<Entities.tag> (
+            selectRecords<Entities.tag> (
                 query "items" "alltags" database |> limitTo num
                 )
             
@@ -39,10 +49,11 @@ module Data =
             let t = 
                 match tags with 
                 | Some t when (List.length t) > 0 -> 
-                    sprintf "text:\"%s\" or title:\"%s\" and (tag:%s)" text text (System.String.Join(" or tag:", Array.ofList (List.map (fun (e: Entities.tag) -> e.text)  t)))
+                    sprintf "text:\"%s\" or title:\"%s\" and (tag:%s)" text text 
+                        (System.String.Join(" or tag:", Array.ofList (List.map (fun (e: Entities.tag) -> e.safeText)  t)))
                 | _ -> sprintf "text:\"%s\" or title:\"%s\"" text text 
                 
-            selectDocs<Entities.posting> (
+            selectRecords<Entities.posting> (
                 query "items" "all" database |>
                 q t
                 )

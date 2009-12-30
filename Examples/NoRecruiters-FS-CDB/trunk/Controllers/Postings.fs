@@ -38,4 +38,5 @@ namespace NoRecruiters.Controllers
                     List.filter (fun e -> not <| List.exists ((=) e) l) 
                 | None -> Tags.rankedTags 15
             
-            Postings.search (txtQuery.Value) currentTags (Content.fromString contentType)
+            popularTags, 
+            (Postings.search (txtQuery.Value) currentTags (Content.fromString contentType)) |> named "searchResults"

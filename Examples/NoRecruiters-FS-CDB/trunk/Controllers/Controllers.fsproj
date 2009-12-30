@@ -42,6 +42,10 @@
       <HintPath>C:\Development\NoRecruiters-FS-CDB\lib\Divan.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="FunctionalDivan">
+      <HintPath>C:\Development\NoRecruiters-FS-CDB\lib\FunctionalDivan.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core" />
     <Reference Include="NDjango.Core">
@@ -65,13 +69,6 @@
     <Compile Include="Filters.fs" />
     <Compile Include="Postings.fs" />
     <Compile Include="Aspects.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FunctionalDivan\FunctionalDivan.fsproj">
-      <Name>FunctionalDivan</Name>
-      <Project>{1d9e1b95-4d9c-4eb3-82c5-a2a037ef8fbb}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -3,19 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Bistro.Designer.ProjectBase;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace Bistro.Designer.Projects.FSharp
 {
     public class ProjectManager : ProjectNode
     {
-        private DesignerPackage package;
+        private static ImageList imageList;
 
+        static ProjectManager()
+        {
+            imageList = Utilities.GetImageList(
+                typeof(ProjectNode).Assembly.GetManifestResourceStream("Bistro.Designer.Resources.Root.bmp"));
+        }
+
+        int imageIndex;
         public ProjectManager(DesignerPackage package)
         {
-            this.package = package;
+            Package = package;
 
             // I would rather override the property to always return true
             this.SupportsProjectDesigner = true;
+            imageIndex = this.ImageHandler.ImageList.Images.Count;
+            foreach (Image img in imageList.Images)
+            {
+                this.ImageHandler.AddImage(img);
+            }
 
             InitializeCATIDs();
         }
@@ -39,6 +53,17 @@ namespace Bistro.Designer.Projects.FSharp
             // We could also provide CATIDs for references and the references container node, if we wanted to.
         }
 
+        public override int ImageIndex
+        {
+            get
+            {
+                return imageIndex;
+            }
+        }
+
+        /// <summary>
+        /// Returns the project type guid AKA the guid of the project factory type
+        /// </summary>
         public override Guid ProjectGuid
         {
             get { return typeof(Factory).GUID; }

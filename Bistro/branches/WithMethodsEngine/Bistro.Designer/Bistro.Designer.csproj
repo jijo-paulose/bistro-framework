@@ -214,7 +214,8 @@
       <DependentUpon>DontShowAgainDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectBase\ProjectBase.resx">
-      <DependentUpon>ProjectBase.cs</DependentUpon>
+      <Visible>true</Visible>
+      <LogicalName>Bistro.Designer.ProjectBase.resources</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectBase\SecurityWarningDialog.resx">
       <DependentUpon>SecurityWarningDialog.cs</DependentUpon>
@@ -243,11 +244,155 @@
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
     <None Include="Resources\Images_32bit.bmp" />
     <None Include="Resources\Images_24bit.bmp" />
-    <None Include="Templates\Projects\FSharp\FSharpProject.bfsproj" />
+    <EmbeddedResource Include="Resources\Root.bmp" />
+    <EmbeddedResource Include="Resources\imagelis.bmp">
+      <Visible>true</Visible>
+      <LogicalName>Resources.imagelis.bmp</LogicalName>
+    </EmbeddedResource>
+    <Content Include="Resources\Package.ico" />
+  </ItemGroup>
+  <!-- Browser file -->
+  <ItemGroup>
+    <ZipItem Include="Templates\ProjectItems\BrowserFile\BrowserFile.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\BrowserFile\BrowserFile.Browser">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+  </ItemGroup>
+  <!-- JScript file -->
+  <ItemGroup>
+    <ZipItem Include="Templates\ProjectItems\JScript\JScript.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\JScript\JScript.js">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+  </ItemGroup>
+  <!-- StyleSheet file -->
+  <ItemGroup>
+    <ZipItem Include="Templates\ProjectItems\StyleSheet\StyleSheet.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\StyleSheet\StyleSheet.css">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+  </ItemGroup>
+  <!-- WebConfig file -->
+  <ItemGroup>
+    <ZipItem Include="Templates\ProjectItems\WebConfig\WebConfig.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\WebConfig\Web.Config">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+  </ItemGroup>
+  <!-- HTML page -->
+  <ItemGroup>
+    <ZipItem Include="Templates\ProjectItems\WebHTMLPage\WebHTMLPage.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\WebHTMLPage\HTMLPage.htm">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+  </ItemGroup>
+  <!-- Basic (empty) NDjango template -->
+  <ItemGroup>
+    <ZipItem Include="Templates\ProjectItems\NDjango\NDjango.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\NDjango\NDjango.django">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\NDjango\NDjango.ico">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+  </ItemGroup>
+  <!-- Empty text file -->
+  <ItemGroup>
+    <ZipItem Include="Templates\ProjectItems\Text\Text.ico">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\Text\TextFile.txt">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\Text\TextFile.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+  </ItemGroup>
+  <!-- Fsharp source code -->
+  <ItemGroup>
+    <ZipItem Include="Templates\ProjectItems\FSharp\CodeFile.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
+    <ZipItem Include="Templates\ProjectItems\FSharp\CodeFile.fs">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipItem>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\Package.ico" />
-    <Content Include="Templates\Projects\FSharp\FSharpProject.ico" />
+    <ZipProject Include="Templates\Projects\FSharp\base.django">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\Controllers.fs">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\FSharpProject.bfsproj">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\home.django">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\Web.config">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\Bistro.Core.dll">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\Bistro.Core.pdb">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\Bistro.Extensions.dll">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\Bistro.Extensions.pdb">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\Bistro.FSharpExtensions.dll">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\Bistro.FSharpExtensions.pdb">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\default.htm">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\FSharpProject.ico">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\FSharpProject.vstemplate">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\NDjango.BistroIntegration.dll">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\NDjango.BistroIntegration.pdb">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\NDjango.Core.dll">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\NDjango.Core.pdb">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\NDjango.Filters.dll">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\NDjango.Filters.pdb">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
+    <ZipProject Include="Templates\Projects\FSharp\StructureMap.dll">
+      <OutputSubPath>Bistro</OutputSubPath>
+    </ZipProject>
   </ItemGroup>
   <PropertyGroup>
     <!--

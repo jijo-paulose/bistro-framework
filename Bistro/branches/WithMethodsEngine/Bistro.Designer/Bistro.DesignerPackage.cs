@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Bistro.Designer.Explorer;
+using Bistro.Designer.ProjectBase;
 
 namespace Bistro.Designer
 {
@@ -47,15 +48,20 @@ namespace Bistro.Designer
 
     [ProvideProjectFactory(
         typeof(Projects.FSharp.Factory), 
-        "Bistro",
+        null,
         "Bistro Project Files (*.bfsproj);*.bfsproj", 
         "bfsproj",                                      // default project file extension
         "bfsproj",                                      // possible project file extensions
-        @"..\..\Templates\Projects\FSharp",             // template directory .\\NullPath indicates that
-        LanguageVsTemplate = "Bistro")]                 // template registration key
+        @".\NullPath",                                  // template directory .\\NullPath indicates that
+                                                        // the template directory will not be used, instead
+                                                        // the zipped templates will be scanned for vstemplate
+                                                        // files with project type equal to template registartion key 
+        LanguageVsTemplate = "Bistro")]                 // the value of the template registration key. This value 
+                                                        // will also be used as the name of the node grouping
+                                                        // projects in the AddNewProject dialog
 
     [Guid(Guids.guidBistro_DesignerPkgString)]
-    public sealed class DesignerPackage : Package
+    public sealed class DesignerPackage : ProjectPackage
     {
         /// <summary>
         /// Default constructor of the package.

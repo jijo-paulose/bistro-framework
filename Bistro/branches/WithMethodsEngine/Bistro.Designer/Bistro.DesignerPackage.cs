@@ -47,11 +47,11 @@ namespace Bistro.Designer
 
     [ProvideProjectFactory(
         typeof(Projects.FSharp.Factory), 
-        "Bistro", 
-        "Bistro Project Files (*.pyproj);*.pyproj", 
+        "Bistro",
+        "Bistro Project Files (*.bfsproj);*.bfsproj", 
         "bfsproj",                                      // default project file extension
         "bfsproj",                                      // possible project file extensions
-        ".\\NullPath",                                  // template directory .\\NullPath indicates that
+        @"..\..\Templates\Projects\FSharp",             // template directory .\\NullPath indicates that
         LanguageVsTemplate = "Bistro")]                 // template registration key
 
     [Guid(Guids.guidBistro_DesignerPkgString)]

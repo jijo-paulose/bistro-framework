@@ -107,5 +107,13 @@ namespace Bistro.Designer.Projects.FSharp
             //}
             return service;
         }
+
+        protected override Guid[] GetConfigurationIndependentPropertyPages()
+        {
+            Guid[] result = new Guid[1];
+            result[0] = typeof(BuildPropertyPage).GUID;
+            return result;
+        }
+
     }
 }

@@ -243,9 +243,11 @@
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
     <None Include="Resources\Images_32bit.bmp" />
     <None Include="Resources\Images_24bit.bmp" />
+    <None Include="Templates\Projects\FSharp\FSharpProject.bfsproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Package.ico" />
+    <Content Include="Templates\Projects\FSharp\FSharpProject.ico" />
   </ItemGroup>
   <PropertyGroup>
     <!--

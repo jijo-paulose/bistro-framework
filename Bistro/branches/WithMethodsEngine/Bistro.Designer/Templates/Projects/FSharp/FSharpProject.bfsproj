@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup>
+  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+  <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+  <ProductVersion>8.0.30703</ProductVersion>
+  <SchemaVersion>2.0</SchemaVersion>
+  <ProjectGuid>$guid1$</ProjectGuid>
+  <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{D6F4F6FE-916A-48cc-8A39-2C9D97B0A53C};{f2a71f9b-5d33-465a-a702-920d77279786}</ProjectTypeGuids>
+  <OutputType>Library</OutputType>
+  <RootNamespace>$safeprojectname$</RootNamespace>
+  <AssemblyName>$safeprojectname$</AssemblyName>
+  <TargetFrameworkVersion>v$targetframeworkversion$</TargetFrameworkVersion>
+ </PropertyGroup>
+ <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <DebugSymbols>true</DebugSymbols>
+  <DebugType>full</DebugType>
+  <Optimize>false</Optimize>
+  <Tailcalls>false</Tailcalls>
+  <OutputPath>bin\</OutputPath>
+  <DefineConstants>DEBUG;TRACE</DefineConstants>
+  <WarningLevel>3</WarningLevel>
+ </PropertyGroup>
+ <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <DebugType>pdbonly</DebugType>
+   <Optimize>true</Optimize>
+  <Tailcalls>true</Tailcalls>
+  <OutputPath>bin\</OutputPath>
+  <DefineConstants>TRACE</DefineConstants>
+  <WarningLevel>3</WarningLevel>
+ </PropertyGroup>
+ <ItemGroup>
+  <Reference Include="mscorlib"/>
+  <Reference Include="FSharp.Core"/>
+  <Reference Include="System"/>
+  <!-- $if$ ($targetframeworkversion$ == 3.5) -->
+  <Reference Include="System.Core">
+   <RequiredTargetFramework>3.5</RequiredTargetFramework>
+  </Reference>
+  <!-- $endif$ -->
+  <Reference Include="Bistro.Core, Version=0.9.2.0, Culture=neutral, PublicKeyToken=null">
+   <Name>Bistro.Core</Name>
+   <AssemblyName>Bistro.Core.dll</AssemblyName>
+   <HintPath>lib\Bistro.Core.dll</HintPath>
+   <Private>True</Private>
+  </Reference>
+  <Reference Include="Bistro.Extensions, Version=0.9.2.0, Culture=neutral, PublicKeyToken=null">
+   <Name>Bistro.Extensions</Name>
+   <AssemblyName>Bistro.Extensions.dll</AssemblyName>
+   <HintPath>lib\Bistro.Extensions.dll</HintPath>
+   <Private>True</Private>
+  </Reference>
+  <Reference Include="Bistro.FSharpExtensions, Version=0.9.5.0, Culture=neutral, PublicKeyToken=null">
+   <Name>Bistro.FSharpExtensions</Name>
+   <AssemblyName>Bistro.FSharpExtensions.dll</AssemblyName>
+   <HintPath>lib\Bistro.FSharpExtensions.dll</HintPath>
+   <Private>True</Private>
+  </Reference>
+  <Reference Include="NDjango.BistroIntegration, Version=0.9.1.2, Culture=neutral, PublicKeyToken=null">
+   <Name>NDjango.BistroIntegration</Name>
+   <AssemblyName>NDjango.BistroIntegration.dll</AssemblyName>
+   <HintPath>lib\NDjango.BistroIntegration.dll</HintPath>
+   <Private>True</Private>
+  </Reference>
+  <Reference Include="NDjango.Core, Version=0.9.6.0, Culture=neutral, PublicKeyToken=null">
+   <Name>NDjango.Core</Name>
+   <AssemblyName>NDjango.Core.dll</AssemblyName>
+   <HintPath>lib\NDjango.Core.dll</HintPath>
+   <Private>True</Private>
+  </Reference>
+  <Reference Include="NDjango.Filters, Version=0.9.1.2, Culture=neutral, PublicKeyToken=null">
+   <Name>NDjango.Filters</Name>
+   <AssemblyName>NDjango.Filters.dll</AssemblyName>
+   <HintPath>lib\NDjango.Filters.dll</HintPath>
+   <Private>True</Private>
+  </Reference>
+  <Reference Include="StructureMap, Version=2.5.3.0, Culture=neutral, PublicKeyToken=e60ad81abae3c223">
+   <Name>StructureMap</Name>
+   <AssemblyName>StructureMap.dll</AssemblyName>
+   <HintPath>lib\StructureMap.dll</HintPath>
+   <Private>True</Private>
+  </Reference>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="lib\Bistro.Core.dll"/>
+  <None Include="lib\Bistro.Extensions.dll"/>
+  <None Include="lib\Bistro.FSharpExtensions.dll"/>
+  <None Include="lib\NDjango.BistroIntegration.dll"/>
+  <None Include="lib\NDjango.Core.dll"/>
+  <None Include="lib\NDjango.Filters.dll"/>
+  <None Include="lib\StructureMap.dll"/>
+ </ItemGroup>
+ <ItemGroup>
+  <Compile Include="Controllers\Controllers.fs" />
+ </ItemGroup>
+ <ItemGroup>
+  <Content Include="Views\base.django"/>
+  <Content Include="Views\home.django"/>
+ </ItemGroup>
+ <ItemGroup>
+  <Content Include="Web.config"/>
+  <Content Include="Default.htm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <Folder Include="App_Data" />
+  <Folder Include="Controllers" />
+  <Folder Include="Properties" />
+ </ItemGroup>
+ <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" />
+ <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+      Other similar extension points exist, see Microsoft.Common.targets.
+ <Target Name="BeforeBuild">
+ </Target>
+ <Target Name="AfterBuild">
+ </Target>
+ -->
+ </Project>

@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -198,8 +199,22 @@
     <Compile Include="ProjectBase\Utilities.cs" />
     <Compile Include="ProjectBase\VsCommands.cs" />
     <Compile Include="ProjectBase\VSShellUtilities.cs" />
+    <Compile Include="Projects\FSharp\CompilerPropertyContainer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Projects\FSharp\CompilerPropertyControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Projects\FSharp\CompilerPropertyControl.Designer.cs">
+      <DependentUpon>CompilerPropertyControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Projects\FSharp\ConfigProvider.cs" />
     <Compile Include="Projects\FSharp\Factory.cs" />
+    <Compile Include="Projects\FSharp\ProjectConfig.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
+    <Compile Include="Projects\FSharp\PropertyTabContainer.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -244,6 +259,9 @@
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
     <None Include="Resources\Images_32bit.bmp" />
     <None Include="Resources\Images_24bit.bmp" />
+    <EmbeddedResource Include="Projects\FSharp\CompilerPropertyControl.resx">
+      <DependentUpon>CompilerPropertyControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Root.bmp" />
     <EmbeddedResource Include="Resources\imagelis.bmp">
       <Visible>true</Visible>

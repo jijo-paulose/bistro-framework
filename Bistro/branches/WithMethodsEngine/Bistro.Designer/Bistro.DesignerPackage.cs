@@ -60,6 +60,9 @@ namespace Bistro.Designer
                                                         // will also be used as the name of the node grouping
                                                         // projects in the AddNewProject dialog
 
+    [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
+    [WAProvideProjectFactoryTemplateMapping("{" + Guids.guidFSharpProjectFactoryString + "}", typeof(Projects.FSharp.DummyWebFactory))]
+
     [Guid(Guids.guidBistro_DesignerPkgString)]
     public sealed class DesignerPackage : ProjectPackage
     {

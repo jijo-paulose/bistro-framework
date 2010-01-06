@@ -66,7 +66,7 @@ namespace Bistro.Designer.Projects.FSharp
         /// </summary>
         public override Guid ProjectGuid
         {
-            get { return typeof(Factory).GUID; }
+            get { return typeof(Factory).GUID; } 
         }
 
         public override string ProjectType
@@ -74,9 +74,9 @@ namespace Bistro.Designer.Projects.FSharp
             get { return "Bistro"; }
         }
 
-        protected override ConfigProvider CreateConfigProvider()
+        protected override ProjectBase.ConfigProvider CreateConfigProvider()
         {
-            return base.CreateConfigProvider();
+            return new ConfigProvider(this);
         }
 
         /// <summary>
@@ -110,8 +110,9 @@ namespace Bistro.Designer.Projects.FSharp
 
         protected override Guid[] GetConfigurationIndependentPropertyPages()
         {
-            Guid[] result = new Guid[1];
+            Guid[] result = new Guid[2];
             result[0] = typeof(BuildPropertyPage).GUID;
+            result[1] = typeof(CompilerPropertyPage).GUID;
             return result;
         }
 

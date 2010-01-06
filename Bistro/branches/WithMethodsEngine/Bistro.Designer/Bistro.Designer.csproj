@@ -199,18 +199,14 @@
     <Compile Include="ProjectBase\Utilities.cs" />
     <Compile Include="ProjectBase\VsCommands.cs" />
     <Compile Include="ProjectBase\VSShellUtilities.cs" />
-    <Compile Include="Projects\FSharp\CompilerPropertyContainer.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Projects\FSharp\CompilerPropertyControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Projects\FSharp\CompilerPropertyControl.Designer.cs">
       <DependentUpon>CompilerPropertyControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Projects\FSharp\ConfigProvider.cs" />
+    <Compile Include="Projects\FSharp\CompilerPropertyPage.cs" />
     <Compile Include="Projects\FSharp\Factory.cs" />
-    <Compile Include="Projects\FSharp\ProjectConfig.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
     <Compile Include="Projects\FSharp\PropertyTabContainer.cs">
       <SubType>Code</SubType>
@@ -223,6 +219,30 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VSSDKCSharpIncPath>$(VSSDK90Install)VisualStudioIntegration\Common\Source\CSharp</VSSDKCSharpIncPath>
+    <CommonRegAttributes>$(VSSDKCSharpIncPath)\RegistrationAttributes</CommonRegAttributes>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(CommonRegAttributes)\WebSiteProjectAttribute.cs">
+      <Link>RegistrationAttributes\WebSiteProjectAttribute.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonRegAttributes)\WebSiteProjectRelatedFilesAttribute.cs">
+      <Link>RegistrationAttributes\WebSiteProjectRelatedFilesAttribute.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonRegAttributes)\WAProvideLanguagePropertyAttribute.cs">
+      <Link>RegistrationAttributes\WAProvideLanguagePropertyAttribute.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonRegAttributes)\WAProvideProjectFactoryAttribute.cs">
+      <Link>RegistrationAttributes\WAProvideProjectFactoryAttribute.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonRegAttributes)\WAProvideProjectFactoryTemplateMappingAttribute.cs">
+      <Link>RegistrationAttributes\WAProvideProjectFactoryTemplateMappingAttribute.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonRegAttributes)\ProvideMSBuildTargetAttribute.cs">
+      <Link>RegistrationAttributes\ProvideMSBuildTargetAttribute.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">

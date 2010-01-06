@@ -74,11 +74,6 @@ namespace Bistro.Designer.Projects.FSharp
             get { return "Bistro"; }
         }
 
-        protected override ProjectBase.ConfigProvider CreateConfigProvider()
-        {
-            return new ConfigProvider(this);
-        }
-
         /// <summary>
         /// Creates the services exposed by this project.
         /// </summary>

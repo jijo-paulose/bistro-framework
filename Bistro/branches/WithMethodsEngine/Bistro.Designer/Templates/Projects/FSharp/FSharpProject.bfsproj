@@ -6,7 +6,8 @@
   <ProductVersion>8.0.30703</ProductVersion>
   <SchemaVersion>2.0</SchemaVersion>
   <ProjectGuid>$guid1$</ProjectGuid>
-	 <!-- ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{D6F4F6FE-916A-48cc-8A39-2C9D97B0A53C};{f2a71f9b-5d33-465a-a702-920d77279786}</ProjectTypeGuids -->
+  <!-- ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{D6F4F6FE-916A-48cc-8A39-2C9D97B0A53C};{f2a71f9b-5d33-465a-a702-920d77279786}</ProjectTypeGuids -->
+  <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{94887830-9110-3f61-84ae-beea7891c7e6}</ProjectTypeGuids>
   <OutputType>Library</OutputType>
   <RootNamespace>$safeprojectname$</RootNamespace>
   <AssemblyName>$safeprojectname$</AssemblyName>
@@ -33,6 +34,7 @@
   <Reference Include="mscorlib"/>
   <Reference Include="FSharp.Core"/>
   <Reference Include="System"/>
+  <Reference Include="System.Web"/>
   <!-- $if$ ($targetframeworkversion$ == 3.5) -->
   <Reference Include="System.Core">
    <RequiredTargetFramework>3.5</RequiredTargetFramework>

@@ -5,12 +5,14 @@ using System.Text;
 using Bistro.Designer.ProjectBase;
 using System.Drawing;
 using System.Windows.Forms;
+using Bistro.Designer.ProjectBase.Automation;
 
 namespace Bistro.Designer.Projects.FSharp
 {
     public class ProjectManager : ProjectNode
     {
         private static ImageList imageList;
+        private OAVSProject vsProject;
 
         static ProjectManager()
         {
@@ -49,7 +51,21 @@ namespace Bistro.Designer.Projects.FSharp
             //// Because our property page pass itself as the object to display in its grid, we need to make it have the same CATID
             //// as the browse object of the project node so that filtering is possible.
             //this.AddCATIDMapping(typeof(GeneralPropertyPage), typeof(PythonProjectNodeProperties).GUID);
-
+            
+            //AddCATIDMapping(typeof(FSharpProjectNodeProperties), typeof(FSharpProjectNodeProperties).GUID);
+            //FSharpProjectNode local11 = @this.@this.contents;
+            //int num11 = local11.GetHashCode;
+            //local11.AddCATIDMapping(typeof(FSharpFileNodeProperties), typeof(FSharpFileNodeProperties).GUID);
+            //FSharpProjectNode local12 = @this.@this.contents;
+            //int num12 = local12.GetHashCode;
+            //local12.AddCATIDMapping(typeof(FileNodeProperties), typeof(FSharpFileNodeProperties).GUID);
+            //FSharpProjectNode local13 = @this.@this.contents;
+            //int num13 = local13.GetHashCode;
+            //AddCATIDMapping(typeof(Microsoft.VisualStudio.FSharp.ProjectSystem.GeneralPropertyPage), typeof(ProjectNodeProperties).GUID);
+            //Notifier sourcesAndFlagsNotifier = @this.sourcesAndFlagsNotifier;
+            //FSharpProjectNode local14 = @this.@this.contents;
+            //int num14 = local14.GetHashCode;
+ 
             // We could also provide CATIDs for references and the references container node, if we wanted to.
         }
 
@@ -92,23 +108,46 @@ namespace Bistro.Designer.Projects.FSharp
             //{
             //    service = this.DesignerContext;
             //}
-            //else if (typeof(VSLangProj.VSProject) == serviceType)
-            //{
-            //    service = this.VSProject;
-            //}
-            //else if (typeof(EnvDTE.Project) == serviceType)
-            //{
-            //    service = this.GetAutomationObject();
-            //}
+            /*else*/ 
+            if (typeof(VSLangProj.VSProject) == serviceType)
+            {
+                service = this.VSProject;
+            }
+            else if (typeof(EnvDTE.Project) == serviceType)
+            {
+                service = this.GetAutomationObject();
+            }
             return service;
+        }
+
+        /// <summary>
+        /// Get the VSProject corresponding to this project
+        /// </summary>
+        protected internal VSLangProj.VSProject VSProject
+        {
+            get
+            {
+                if (vsProject == null)
+                    vsProject = new OAVSProject(this);
+                return vsProject;
+            }
         }
 
         protected override Guid[] GetConfigurationIndependentPropertyPages()
         {
-            Guid[] result = new Guid[2];
-            result[0] = typeof(BuildPropertyPage).GUID;
-            result[1] = typeof(CompilerPropertyPage).GUID;
+            Guid[] result = new Guid[1];
+            //result[0] = typeof(BuildPropertyPage).GUID;
+            result[0] = typeof(BuildOrderPage).GUID;
+//            result[2] = new Guid("6D2D9B56-2691-4624-A1BF-D07A14594748");
             return result;
+        }
+
+        public List<string> Files = new List<string>();
+
+        public override FileNode CreateFileNode(ProjectElement item)
+        {
+            Files.Add("Name = " + item.Item.FinalItemSpec);
+            return base.CreateFileNode(item);
         }
 
     }

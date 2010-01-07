@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bistro.Designer", "Bistro.Designer\Bistro.Designer.csproj", "{7C11A46D-27A6-41F9-A754-0D9F1DA4369D}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.fsproj", "{9CBF5712-21EB-4F9A-B775-EA40712BF330}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{7C11A46D-27A6-41F9-A754-0D9F1DA4369D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C11A46D-27A6-41F9-A754-0D9F1DA4369D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C11A46D-27A6-41F9-A754-0D9F1DA4369D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CBF5712-21EB-4F9A-B775-EA40712BF330}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CBF5712-21EB-4F9A-B775-EA40712BF330}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CBF5712-21EB-4F9A-B775-EA40712BF330}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CBF5712-21EB-4F9A-B775-EA40712BF330}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -360,10 +360,10 @@
   </ItemGroup>
   <!-- Fsharp source code -->
   <ItemGroup>
-    <ZipItem Include="Templates\ProjectItems\FSharp\CodeFile.vstemplate">
+    <ZipItem Include="Templates\ProjectItems\FSharpControllers\CodeFile.vstemplate">
       <OutputSubPath>Bistro</OutputSubPath>
     </ZipItem>
-    <ZipItem Include="Templates\ProjectItems\FSharp\CodeFile.fs">
+    <ZipItem Include="Templates\ProjectItems\FSharpControllers\CodeFile.fs">
       <OutputSubPath>Bistro</OutputSubPath>
     </ZipItem>
   </ItemGroup>

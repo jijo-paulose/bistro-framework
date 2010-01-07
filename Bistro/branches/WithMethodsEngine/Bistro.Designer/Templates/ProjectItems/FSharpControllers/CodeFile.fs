@@ -1,6 +1,6 @@
-#light
+﻿#light
 
-namespace $safeprojectname$
+namespace $rootnamespace$
 
     open Bistro.FS.Controller
     open Bistro.FS.Definitions

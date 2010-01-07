@@ -12,6 +12,6 @@
     <DefaultName>Module.fs</DefaultName>
   </TemplateData>
   <TemplateContent>
-    <ProjectItem>CodeFile.fs</ProjectItem>
+    <ProjectItem ReplaceParameters="true">CodeFile.fs</ProjectItem>
   </TemplateContent>
 </VSTemplate>

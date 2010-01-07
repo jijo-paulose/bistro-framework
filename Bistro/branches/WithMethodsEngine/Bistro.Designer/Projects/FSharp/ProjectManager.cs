@@ -6,6 +6,7 @@ using Bistro.Designer.ProjectBase;
 using System.Drawing;
 using System.Windows.Forms;
 using Bistro.Designer.ProjectBase.Automation;
+using System.IO;
 
 namespace Bistro.Designer.Projects.FSharp
 {
@@ -40,6 +41,7 @@ namespace Bistro.Designer.Projects.FSharp
         /// </summary>
         private void InitializeCATIDs()
         {
+            // TODO: figure out CATIDs - they have to do with property browsing
             //// The following properties classes are specific to python so we can use their GUIDs directly
             //this.AddCATIDMapping(typeof(PythonProjectNodeProperties), typeof(PythonProjectNodeProperties).GUID);
             //this.AddCATIDMapping(typeof(PythonFileNodeProperties), typeof(PythonFileNodeProperties).GUID);
@@ -69,25 +71,40 @@ namespace Bistro.Designer.Projects.FSharp
             // We could also provide CATIDs for references and the references container node, if we wanted to.
         }
 
+        /// <summary>
+        /// Returns the project type guid AKA the guid of the project factory type
+        /// </summary>
+        public override Guid ProjectGuid
+        {
+            get { return typeof(Factory).GUID; }
+        }
+
+        /// <summary>
+        /// Evaluates if a file is an FSharp code file based on is extension
+        /// </summary>
+        /// <param name="strFileName">The filename to be evaluated</param>
+        /// <returns>true if is a code file</returns>
+        public override string ProjectType
+        {
+            get { return "Bistro"; }
+        }
+
+        public override bool IsCodeFile(string fileName)
+        {
+            // We do not want to assert here, just return silently.
+            if (String.IsNullOrEmpty(fileName))
+            {
+                return false;
+            }
+            return (String.Compare(Path.GetExtension(fileName), ".fs", StringComparison.OrdinalIgnoreCase) == 0);
+        }
+
         public override int ImageIndex
         {
             get
             {
                 return imageIndex;
             }
-        }
-
-        /// <summary>
-        /// Returns the project type guid AKA the guid of the project factory type
-        /// </summary>
-        public override Guid ProjectGuid
-        {
-            get { return typeof(Factory).GUID; } 
-        }
-
-        public override string ProjectType
-        {
-            get { return "Bistro"; }
         }
 
         /// <summary>
@@ -142,13 +159,13 @@ namespace Bistro.Designer.Projects.FSharp
             return result;
         }
 
-        public List<string> Files = new List<string>();
+        //public List<string> Files = new List<string>();
 
-        public override FileNode CreateFileNode(ProjectElement item)
-        {
-            Files.Add("Name = " + item.Item.FinalItemSpec);
-            return base.CreateFileNode(item);
-        }
+        //public override FileNode CreateFileNode(ProjectElement item)
+        //{
+        //    Files.Add("Name = " + item.Item.FinalItemSpec);
+        //    return base.CreateFileNode(item);
+        //}
 
     }
 }

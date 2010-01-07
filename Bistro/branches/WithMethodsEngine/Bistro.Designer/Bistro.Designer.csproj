@@ -199,13 +199,6 @@
     <Compile Include="ProjectBase\Utilities.cs" />
     <Compile Include="ProjectBase\VsCommands.cs" />
     <Compile Include="ProjectBase\VSShellUtilities.cs" />
-    <Compile Include="Projects\FSharp\CompilerPropertyControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Projects\FSharp\CompilerPropertyControl.Designer.cs">
-      <DependentUpon>CompilerPropertyControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Projects\FSharp\CompilerPropertyPage.cs" />
     <Compile Include="Projects\FSharp\Factory.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
     <Compile Include="Projects\FSharp\PropertyTabContainer.cs">
@@ -243,6 +236,13 @@
     <Compile Include="$(CommonRegAttributes)\ProvideMSBuildTargetAttribute.cs">
       <Link>RegistrationAttributes\ProvideMSBuildTargetAttribute.cs</Link>
     </Compile>
+    <Compile Include="Projects\FSharp\BuildOrderPage.cs" />
+    <Compile Include="Projects\FSharp\BuildOrderViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Projects\FSharp\BuildOrderViewer.Designer.cs">
+      <DependentUpon>BuildOrderViewer.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">
@@ -279,8 +279,8 @@
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
     <None Include="Resources\Images_32bit.bmp" />
     <None Include="Resources\Images_24bit.bmp" />
-    <EmbeddedResource Include="Projects\FSharp\CompilerPropertyControl.resx">
-      <DependentUpon>CompilerPropertyControl.cs</DependentUpon>
+    <EmbeddedResource Include="Projects\FSharp\BuildOrderViewer.resx">
+      <DependentUpon>BuildOrderViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Root.bmp" />
     <EmbeddedResource Include="Resources\imagelis.bmp">

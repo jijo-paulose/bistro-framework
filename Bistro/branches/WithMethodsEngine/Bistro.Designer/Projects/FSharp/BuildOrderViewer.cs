@@ -24,14 +24,11 @@ namespace Bistro.Designer.Projects.FSharp
             public BuildItemGroup BuildItemGroup { get; private set; }
             public BuildItem BuildItem { get; private set; }
         }
-        List<BuildElement> buildItems = new List<BuildElement>();
 
         public BuildOrderViewer(ProjectManager project)
         {
             this.project = project;
             InitializeComponent();
-
-            int i = 0;
             foreach (BuildItemGroup group in project.BuildProject.ItemGroups)
             {
                 foreach (BuildItem item in group)
@@ -39,38 +36,67 @@ namespace Bistro.Designer.Projects.FSharp
                         && project.IsCodeFile(item.FinalItemSpec)
                         && !item.IsImported)
                     {
-                        buildItems.Add(new BuildElement(group, item));
-                        Dependencies.Nodes.Add(item.FinalItemSpec);
+                        Dependencies.Nodes.Add(item.FinalItemSpec)
+                            .Tag = new BuildElement(group, item);
                     }
             }           
         }
 
         private void MoveUp_Click(object sender, EventArgs e)
         {
-            if (Dependencies.SelectedNode == null)
-                return;
-            if (Dependencies.SelectedNode.Index <= 0)
-                return;
-            TreeNode node = Dependencies.SelectedNode;
-            TreeNodeCollection collection = Dependencies.Nodes;
-            int index = node.Index;
-            collection.Remove(node);
-            collection.Insert(index - 1, node);
-            Dependencies.SelectedNode = node;
+            if (Dependencies.SelectedNode != null)
+                Swap(Dependencies.SelectedNode, Direction.Up);
         }
+
 
         private void MoveDown_Click(object sender, EventArgs e)
         {
-            if (Dependencies.SelectedNode == null)
+            if (Dependencies.SelectedNode != null)
+                Swap(Dependencies.SelectedNode, Direction.Down);
+        }
+
+        enum Direction { Up, Down }
+
+        private void Swap(TreeNode n, Direction dir)
+        {
+            if (!Dependencies.Nodes.Contains(n))
                 return;
-            if (Dependencies.SelectedNode.Index > Dependencies.Nodes.Count-1)
-                return;
-            TreeNode node = Dependencies.SelectedNode;
-            TreeNodeCollection collection = Dependencies.Nodes;
-            int index = node.Index;
-            collection.Remove(node);
-            collection.Insert(index + 1, node);
-            Dependencies.SelectedNode = node;
+            int new_index = 0;
+            switch (dir)
+            {
+                case Direction.Up:
+                    if (n.Index <= 0)
+                        return;
+                    new_index = n.Index - 1;
+                    break;
+                case Direction.Down:
+                    if (n.Index >= Dependencies.Nodes.Count)
+                        return;
+                    new_index = n.Index + 1;
+                    break;
+            }
+
+            BuildElement fst = (BuildElement)n.Tag;
+            BuildElement snd = (BuildElement)Dependencies.Nodes[new_index].Tag;
+
+            Dependencies.Nodes.Remove(n);
+            Dependencies.Nodes.Insert(new_index, n);
+            Dependencies.SelectedNode = n;
+
+            //int fst_loc = Locate(fst);
+            //int snd_loc = Locate(snd);
+            //fst.BuildItemGroup[fst_loc] = snd.BuildItem;
+            //new BuildItemGroup(
+
+        }
+
+        int Locate(BuildElement elem)
+        {
+            int result = -1;
+            foreach (BuildItem b in elem.BuildItemGroup)
+                if (elem.BuildItemGroup[++result] == elem.BuildItem)
+                    return result;
+            return result;
         }
     }
 }

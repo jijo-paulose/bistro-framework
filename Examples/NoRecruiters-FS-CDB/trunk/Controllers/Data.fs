@@ -8,7 +8,7 @@ module Data =
     open NoRecruiters.Enums
 
     let database = 
-        server "172.16.10.78" 5984 |>
+        server "localhost" 5984 |>
         db "nr"
 
     module Entities =
@@ -57,3 +57,6 @@ module Data =
                 query "items" "all" database |>
                 q t
                 )
+                
+        let byName name = 
+            name |> from<Entities.posting> database

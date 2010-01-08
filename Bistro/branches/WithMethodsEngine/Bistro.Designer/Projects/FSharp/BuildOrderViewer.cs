@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using Bistro.Designer.ProjectBase;
 using Microsoft.Build.BuildEngine;
+using System.Xml;
+using System.Reflection;
 
 namespace Bistro.Designer.Projects.FSharp
 {
@@ -29,6 +31,17 @@ namespace Bistro.Designer.Projects.FSharp
         {
             this.project = project;
             InitializeComponent();
+            refresh_file_list();
+            project.OnProjectModified += new EventHandler(project_OnProjectModified);
+        }
+
+        void project_OnProjectModified(object sender, EventArgs e)
+        {
+            refresh_file_list();
+        }
+
+        void refresh_file_list()
+        {
             foreach (BuildItemGroup group in project.BuildProject.ItemGroups)
             {
                 foreach (BuildItem item in group)
@@ -70,7 +83,7 @@ namespace Bistro.Designer.Projects.FSharp
                     new_index = n.Index - 1;
                     break;
                 case Direction.Down:
-                    if (n.Index >= Dependencies.Nodes.Count)
+                    if (n.Index >= Dependencies.Nodes.Count - 1)
                         return;
                     new_index = n.Index + 1;
                     break;
@@ -83,11 +96,12 @@ namespace Bistro.Designer.Projects.FSharp
             Dependencies.Nodes.Insert(new_index, n);
             Dependencies.SelectedNode = n;
 
-            //int fst_loc = Locate(fst);
-            //int snd_loc = Locate(snd);
-            //fst.BuildItemGroup[fst_loc] = snd.BuildItem;
-            //new BuildItemGroup(
-
+            int fst_loc = Locate(fst);
+            int snd_loc = Locate(snd);
+            fst.BuildItemGroup.RemoveItem(fst.BuildItem);
+            AddItemAt(snd.BuildItemGroup, fst.BuildItem, snd_loc);
+            snd.BuildItemGroup.RemoveItem(snd.BuildItem);
+            AddItemAt(fst.BuildItemGroup, snd.BuildItem, fst_loc);
         }
 
         int Locate(BuildElement elem)
@@ -98,5 +112,48 @@ namespace Bistro.Designer.Projects.FSharp
                     return result;
             return result;
         }
+
+        // The code below is ripped off from the FSharp project system
+
+        /// <summary>
+        /// Adds an existing BuildItem to a BuildItemGroup at given location
+        /// </summary>
+        /// <param name="big"></param>
+        /// <param name="itemToAdd"></param>
+        /// <param name="index"></param>
+        internal static void AddItemAt(BuildItemGroup big, BuildItem itemToAdd, int index)
+        {
+            XmlNode node;
+            XmlElement element = (XmlElement)typeof(BuildItemGroup)
+                .InvokeMember("get_ItemGroupElement", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, big, new object [] { } );
+            if (big.Count > 0)
+            {
+                XmlElement element2;
+                if (index == big.Count)
+                {
+                    element2 = ItemElement(big[big.Count - 1]);
+                    node = ((XmlElement)element2.ParentNode).InsertAfter(ItemElement(itemToAdd), element2);
+                }
+                else
+                {
+                    element2 = ItemElement(big[index]);
+                    node = ((XmlElement)element2.ParentNode).InsertBefore(ItemElement(itemToAdd), element2);
+                }
+            }
+            else
+            {
+                node = element.AppendChild(ItemElement(itemToAdd));
+            }
+            object[] args = new object[] { index, itemToAdd };
+            object obj2 = typeof(BuildItemGroup)
+                .InvokeMember("AddExistingItemAt", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, big, args);
+        }
+
+        internal static XmlElement ItemElement(BuildItem bi)
+        {
+            return (XmlElement)typeof(BuildItem).
+                InvokeMember("get_ItemElement", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, bi, new object[] {});
+        }
+
     }
 }

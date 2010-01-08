@@ -36,6 +36,60 @@ namespace Bistro.Designer.Projects.FSharp
 
             InitializeCATIDs();
         }
+
+        /// <summary>
+        /// Returns the project type guid AKA the guid of the project factory type
+        /// </summary>
+        public override Guid ProjectGuid
+        {
+            get { return typeof(Factory).GUID; }
+        }
+
+        /// <summary>
+        /// Evaluates if a file is an FSharp code file based on is extension
+        /// </summary>
+        /// <param name="strFileName">The filename to be evaluated</param>
+        /// <returns>true if is a code file</returns>
+        public override string ProjectType
+        {
+            get { return "Bistro"; }
+        }
+
+        /// <summary>
+        /// Evaluates file name to determine whether this is a code file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public override bool IsCodeFile(string fileName)
+        {
+            if (String.IsNullOrEmpty(fileName))
+            {
+                return false;
+            }
+            return (String.Compare(Path.GetExtension(fileName), ".fs", StringComparison.OrdinalIgnoreCase) == 0);
+        }
+
+        /// <summary>
+        /// Overriden here to provide notification to the projecy property page
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        protected override ProjectElement AddFileToMsBuild(string file)
+        {
+            // TODO: rename; delete
+            ProjectElement result = base.AddFileToMsBuild(file);
+            RaiseProjectModified();
+            return result;
+        }
+
+        public event EventHandler OnProjectModified;
+
+        public void RaiseProjectModified()
+        {
+            if (OnProjectModified != null)
+                OnProjectModified(this, EventArgs.Empty);
+        }
+
         /// <summary>
         /// Provide mapping from our browse objects and automation objects to our CATIDs
         /// </summary>
@@ -71,34 +125,6 @@ namespace Bistro.Designer.Projects.FSharp
             // We could also provide CATIDs for references and the references container node, if we wanted to.
         }
 
-        /// <summary>
-        /// Returns the project type guid AKA the guid of the project factory type
-        /// </summary>
-        public override Guid ProjectGuid
-        {
-            get { return typeof(Factory).GUID; }
-        }
-
-        /// <summary>
-        /// Evaluates if a file is an FSharp code file based on is extension
-        /// </summary>
-        /// <param name="strFileName">The filename to be evaluated</param>
-        /// <returns>true if is a code file</returns>
-        public override string ProjectType
-        {
-            get { return "Bistro"; }
-        }
-
-        public override bool IsCodeFile(string fileName)
-        {
-            // We do not want to assert here, just return silently.
-            if (String.IsNullOrEmpty(fileName))
-            {
-                return false;
-            }
-            return (String.Compare(Path.GetExtension(fileName), ".fs", StringComparison.OrdinalIgnoreCase) == 0);
-        }
-
         public override int ImageIndex
         {
             get
@@ -112,6 +138,7 @@ namespace Bistro.Designer.Projects.FSharp
         /// </summary>
         private object CreateServices(Type serviceType)
         {
+            // TODO: figure out services
             object service = null;
             //if (typeof(SVSMDCodeDomProvider) == serviceType)
             //{
@@ -158,14 +185,6 @@ namespace Bistro.Designer.Projects.FSharp
 //            result[2] = new Guid("6D2D9B56-2691-4624-A1BF-D07A14594748");
             return result;
         }
-
-        //public List<string> Files = new List<string>();
-
-        //public override FileNode CreateFileNode(ProjectElement item)
-        //{
-        //    Files.Add("Name = " + item.Item.FinalItemSpec);
-        //    return base.CreateFileNode(item);
-        //}
 
     }
 }

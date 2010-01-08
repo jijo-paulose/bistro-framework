@@ -42,6 +42,7 @@ namespace Bistro.Designer.Projects.FSharp
 
         void refresh_file_list()
         {
+            Dependencies.Nodes.Clear();
             foreach (BuildItemGroup group in project.BuildProject.ItemGroups)
             {
                 foreach (BuildItem item in group)

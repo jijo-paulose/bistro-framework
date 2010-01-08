@@ -7,10 +7,14 @@ using System.Drawing;
 using System.Windows.Forms;
 using Bistro.Designer.ProjectBase.Automation;
 using System.IO;
+using Microsoft.VisualStudio.Editors.PropertyPages;
+using VSLangProj;
+using System.Runtime.InteropServices;
 
 namespace Bistro.Designer.Projects.FSharp
 {
-    public class ProjectManager : ProjectNode
+    [ComVisible(true), CLSCompliant(false)]
+    public partial class ProjectManager : ProjectNode, ProjectProperties
     {
         private static ImageList imageList;
         private OAVSProject vsProject;
@@ -90,6 +94,24 @@ namespace Bistro.Designer.Projects.FSharp
                 OnProjectModified(this, EventArgs.Empty);
         }
 
+        protected override Guid[] GetConfigurationIndependentPropertyPages()
+        {
+            // Application, BuildEvents, ReferencePaths
+            return new Guid[]
+            {
+                typeof(ApplicationPropPageComClass).GUID,
+                typeof(BuildOrderPage).GUID,
+                typeof(BuildEventsPropPageComClass).GUID,
+                typeof(ReferencePathsPropPageComClass).GUID
+            };
+        }
+
+        protected override Guid[] GetConfigurationDependentPropertyPages()
+        {
+            // Build Project property page
+            return new Guid[] { typeof(BuildPropPageComClass).GUID };
+        }
+
         /// <summary>
         /// Provide mapping from our browse objects and automation objects to our CATIDs
         /// </summary>
@@ -117,10 +139,7 @@ namespace Bistro.Designer.Projects.FSharp
             //local12.AddCATIDMapping(typeof(FileNodeProperties), typeof(FSharpFileNodeProperties).GUID);
             //FSharpProjectNode local13 = @this.@this.contents;
             //int num13 = local13.GetHashCode;
-            //AddCATIDMapping(typeof(Microsoft.VisualStudio.FSharp.ProjectSystem.GeneralPropertyPage), typeof(ProjectNodeProperties).GUID);
-            //Notifier sourcesAndFlagsNotifier = @this.sourcesAndFlagsNotifier;
-            //FSharpProjectNode local14 = @this.@this.contents;
-            //int num14 = local14.GetHashCode;
+            AddCATIDMapping(typeof(GeneralPropertyPage), typeof(GeneralPropertyPage).GUID);
  
             // We could also provide CATIDs for references and the references container node, if we wanted to.
         }
@@ -175,15 +194,6 @@ namespace Bistro.Designer.Projects.FSharp
                     vsProject = new OAVSProject(this);
                 return vsProject;
             }
-        }
-
-        protected override Guid[] GetConfigurationIndependentPropertyPages()
-        {
-            Guid[] result = new Guid[1];
-            //result[0] = typeof(BuildPropertyPage).GUID;
-            result[0] = typeof(BuildOrderPage).GUID;
-//            result[2] = new Guid("6D2D9B56-2691-4624-A1BF-D07A14594748");
-            return result;
         }
 
     }

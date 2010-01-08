@@ -21,7 +21,7 @@ namespace NoRecruiters.Controllers
     
     open NoRecruiters.Data
 
-    module Search =
+    module View =
         [<Bind("get /postings/{contentType}?{firstTime}"); ReflectedDefinition>]
         let firstTimeSearchC contentType firstTime defaultContentType = 
             let newContentType = if firstTime then contentType else defaultContentType
@@ -40,3 +40,31 @@ namespace NoRecruiters.Controllers
             
             popularTags, 
             (Postings.search (txtQuery.Value) currentTags (Content.fromString contentType)) |> named "searchResults"
+            
+        [<Bind("get /ad/{shortName}")>]
+        [<Bind("get /resume/{shortName}")>]
+        [<RenderWith("Views/Posting/view.django"); ReflectedDefinition>]
+        let viewC shortName (contentType: string option) (defaultContentType: string) =
+            Postings.byName shortName |> named "posting",
+            defaultContentType |> named "contentType"
+            
+    module Manage =
+        module Ad = 
+            [<Bind("get /posting/ad/byname/{shortName}")>]
+            [<RenderWith("Views/Posting/Ad/edit.django"); ReflectedDefinition>]
+            let displayC() = ()
+
+            type adForm = {
+                heading: string
+                tags: string
+                detail: string
+                published: string
+            }
+
+            [<Bind("post /posting/ad/byname/{shortName}")>]
+            [<RenderWith("Views/Posting/Ad/edit.django"); ReflectedDefinition>]
+            let updateC (data: adForm) shortName = ()
+                if System.String.IsNullOrEmpty(data.published) then
+                    
+                else
+                

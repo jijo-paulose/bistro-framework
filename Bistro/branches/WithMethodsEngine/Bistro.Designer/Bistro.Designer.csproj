@@ -246,8 +246,9 @@
     <Compile Include="Projects\FSharp\BuildOrderViewer.Designer.cs">
       <DependentUpon>BuildOrderViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Projects\FSharp\GeneralPropertyPage.cs" />
-    <Compile Include="Projects\FSharp\OAProject.cs" />
+    <Compile Include="Projects\FSharp\OAProjectProperties.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">

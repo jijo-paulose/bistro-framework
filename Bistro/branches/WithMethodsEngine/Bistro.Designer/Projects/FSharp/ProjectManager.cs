@@ -8,13 +8,10 @@ using System.Windows.Forms;
 using Bistro.Designer.ProjectBase.Automation;
 using System.IO;
 using Microsoft.VisualStudio.Editors.PropertyPages;
-using VSLangProj;
-using System.Runtime.InteropServices;
 
 namespace Bistro.Designer.Projects.FSharp
 {
-    [ComVisible(true), CLSCompliant(false)]
-    public partial class ProjectManager : ProjectNode, ProjectProperties
+    public class ProjectManager : ProjectNode
     {
         private static ImageList imageList;
         private OAVSProject vsProject;
@@ -94,6 +91,11 @@ namespace Bistro.Designer.Projects.FSharp
                 OnProjectModified(this, EventArgs.Empty);
         }
 
+        protected override NodeProperties CreatePropertiesObject()
+        {
+            return new OAProjectProperties(this);
+        }
+
         protected override Guid[] GetConfigurationIndependentPropertyPages()
         {
             // Application, BuildEvents, ReferencePaths
@@ -139,7 +141,7 @@ namespace Bistro.Designer.Projects.FSharp
             //local12.AddCATIDMapping(typeof(FileNodeProperties), typeof(FSharpFileNodeProperties).GUID);
             //FSharpProjectNode local13 = @this.@this.contents;
             //int num13 = local13.GetHashCode;
-            AddCATIDMapping(typeof(GeneralPropertyPage), typeof(GeneralPropertyPage).GUID);
+            // AddCATIDMapping(typeof(GeneralPropertyPage), typeof(GeneralPropertyPage).GUID);
  
             // We could also provide CATIDs for references and the references container node, if we wanted to.
         }

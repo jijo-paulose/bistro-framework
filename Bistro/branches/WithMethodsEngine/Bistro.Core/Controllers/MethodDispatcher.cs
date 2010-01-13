@@ -107,7 +107,7 @@ namespace Bistro.Controllers
         /// </returns>
         public bool IsMethodDefined(string method)
         {
-            return dispatcher.GetControllers(method).Length > 0;
+            return dispatcher.IsDefined(method);
         }
 
         /// <summary>
@@ -140,9 +140,11 @@ namespace Bistro.Controllers
 
             try
             {
-                ControllerInvocationInfo[] controllers = dispatcher.GetControllers(requestPoint);
+				IEnumerable<ControllerInvocationInfo> invocationInfos = dispatcher.GetControllers(requestPoint);
 
-                if (controllers.Length == 0)
+				// TODO: this code should be replaced with call to the check method 
+				// when it will be implemented on the dispatcher correctly
+                if (invocationInfos.Count() == 0)
                 {
                     logger.Report(Messages.ControllerNotFound, requestPoint);
                     throw new WebException(StatusCode.NotFound, String.Format("'{0} could not be found", requestPoint));
@@ -152,9 +154,9 @@ namespace Bistro.Controllers
                 bool securityCheckFailed = false;
                 var failedPermissions = new Dictionary<string, KeyValuePair<FailAction, string>>();
 
-                foreach (ControllerInvocationInfo info in controllers)
+				foreach (ControllerInvocationInfo invocationInfo in invocationInfos)
                 {
-                    IController controller = manager.GetController(info, context, requestContext);
+					IController controller = manager.GetController(invocationInfo, context, requestContext);
 
                     try
                     {
@@ -217,8 +219,8 @@ namespace Bistro.Controllers
                             }
                             else
                             {
-                                if (info.BindPoint.Controller.DefaultTemplates.Count > 0)
-                                    requestContext.Response.RenderWith(info.BindPoint.Controller.DefaultTemplates);
+								if (invocationInfo.BindPoint.Controller.DefaultTemplates.Count > 0)
+									requestContext.Response.RenderWith(invocationInfo.BindPoint.Controller.DefaultTemplates);
 
                                 controller.ProcessRequest(context, requestContext);
                             }

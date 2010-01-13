@@ -82,7 +82,6 @@
     <Compile Include="Controllers\Descriptor\Data\FormFieldAttribute.cs" />
     <Compile Include="Controllers\Descriptor\Data\IDataFieldMarker.cs" />
     <Compile Include="Controllers\DefaultContext.cs" />
-    <Compile Include="Controllers\DependencyHelper.cs" />
     <Compile Include="Controllers\Dispatch\DispatcherFactory.cs" />
     <Compile Include="Controllers\EventContext.cs" />
     <Compile Include="Controllers\HandlerFactory.cs" />

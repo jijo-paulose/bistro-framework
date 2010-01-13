@@ -26,6 +26,7 @@ using Bistro.Controllers.Descriptor;
 using Bistro.MethodsEngine.Reflection;
 using System.Text.RegularExpressions;
 using Bistro.Configuration.Logging;
+using Bistro.Controllers;
 
 namespace Bistro.MethodsEngine.Subsets
 {
@@ -95,19 +96,23 @@ namespace Bistro.MethodsEngine.Subsets
         }
 
 
-        /// <summary>
-        /// Searches and gets the method by an URL.
-        /// </summary>
-        /// <param name="requestUrl">The request URL.</param>
-        /// <returns></returns>
-        internal MethodUrlsSubset GetMethodByUrl(string requestUrl)
+		/// <summary>
+		/// Searches and gets the method by an URL.
+		/// </summary>
+		/// <param name="requestUrl">The request URL.</param>
+		/// <param name="getParams">The returned params from the query string.</param>
+		/// <returns></returns>
+        internal MethodUrlsSubset GetMethodByUrl(string requestUrl, out Dictionary<IMethodsBindPointDesc,Dictionary<string,string>> getParams)
         {
             // Compare with each Binding
-            Dictionary<GenBinding,GenBinding> bindingsToSearch = new Dictionary<GenBinding,GenBinding>();
+            Dictionary<GenBinding,Dictionary<string,string>> bindingsToSearch = new Dictionary<GenBinding,Dictionary<string,string>>();
             foreach (GenBindingTuple tuple in allBindings)
             {
-                GenBinding tempBind = tuple.TryMatchUrl(requestUrl);
-                bindingsToSearch.Add(tempBind,tempBind);
+				Dictionary<string, string> getParamsVals;
+				GenBinding tempBind = tuple.TryMatchUrlGetParams(requestUrl, out getParamsVals);
+				// getParamsVals will be null when MatchStatus is false.
+				bindingsToSearch.Add(tempBind, getParamsVals);
+                
             }
 
 
@@ -123,8 +128,32 @@ namespace Bistro.MethodsEngine.Subsets
                 }
                 if (notFound)
                     continue;
+
+				getParams = new Dictionary<IMethodsBindPointDesc, Dictionary<string, string>>();
+
+				foreach (var bindPoint in subset.BindPointsList)
+				{
+					var relation = subset.PointBindRelation[bindPoint];
+					Dictionary<string, string> parameters =
+						relation.Count == 0 ?
+							new Dictionary<string, string>() :
+							bindingsToSearch[relation[0]];
+
+					getParams.Add(bindPoint, parameters);
+					for (int i = 1; i < relation.Count; i++)
+					{
+						foreach (KeyValuePair<string, string> pair in bindingsToSearch[relation[i]])
+						{
+							getParams[bindPoint][pair.Key] = pair.Value;
+						}
+					}
+
+				}
                 return subset;
             }
+
+			getParams = null;
+
             engine.Logger.Report(Errors.ErrorMethodNotFound, requestUrl);
             //throw new ApplicationException("Method not found - see log for details");
             return null;

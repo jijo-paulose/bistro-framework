@@ -183,12 +183,14 @@ namespace Bistro.Controllers
 			// it won't get overriden with a null.
 
 			foreach (string field in info.Parameters.Keys)
-				// not all path parameters may be present on the controller
-				if (info.BindPoint.ParameterFields.ContainsKey(field))
-					SetValue(
-						instance, 
-						info.BindPoint.ParameterFields[field], 
-						info.Parameters[field]);
+			    // not all path parameters may be present on the controller
+			    if (info.BindPoint.ParameterFields.ContainsKey(field))
+			        SetValue(
+			            instance, 
+			            info.BindPoint.ParameterFields[field], 
+			            info.Parameters[field]);
+
+
 
             if (context != null)
             {
@@ -231,6 +233,7 @@ namespace Bistro.Controllers
 
 			return instance;
 		}
+
 
 		/// <summary>
 		/// Prepares the controller for a new lifecycle.

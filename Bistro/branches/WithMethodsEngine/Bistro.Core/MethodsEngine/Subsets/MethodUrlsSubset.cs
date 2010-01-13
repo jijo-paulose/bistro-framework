@@ -50,6 +50,7 @@ namespace Bistro.MethodsEngine.Subsets
         {
             bindPointsList = new List<IMethodsBindPointDesc>();
             bindingsList = new List<GenBinding>();
+			pointBindRelation = new Dictionary<IMethodsBindPointDesc, List<GenBinding>>();
             engine = _engine;
         }
 
@@ -77,16 +78,26 @@ namespace Bistro.MethodsEngine.Subsets
         internal void UpdateBindPoints()
         {
             bindPointsList = new List<IMethodsBindPointDesc>();
+			pointBindRelation = new Dictionary<IMethodsBindPointDesc, List<GenBinding>>();
             foreach (GenBinding binding in bindingsList.Where(bind => bind.MatchStatus))
             {
                 foreach (IMethodsBindPointDesc bindPointInfo in engine.GetTypesByBinding(binding))
                 {
+					if (!pointBindRelation.ContainsKey(bindPointInfo))
+					{
+						pointBindRelation.Add(bindPointInfo, new List<GenBinding>());
+					}
+					pointBindRelation[bindPointInfo].Add(binding);
+					
                     if (!bindPointsList.Contains(bindPointInfo))
                     {
                         bindPointsList.Add(bindPointInfo);
                     }
                 }
             }
+
+			// TODO: revise this process.
+
             CleanBindPoints();
 
             ScanResources();
@@ -186,9 +197,6 @@ namespace Bistro.MethodsEngine.Subsets
 
             StringBuilder tempsb = bindPointsList.Aggregate(new StringBuilder(),(oldStr,bpd) => oldStr.Append(bpd.Controller.ControllerTypeName).Append(":").Append(bpd.Target).Append("\r\n"));
             
-
-//            engine.Logger.Report(Messages.ListSorted,tempsb.ToString());
-
             var securityControllers = new List<IMethodsBindPointDesc>();
 
             int i = 0;
@@ -231,6 +239,8 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         private List<IMethodsBindPointDesc> bindPointsList;
 
+		private Dictionary<IMethodsBindPointDesc, List<GenBinding>> pointBindRelation;
+
         #endregion
 
         #region internal members
@@ -252,6 +262,15 @@ namespace Bistro.MethodsEngine.Subsets
         {
             get { return bindPointsList; }
         }
+
+		/// <summary>
+		/// Gets the bindpoint to genbinding relation.
+		/// </summary>
+		/// <value>The bindpoint to genbinding relation.</value>
+		internal Dictionary<IMethodsBindPointDesc, List<GenBinding>> PointBindRelation
+		{
+			get { return pointBindRelation; }
+		}
 
 
         /// <summary>

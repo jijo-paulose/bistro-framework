@@ -164,21 +164,27 @@ namespace Bistro.MethodsEngine
         /// </summary>
         /// <param name="requestUrl">The request URL.</param>
         /// <returns></returns>
-        public ControllerInvocationInfo[] GetControllers(string requestUrl)
+        public List<ControllerInvocationInfo> GetControllers(string requestUrl)
         {
-            MethodUrlsSubset urlSubSet = processor.GetMethodByUrl(requestUrl);
+			Dictionary<IMethodsBindPointDesc,Dictionary<string,string>> getParams;
+			var methodSubSet = processor.GetMethodByUrl(requestUrl, out getParams);
 
-            var retList = urlSubSet.BindPointsList.Select(bpd => new ControllerInvocationInfo((BindPointDescriptor)bpd, new Dictionary<string, string>()));
+			List<ControllerInvocationInfo> retList = new List<ControllerInvocationInfo>(methodSubSet.BindingsList.Count);
+			// Here we should get the bindings list and create controller invocation with params and binding for every controller.
+			foreach (var bindPoint in methodSubSet.BindPointsList)
+			{
+				retList.Add(new ControllerInvocationInfo((BindPointDescriptor)bindPoint, getParams[bindPoint]));
+			}
 
-            return retList.ToArray();
+			return retList;
         }
 
+		public bool IsDefined(string requestUrl)
+		{
+			return GetControllers(requestUrl).Count > 0;
+		}
 
 
-
-        //internal virtual void RaiseInvalidBinding(ControllerType controller, params string[] args)
-        //{
-        //}
 
         internal virtual void RaiseResourceLoop(string methodUrl, IEnumerable<IMethodsControllerDesc> controllers, params string[] args)
         {

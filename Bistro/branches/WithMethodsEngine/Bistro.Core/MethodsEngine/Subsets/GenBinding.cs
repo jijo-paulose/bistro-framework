@@ -53,9 +53,9 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         /// <param name="url">The URL.</param>
         /// <returns>GenBinding with the appropriate matchstatus.</returns>
-        internal GenBinding TryMatchUrl(string url)
+        internal GenBinding TryMatchUrlGetParams(string url,out Dictionary<string,string> vals)
         {
-            return PositiveBind.TryMatchUrl(url) ? PositiveBind : NegativeBind;
+            return PositiveBind.TryMatchUrl(url,out vals) ? PositiveBind : NegativeBind;
         }
 
 
@@ -154,6 +154,19 @@ namespace Bistro.MethodsEngine.Subsets
 		private static Regex paramsRegex = new Regex(@"\A(?:{[^}]+})\z", RegexOptions.Compiled);
 
 
+		/// <summary>
+		/// Regular expression for capturing leading ampersands in a query string
+		/// </summary>
+		private Regex leadingAmpRE = new Regex("^&+", RegexOptions.Compiled);
+		/// <summary>
+		/// Regular expression for capturing leading ampersands in a query string
+		/// </summary>
+		private Regex trailingAmpRE = new Regex("&+$", RegexOptions.Compiled);
+
+		/// <summary>
+		/// Regular expression for capturing consequtive ampersands in a query string
+		/// </summary>
+		private Regex dupedAmpRE = new Regex("(?<=&)&", RegexOptions.Compiled);
 
         /// <summary>
         /// contains url splitted by ? ar first level, and by / on the second.
@@ -253,14 +266,18 @@ namespace Bistro.MethodsEngine.Subsets
 
         /// <summary>
         /// Tries to match URL to bind URL (NOT to the half of the URL field).
+		/// It's convenient toextract parameter's values here.
         /// </summary>
         /// <param name="requestUrl">The request URL.</param>
         /// <returns>result of the match</returns>
-        internal bool TryMatchUrl(string requestUrl)
+        internal bool TryMatchUrl(string requestUrl,out Dictionary<string,string> getParamsValues )
         {
+			getParamsValues = new Dictionary<string,string>();
+			Dictionary<string,string> tempParamsValue = new Dictionary<string,string>();
+
             engine.Logger.Report(Messages.MessageMatchingUrl, requestUrl);
 
-
+			// Actually url will be split into two parts. - before ? and after.
             List<string> splitQueryString = requestUrl.Split('?').ToList();
             List<string> requestComponents = smartUrlSplit(splitQueryString[0]).Where(str => str != String.Empty).ToList();
 			
@@ -283,6 +300,11 @@ namespace Bistro.MethodsEngine.Subsets
             bool firstItemMatchImpossible = false;
             for (int i = 0; i < firstPart.Count; i++)
             {
+				if (paramsRegex.IsMatch(firstPart[i]))
+				{
+					tempParamsValue.Add(firstPart[i].Trim('{','}'),requestComponents[i]);
+					continue;
+				}
                 if ((wildCardRegex.IsMatch(firstPart[i])) || (firstPart[i] == requestComponents[i]))
                     continue;
 
@@ -292,6 +314,8 @@ namespace Bistro.MethodsEngine.Subsets
 
             if (firstItemMatchImpossible)
                 return false;
+			// first merge of parameters values into the common dictionary.
+			getParamsValues = tempParamsValue.Aggregate(getParamsValues, (dict, kvp) => { dict[kvp.Key] = kvp.Value; return dict; });
 
             int positionInMatchPart = firstPart.Count;
 
@@ -304,9 +328,15 @@ namespace Bistro.MethodsEngine.Subsets
             {
                 if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Count)
                 {
+					tempParamsValue.Clear();
                     bool placed = true;
                     for (int i = 0; i < currentMatchPart.Count; i++)
                     {
+						if (paramsRegex.IsMatch(currentMatchPart[i]))
+						{
+							tempParamsValue.Add(currentMatchPart[i].Trim('{', '}'), requestComponents[i + positionInMatchPart]);
+							continue;
+						}
                         if (wildCardRegex.IsMatch(currentMatchPart[i]))
                             continue;
                         if (currentMatchPart[i] == requestComponents[i + positionInMatchPart])
@@ -320,7 +350,8 @@ namespace Bistro.MethodsEngine.Subsets
                         positionInMatchPart = positionInMatchPart + currentMatchPart.Count;
                         currentMatchPartEnum.MoveNext();
                         currentMatchPart = currentMatchPartEnum.Current;
-                    }
+						getParamsValues = tempParamsValue.Aggregate(getParamsValues, (dict, kvp) => { dict[kvp.Key] = kvp.Value; return dict; });
+					}
                     else 
                         positionInMatchPart++;
                 }
@@ -329,6 +360,17 @@ namespace Bistro.MethodsEngine.Subsets
                     return false;
                 }
             }
+
+			// if there are query string parameters, populate them by name, and not positionally
+			if (splitQueryString.Count == 2)
+			{
+				// if there are any errant leading or trailing ampersands, get rid of them
+				string[] queryStringParameters = CleanQueryString(splitQueryString[1]).Split('&', '=');
+				for (int i = 0; i + 1 < queryStringParameters.Length; i += 2)
+//					if (descriptor.ParameterFields.ContainsKey(queryStringParameters[i]) && !parameterValues.ContainsKey(queryStringParameters[i]))
+						getParamsValues[queryStringParameters[i]] = queryStringParameters[i + 1];
+			}
+
             return true;
         }
 
@@ -531,6 +573,22 @@ namespace Bistro.MethodsEngine.Subsets
 
             return BindPointUtilities.GetBindComponents(url);
         }
+
+		/// <summary>
+		/// Cleans query strings of leading and duplicate ampersands
+		/// </summary>
+		/// <param name="queryString">the query string</param>
+		/// <returns></returns>
+		private string CleanQueryString(string queryString)
+		{
+			return
+				dupedAmpRE.Replace(
+					trailingAmpRE.Replace(
+						leadingAmpRE.Replace(queryString, String.Empty),
+						String.Empty),
+					String.Empty);
+		}
+
         #endregion
 
 

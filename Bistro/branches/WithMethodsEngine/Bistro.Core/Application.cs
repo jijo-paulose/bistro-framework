@@ -139,7 +139,8 @@ namespace Bistro
 
 			// Invoke application startup event
 			var methodDispatcher = new MethodDispatcher(this);
-			if (methodDispatcher.IsMethodDefined(ApplicationStartup))
+			// Application startup should be defined explicitly.
+			if (methodDispatcher.IsMethodDefinedExplicitly(ApplicationStartup))
 				methodDispatcher.InvokeMethod(null, ApplicationStartup, new EventContext(null, false));
 		}
 

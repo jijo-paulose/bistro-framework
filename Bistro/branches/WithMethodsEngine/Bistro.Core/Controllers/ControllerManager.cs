@@ -190,9 +190,9 @@ If this assembly contains controllers, the exception may be caused by assembly v
         /// <param name="t">The t.</param>
         /// <param name="requestPoint">The request point.</param>
         /// <returns></returns>
-        public IController GetController(ControllerInvocationInfo invocation, HttpContextBase context, IContext requestContext)
+		public IController GetController(ControllerInvocationInfo invocationInfo, HttpContextBase context, IContext requestContext)
         {
-            return handlers[invocation.BindPoint.Controller.ControllerType].GetControllerInstance(invocation, context, requestContext);
+			return handlers[invocationInfo.BindPoint.Controller.ControllerType].GetControllerInstance(invocationInfo, context, requestContext);
         }
 
         /// <summary>

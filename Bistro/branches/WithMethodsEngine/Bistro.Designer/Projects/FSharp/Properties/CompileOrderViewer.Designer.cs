@@ -1,6 +1,6 @@
-﻿namespace Bistro.Designer.Projects.FSharp
+﻿namespace Bistro.Designer.Projects.FSharp.Properties
 {
-    partial class BuildOrderViewer
+    partial class CompileOrderViewer
     {
         /// <summary> 
         /// Required designer variable.

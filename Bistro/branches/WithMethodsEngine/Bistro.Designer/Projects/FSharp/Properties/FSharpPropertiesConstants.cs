@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Bistro.Designer.Projects.FSharp.Properties
+{
+    public static class FSharpPropertiesConstants
+    {
+        public const string Application = "Application";
+        public const string RootNamespaceDescription = "RootNamespaceDescription";
+    }
+}

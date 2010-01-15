@@ -28,7 +28,7 @@ namespace Bistro.Designer.ProjectBase
 	/// <summary>
 	/// Defines the properties on the build property page and the logic the binds the properties to project data (load and save)
 	/// </summary>
-    [CLSCompliant(false), ComVisible(true), Guid("F7B8DB0E-C637-4f07-BF40-E843CCD2BAB3")]// "9B3DEA40-7F29-4a17-87A4-00EE08E8241E")]
+    [CLSCompliant(false), ComVisible(true), Guid("F7B8DB0E-C637-4f07-BF40-E843CCD2BAB3")]
 	public class BuildPropertyPage : SettingsPage
 	{
 		#region fields

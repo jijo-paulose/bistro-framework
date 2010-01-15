@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.Shell;
 using Bistro.Designer.Explorer;
 using Bistro.Designer.ProjectBase;
 using Bistro.Designer.Projects.FSharp;
+using Bistro.Designer.Projects.FSharp.Properties;
 
 namespace Bistro.Designer
 {
@@ -64,8 +65,8 @@ namespace Bistro.Designer
     [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
     [WAProvideProjectFactoryTemplateMapping("{" + Guids.guidFSharpProjectFactoryString + "}", typeof(Projects.FSharp.DummyWebFactory))]
 
-    [ProvideObject(typeof(BuildPropertyPage))]
-//    [ProvideObject(typeof(GeneralPropertyPage))]
+    [ProvideObject(typeof(CompileOrderPage))]
+    [ProvideObject(typeof(ApplicationPage))]
 
     [Guid(Guids.guidBistro_DesignerPkgString)]
     public sealed class DesignerPackage : ProjectPackage

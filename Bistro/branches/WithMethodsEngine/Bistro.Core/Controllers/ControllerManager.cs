@@ -108,9 +108,11 @@ If this assembly contains controllers, the exception may be caused by assembly v
             foreach (Assembly assm in AppDomain.CurrentDomain.GetAssemblies())
                 LoadAssembly(assm);
 
+			dispatcherFactory.GetDispatcherInstance().ForceUpdateBindPoints();
+
+
             AppDomain.CurrentDomain.AssemblyLoad += new AssemblyLoadEventHandler(CurrentDomain_AssemblyLoad);
 
-//            dispatcherFactory.GetDispatcherInstance().ProcessControllers();
             loaded = true;
         }
 
@@ -122,8 +124,8 @@ If this assembly contains controllers, the exception may be caused by assembly v
         void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
             LoadAssembly(args.LoadedAssembly);
+			dispatcherFactory.GetDispatcherInstance().ForceUpdateBindPoints();
 
-//            dispatcherFactory.GetDispatcherInstance().ProcessControllers();
         }
 
         /// <summary>
@@ -141,7 +143,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
 				{
 					if (t.GetInterface(typeof(IController).Name) != null)
 						LoadType(t);
-					Trace.WriteLine(String.Format("------------------------CONTROLLERS PROCESSED: {0} of {1}", i, j));
+//					Trace.WriteLine(String.Format("------------------------CONTROLLERS PROCESSED: {0} of {1}", i, j));
 					i++;
 				}
             }

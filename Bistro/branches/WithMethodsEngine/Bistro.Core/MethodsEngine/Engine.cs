@@ -30,6 +30,7 @@ using BindPointDescriptor = Bistro.Controllers.Descriptor.ControllerDescriptor.B
 using Bistro.Controllers;
 using Bistro.Interfaces;
 using Bistro.Controllers.Dispatch;
+using System.Diagnostics;
 
 namespace Bistro.MethodsEngine
 {
@@ -47,6 +48,13 @@ namespace Bistro.MethodsEngine
             InterfaceNotSupported
         }
 
+		enum Messages
+		{
+			[DefaultMessage("Extracted method by url in {0} ms over a set of {1} bind points")]
+			MethodFound,
+			[DefaultMessage("Found execution path in {0} ms over a set of {1} bind points")]
+			PathCalculation
+		}
 
 
         /// <summary>
@@ -122,10 +130,18 @@ namespace Bistro.MethodsEngine
             {
                 processor.AddNewBinding(bindUrl);
             }
-            processor.UpdateBindPoints();
+//            processor.UpdateBindPoints();
 
 
         }
+
+
+		public void ForceUpdateBindPoints()
+		{
+			processor.UpdateBindPoints();
+//			System.Diagnostics.Trace.WriteLine("BindPoints updated");
+		}
+
 
         /// <summary>
         /// Determines whether the request url has exact bind in the <c>map</c>
@@ -166,8 +182,14 @@ namespace Bistro.MethodsEngine
         /// <returns></returns>
         public List<ControllerInvocationInfo> GetControllers(string requestUrl)
         {
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
+
 			Dictionary<IMethodsBindPointDesc,Dictionary<string,string>> getParams;
 			var methodSubSet = processor.GetMethodByUrl(requestUrl, out getParams);
+
+			Logger.Report(Messages.MethodFound, sw.ElapsedMilliseconds.ToString(), map.Count.ToString());
+
 
 			List<ControllerInvocationInfo> retList = new List<ControllerInvocationInfo>(methodSubSet.BindingsList.Count);
 			// Here we should get the bindings list and create controller invocation with params and binding for every controller.
@@ -175,6 +197,8 @@ namespace Bistro.MethodsEngine
 			{
 				retList.Add(new ControllerInvocationInfo((BindPointDescriptor)bindPoint, getParams[bindPoint]));
 			}
+
+			Logger.Report(Messages.PathCalculation, sw.ElapsedMilliseconds.ToString(), map.Count.ToString());
 
 			return retList;
         }

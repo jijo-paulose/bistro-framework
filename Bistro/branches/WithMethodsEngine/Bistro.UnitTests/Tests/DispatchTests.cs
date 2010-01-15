@@ -63,7 +63,7 @@ namespace Bistro.UnitTests.Tests
         public void HomeURL()
         {
             var controllers = dispatcher.GetControllers("GET/");
-            Assert.AreEqual(2 + controllerCountOffset, controllers);
+            Assert.AreEqual(2 + controllerCountOffset, controllers.Count);
 
             Assert.That(typeof(HomeUrlController1).IsPresentIn(controllers), "HomeUrlController1 is missing");
             Assert.That(typeof(HomeUrlController2).IsPresentIn(controllers), "HomeUrlController2 is missing");

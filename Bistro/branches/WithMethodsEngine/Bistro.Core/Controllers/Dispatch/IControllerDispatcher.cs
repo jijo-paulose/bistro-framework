@@ -64,5 +64,11 @@ namespace Bistro.Controllers.Dispatch
         /// <param name="info">The info.</param>
         void RegisterController(IControllerDescriptor info);
 
+		/// <summary>
+		/// Forces the update of bind points.
+		/// </summary>
+		void ForceUpdateBindPoints();
+
+
     }
 }

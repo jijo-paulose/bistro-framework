@@ -162,8 +162,6 @@ namespace Bistro.UnitTests.Tests
 		[TestFixtureTearDown]
 		public void Cleanup()
 		{
-//			TestApplication app = Application.Instance as TestApplication;
-//			app.ResetApp();
 
 		}
 
@@ -184,7 +182,6 @@ namespace Bistro.UnitTests.Tests
 			#region Load part
 			TestDescriptor descriptor = (TestDescriptor)test;
 
-
 			if (Application.Instance == null)
 				Application.Initialize(initSh);
 
@@ -202,7 +199,6 @@ namespace Bistro.UnitTests.Tests
 
 
 			#region Test part
-
 
 
 			foreach (UrlControllersTest urlTest in descriptor.UrlTests)

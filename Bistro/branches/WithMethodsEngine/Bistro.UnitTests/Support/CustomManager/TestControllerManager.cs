@@ -104,6 +104,9 @@ namespace Bistro.UnitTests.Support.CustomManager
                 RegisterController(testDescriptor);
 				i++;
             }
+
+			(dispatcherFactory.GetDispatcherInstance()).ForceUpdateBindPoints();
+
         }
 
 

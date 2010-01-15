@@ -31,7 +31,9 @@ namespace Bistro.UnitTests.Support
 
             if (Application.Instance == null)
                 Application.Initialize(sh);
-			(Application.Instance as TestApplication).InitAfter(sh);
+
+			if (Application.Instance.ManagerFactory.GetType() != typeof(ControllerManagerFactory))
+				(Application.Instance as TestApplication).InitAfter(sh);
 			
          
             application = Application.Instance;

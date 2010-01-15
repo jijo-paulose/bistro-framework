@@ -35,12 +35,6 @@ namespace Bistro.MethodsEngine.Subsets
     public class MethodUrlsSubset
     {
 
-        enum Messages
-        {
-            [DefaultMessage("ControllersList sorted \r\n{0}\r\n---------------------\r\n")]
-            ListSorted
-        }
-
 
         /// <summary>
         /// Initializes a new empty instance of the <see cref="MethodUrlsSubset"/> class.

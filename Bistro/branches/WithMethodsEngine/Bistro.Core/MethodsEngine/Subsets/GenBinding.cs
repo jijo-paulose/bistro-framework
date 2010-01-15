@@ -107,14 +107,7 @@ namespace Bistro.MethodsEngine.Subsets
             ErrorSplittingUrl
         }
 
-        /// <summary>
-        /// Information messages
-        /// </summary>
-        enum Messages
-        {
-            [DefaultMessage("Matching url: {0}")]
-            MessageMatchingUrl
-        }
+
 
         /// <summary>
         /// The only constructor, which splits url to the items.
@@ -275,7 +268,6 @@ namespace Bistro.MethodsEngine.Subsets
 			getParamsValues = new Dictionary<string,string>();
 			Dictionary<string,string> tempParamsValue = new Dictionary<string,string>();
 
-            engine.Logger.Report(Messages.MessageMatchingUrl, requestUrl);
 
 			// Actually url will be split into two parts. - before ? and after.
             List<string> splitQueryString = requestUrl.Split('?').ToList();
@@ -302,7 +294,7 @@ namespace Bistro.MethodsEngine.Subsets
             {
 				if (paramsRegex.IsMatch(firstPart[i]))
 				{
-					tempParamsValue.Add(firstPart[i].Trim('{','}'),requestComponents[i]);
+					tempParamsValue.Add(firstPart[i].Trim('{','}'),(i<requestComponents.Count) ? requestComponents[i] : null);
 					continue;
 				}
                 if ((wildCardRegex.IsMatch(firstPart[i])) || (firstPart[i] == requestComponents[i]))
@@ -334,7 +326,7 @@ namespace Bistro.MethodsEngine.Subsets
                     {
 						if (paramsRegex.IsMatch(currentMatchPart[i]))
 						{
-							tempParamsValue.Add(currentMatchPart[i].Trim('{', '}'), requestComponents[i + positionInMatchPart]);
+							tempParamsValue.Add(currentMatchPart[i].Trim('{', '}'),((i + positionInMatchPart)< requestComponents.Count)? requestComponents[i + positionInMatchPart] : null);
 							continue;
 						}
                         if (wildCardRegex.IsMatch(currentMatchPart[i]))

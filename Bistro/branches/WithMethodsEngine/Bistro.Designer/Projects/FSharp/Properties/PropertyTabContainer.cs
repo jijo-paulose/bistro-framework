@@ -15,21 +15,21 @@ namespace Bistro.Designer.Projects.FSharp
     {
         private Control control;
 
-        protected abstract Type TabType { get; }
-
         public override void Activate(IntPtr parent, RECT[] pRect, int bModal)
         {
             if (this.control == null)
             {
-                this.control = (Control)Activator.CreateInstance(TabType, ProjectMgr);
+                this.control = CreateControl();
                 this.control.Size = new Size(pRect[0].right - pRect[0].left, pRect[0].bottom - pRect[0].top);
-                this.control.Text = "Settings";// TODO localization
                 this.control.Visible = false;
                 this.control.Size = new Size(550, 300);
                 this.control.CreateControl();
                 NativeMethods.SetParent(this.control.Handle, parent);
+                BindProperties();
             }
         }
+
+        protected abstract Control CreateControl();
 
         public override void Show(uint cmd)
         {
@@ -43,16 +43,6 @@ namespace Bistro.Designer.Projects.FSharp
 
             this.control.Location = new Point(r.left, r.top);
             this.control.Size = new Size(r.right - r.left, r.bottom - r.top);
-        }
-
-        protected override void BindProperties()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override int ApplyChanges()
-        {
-            throw new NotImplementedException();
         }
 
     }

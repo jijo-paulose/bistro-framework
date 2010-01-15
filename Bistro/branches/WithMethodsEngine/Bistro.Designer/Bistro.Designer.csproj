@@ -204,7 +204,7 @@
     <Compile Include="ProjectBase\VSShellUtilities.cs" />
     <Compile Include="Projects\FSharp\Factory.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
-    <Compile Include="Projects\FSharp\PropertyTabContainer.cs">
+    <Compile Include="Projects\FSharp\Properties\PropertyTabContainer.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Resources.Designer.cs">
@@ -239,16 +239,24 @@
     <Compile Include="$(CommonRegAttributes)\ProvideMSBuildTargetAttribute.cs">
       <Link>RegistrationAttributes\ProvideMSBuildTargetAttribute.cs</Link>
     </Compile>
-    <Compile Include="Projects\FSharp\BuildOrderPage.cs" />
-    <Compile Include="Projects\FSharp\BuildOrderViewer.cs">
+    <Compile Include="Projects\FSharp\Properties\ApplicationPage.cs" />
+    <Compile Include="Projects\FSharp\Properties\ApplicationViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Projects\FSharp\BuildOrderViewer.Designer.cs">
-      <DependentUpon>BuildOrderViewer.cs</DependentUpon>
+    <Compile Include="Projects\FSharp\Properties\ApplicationViewer.Designer.cs">
+      <DependentUpon>ApplicationViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Projects\FSharp\Properties\CompileOrderPage.cs" />
+    <Compile Include="Projects\FSharp\Properties\CompileOrderViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Projects\FSharp\Properties\CompileOrderViewer.Designer.cs">
+      <DependentUpon>CompileOrderViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Projects\FSharp\OAProjectProperties.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Projects\FSharp\Properties\FSharpPropertiesConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">
@@ -285,8 +293,11 @@
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
     <None Include="Resources\Images_32bit.bmp" />
     <None Include="Resources\Images_24bit.bmp" />
-    <EmbeddedResource Include="Projects\FSharp\BuildOrderViewer.resx">
-      <DependentUpon>BuildOrderViewer.cs</DependentUpon>
+    <EmbeddedResource Include="Projects\FSharp\Properties\ApplicationViewer.resx">
+      <DependentUpon>ApplicationViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Projects\FSharp\Properties\CompileOrderViewer.resx">
+      <DependentUpon>CompileOrderViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Root.bmp" />
     <EmbeddedResource Include="Resources\imagelis.bmp">

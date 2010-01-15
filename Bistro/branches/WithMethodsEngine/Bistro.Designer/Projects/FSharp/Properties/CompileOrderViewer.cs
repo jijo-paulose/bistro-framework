@@ -11,9 +11,9 @@ using Microsoft.Build.BuildEngine;
 using System.Xml;
 using System.Reflection;
 
-namespace Bistro.Designer.Projects.FSharp
+namespace Bistro.Designer.Projects.FSharp.Properties
 {
-    public partial class BuildOrderViewer : UserControl
+    public partial class CompileOrderViewer : UserControl
     {
         ProjectManager project;
         class BuildElement
@@ -27,7 +27,7 @@ namespace Bistro.Designer.Projects.FSharp
             public BuildItem BuildItem { get; private set; }
         }
 
-        public BuildOrderViewer(ProjectManager project)
+        public CompileOrderViewer(ProjectManager project)
         {
             this.project = project;
             InitializeComponent();

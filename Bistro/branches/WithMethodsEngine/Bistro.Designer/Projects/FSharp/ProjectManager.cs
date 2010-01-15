@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Bistro.Designer.ProjectBase.Automation;
 using System.IO;
 using Microsoft.VisualStudio.Editors.PropertyPages;
+using Bistro.Designer.Projects.FSharp.Properties;
 
 namespace Bistro.Designer.Projects.FSharp
 {
@@ -101,8 +102,9 @@ namespace Bistro.Designer.Projects.FSharp
             // Application, BuildEvents, ReferencePaths
             return new Guid[]
             {
+                typeof(ApplicationPage).GUID,
                 typeof(ApplicationPropPageComClass).GUID,
-                typeof(BuildOrderPage).GUID,
+                typeof(CompileOrderPage).GUID,
                 typeof(BuildEventsPropPageComClass).GUID,
                 typeof(ReferencePathsPropPageComClass).GUID
             };

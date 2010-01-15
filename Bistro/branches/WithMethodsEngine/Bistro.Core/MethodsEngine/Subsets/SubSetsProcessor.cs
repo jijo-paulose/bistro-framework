@@ -27,6 +27,7 @@ using Bistro.MethodsEngine.Reflection;
 using System.Text.RegularExpressions;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers;
+using System.Diagnostics;
 
 namespace Bistro.MethodsEngine.Subsets
 {
@@ -37,6 +38,20 @@ namespace Bistro.MethodsEngine.Subsets
     internal class SubSetsProcessor
     {
 
+		private class SwitcherNode
+		{
+			private SwitcherNode positive;
+			private SwitcherNode negative;
+			private GenBindingTuple tuple;
+			private MethodUrlsSubset subset;
+
+			internal SwitcherNode(GenBindingTuple _tuple)
+			{
+				tuple = _tuple;
+			}
+
+		}
+
 
         enum Errors
         {
@@ -44,6 +59,13 @@ namespace Bistro.MethodsEngine.Subsets
             ErrorMethodNotFound
         }
 
+		enum Messages
+		{
+			[DefaultMessage("Method comparison completed in {0} ms (TryMatchUrlGetParams) ")]
+			MethodTryMatch,
+			[DefaultMessage("Method matched and found in {0} ms (DictionarySearch) ")]
+			MethodMatchedAndFound
+		}
 
 
         /// <summary>
@@ -106,6 +128,8 @@ namespace Bistro.MethodsEngine.Subsets
         {
             // Compare with each Binding
             Dictionary<GenBinding,Dictionary<string,string>> bindingsToSearch = new Dictionary<GenBinding,Dictionary<string,string>>();
+			Stopwatch sw1 = new Stopwatch();
+			sw1.Start();
             foreach (GenBindingTuple tuple in allBindings)
             {
 				Dictionary<string, string> getParamsVals;
@@ -115,6 +139,7 @@ namespace Bistro.MethodsEngine.Subsets
                 
             }
 
+			engine.Logger.Report(Messages.MethodTryMatch, sw1.ElapsedMilliseconds.ToString());
 
             // Compare result with each method
             foreach (MethodUrlsSubset subset in allMethods)
@@ -125,9 +150,12 @@ namespace Bistro.MethodsEngine.Subsets
                     if (bindingsToSearch.ContainsKey(bind))
                         continue;
                     notFound = true;
+					break;
                 }
                 if (notFound)
                     continue;
+
+				engine.Logger.Report(Messages.MethodMatchedAndFound, sw1.ElapsedMilliseconds.ToString());
 
 				getParams = new Dictionary<IMethodsBindPointDesc, Dictionary<string, string>>();
 
@@ -149,7 +177,9 @@ namespace Bistro.MethodsEngine.Subsets
 					}
 
 				}
-                return subset;
+
+				sw1.Stop();
+				return subset;
             }
 
 			getParams = null;
@@ -168,6 +198,8 @@ namespace Bistro.MethodsEngine.Subsets
             {
                 subset.UpdateBindPoints();
             }
+
+
         }
 
 

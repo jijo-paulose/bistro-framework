@@ -37,7 +37,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 11);
+            this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
             this.label1.Padding = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.label1.Size = new System.Drawing.Size(86, 13);
@@ -46,14 +46,14 @@
             // 
             // assemblyName
             // 
-            this.assemblyName.Location = new System.Drawing.Point(6, 27);
+            this.assemblyName.Location = new System.Drawing.Point(6, 16);
             this.assemblyName.Name = "assemblyName";
             this.assemblyName.Size = new System.Drawing.Size(248, 20);
             this.assemblyName.TabIndex = 1;
             // 
             // rootNamespace
             // 
-            this.rootNamespace.Location = new System.Drawing.Point(277, 27);
+            this.rootNamespace.Location = new System.Drawing.Point(277, 16);
             this.rootNamespace.Name = "rootNamespace";
             this.rootNamespace.Size = new System.Drawing.Size(248, 20);
             this.rootNamespace.TabIndex = 3;
@@ -62,7 +62,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(274, 11);
+            this.label2.Location = new System.Drawing.Point(274, 0);
             this.label2.Name = "label2";
             this.label2.Padding = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.label2.Size = new System.Drawing.Size(105, 13);

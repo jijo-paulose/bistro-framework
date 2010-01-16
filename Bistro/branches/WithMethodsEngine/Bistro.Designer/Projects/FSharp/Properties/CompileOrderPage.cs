@@ -9,16 +9,17 @@ using Microsoft.VisualStudio;
 namespace Bistro.Designer.Projects.FSharp.Properties
 {
     [CLSCompliant(false), ComVisible(true), Guid("D43926CD-8001-42fd-999E-F5B4BA050107")]
-    public class CompileOrderPage : PropertyTabContainer
+    public class CompileOrderPage : PropertyTabContainer<CompileOrderViewer>
     {
-        public CompileOrderPage()
+
+        protected override string Name
         {
-            Name = "Compilation Order";
+            get { return FSharpPropertiesConstants.CompileOrder; }
         }
 
-        protected override Control CreateControl()
+        protected override CompileOrderViewer CreateControl()
         {
-            return new CompileOrderViewer((ProjectManager)this.ProjectMgr);
+            return new CompileOrderViewer((ProjectManager)this.Project);
         }
 
         protected override void BindProperties()

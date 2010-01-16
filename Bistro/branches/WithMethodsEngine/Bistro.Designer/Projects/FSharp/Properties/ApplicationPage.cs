@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Bistro.Designer.Projects.FSharp.Properties
 {
     [CLSCompliant(false), ComVisible(true), Guid("E04AA22F-EC71-4a64-A7B5-8537F85A341E")]
-    public class ApplicationPage : PropertyTabContainer
+    public class ApplicationPage : PropertyTabContainer<ApplicationViewer>
     {
         string rootNamespace;
 
@@ -25,33 +25,26 @@ namespace Bistro.Designer.Projects.FSharp.Properties
         }
         #endregion
 
-        public ApplicationPage()
+        protected override string Name
         {
-            Name = SR.GetString(FSharpPropertiesConstants.Application);
+            get { return FSharpPropertiesConstants.Application; }
         }
 
-
-        ApplicationViewer control;
-        protected override Control CreateControl()
+        protected override ApplicationViewer CreateControl()
         {
-            control = new ApplicationViewer(this);
-            return control;
+            return new ApplicationViewer(this);
         }
 
         protected override void BindProperties()
 		{
             rootNamespace = GetConfigProperty(ProjectFileConstants.RootNamespace);
-            control.BindProperties();
+            Control.BindProperties();
 		}
 
 		protected override int ApplyChanges()
 		{
-			if(ProjectMgr == null)
-				return VSConstants.E_INVALIDARG;
-
-			SetConfigProperty(ProjectFileConstants.RootNamespace, rootNamespace);
-			IsDirty = false;
-			return VSConstants.S_OK;
+			Project.SetProjectProperty(ProjectFileConstants.RootNamespace, rootNamespace);
+            return VSConstants.S_OK;
 		}
     }
 }

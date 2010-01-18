@@ -21,11 +21,17 @@ namespace Bistro.Designer.Projects.FSharp.Properties
         internal void BindProperties()
         {
             rootNamespace.Text = page.RootNamespace;
+            assemblyName.Text = page.AssemblyName;
         }
 
         private void rootNamespace_TextChanged(object sender, EventArgs e)
         {
             page.RootNamespace = rootNamespace.Text;
+        }
+
+        private void assemblyName_TextChanged(object sender, EventArgs e)
+        {
+            page.AssemblyName = assemblyName.Text;
         }
     }
 }

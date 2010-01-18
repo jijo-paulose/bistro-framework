@@ -50,6 +50,7 @@
             this.assemblyName.Name = "assemblyName";
             this.assemblyName.Size = new System.Drawing.Size(248, 20);
             this.assemblyName.TabIndex = 1;
+            this.assemblyName.TextChanged += new System.EventHandler(this.assemblyName_TextChanged);
             // 
             // rootNamespace
             // 

@@ -92,10 +92,10 @@ namespace Bistro.Designer.Projects.FSharp
                 OnProjectModified(this, EventArgs.Empty);
         }
 
-        protected override NodeProperties CreatePropertiesObject()
-        {
-            return new OAProjectProperties(this);
-        }
+        //protected override NodeProperties CreatePropertiesObject()
+        //{
+        //    return new OAProjectProperties(this);
+        //}
 
         protected override Guid[] GetConfigurationIndependentPropertyPages()
         {
@@ -103,17 +103,21 @@ namespace Bistro.Designer.Projects.FSharp
             return new Guid[]
             {
                 typeof(ApplicationPage).GUID,
-                typeof(ApplicationPropPageComClass).GUID,
-                typeof(CompileOrderPage).GUID,
-                typeof(BuildEventsPropPageComClass).GUID,
-                typeof(ReferencePathsPropPageComClass).GUID
+                typeof(CompileOrderPage).GUID
+                //typeof(BuildEventsPropPageComClass).GUID,
+                //typeof(ReferencePathsPropPageComClass).GUID
             };
         }
 
         protected override Guid[] GetConfigurationDependentPropertyPages()
         {
             // Build Project property page
-            return new Guid[] { typeof(BuildPropPageComClass).GUID };
+            return new Guid[] { typeof(FSharpBuildPropPageComClass).GUID };
+        }
+
+        protected override ConfigProvider CreateConfigProvider()
+        {
+            return new FSharpConfigProvider(this);
         }
 
         /// <summary>

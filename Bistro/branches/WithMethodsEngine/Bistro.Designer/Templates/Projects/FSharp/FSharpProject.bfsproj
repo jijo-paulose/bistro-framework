@@ -13,16 +13,16 @@
   <AssemblyName>$safeprojectname$</AssemblyName>
   <TargetFrameworkVersion>v$targetframeworkversion$</TargetFrameworkVersion>
  </PropertyGroup>
- <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+ <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
   <DebugSymbols>true</DebugSymbols>
   <DebugType>full</DebugType>
   <Optimize>false</Optimize>
-  <Tailcalls>false</Tailcalls>
+  <Tailcalls>true</Tailcalls>
   <OutputPath>bin\</OutputPath>
   <DefineConstants>DEBUG;TRACE</DefineConstants>
   <WarningLevel>3</WarningLevel>
  </PropertyGroup>
- <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+ <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
   <DebugType>pdbonly</DebugType>
    <Optimize>true</Optimize>
   <Tailcalls>true</Tailcalls>

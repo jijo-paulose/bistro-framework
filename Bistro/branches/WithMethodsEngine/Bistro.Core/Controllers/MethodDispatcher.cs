@@ -45,6 +45,8 @@ namespace Bistro.Controllers
             ExceptionNoSession,
             [DefaultMessage("Exception processing URL ({0}) {1}\r\n\tSession: ID={2} Activity: {3} ({4}). For additional information, reference {5}.")]
             Exception,
+			[DefaultMessage("Unhandled exception: {0}\r\n\t Stack trace: {1}")]
+			UnhandledException,
             [DefaultMessage("Headers are \r\n{0}")]
             Headers,
             [DefaultMessage("Extended information for trace {0}. Review attached parameters.")]
@@ -242,8 +244,17 @@ namespace Bistro.Controllers
             }
             catch (Exception ex)
             {
-                if (!IsMethodDefinedExplicitly(Application.UnhandledException))
-                    throw new ApplicationException("Unhandled exception, and no binding to " + Application.UnhandledException + " found.", ex);
+				try
+				{
+					logger.Report(Messages.UnhandledException,ex.Message,ex.StackTrace);
+				}
+				catch
+				{}
+
+				if (!IsMethodDefinedExplicitly(Application.UnhandledException))
+				{
+					throw new ApplicationException("Unhandled exception, and no binding to " + Application.UnhandledException + " found.", ex);
+				}
 
                 requestContext.Clear();
                 requestContext.Add("unhandledException", ex);

@@ -32,7 +32,7 @@ namespace Bistro.MethodsEngine.Subsets
     /// Class, representing a part of the url field. It contains one of two GenBindings for every binding in the engine.
     /// Hence, there's information on how this urlsubset relates to the bindings.
     /// </summary>
-    public class MethodUrlsSubset
+    public class BistroMethod
     {
 
 
@@ -40,7 +40,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// Initializes a new empty instance of the <see cref="MethodUrlsSubset"/> class.
         /// </summary>
         /// <param name="_engine">The engine.</param>
-        internal MethodUrlsSubset(Engine _engine)
+        internal BistroMethod(Engine _engine)
         {
             bindPointsList = new List<IMethodsBindPointDesc>();
             bindingsList = new List<GenBinding>();
@@ -55,7 +55,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// <param name="_engine">The engine.</param>
         /// <param name="oldBindingsList">Old bindings list.</param>
         /// <param name="newBinding">The new binding.</param>
-        private MethodUrlsSubset(Engine _engine, List<GenBinding> oldBindingsList, GenBinding newBinding)
+        private BistroMethod(Engine _engine, List<GenBinding> oldBindingsList, GenBinding newBinding)
         {
             engine = _engine;
             
@@ -64,6 +64,46 @@ namespace Bistro.MethodsEngine.Subsets
 
 
         }
+
+
+
+		/// <summary>
+		/// Extracts the parameters suitable for this method from the specified url.
+		/// </summary>
+		/// <param name="requestUrl">The request URL.</param>
+		/// <returns>Dictionary with bindpoints bound to parameters.</returns>
+		internal Dictionary<IMethodsBindPointDesc, Dictionary<string, string>> ExtractParameters(string requestUrl)
+		{
+			IEnumerable<GenBinding> positiveBinds = BindingsList.Where(bind => bind.MatchStatus);
+			Dictionary<GenBinding, Dictionary<string, string>> associatedParams = new Dictionary<GenBinding, Dictionary<string, string>>();
+
+			foreach (GenBinding bind in positiveBinds)
+			{
+				associatedParams.Add(bind, bind.ExtractParameters(requestUrl));
+			}
+
+
+			var getParams = new Dictionary<IMethodsBindPointDesc, Dictionary<string, string>>();
+
+			foreach (var bindPoint in bindPointsList)
+			{
+				var relation = pointBindRelation[bindPoint];
+				Dictionary<string, string> parameters =
+					relation.Count == 0 ?
+						new Dictionary<string, string>() : associatedParams[relation[0]];
+
+				getParams.Add(bindPoint, parameters);
+				for (int i = 1; i < relation.Count; i++)
+				{
+					foreach (KeyValuePair<string, string> pair in associatedParams[relation[i]])
+					{
+						getParams[bindPoint][pair.Key] = pair.Value;
+					}
+				}
+			}
+			return getParams;
+
+		}
 
 
         /// <summary>
@@ -233,6 +273,9 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         private List<IMethodsBindPointDesc> bindPointsList;
 
+		/// <summary>
+		/// BindPoint to GenBinding relation
+		/// </summary>
 		private Dictionary<IMethodsBindPointDesc, List<GenBinding>> pointBindRelation;
 
         #endregion
@@ -268,16 +311,16 @@ namespace Bistro.MethodsEngine.Subsets
 
 
         /// <summary>
-        /// This method is called for each binding and returns newly-constructed SubSet, consisting of matching/not matching GenBindings.
+        /// This method is called for each binding and returns newly-constructed Bistro method, consisting of matching/not matching GenBindings.
         /// </summary>
         /// <param name="newBinding">new binding</param>
         /// <returns>newly-created method.</returns>
-        internal MethodUrlsSubset ApplyBinding(GenBinding newBinding)
+        internal BistroMethod ApplyBinding(GenBinding newBinding)
         {
 
             if (newBinding.MatchWithSubset(this))
             {
-                return new MethodUrlsSubset(engine, bindingsList, newBinding);
+                return new BistroMethod(engine, bindingsList, newBinding);
             }
 
             return null;

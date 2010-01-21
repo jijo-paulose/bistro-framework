@@ -129,7 +129,7 @@
     <Compile Include="MethodsEngine\Reflection\IMethodsControllerDesc.cs" />
     <Compile Include="MethodsEngine\Resource.cs" />
     <Compile Include="MethodsEngine\Subsets\GenBinding.cs" />
-    <Compile Include="MethodsEngine\Subsets\MethodUrlsSubset.cs" />
+    <Compile Include="MethodsEngine\Subsets\BistroMethod.cs" />
     <Compile Include="MethodsEngine\Subsets\SubSetsProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\ApplicationValidationResult.cs" />

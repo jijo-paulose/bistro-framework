@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Bistro.Designer.Projects.FSharp.Properties;
-using VSLangProj;
 using Microsoft.VisualStudio.OLE.Interop;
-using System.ComponentModel;
+
+using IOLEServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using System.Collections.Generic;
 
 namespace Bistro.Designer.Projects.FSharp
 {
@@ -29,7 +28,7 @@ namespace Bistro.Designer.Projects.FSharp
             return VSConstants.S_OK;
         }
 
-        const string debug_page_guid = "";
+        const string debug_page_guid = "{9CFBEB2A-6824-43e2-BD3B-B112FEBC3772}";
 
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
@@ -41,28 +40,17 @@ namespace Bistro.Designer.Projects.FSharp
                     case __VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList:
                         //Remove the Debug page
                         property = property.ToString().Split(';')
-                            .Aggregate("", (a, next) => next == debug_page_guid ? a : a + ';' + next).Substring(1);
+                            .Aggregate("", (a, next) => next.Equals(debug_page_guid, StringComparison.OrdinalIgnoreCase) ? a : a + ';' + next).Substring(1);
                         return VSConstants.S_OK;
                     case __VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList:
-                        //Add the Deployment property page.
-                        property += ';' + typeof(CompileOrderPage).GUID.ToString("B");
+                        //Add the CompileOrder property page.
+                        var properties = new List<string>(property.ToString().Split(';'));
+                        properties.Insert(1, typeof(CompileOrderPage).GUID.ToString("B"));
+                        property = properties.Aggregate("", (a, next) => a + ';' + next).Substring(1);
                         return VSConstants.S_OK;
-                    //case __VSHPROPID2.VSHPROPID_BrowseObjectCATID:
-                    //    property = null;
-                    //    return VSConstants.DISP_E_MEMBERNOTFOUND;
                     default:
                         break;
                 }
-                //switch ((__VSHPROPID)propId)
-                //{
-                //    case __VSHPROPID.VSHPROPID_BrowseObject:
-                //        //if (propWrapper == null)
-                //        //    propWrapper = new ProjectPropertiesWrapper(property);
-                //        //property = propWrapper;
-                //        return result;
-                //    default:
-                //        break;
-                //}
             }
             return result;
         }

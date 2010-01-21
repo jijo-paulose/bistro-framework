@@ -158,7 +158,6 @@ namespace Bistro.Http
 				Stopwatch sw = new Stopwatch();
 				sw.Start();
 
-
 				var contextWrapper = new HttpContextWrapper(context);
 				IContext requestContext = CreateRequestContext(contextWrapper);
 				context.User = requestContext.CurrentUser;

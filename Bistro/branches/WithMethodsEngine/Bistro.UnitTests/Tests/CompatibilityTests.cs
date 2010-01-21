@@ -197,7 +197,6 @@ namespace Bistro.UnitTests.Tests
 			testMgr.LoadSpecial(descriptor.Controllers);
 			#endregion
 
-
 			#region Test part
 
 

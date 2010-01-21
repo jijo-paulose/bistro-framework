@@ -6,16 +6,16 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Bistro.Designer.ProjectBase;
 using Microsoft.Build.BuildEngine;
 using System.Xml;
 using System.Reflection;
+using System.IO;
 
 namespace Bistro.Designer.Projects.FSharp.Properties
 {
     public partial class CompileOrderViewer : UserControl
     {
-        ProjectManager project;
+        Project project;
         class BuildElement
         {
             public BuildElement(BuildItemGroup BuildItemGroup, BuildItem BuildItem)
@@ -27,33 +27,32 @@ namespace Bistro.Designer.Projects.FSharp.Properties
             public BuildItem BuildItem { get; private set; }
         }
 
-        public CompileOrderViewer(ProjectManager project)
+        public CompileOrderViewer(Project project)
         {
             this.project = project;
             InitializeComponent();
             refresh_file_list();
-            //project.OnProjectModified += new EventHandler(project_OnProjectModified);
         }
+
+        public event EventHandler OnPageUpdated;
 
         void project_OnProjectModified(object sender, EventArgs e)
         {
             refresh_file_list();
         }
 
-        void refresh_file_list()
+        public void refresh_file_list()
         {
             Dependencies.Nodes.Clear();
-            //foreach (BuildItemGroup group in project.BuildProject.ItemGroups)
-            //{
-            //    foreach (BuildItem item in group)
-            //        if (item.Name == "Compile"
-            //            && project.IsCodeFile(item.FinalItemSpec)
-            //            && !item.IsImported)
-            //        {
-            //            Dependencies.Nodes.Add(item.FinalItemSpec)
-            //                .Tag = new BuildElement(group, item);
-            //        }
-            //}           
+            foreach (BuildItemGroup group in project.ItemGroups)
+            {
+                foreach (BuildItem item in group)
+                    if (item.Name == "Compile" && Path.GetExtension(item.FinalItemSpec) == ".fs")
+                    {
+                        Dependencies.Nodes.Add(item.FinalItemSpec)
+                            .Tag = new BuildElement(group, item);
+                    }
+            }           
         }
 
         private void MoveUp_Click(object sender, EventArgs e)
@@ -89,6 +88,8 @@ namespace Bistro.Designer.Projects.FSharp.Properties
                     new_index = n.Index + 1;
                     break;
             }
+            if (OnPageUpdated != null)
+                OnPageUpdated(this, EventArgs.Empty);
 
             BuildElement fst = (BuildElement)n.Tag;
             BuildElement snd = (BuildElement)Dependencies.Nodes[new_index].Tag;

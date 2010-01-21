@@ -32,14 +32,6 @@ namespace Bistro.Designer.Projects.FSharp
         {
             var project = new ProjectManager();
             project.SetSite((IOleServiceProvider)((IServiceProvider)package).GetService(typeof(IOleServiceProvider)));
-            //ILocalRegistryCorrected globalService = (ILocalRegistryCorrected)Package.GetGlobalService(typeof(SLocalRegistry));
-            //Guid clsid = new Guid("{C402364C-5474-47e7-AE72-BF5418780221}");
-            //Guid riid = VSConstants.IID_IUnknown;
-            //uint dwFlags = 1;
-            //IntPtr ppvObj = IntPtr.Zero;
-            //IVsProjectAggregator2 objectForIUnknown = null;
-            //int hr = globalService.CreateInstance(clsid, outerProjectIUnknown, ref riid, dwFlags, out ppvObj);
-            //var o = Marshal.CreateAggregatedObject(ppvObj, project);
             return project;
         }
     }

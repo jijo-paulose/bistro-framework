@@ -12,7 +12,6 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Bistro.Designer.Explorer;
 using Bistro.Designer.ProjectBase;
-using Bistro.Designer.Projects.FSharp;
 using Bistro.Designer.Projects.FSharp.Properties;
 
 namespace Bistro.Designer
@@ -51,9 +50,9 @@ namespace Bistro.Designer
     [ProvideProjectFactory(
         typeof(Projects.FSharp.Factory), 
         null,
-        "Bistro Project Files (*.bfsproj);*.bfsproj", 
-        "bfsproj",                                      // default project file extension
-        "bfsproj",                                      // possible project file extensions
+        null, 
+        null,                                           // default project file extension
+        null,                                           // possible project file extensions
         @".\NullPath",                                  // template directory .\\NullPath indicates that
                                                         // the template directory will not be used, instead
                                                         // the zipped templates will be scanned for vstemplate
@@ -63,13 +62,12 @@ namespace Bistro.Designer
                                                         // projects in the AddNewProject dialog
 
     [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
-    [WAProvideProjectFactoryTemplateMapping("{" + Guids.guidFSharpProjectFactoryString + "}", typeof(Projects.FSharp.DummyWebFactory))]
+    [WAProvideProjectFactoryTemplateMapping("{" + "f2a71f9b-5d33-465a-a702-920d77279786" + "}", typeof(Projects.FSharp.DummyWebFactory))]
 
     [ProvideObject(typeof(CompileOrderPage))]
-    [ProvideObject(typeof(ApplicationPage))]
 
     [Guid(Guids.guidBistro_DesignerPkgString)]
-    public sealed class DesignerPackage : ProjectPackage
+    public sealed class DesignerPackage : Package
     {
         /// <summary>
         /// Default constructor of the package.

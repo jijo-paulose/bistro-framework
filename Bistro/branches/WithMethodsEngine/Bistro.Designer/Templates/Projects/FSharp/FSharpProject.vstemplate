@@ -10,7 +10,7 @@
 		<ProvideDefaultName>true</ProvideDefaultName>
 	</TemplateData>
 	<TemplateContent>
-		<Project File="FSharpProject.bfsproj" ReplaceParameters="true">
+		<Project File="FSharpProject.fsproj" ReplaceParameters="true">
 			<Folder Name="Controllers" TargetFolderName="Controllers">
 				<ProjectItem ReplaceParameters="true" OpenInEditor="true">
 					Controllers.fs

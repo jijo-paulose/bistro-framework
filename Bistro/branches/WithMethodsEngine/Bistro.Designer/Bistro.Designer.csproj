@@ -35,6 +35,7 @@
   <ItemGroup>
     <Reference Include="EnvDTE" />
     <Reference Include="EnvDTE80" />
+    <Reference Include="FSharp.ProjectSystem.Base, Version=1.9.7.8, Culture=neutral, PublicKeyToken=a19089b1c74d0809, processorArchitecture=MSIL" />
     <Reference Include="FSharp.ProjectSystem.PropertyPages, Version=1.9.7.8, Culture=neutral, PublicKeyToken=a19089b1c74d0809, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Build.Engine, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>Microsoft.Build.Engine.dll</HintPath>
@@ -60,6 +61,7 @@
     <Reference Include="Microsoft.VisualStudio.CommonIDE, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Editors" />
     <Reference Include="Microsoft.VisualStudio.ManagedInterfaces" />
+    <Reference Include="Microsoft.VisualStudio.ProjectAggregator, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Design, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.VSHelp, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Designer.Interfaces" />
@@ -203,10 +205,6 @@
     <Compile Include="ProjectBase\VsCommands.cs" />
     <Compile Include="ProjectBase\VSShellUtilities.cs" />
     <Compile Include="Projects\FSharp\Factory.cs" />
-    <Compile Include="Projects\FSharp\ProjectManager.cs" />
-    <Compile Include="Projects\FSharp\Properties\PropertyTabContainer.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -239,26 +237,22 @@
     <Compile Include="$(CommonRegAttributes)\ProvideMSBuildTargetAttribute.cs">
       <Link>RegistrationAttributes\ProvideMSBuildTargetAttribute.cs</Link>
     </Compile>
-    <Compile Include="Projects\FSharp\FSharpConfigProvider.cs" />
-    <Compile Include="Projects\FSharp\FSharpProjectNodeProperties.cs" />
-    <Compile Include="Projects\FSharp\Properties\ApplicationPage.cs" />
-    <Compile Include="Projects\FSharp\Properties\ApplicationViewer.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="Projects\FSharp\ProjectManager.cs" />
+    <Compile Include="Projects\FSharp\Properties\CompileOrderPage.cs">
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Projects\FSharp\Properties\ApplicationViewer.Designer.cs">
-      <DependentUpon>ApplicationViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\CompileOrderPage.cs" />
     <Compile Include="Projects\FSharp\Properties\CompileOrderViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Projects\FSharp\Properties\CompileOrderViewer.Designer.cs">
       <DependentUpon>CompileOrderViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Projects\FSharp\OAProjectProperties.cs">
+    <Compile Include="Projects\FSharp\Properties\FSharpPropertiesConstants.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Projects\FSharp\Properties\FSharpPropertiesConstants.cs" />
+    <Compile Include="Projects\FSharp\Properties\PropertyTabContainer.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">
@@ -295,9 +289,6 @@
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
     <None Include="Resources\Images_32bit.bmp" />
     <None Include="Resources\Images_24bit.bmp" />
-    <EmbeddedResource Include="Projects\FSharp\Properties\ApplicationViewer.resx">
-      <DependentUpon>ApplicationViewer.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Projects\FSharp\Properties\CompileOrderViewer.resx">
       <DependentUpon>CompileOrderViewer.cs</DependentUpon>
     </EmbeddedResource>
@@ -393,7 +384,7 @@
     <ZipProject Include="Templates\Projects\FSharp\Controllers.fs">
       <OutputSubPath>Bistro</OutputSubPath>
     </ZipProject>
-    <ZipProject Include="Templates\Projects\FSharp\FSharpProject.bfsproj">
+    <ZipProject Include="Templates\Projects\FSharp\FSharpProject.fsproj">
       <OutputSubPath>Bistro</OutputSubPath>
     </ZipProject>
     <ZipProject Include="Templates\Projects\FSharp\home.django">

@@ -45,7 +45,9 @@ namespace Bistro.Controllers
             [DefaultMessage(@"Skipping assembly '{0}' due to load exceptions. 
 If this assembly contains controllers, the exception may be caused by assembly version mismatches. Exception follows.
 {1}")]
-            ExceptionLoadingAssembly
+            ExceptionLoadingAssembly,
+			[DefaultMessage("Assembly loaded in {0} ms.")]
+			AssemblyLoaded
         }
 
         /// <summary>
@@ -122,18 +124,20 @@ If this assembly contains controllers, the exception may be caused by assembly v
         /// <param name="sender">The source of the event.</param>
         /// <param name="args">The <see cref="System.AssemblyLoadEventArgs"/> instance containing the event data.</param>
         void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
-        {
-            LoadAssembly(args.LoadedAssembly);
-			dispatcherFactory.GetDispatcherInstance().ForceUpdateBindPoints();
-
+		{
+			if (LoadAssembly(args.LoadedAssembly))
+			{
+				dispatcherFactory.GetDispatcherInstance().ForceUpdateBindPoints();
+			}
         }
 
         /// <summary>
         /// Loads the assembly.
         /// </summary>
         /// <param name="assm">The assm.</param>
-        protected virtual void LoadAssembly(Assembly assm)
+        protected virtual bool LoadAssembly(Assembly assm)
         {
+			bool controllerFound = false;
             try
             {
 				var aaa = assm.GetTypes();
@@ -142,8 +146,10 @@ If this assembly contains controllers, the exception may be caused by assembly v
 				foreach (Type t in aaa)
 				{
 					if (t.GetInterface(typeof(IController).Name) != null)
+					{
+						controllerFound = true;
 						LoadType(t);
-//					Trace.WriteLine(String.Format("------------------------CONTROLLERS PROCESSED: {0} of {1}", i, j));
+					}
 					i++;
 				}
             }
@@ -161,6 +167,7 @@ If this assembly contains controllers, the exception may be caused by assembly v
 
                 logger.Report(Messages.ExceptionLoadingAssembly, assm.FullName, sb.ToString());
             }
+			return controllerFound;
         }
 
         /// <summary>

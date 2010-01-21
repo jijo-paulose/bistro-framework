@@ -67,7 +67,9 @@ namespace Bistro.MethodsEngine.Subsets
 			[DefaultMessage("Method comparison completed in {0} ms (TryMatchUrlGetParams) ")]
 			MethodTryMatch,
 			[DefaultMessage("Method matched and found in {0} ms (DictionarySearch) ")]
-			MethodMatchedAndFound
+			MethodMatchedAndFound,
+			[DefaultMessage("Updating bind points! - Long process.")]
+			UpdatingBindPoints
 		}
 
 
@@ -170,6 +172,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         internal void UpdateBindPoints()
         {
+			engine.Logger.Report(Messages.UpdatingBindPoints);
 			methodsDictionary = new Dictionary<string,BistroMethod>();
             foreach(BistroMethod subset in allMethods)
             {

@@ -213,7 +213,7 @@ namespace Bistro.Controllers.Dispatch
                     }
 
                     // if there are query string parameters, populate them by name, and not positionally
-                    if (splitQueryString.Length == 2)   
+                    if (splitQueryString.Length == 2)
                     {
                         // if there are any errant leading or trailing ampersands, get rid of them
                         string[] queryStringParameters = CleanQueryString(splitQueryString[1]).Split('&', '=');

@@ -74,15 +74,15 @@ namespace Bistro.Designer.Projects.FSharp
 
         public string GetProperty(string propertyName)
         {
-            if (this.project != null)
-            {
-                string property = this.project.BuildProject.GlobalProperties[propertyName].Value;
+            //if (this.project != null)
+            //{
+            //    string property = this.project.BuildProject.GlobalProperties[propertyName].Value;
 
-                if (property != null)
-                {
-                    return property;
-                }
-            }
+            //    if (property != null)
+            //    {
+            //        return property;
+            //    }
+            //}
             return String.Empty;
         }
 
@@ -141,7 +141,7 @@ namespace Bistro.Designer.Projects.FSharp
                     config.SetConfigurationProperty(name, value);
                 }
 
-                this.project.SetProjectFileDirty(true);
+                //this.project.SetProjectFileDirty(true);
             }
         }
         #endregion
@@ -220,64 +220,64 @@ namespace Bistro.Designer.Projects.FSharp
 
         public virtual void SetObjects(uint count, object[] punk)
         {
-            if (count > 0)
-            {
-                if (punk[0] is ProjectConfig)
-                {
-                    ArrayList configs = new ArrayList();
-                    for (int i = 0; i < count; i++)
-                    {
-                        ProjectConfig config = (ProjectConfig)punk[i];
-                        if (this.project == null)
-                        {
-                            this.project = config.ProjectMgr as ProjectManager;
-                        }
-                        configs.Add(config);
-                    }
-                    this.projectConfigs = (ProjectConfig[])configs.ToArray(typeof(ProjectConfig));
-                }
-                else if (punk[0] is NodeProperties)
-                {
-                    if (this.project == null)
-                    {
-                        this.project = (punk[0] as NodeProperties).Node.ProjectMgr as ProjectManager;
-                    }
+            //if (count > 0)
+            //{
+            //    if (punk[0] is ProjectConfig)
+            //    {
+            //        ArrayList configs = new ArrayList();
+            //        for (int i = 0; i < count; i++)
+            //        {
+            //            ProjectConfig config = (ProjectConfig)punk[i];
+            //            if (this.project == null)
+            //            {
+            //                this.project = config.ProjectMgr as ProjectManager;
+            //            }
+            //            configs.Add(config);
+            //        }
+            //        this.projectConfigs = (ProjectConfig[])configs.ToArray(typeof(ProjectConfig));
+            //    }
+            //    else if (punk[0] is NodeProperties)
+            //    {
+            //        if (this.project == null)
+            //        {
+            //            this.project = (punk[0] as NodeProperties).Node.ProjectMgr as ProjectManager;
+            //        }
 
-                    var configsMap = new System.Collections.Generic.Dictionary<string, ProjectConfig>();
-                    for (int i = 0; i < count; i++)
-                    {
-                        NodeProperties property = (NodeProperties)punk[i];
-                        IVsCfgProvider provider;
-                        ErrorHandler.ThrowOnFailure(property.Node.ProjectMgr.GetCfgProvider(out provider));
-                        uint[] expected = new uint[1];
-                        ErrorHandler.ThrowOnFailure(provider.GetCfgs(0, null, expected, null));
-                        if (expected[0] > 0)
-                        {
-                            ProjectConfig[] configs = new ProjectConfig[expected[0]];
-                            uint[] actual = new uint[1];
-                            ErrorHandler.ThrowOnFailure(provider.GetCfgs(expected[0], configs, actual, null));
+            //        var configsMap = new System.Collections.Generic.Dictionary<string, ProjectConfig>();
+            //        for (int i = 0; i < count; i++)
+            //        {
+            //            NodeProperties property = (NodeProperties)punk[i];
+            //            IVsCfgProvider provider;
+            //            ErrorHandler.ThrowOnFailure(property.Node.ProjectMgr.GetCfgProvider(out provider));
+            //            uint[] expected = new uint[1];
+            //            ErrorHandler.ThrowOnFailure(provider.GetCfgs(0, null, expected, null));
+            //            if (expected[0] > 0)
+            //            {
+            //                ProjectConfig[] configs = new ProjectConfig[expected[0]];
+            //                uint[] actual = new uint[1];
+            //                ErrorHandler.ThrowOnFailure(provider.GetCfgs(expected[0], configs, actual, null));
 
-                            foreach (ProjectConfig config in configs)
-                            {
-                                if (!configsMap.ContainsKey(config.ConfigName))
-                                {
-                                    configsMap.Add(config.ConfigName, config);
-                                }
-                            }
-                        }
-                    }
+            //                foreach (ProjectConfig config in configs)
+            //                {
+            //                    if (!configsMap.ContainsKey(config.ConfigName))
+            //                    {
+            //                        configsMap.Add(config.ConfigName, config);
+            //                    }
+            //                }
+            //            }
+            //        }
 
-                    if (configsMap.Count > 0)
-                    {
-                        if (this.projectConfigs == null)
-                        {
-                            this.projectConfigs = new ProjectConfig[configsMap.Keys.Count];
-                        }
-                        configsMap.Values.CopyTo(this.projectConfigs, 0);
-                    }
-                }
-            }
-            else
+            //        if (configsMap.Count > 0)
+            //        {
+            //            if (this.projectConfigs == null)
+            //            {
+            //                this.projectConfigs = new ProjectConfig[configsMap.Keys.Count];
+            //            }
+            //            configsMap.Values.CopyTo(this.projectConfigs, 0);
+            //        }
+            //    }
+            //}
+            //else
             {
                 this.project = null;
             }

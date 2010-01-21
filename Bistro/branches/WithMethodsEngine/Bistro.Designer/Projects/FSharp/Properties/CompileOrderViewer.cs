@@ -32,7 +32,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
             this.project = project;
             InitializeComponent();
             refresh_file_list();
-            project.OnProjectModified += new EventHandler(project_OnProjectModified);
+            //project.OnProjectModified += new EventHandler(project_OnProjectModified);
         }
 
         void project_OnProjectModified(object sender, EventArgs e)
@@ -43,17 +43,17 @@ namespace Bistro.Designer.Projects.FSharp.Properties
         void refresh_file_list()
         {
             Dependencies.Nodes.Clear();
-            foreach (BuildItemGroup group in project.BuildProject.ItemGroups)
-            {
-                foreach (BuildItem item in group)
-                    if (item.Name == "Compile"
-                        && project.IsCodeFile(item.FinalItemSpec)
-                        && !item.IsImported)
-                    {
-                        Dependencies.Nodes.Add(item.FinalItemSpec)
-                            .Tag = new BuildElement(group, item);
-                    }
-            }           
+            //foreach (BuildItemGroup group in project.BuildProject.ItemGroups)
+            //{
+            //    foreach (BuildItem item in group)
+            //        if (item.Name == "Compile"
+            //            && project.IsCodeFile(item.FinalItemSpec)
+            //            && !item.IsImported)
+            //        {
+            //            Dependencies.Nodes.Add(item.FinalItemSpec)
+            //                .Tag = new BuildElement(group, item);
+            //        }
+            //}           
         }
 
         private void MoveUp_Click(object sender, EventArgs e)

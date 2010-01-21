@@ -53,9 +53,9 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         /// <param name="url">The URL.</param>
         /// <returns>GenBinding with the appropriate matchstatus.</returns>
-        internal GenBinding TryMatchUrlGetParams(string url,out Dictionary<string,string> vals)
+        internal GenBinding TryMatchUrlGetParams(string url)
         {
-            return PositiveBind.TryMatchUrl(url,out vals) ? PositiveBind : NegativeBind;
+            return PositiveBind.TryMatchUrl(url) ? PositiveBind : NegativeBind;
         }
 
 
@@ -104,7 +104,9 @@ namespace Bistro.MethodsEngine.Subsets
         enum Errors
         {
             [DefaultMessage("Error splitting incoming url: {0}")]
-            ErrorSplittingUrl
+            ErrorSplittingUrl,
+			[DefaultMessage("Error extracting parameters from the url: {0}")]
+			ErrorExtractingParams
         }
 
 
@@ -256,6 +258,93 @@ namespace Bistro.MethodsEngine.Subsets
 
         #region Internal methods
 
+		/// <summary>
+		/// Extracts the parameters from the GenBinding. Request url must match this binding - there's no check for validation here.
+		/// </summary>
+		/// <param name="requestUrl">The request URL.</param>
+		/// <returns></returns>
+		internal Dictionary<string, string> ExtractParameters(string requestUrl)
+		{
+
+			Dictionary<string, string> tempParamsValues = new Dictionary<string, string>();
+
+			List<string> splitQueryString = requestUrl.Split('?').ToList();
+			List<string> requestComponents = smartUrlSplit(splitQueryString[0]).Where(str => str != String.Empty).ToList();
+
+			if ((requestComponents.Count == 1) || (lengthWithoutEndParams == 1 && this.items.Count == 1))
+				return new Dictionary<string, string>();
+
+			List<string> firstPart = items[0];
+			for (int i = 0; i < firstPart.Count; i++)
+			{
+				if (paramsRegex.IsMatch(firstPart[i]))
+					tempParamsValues.Add(firstPart[i].Trim('{', '}'), (i < requestComponents.Count) ? requestComponents[i] : null);
+				continue;
+			}
+
+
+			Dictionary<string,string> retParams = tempParamsValues;
+			tempParamsValues = new Dictionary<string,string>();
+	
+            int positionInMatchPart = firstPart.Count;
+
+            var currentMatchPartEnum = items.GetEnumerator();
+            currentMatchPartEnum.MoveNext();
+
+			List<string> currentMatchPart = (currentMatchPartEnum.MoveNext()) ? currentMatchPartEnum.Current : null;
+
+			while (currentMatchPart != null)
+			{
+				if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Count)
+				{
+					tempParamsValues.Clear();
+					bool placed = true;
+					for (int i = 0; i < currentMatchPart.Count; i++)
+					{
+						if (paramsRegex.IsMatch(currentMatchPart[i]))
+						{
+							tempParamsValues.Add(currentMatchPart[i].Trim('{', '}'), ((i + positionInMatchPart) < requestComponents.Count) ? requestComponents[i + positionInMatchPart] : null);
+							continue;
+						}
+						if (wildCardRegex.IsMatch(currentMatchPart[i]))
+							continue;
+						if (currentMatchPart[i] == requestComponents[i + positionInMatchPart])
+							continue;
+						placed = false;
+						break;
+					}
+
+					if (placed)
+					{
+						positionInMatchPart = positionInMatchPart + currentMatchPart.Count;
+						currentMatchPartEnum.MoveNext();
+						currentMatchPart = currentMatchPartEnum.Current;
+						retParams = tempParamsValues.Aggregate(retParams, (dict, kvp) => { dict[kvp.Key] = kvp.Value; return dict; });
+					}
+					else
+						positionInMatchPart++;
+				}
+				else
+				{
+					engine.Logger.Report(Errors.ErrorExtractingParams,requestUrl);
+				}
+			}
+
+
+			// if there are query string parameters, populate them by name, and not positionally
+			// This part can be moved to a single place somewhere in the BistroMethod.cs
+			if (splitQueryString.Count == 2)
+			{
+				// if there are any errant leading or trailing ampersands, get rid of them
+				string[] queryStringParameters = CleanQueryString(splitQueryString[1]).Split('&', '=');
+				for (int i = 0; i + 1 < queryStringParameters.Length; i += 2)
+					//					if (descriptor.ParameterFields.ContainsKey(queryStringParameters[i]) && !parameterValues.ContainsKey(queryStringParameters[i]))
+					retParams[queryStringParameters[i]] = queryStringParameters[i + 1];
+			}
+
+			return retParams;
+		}
+
 
         /// <summary>
         /// Tries to match URL to bind URL (NOT to the half of the URL field).
@@ -263,10 +352,8 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         /// <param name="requestUrl">The request URL.</param>
         /// <returns>result of the match</returns>
-        internal bool TryMatchUrl(string requestUrl,out Dictionary<string,string> getParamsValues )
+        internal bool TryMatchUrl(string requestUrl)
         {
-			getParamsValues = new Dictionary<string,string>();
-			Dictionary<string,string> tempParamsValue = new Dictionary<string,string>();
 
 
 			// Actually url will be split into two parts. - before ? and after.
@@ -281,8 +368,6 @@ namespace Bistro.MethodsEngine.Subsets
 				return ((requestComponents.Count == 1) && (lengthWithoutEndParams == 1) && ((this.items.Count == 1) ||(this.items.Count == 2)) && (requestComponents[0] == this.items[0][0]));
 			}
 
-
-
             // if there are more bind components than there are url components, we don't have a match.
             if (requestComponents.Count < lengthWithoutEndParams)
                 return false;
@@ -292,11 +377,6 @@ namespace Bistro.MethodsEngine.Subsets
             bool firstItemMatchImpossible = false;
             for (int i = 0; i < firstPart.Count; i++)
             {
-				if (paramsRegex.IsMatch(firstPart[i]))
-				{
-					tempParamsValue.Add(firstPart[i].Trim('{','}'),(i<requestComponents.Count) ? requestComponents[i] : null);
-					continue;
-				}
                 if ((wildCardRegex.IsMatch(firstPart[i])) || (firstPart[i] == requestComponents[i]))
                     continue;
 
@@ -306,8 +386,6 @@ namespace Bistro.MethodsEngine.Subsets
 
             if (firstItemMatchImpossible)
                 return false;
-			// first merge of parameters values into the common dictionary.
-			getParamsValues = tempParamsValue.Aggregate(getParamsValues, (dict, kvp) => { dict[kvp.Key] = kvp.Value; return dict; });
 
             int positionInMatchPart = firstPart.Count;
 
@@ -320,15 +398,9 @@ namespace Bistro.MethodsEngine.Subsets
             {
                 if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Count)
                 {
-					tempParamsValue.Clear();
                     bool placed = true;
                     for (int i = 0; i < currentMatchPart.Count; i++)
                     {
-						if (paramsRegex.IsMatch(currentMatchPart[i]))
-						{
-							tempParamsValue.Add(currentMatchPart[i].Trim('{', '}'),((i + positionInMatchPart)< requestComponents.Count)? requestComponents[i + positionInMatchPart] : null);
-							continue;
-						}
                         if (wildCardRegex.IsMatch(currentMatchPart[i]))
                             continue;
                         if (currentMatchPart[i] == requestComponents[i + positionInMatchPart])
@@ -342,7 +414,6 @@ namespace Bistro.MethodsEngine.Subsets
                         positionInMatchPart = positionInMatchPart + currentMatchPart.Count;
                         currentMatchPartEnum.MoveNext();
                         currentMatchPart = currentMatchPartEnum.Current;
-						getParamsValues = tempParamsValue.Aggregate(getParamsValues, (dict, kvp) => { dict[kvp.Key] = kvp.Value; return dict; });
 					}
                     else 
                         positionInMatchPart++;
@@ -353,16 +424,6 @@ namespace Bistro.MethodsEngine.Subsets
                 }
             }
 
-			// if there are query string parameters, populate them by name, and not positionally
-			if (splitQueryString.Count == 2)
-			{
-				// if there are any errant leading or trailing ampersands, get rid of them
-				string[] queryStringParameters = CleanQueryString(splitQueryString[1]).Split('&', '=');
-				for (int i = 0; i + 1 < queryStringParameters.Length; i += 2)
-//					if (descriptor.ParameterFields.ContainsKey(queryStringParameters[i]) && !parameterValues.ContainsKey(queryStringParameters[i]))
-						getParamsValues[queryStringParameters[i]] = queryStringParameters[i + 1];
-			}
-
             return true;
         }
 
@@ -372,7 +433,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         /// <param name="methodUrlsSubset">The method subset of bind urls.</param>
         /// <returns></returns>
-        internal bool MatchWithSubset(MethodUrlsSubset methodUrlsSubset)
+        internal bool MatchWithSubset(BistroMethod methodUrlsSubset)
         {
 			if (CheckForRoot())
 				return true;
@@ -543,7 +604,6 @@ namespace Bistro.MethodsEngine.Subsets
                 // noMatch binding completely matches with one of the match bindings.
                 return false;
             }
-
 
 
             return true;

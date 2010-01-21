@@ -130,16 +130,17 @@ namespace Bistro.MethodsEngine
             {
                 processor.AddNewBinding(bindUrl);
             }
-//            processor.UpdateBindPoints();
 
 
         }
 
 
+		/// <summary>
+		/// Forces the update of bind points in all methods.
+		/// </summary>
 		public void ForceUpdateBindPoints()
 		{
 			processor.UpdateBindPoints();
-//			System.Diagnostics.Trace.WriteLine("BindPoints updated");
 		}
 
 
@@ -185,9 +186,9 @@ namespace Bistro.MethodsEngine
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 
-			Dictionary<IMethodsBindPointDesc,Dictionary<string,string>> getParams;
-			var methodSubSet = processor.GetMethodByUrl(requestUrl, out getParams);
-
+			
+			var methodSubSet = processor.GetMethodByUrl(requestUrl);
+			var getParams = methodSubSet.ExtractParameters(requestUrl);
 			Logger.Report(Messages.MethodFound, sw.ElapsedMilliseconds.ToString(), map.Count.ToString());
 
 
@@ -203,6 +204,14 @@ namespace Bistro.MethodsEngine
 			return retList;
         }
 
+		/// <summary>
+		/// Determines whether the specified method url returns at least one controller.
+		/// TODO: Analyze how often we call this method and implement some caching dictionary.
+		/// </summary>
+		/// <param name="requestUrl">The method URL.</param>
+		/// <returns>
+		/// 	<c>true</c> if specified method url returns at least one controller; otherwise, <c>false</c>.
+		/// </returns>
 		public bool IsDefined(string requestUrl)
 		{
 			return GetControllers(requestUrl).Count > 0;

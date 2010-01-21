@@ -38,14 +38,15 @@ namespace Bistro.MethodsEngine.Subsets
     internal class SubSetsProcessor
     {
 
-		private class SwitcherNode
+		private class ForkNode
 		{
-			private SwitcherNode positive;
-			private SwitcherNode negative;
 			private GenBindingTuple tuple;
-			private MethodUrlsSubset subset;
+			internal BistroMethod Subset {get;set;}
 
-			internal SwitcherNode(GenBindingTuple _tuple)
+			internal ForkNode Positive {get;set;}
+			internal ForkNode Negative {get;set;}
+
+			internal ForkNode(GenBindingTuple _tuple)
 			{
 				tuple = _tuple;
 			}
@@ -56,7 +57,9 @@ namespace Bistro.MethodsEngine.Subsets
         enum Errors
         {
             [DefaultMessage("Error processing link - method not found: {0}")]
-            ErrorMethodNotFound
+            ErrorMethodNotFound,
+			[DefaultMessage("Bindings have wrong order in the common list and method.")]
+			ErrorWrongBindOrder
         }
 
 		enum Messages
@@ -75,10 +78,10 @@ namespace Bistro.MethodsEngine.Subsets
         internal SubSetsProcessor(Engine _engine)
         {
             engine = _engine;
-            allMethods = new List<MethodUrlsSubset>();
+            allMethods = new List<BistroMethod>();
             allBindings = new List<GenBindingTuple>();
             // We need to have at least one empty method. Otherwise it will be impossible to create new non-empty methods.
-            allMethods.Add(new MethodUrlsSubset(_engine));
+            allMethods.Add(new BistroMethod(_engine));
 
 
         }
@@ -94,12 +97,21 @@ namespace Bistro.MethodsEngine.Subsets
         /// <summary>
         /// List to store all the methods.
         /// </summary>
-        private List<MethodUrlsSubset> allMethods;
+        private List<BistroMethod> allMethods;
+
+
+		private Dictionary<string, BistroMethod> methodsDictionary;
 
         /// <summary>
         /// Link to the engine.
         /// </summary>
         private Engine engine;
+
+
+		/// <summary>
+		/// Root node of the search tree.
+		/// </summary>
+		private ForkNode rootNode;
 
         #endregion
 
@@ -124,86 +136,71 @@ namespace Bistro.MethodsEngine.Subsets
 		/// <param name="requestUrl">The request URL.</param>
 		/// <param name="getParams">The returned params from the query string.</param>
 		/// <returns></returns>
-        internal MethodUrlsSubset GetMethodByUrl(string requestUrl, out Dictionary<IMethodsBindPointDesc,Dictionary<string,string>> getParams)
+        internal BistroMethod GetMethodByUrl(string requestUrl)//, out Dictionary<IMethodsBindPointDesc,Dictionary<string,string>> getParams)
         {
             // Compare with each Binding
-            Dictionary<GenBinding,Dictionary<string,string>> bindingsToSearch = new Dictionary<GenBinding,Dictionary<string,string>>();
+			List<GenBinding> bindingsToSearch = new List<GenBinding>();
 			Stopwatch sw1 = new Stopwatch();
 			sw1.Start();
             foreach (GenBindingTuple tuple in allBindings)
             {
-				Dictionary<string, string> getParamsVals;
-				GenBinding tempBind = tuple.TryMatchUrlGetParams(requestUrl, out getParamsVals);
-				// getParamsVals will be null when MatchStatus is false.
-				bindingsToSearch.Add(tempBind, getParamsVals);
-                
+				GenBinding tempBind = tuple.TryMatchUrlGetParams(requestUrl);
+				bindingsToSearch.Add(tempBind);
             }
 
-			engine.Logger.Report(Messages.MethodTryMatch, sw1.ElapsedMilliseconds.ToString());
 
-            // Compare result with each method
-            foreach (MethodUrlsSubset subset in allMethods)
-            {
-                bool notFound = false;
-                foreach (GenBinding bind in subset.BindingsList)
-                {
-                    if (bindingsToSearch.ContainsKey(bind))
-                        continue;
-                    notFound = true;
-					break;
-                }
-                if (notFound)
-                    continue;
 
-				engine.Logger.Report(Messages.MethodMatchedAndFound, sw1.ElapsedMilliseconds.ToString());
+			string key = GetKeyFromBindList(bindingsToSearch);
 
-				getParams = new Dictionary<IMethodsBindPointDesc, Dictionary<string, string>>();
-
-				foreach (var bindPoint in subset.BindPointsList)
-				{
-					var relation = subset.PointBindRelation[bindPoint];
-					Dictionary<string, string> parameters =
-						relation.Count == 0 ?
-							new Dictionary<string, string>() :
-							bindingsToSearch[relation[0]];
-
-					getParams.Add(bindPoint, parameters);
-					for (int i = 1; i < relation.Count; i++)
-					{
-						foreach (KeyValuePair<string, string> pair in bindingsToSearch[relation[i]])
-						{
-							getParams[bindPoint][pair.Key] = pair.Value;
-						}
-					}
-
-				}
-
-				sw1.Stop();
-				return subset;
-            }
-
-			getParams = null;
-
-            engine.Logger.Report(Errors.ErrorMethodNotFound, requestUrl);
-            //throw new ApplicationException("Method not found - see log for details");
-            return null;
+			if (!methodsDictionary.ContainsKey(key))
+			{
+				engine.Logger.Report(Errors.ErrorMethodNotFound, requestUrl);
+				return null;
+			}
+			engine.Logger.Report(Messages.MethodMatchedAndFound, sw1.ElapsedMilliseconds.ToString());
+			return methodsDictionary[key];
         }
+
+
+
+
 
         /// <summary>
         /// Updates bindpoints information in methods.
         /// </summary>
         internal void UpdateBindPoints()
         {
-            foreach(MethodUrlsSubset subset in allMethods)
+			methodsDictionary = new Dictionary<string,BistroMethod>();
+            foreach(BistroMethod subset in allMethods)
             {
+				methodsDictionary.Add(GetKeyFromBindList(subset.BindingsList), subset);
                 subset.UpdateBindPoints();
             }
-
-
         }
 
 
         #region Private methods
+
+		/// <summary>
+		/// Creates the key from bind list.
+		/// </summary>
+		/// <param name="bindList">The bind list.</param>
+		/// <returns></returns>
+		private string GetKeyFromBindList(List<GenBinding> bindList)
+		{
+			StringBuilder sb = new StringBuilder();
+			int i = 0;
+			foreach (var binding in bindList)
+			{
+				if ((binding.MatchStatus ? allBindings[i].PositiveBind : allBindings[i].NegativeBind) != binding)
+					engine.Logger.Report(Errors.ErrorWrongBindOrder);
+				sb.Append(binding.MatchStatus ? "1" : "0");
+
+				i++;
+			}
+			return sb.ToString();
+		}
+
 
         /// <summary>
         /// Normalizes the url and splits it by slashes, not presenting a blank element if the 
@@ -225,19 +222,19 @@ namespace Bistro.MethodsEngine.Subsets
         /// Creates a new methods level for each unprocessed GenBindingTuple iteratively.
         /// </summary>
         /// <returns>Methods list after the last iteration.</returns>
-        private List<MethodUrlsSubset> CreateNewMethodsLevel()
+        private List<BistroMethod> CreateNewMethodsLevel()
         {
-            List<MethodUrlsSubset> newBindingMethods = allMethods;
-            List<MethodUrlsSubset> oldBindingMethods;
+            List<BistroMethod> newBindingMethods = allMethods;
+            List<BistroMethod> oldBindingMethods;
             foreach (GenBindingTuple tuple in allBindings.Where(tpl => !tpl.Processed))
             {
                 oldBindingMethods = newBindingMethods;
-                newBindingMethods = new List<MethodUrlsSubset>();
+                newBindingMethods = new List<BistroMethod>();
                 
-                foreach (MethodUrlsSubset group in allMethods)
+                foreach (BistroMethod group in allMethods)
                 {
-                    MethodUrlsSubset newGroupTrue = group.ApplyBinding(tuple.PositiveBind);
-                    MethodUrlsSubset newGroupFalse = group.ApplyBinding(tuple.NegativeBind);
+                    BistroMethod newGroupTrue = group.ApplyBinding(tuple.PositiveBind);
+                    BistroMethod newGroupFalse = group.ApplyBinding(tuple.NegativeBind);
                     tuple.MarkProcessed();
 
                     if (newGroupTrue != null)

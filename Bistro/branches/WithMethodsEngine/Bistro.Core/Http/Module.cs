@@ -34,6 +34,7 @@ using Bistro.Controllers.OutputHandling;
 using Bistro.Controllers.Dispatch;
 using Bistro.Configuration;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace Bistro.Http
 {
@@ -48,7 +49,9 @@ namespace Bistro.Http
         enum Messages
         {
             [DefaultMessage("{0} is not a valid extension, and will be skipped")]
-            InvalidExtension
+			InvalidExtension,
+			[DefaultMessage("Method invocation completed. Total time: {0} ms. Request url: {1}")]
+			InvocationCompleted
         }
 
         enum Exceptions
@@ -146,30 +149,37 @@ namespace Bistro.Http
         /// Enables processing of HTTP Web requests by a custom HttpHandler that implements the <see cref="T:System.Web.IHttpHandler"/> interface.
         /// </summary>
         /// <param name="context">An <see cref="T:System.Web.HttpContext"/> object that provides references to the intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
-        public void ProcessRequest(HttpContext context)
-        {
-            string requestPoint =
-                BindPointUtilities.Combine(context.Request.HttpMethod, context.Request.RawUrl.Substring(context.Request.ApplicationPath.Length));
-            try
-            {
-                var contextWrapper = new HttpContextWrapper(context);
-                IContext requestContext = CreateRequestContext(contextWrapper);
+		public void ProcessRequest(HttpContext context)
+		{
+			string requestPoint =
+				BindPointUtilities.Combine(context.Request.HttpMethod, context.Request.RawUrl.Substring(context.Request.ApplicationPath.Length));
+			try
+			{
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
 
-                context.User = requestContext.CurrentUser;
 
-                methodDispatcher.InvokeMethod(contextWrapper, requestPoint, requestContext);
-            }
-            catch (WebException webEx)
-            {
-                context.Response.Clear();
-                context.Response.StatusCode = Convert.ToInt16(webEx.Code);
-                if (!String.IsNullOrEmpty(webEx.Message))
-                    context.Response.Write(webEx.Message);
+				var contextWrapper = new HttpContextWrapper(context);
+				IContext requestContext = CreateRequestContext(contextWrapper);
+				context.User = requestContext.CurrentUser;
 
-                if (webEx.InnerException != null && webEx.Code == StatusCode.InternalServerError)
-                    context.Response.Write("\r\n\r\n" + webEx.ToString());
-            }
-        }
+				methodDispatcher.InvokeMethod(contextWrapper, requestPoint, requestContext);
+				sw.Stop();
+				logger.Report(Messages.InvocationCompleted, sw.ElapsedMilliseconds.ToString(), context.Request.RawUrl);
+
+
+			}
+			catch (WebException webEx)
+			{
+				context.Response.Clear();
+				context.Response.StatusCode = Convert.ToInt16(webEx.Code);
+				if (!String.IsNullOrEmpty(webEx.Message))
+					context.Response.Write(webEx.Message);
+
+				if (webEx.InnerException != null && webEx.Code == StatusCode.InternalServerError)
+					context.Response.Write("\r\n\r\n" + webEx.ToString());
+			}
+		}
 
         /// <summary>
         /// Loads the factories.

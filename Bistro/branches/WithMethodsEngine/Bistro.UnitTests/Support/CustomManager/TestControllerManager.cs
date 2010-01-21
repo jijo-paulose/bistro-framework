@@ -112,9 +112,10 @@ namespace Bistro.UnitTests.Support.CustomManager
 
 
 
-        protected override void LoadAssembly(System.Reflection.Assembly assm)
+        protected override bool LoadAssembly(System.Reflection.Assembly assm)
         {
             // do nothing
+			return true;
         }
         protected override void LoadType(Type t)
         {

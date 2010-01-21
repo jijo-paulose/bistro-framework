@@ -28,6 +28,7 @@ using System.Web;
 using Bistro.Controllers.Descriptor;
 using Bistro.Configuration.Logging;
 using Bistro.Controllers.Dispatch;
+using System.Diagnostics;
 
 namespace Bistro.Controllers
 {
@@ -64,7 +65,11 @@ namespace Bistro.Controllers
             [DefaultMessage("Processing request {0}")]
             ProcessingRequest,
             [DefaultMessage("{0} is not a valid extension, and will be skipped")]
-            InvalidExtension
+            InvalidExtension,
+			[DefaultMessage("Controller '{2}' has been invoked. Time elapsed: {0} ms. Processing time: {1}")]
+			ControllerInvoked,
+			[DefaultMessage("Execution path for {0} is \r\n{1}")]
+            ExecutionPath
         }
 
         /// <summary>
@@ -142,7 +147,7 @@ namespace Bistro.Controllers
 
             try
             {
-				IEnumerable<ControllerInvocationInfo> invocationInfos = dispatcher.GetControllers(requestPoint);
+				List<ControllerInvocationInfo> invocationInfos = dispatcher.GetControllers(requestPoint);
 
 				// TODO: this code should be replaced with call to the check method 
 				// when it will be implemented on the dispatcher correctly
@@ -152,12 +157,26 @@ namespace Bistro.Controllers
                     throw new WebException(StatusCode.NotFound, String.Format("'{0} could not be found", requestPoint));
                 }
 
+				StringBuilder path = new StringBuilder();
+				foreach (ControllerInvocationInfo info in invocationInfos)
+					path.Append(info.BindPoint.Controller.ControllerTypeName).Append(" based on ").Append(info.BindPoint.Target).Append("\r\n");
+
+				logger.Report(Messages.ExecutionPath, requestPoint, path.ToString());
+
+
 				bool securityCheckComplete = false;
 				bool securityCheckFailed = false;
 				var failedPermissions = new Dictionary<string, KeyValuePair<FailAction, string>>();
 
+				Stopwatch sw = new Stopwatch();
+				Stopwatch sw1 = new Stopwatch();
+
 				foreach (ControllerInvocationInfo invocationInfo in invocationInfos)
                 {
+					sw.Reset();
+					sw.Start(); 
+					
+					
 					IController controller = manager.GetController(invocationInfo, context, requestContext);
 
 					try
@@ -224,13 +243,20 @@ namespace Bistro.Controllers
 								if (invocationInfo.BindPoint.Controller.DefaultTemplates.Count > 0)
 									requestContext.Response.RenderWith(invocationInfo.BindPoint.Controller.DefaultTemplates);
 
+								sw1.Reset();
+								sw1.Start();
 								controller.ProcessRequest(context, requestContext);
+								sw1.Stop();
+
 							}
 						}
 					}
 					finally
 					{
 						manager.ReturnController(controller, context, requestContext);
+						sw.Stop();
+						logger.Report(Messages.ControllerInvoked, sw.ElapsedMilliseconds.ToString(),sw1.ElapsedMilliseconds.ToString(), invocationInfo.BindPoint.Controller.ControllerTypeName);
+
 					}
 				}
 

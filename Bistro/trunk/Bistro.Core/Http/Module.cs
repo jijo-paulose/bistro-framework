@@ -34,6 +34,7 @@ using Bistro.Controllers.OutputHandling;
 using Bistro.Controllers.Dispatch;
 using Bistro.Configuration;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace Bistro.Http
 {
@@ -48,7 +49,9 @@ namespace Bistro.Http
         enum Messages
         {
             [DefaultMessage("{0} is not a valid extension, and will be skipped")]
-            InvalidExtension
+            InvalidExtension,
+			[DefaultMessage("Method invocation completed in {0} ms. Request url: {1}")]
+			InvocationCompleted
         }
 
         enum Exceptions
@@ -159,13 +162,20 @@ namespace Bistro.Http
                 BindPointUtilities.Combine(context.Request.HttpMethod, context.Request.RawUrl.Substring(context.Request.ApplicationPath.Length));
             try
             {
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+
+
                 var contextWrapper = new HttpContextWrapper(context);
                 IContext requestContext = CreateRequestContext(contextWrapper);
-
                 context.User = requestContext.CurrentUser;
 
                 methodDispatcher.InvokeMethod(contextWrapper, requestPoint, requestContext);
-            }
+				sw.Stop();
+				logger.Report(Messages.InvocationCompleted, sw.ElapsedMilliseconds.ToString(), context.Request.RawUrl);
+				
+
+			}
             catch (WebException webEx)
             {
                 context.Response.Clear();

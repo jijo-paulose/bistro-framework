@@ -189,7 +189,6 @@ namespace Bistro.UnitTests.Tests
             #region Load part
             TestDescriptor descriptor = (TestDescriptor)test;
 
-
             Application.Initialize(initSh);
 
             application = Application.Instance;

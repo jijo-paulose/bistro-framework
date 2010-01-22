@@ -238,6 +238,7 @@
       <Link>RegistrationAttributes\ProvideMSBuildTargetAttribute.cs</Link>
     </Compile>
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
+    <Compile Include="Projects\FSharp\ProjectTreeNode.cs" />
     <Compile Include="Projects\FSharp\Properties\CompileOrderPage.cs">
       <SubType>Code</SubType>
     </Compile>

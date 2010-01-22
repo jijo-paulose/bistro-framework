@@ -172,18 +172,19 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
         int IVsHierarchyEvents.OnInvalidateItems(uint itemidParent)
         {
+            control.refresh_file_list();
             return VSConstants.S_OK;
         }
 
         int IVsHierarchyEvents.OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded)
         {
-            control.refresh_file_list();
+            // OnItemsAppended will be also called so there is no need to do refresh here 
             return VSConstants.S_OK;
         }
 
         int IVsHierarchyEvents.OnItemDeleted(uint itemid)
         {
-            control.refresh_file_list();
+            // OnInvalidateItems will be also called so there is no need to do refresh here 
             return VSConstants.S_OK;
         }
 
@@ -195,7 +196,6 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
         int IVsHierarchyEvents.OnPropertyChanged(uint itemid, int propid, uint flags)
         {
-            control.refresh_file_list();
             return VSConstants.S_OK;
         }
 

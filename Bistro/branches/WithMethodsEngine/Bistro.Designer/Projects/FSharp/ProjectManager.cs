@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
-using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Bistro.Designer.Projects.FSharp.Properties;
 using Microsoft.VisualStudio.OLE.Interop;
 
 using IOLEServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
-using System.Collections.Generic;
+using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 
 namespace Bistro.Designer.Projects.FSharp
 {
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProjectBase
+    public class ProjectManager : FlavoredProjectBase, IVsHierarchyEvents
     {
         
         /// <summary>
@@ -30,9 +32,14 @@ namespace Bistro.Designer.Projects.FSharp
 
         // the fsharp debug project propety page - we need to suppress it
         const string debug_page_guid = "{9CFBEB2A-6824-43e2-BD3B-B112FEBC3772}";
+        uint hierarchy_event_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
 
-        Dictionary<uint, object> firstChild = new Dictionary<uint, object>();
-        Dictionary<uint, object> nextSibling = new Dictionary<uint, object>();
+        protected override void OnAggregationComplete()
+        {
+            base.OnAggregationComplete();
+            new ProjectTreeNode(this, VSConstants.VSITEMID_ROOT);
+            hierarchy_event_cookie = AdviseHierarchyEvents(this);
+        }
 
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
@@ -40,16 +47,30 @@ namespace Bistro.Designer.Projects.FSharp
             {
                 case __VSHPROPID.VSHPROPID_FirstChild:
                 case __VSHPROPID.VSHPROPID_FirstVisibleChild:
-                    if (firstChild.TryGetValue(itemId, out property))
-                        return VSConstants.S_OK;
-                    else
-                        break;
+                    {
+                        ProjectTreeNode n;
+                        property = null;
+                        if (itemMap.TryGetValue(itemId, out n))
+                        {
+                            property = n.FirstChild;
+                            return VSConstants.S_OK;
+                        }
+                        else
+                            return VSConstants.E_INVALIDARG;
+                    }
                 case __VSHPROPID.VSHPROPID_NextSibling:
                 case __VSHPROPID.VSHPROPID_NextVisibleSibling:
-                    if (nextSibling.TryGetValue(itemId, out property))
-                        return VSConstants.S_OK;
-                    else
-                        break;
+                    {
+                        ProjectTreeNode n;
+                        property = null;
+                        if (itemMap.TryGetValue(itemId, out n))
+                        {
+                            property = n.NextSibling;
+                            return VSConstants.S_OK;
+                        }
+                        else
+                            return VSConstants.E_INVALIDARG;
+                    }
                 default:
                     break;
             }
@@ -57,20 +78,6 @@ namespace Bistro.Designer.Projects.FSharp
             int result = base.GetProperty(itemId, propId, out property);
             if (result != VSConstants.S_OK)
                 return result;
-
-            switch ((__VSHPROPID)propId)
-            {
-                case __VSHPROPID.VSHPROPID_FirstChild:
-                case __VSHPROPID.VSHPROPID_FirstVisibleChild:
-                    firstChild.Add(itemId, property);
-                    return VSConstants.S_OK;
-                case __VSHPROPID.VSHPROPID_NextSibling:
-                case __VSHPROPID.VSHPROPID_NextVisibleSibling:
-                    nextSibling.Add(itemId, property);
-                    return VSConstants.S_OK;
-                default:
-                    break;
-            }
 
             if (itemId == VSConstants.VSITEMID_ROOT)
             {
@@ -104,5 +111,89 @@ namespace Bistro.Designer.Projects.FSharp
             return result;
         }
 
+
+        internal string GetNodeName(uint itemId)
+        {
+            object name;
+            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_Caption, out name));
+            return (string)name;
+        }
+
+        internal uint GetNodeChild(uint itemId)
+        {
+            object result;
+            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_FirstChild, out result));
+            return (uint)(int)result;
+        }
+
+        internal uint GetNodeSibling(uint itemId)
+        {
+            object result;
+            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_NextSibling, out result));
+            return (uint)(int)result;
+        }
+
+        Dictionary<uint, ProjectTreeNode> itemMap = new Dictionary<uint, ProjectTreeNode>();
+        internal void MapProjectNode(uint itemId, ProjectTreeNode node)
+        {
+            itemMap.Add(itemId, node);
+        }
+
+        internal void UnmapProjectNode(uint ItemId)
+        {
+            itemMap.Remove(ItemId);
+        }
+
+        protected override void Close()
+        {
+            if (hierarchy_event_cookie != (uint)ShellConstants.VSCOOKIE_NIL)
+                UnadviseHierarchyEvents(hierarchy_event_cookie);
+            base.Close();
+        }
+
+        #region IVsHierarchyEvents Members
+
+        int IVsHierarchyEvents.OnInvalidateIcon(IntPtr hicon)
+        {
+            return VSConstants.S_OK;
+        }
+
+        int IVsHierarchyEvents.OnInvalidateItems(uint itemidParent)
+        {
+            return VSConstants.S_OK;
+        }
+
+        int IVsHierarchyEvents.OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded)
+        {
+            // for some reason during rename OnItemAdded is called twice - let us ignore the second one
+            if (itemMap.ContainsKey(itemidAdded))
+                return VSConstants.S_OK;
+
+            ProjectTreeNode n;
+            if (!itemMap.TryGetValue(itemidParent, out n))
+                return VSConstants.E_INVALIDARG;
+            n.AddChild(itemidAdded);
+            return VSConstants.S_OK;
+        }
+
+        int IVsHierarchyEvents.OnItemDeleted(uint itemid)
+        {
+            ProjectTreeNode n;
+            if (itemMap.TryGetValue(itemid, out n))
+                n.Delete();
+            return VSConstants.S_OK;
+        }
+
+        int IVsHierarchyEvents.OnItemsAppended(uint itemidParent)
+        {
+            return VSConstants.S_OK;
+        }
+
+        int IVsHierarchyEvents.OnPropertyChanged(uint itemid, int propid, uint flags)
+        {
+            return VSConstants.S_OK;
+        }
+
+        #endregion
     }
 }

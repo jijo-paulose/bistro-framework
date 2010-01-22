@@ -21,19 +21,13 @@ namespace Bistro.Designer.Projects.FSharp
             this.package = package;
         }
 
-        //protected override ProjectNode CreateProject()
-        //{
-        //    ProjectManager project = new ProjectManager(this.Package as DesignerPackage);
-        //    project.SetSite((IOleServiceProvider)((IServiceProvider)this.Package).GetService(typeof(IOleServiceProvider)));
-        //    return project;
-        //}
-
         protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
         {
             var project = new ProjectManager();
             project.SetSite((IOleServiceProvider)((IServiceProvider)package).GetService(typeof(IOleServiceProvider)));
             return project;
         }
+
     }
 
     [Guid("C39A00F4-B2A4-478e-A0B2-C3E69B3BD899")]

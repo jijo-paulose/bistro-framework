@@ -47,9 +47,9 @@ namespace Bistro.Designer.Projects.FSharp.Properties
             foreach (BuildItemGroup group in project.ItemGroups)
             {
                 foreach (BuildItem item in group)
-                    if (item.Name == "Compile" && Path.GetExtension(item.FinalItemSpec) == ".fs")
+                    if (item.Name == "Compile" && Path.GetExtension(item.Include) == ".fs")
                     {
-                        Dependencies.Nodes.Add(item.FinalItemSpec)
+                        Dependencies.Nodes.Add(item.Include)
                             .Tag = new BuildElement(group, item);
                     }
             }           

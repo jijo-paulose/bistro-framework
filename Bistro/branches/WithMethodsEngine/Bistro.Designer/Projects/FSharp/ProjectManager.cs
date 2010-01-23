@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 
 using IOLEServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
+using System.Reflection;
 
 namespace Bistro.Designer.Projects.FSharp
 {
@@ -112,11 +113,38 @@ namespace Bistro.Designer.Projects.FSharp
         }
 
 
-        internal string GetNodeName(uint itemId)
+        internal string GetNodeKey(uint itemId)
         {
             object name;
             ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_Caption, out name));
-            return (string)name;
+            Guid type;
+            try
+            {
+                type = base.GetGuidProperty(itemId, (int)__VSHPROPID.VSHPROPID_TypeGuid);
+            }
+            catch (COMException e)
+            {
+                // FSharp project returns Guid.Empty as the type guid for reference nodes, which causes the WAP to throw an exception
+                var pinfo = e.GetType().GetProperty("HResult", BindingFlags.Instance | BindingFlags.NonPublic);
+                if ((int)pinfo.GetValue(e, new object[] { }) == VSConstants.DISP_E_MEMBERNOTFOUND)
+                    type = Guid.Empty;
+                else
+                    throw;
+            }
+
+            // set the sort order based on the item type
+            string sort_order = "";
+            if (type == Guid.Empty)
+                sort_order = "a";
+            else if (type == VSConstants.GUID_ItemType_PhysicalFile)
+                sort_order = "e";
+            else if (type == VSConstants.GUID_ItemType_PhysicalFolder)
+                sort_order = "d";
+            else if (type == VSConstants.GUID_ItemType_SubProject)
+                sort_order = "b";
+            else if (type == VSConstants.GUID_ItemType_VirtualFolder)
+                sort_order = "c";
+            return sort_order + ';' + (string)name;
         }
 
         internal uint GetNodeChild(uint itemId)

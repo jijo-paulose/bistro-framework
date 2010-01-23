@@ -23,7 +23,7 @@ namespace Bistro.Designer.Projects.FSharp
             {
                 ProjectTreeNode node = new ProjectTreeNode(project, child);
                 node.parent = this;
-                children.Add(project.GetNodeName(child), node);
+                children.Add(project.GetNodeKey(child), node);
                 child = project.GetNodeSibling(child);
             }
             childrenMap = new Dictionary<uint, int>(children.Count);
@@ -67,7 +67,7 @@ namespace Bistro.Designer.Projects.FSharp
         {
             ProjectTreeNode node = new ProjectTreeNode(project, itemidAdded);
             node.parent = this;
-            children.Add(project.GetNodeName(itemidAdded), node);
+            children.Add(project.GetNodeKey(itemidAdded), node);
             childrenMap.Clear();
             int i = 0;
             foreach (var item in children)

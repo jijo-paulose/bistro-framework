@@ -13,11 +13,19 @@ using Microsoft.VisualStudio.OLE.Interop;
 using IOLEServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 using System.Reflection;
+using Microsoft.Build.BuildEngine;
+using System.ComponentModel;
 
 namespace Bistro.Designer.Projects.FSharp
 {
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProjectBase, IVsHierarchyEvents
+    public interface IProjectManager
+    {
+        Project MSBuildProject { get; }
+    }
+
+    [ComVisible(true)]
+    public class ProjectManager : FlavoredProjectBase, IProjectManager
     {
         
         /// <summary>
@@ -34,12 +42,21 @@ namespace Bistro.Designer.Projects.FSharp
         // the fsharp debug project propety page - we need to suppress it
         const string debug_page_guid = "{9CFBEB2A-6824-43e2-BD3B-B112FEBC3772}";
         uint hierarchy_event_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
+        string fileName;
+        ItemList itemList;
+
+        protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
+        {
+            this.fileName = fileName;
+            base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
+        }
 
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();
-            new ProjectTreeNode(this, VSConstants.VSITEMID_ROOT);
-            hierarchy_event_cookie = AdviseHierarchyEvents(this);
+            MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
+            itemList = new ItemList(this, MSBuildProject);
+            hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
         }
 
         protected override int GetProperty(uint itemId, int propId, out object property)
@@ -48,30 +65,10 @@ namespace Bistro.Designer.Projects.FSharp
             {
                 case __VSHPROPID.VSHPROPID_FirstChild:
                 case __VSHPROPID.VSHPROPID_FirstVisibleChild:
-                    {
-                        ProjectTreeNode n;
-                        property = null;
-                        if (itemMap.TryGetValue(itemId, out n))
-                        {
-                            property = n.FirstChild;
-                            return VSConstants.S_OK;
-                        }
-                        else
-                            return VSConstants.E_INVALIDARG;
-                    }
+                    return itemList.GetFirstChild(itemId, out property);
                 case __VSHPROPID.VSHPROPID_NextSibling:
                 case __VSHPROPID.VSHPROPID_NextVisibleSibling:
-                    {
-                        ProjectTreeNode n;
-                        property = null;
-                        if (itemMap.TryGetValue(itemId, out n))
-                        {
-                            property = n.NextSibling;
-                            return VSConstants.S_OK;
-                        }
-                        else
-                            return VSConstants.E_INVALIDARG;
-                    }
+                    return itemList.GetNextSibling(itemId, out property);
                 default:
                     break;
             }
@@ -161,17 +158,6 @@ namespace Bistro.Designer.Projects.FSharp
             return (uint)(int)result;
         }
 
-        Dictionary<uint, ProjectTreeNode> itemMap = new Dictionary<uint, ProjectTreeNode>();
-        internal void MapProjectNode(uint itemId, ProjectTreeNode node)
-        {
-            itemMap.Add(itemId, node);
-        }
-
-        internal void UnmapProjectNode(uint ItemId)
-        {
-            itemMap.Remove(ItemId);
-        }
-
         protected override void Close()
         {
             if (hierarchy_event_cookie != (uint)ShellConstants.VSCOOKIE_NIL)
@@ -179,47 +165,19 @@ namespace Bistro.Designer.Projects.FSharp
             base.Close();
         }
 
-        #region IVsHierarchyEvents Members
-
-        int IVsHierarchyEvents.OnInvalidateIcon(IntPtr hicon)
+        internal string GetBuildProperty(uint itemId, string property)
         {
-            return VSConstants.S_OK;
+            object browseObject;
+            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
+            return (string)browseObject.GetType().GetMethod("GetProperty").Invoke(browseObject, new object[] {property, null});
         }
 
-        int IVsHierarchyEvents.OnInvalidateItems(uint itemidParent)
-        {
-            return VSConstants.S_OK;
-        }
+        #region IProjectManager Members
 
-        int IVsHierarchyEvents.OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded)
+        public Project MSBuildProject
         {
-            // for some reason during rename OnItemAdded is called twice - let us ignore the second one
-            if (itemMap.ContainsKey(itemidAdded))
-                return VSConstants.S_OK;
-
-            ProjectTreeNode n;
-            if (!itemMap.TryGetValue(itemidParent, out n))
-                return VSConstants.E_INVALIDARG;
-            n.AddChild(itemidAdded);
-            return VSConstants.S_OK;
-        }
-
-        int IVsHierarchyEvents.OnItemDeleted(uint itemid)
-        {
-            ProjectTreeNode n;
-            if (itemMap.TryGetValue(itemid, out n))
-                n.Delete();
-            return VSConstants.S_OK;
-        }
-
-        int IVsHierarchyEvents.OnItemsAppended(uint itemidParent)
-        {
-            return VSConstants.S_OK;
-        }
-
-        int IVsHierarchyEvents.OnPropertyChanged(uint itemid, int propid, uint flags)
-        {
-            return VSConstants.S_OK;
+            get;
+            private set;
         }
 
         #endregion

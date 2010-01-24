@@ -20,7 +20,6 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
         CompileOrderViewer control;
         bool dirty = false;
-        MSProject project;
         uint eventCookie;
         IVsHierarchy item;
 
@@ -47,7 +46,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
         {
             if (this.control == null)
             {
-                this.control = new CompileOrderViewer(project);
+                this.control = new CompileOrderViewer(((IProjectManager)item));
                 this.control.Size = new Size(pRect[0].right - pRect[0].left, pRect[0].bottom - pRect[0].top);
                 this.control.Visible = false;
                 this.control.Size = new Size(550, 300);
@@ -118,24 +117,21 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
                         item.AdviseHierarchyEvents(this, out eventCookie);
 
-                        project = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(name);
+//                        project = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(name);
 
                         return;
                     }
                     catch (Exception)
                     {
-                        // if the project is not null item could not be null either
-                        if (project != null)
+                        if (item != null)
                             item.UnadviseHierarchyEvents(eventCookie);
-                        project = null;
                         item = null;
                         throw;
                     }
 
             // if we could not get our hands on the project let us clear whatever we already have there
-            if (project != null)
+            if (item != null)
                 item.UnadviseHierarchyEvents(eventCookie);
-            project = null;
             item = null;
         }
 

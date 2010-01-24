@@ -10,5 +10,6 @@ namespace Bistro.Designer.Projects.FSharp.Properties
         public const string Application = "Application";
         public const string RootNamespaceDescription = "RootNamespaceDescription";
         public const string CompileOrder = "Compilation Order";
+        public const string DependsOn = "DependsOn";
     }
 }

@@ -15,7 +15,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 {
     public partial class CompileOrderViewer : UserControl
     {
-        Project project;
+        IProjectManager project;
         class BuildElement
         {
             public BuildElement(BuildItemGroup BuildItemGroup, BuildItem BuildItem)
@@ -25,13 +25,32 @@ namespace Bistro.Designer.Projects.FSharp.Properties
             }
             public BuildItemGroup BuildItemGroup { get; private set; }
             public BuildItem BuildItem { get; private set; }
+
+            public override string ToString()
+            {
+                return BuildItem.Include;
+            }
+
+            internal string GetDependencies()
+            {
+                return BuildItem.GetMetadata(FSharpPropertiesConstants.DependsOn);
+            }
+
+            internal void UpdateDependencies(List<BuildElement> dependencies)
+            {
+                if (dependencies.Count == 0)
+                    BuildItem.RemoveMetadata(FSharpPropertiesConstants.DependsOn);
+                else
+                    BuildItem.SetMetadata(FSharpPropertiesConstants.DependsOn, dependencies.ConvertAll(elem => elem.ToString()).Aggregate("", (a, item) => a + ',' + item).Substring(1));
+            }
         }
 
-        public CompileOrderViewer(Project project)
+        public CompileOrderViewer(IProjectManager project)
         {
             this.project = project;
             InitializeComponent();
             refresh_file_list();
+            var service = (ProjectManager)GetService(typeof(ProjectManager));
         }
 
         public event EventHandler OnPageUpdated;
@@ -43,36 +62,60 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
         public void refresh_file_list()
         {
-            Dependencies.Nodes.Clear();
-            foreach (BuildItemGroup group in project.ItemGroups)
+            CompileItems.Nodes.Clear();
+            foreach (BuildItemGroup group in project.MSBuildProject.ItemGroups)
             {
                 foreach (BuildItem item in group)
                     if (item.Name == "Compile" && Path.GetExtension(item.Include) == ".fs")
                     {
-                        Dependencies.Nodes.Add(item.Include)
-                            .Tag = new BuildElement(group, item);
+                        TreeNode compileItem = new TreeNode(item.Include);
+                        compileItem.Tag = new BuildElement(group, item);
+                        compileItem.ContextMenuStrip = compileItemMenu;
+                        BuildDependencies(compileItem);
+                        CompileItems.Nodes.Add(compileItem);
                     }
             }           
         }
 
+        private void BuildDependencies(TreeNode node)
+        {
+            node.Nodes.Clear();
+            string dependencies = ((BuildElement)node.Tag).GetDependencies();
+            if (dependencies != null)
+                foreach (var d in dependencies.Split(','))
+                    if (d != "")
+                        node.Nodes.Add(d);
+        }
+
+        private void CompileItems_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            MoveUp.Enabled = false;
+            MoveDown.Enabled = false;
+            if (e.Node.Level == 0 && CompileItems.SelectedNode != null)
+            {
+                MoveUp.Enabled = CompileItems.Nodes.IndexOf(e.Node) > 0;
+                MoveDown.Enabled = CompileItems.Nodes.IndexOf(e.Node) < CompileItems.Nodes.Count - 1;
+            }
+        }
+
         private void MoveUp_Click(object sender, EventArgs e)
         {
-            if (Dependencies.SelectedNode != null)
-                Swap(Dependencies.SelectedNode, Direction.Up);
+            if (CompileItems.SelectedNode != null)
+                Swap(CompileItems.SelectedNode, Direction.Up);
         }
 
 
         private void MoveDown_Click(object sender, EventArgs e)
         {
-            if (Dependencies.SelectedNode != null)
-                Swap(Dependencies.SelectedNode, Direction.Down);
+            if (CompileItems.SelectedNode != null)
+                Swap(CompileItems.SelectedNode, Direction.Down);
         }
 
         enum Direction { Up, Down }
 
         private void Swap(TreeNode n, Direction dir)
         {
-            if (!Dependencies.Nodes.Contains(n))
+            if (!CompileItems.Nodes.Contains(n))
                 return;
             int new_index = 0;
             switch (dir)
@@ -83,7 +126,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
                     new_index = n.Index - 1;
                     break;
                 case Direction.Down:
-                    if (n.Index >= Dependencies.Nodes.Count - 1)
+                    if (n.Index >= CompileItems.Nodes.Count - 1)
                         return;
                     new_index = n.Index + 1;
                     break;
@@ -92,11 +135,11 @@ namespace Bistro.Designer.Projects.FSharp.Properties
                 OnPageUpdated(this, EventArgs.Empty);
 
             BuildElement fst = (BuildElement)n.Tag;
-            BuildElement snd = (BuildElement)Dependencies.Nodes[new_index].Tag;
+            BuildElement snd = (BuildElement)CompileItems.Nodes[new_index].Tag;
 
-            Dependencies.Nodes.Remove(n);
-            Dependencies.Nodes.Insert(new_index, n);
-            Dependencies.SelectedNode = n;
+            CompileItems.Nodes.Remove(n);
+            CompileItems.Nodes.Insert(new_index, n);
+            CompileItems.SelectedNode = n;
 
             int fst_loc = Locate(fst);
             int snd_loc = Locate(snd);
@@ -157,5 +200,30 @@ namespace Bistro.Designer.Projects.FSharp.Properties
                 InvokeMember("get_ItemElement", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, bi, new object[] {});
         }
 
+
+        private void compileItemMenu_Click(object sender, EventArgs e)
+        {
+            EditDependenciesDialog addForm = new EditDependenciesDialog();
+            var origin = CompileItems.HitTest(((MouseEventArgs)e).Location);
+            if (origin.Node == null)
+                return;
+            foreach (TreeNode n in CompileItems.Nodes)
+            {
+                if (origin.Node != n)
+                    addForm.Dependencies.Items.Add(n.Tag);
+                if (((BuildElement)origin.Node.Tag).GetDependencies().IndexOf(n.Tag.ToString()) >= 0)
+                    addForm.Dependencies.SetItemChecked(addForm.Dependencies.Items.Count - 1, true);
+            }
+            if (addForm.ShowDialog() == DialogResult.OK)
+            {
+                List<BuildElement> dependencies = new List<BuildElement>();
+                foreach (BuildElement item in addForm.Dependencies.CheckedItems)
+                    dependencies.Add(item);
+
+                ((BuildElement)origin.Node.Tag).UpdateDependencies(dependencies);
+                BuildDependencies(origin.Node);
+            }
+            addForm.Dispose();
+        }
     }
 }

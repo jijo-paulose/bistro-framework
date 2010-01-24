@@ -6,32 +6,34 @@ using Microsoft.VisualStudio;
 
 namespace Bistro.Designer.Projects.FSharp
 {
-    public class ProjectTreeNode
+    public class ItemNode
     {
-        SortedList<string, ProjectTreeNode> children = new SortedList<string, ProjectTreeNode>();
-        Dictionary<uint, int> childrenMap;
-        ProjectTreeNode parent;
-        ProjectManager project;
+        ItemList items;
+        ItemNode parent;
 
-        public uint ItemId { get; private set; }
-        public ProjectTreeNode(ProjectManager project, uint itemId)
+        SortedList<string, ItemNode> children = new SortedList<string, ItemNode>();
+        Dictionary<uint, int> childrenMap;
+
+        public ItemNode(ItemList items, uint itemId)
         {
-            this.project = project;
+            this.items = items;
             ItemId = itemId;
-            uint child = project.GetNodeChild(itemId);
+            uint child = items.GetNodeFirstChild(itemId);
             while (child != VSConstants.VSITEMID_NIL)
             {
-                ProjectTreeNode node = new ProjectTreeNode(project, child);
+                ItemNode node = new ItemNode(items, child);
                 node.parent = this;
-                children.Add(project.GetNodeKey(child), node);
-                child = project.GetNodeSibling(child);
+                children.Add(items.GetNodeKey(child), node);
+                child = items.GetNodeSibling(child);
             }
             childrenMap = new Dictionary<uint, int>(children.Count);
             int i = 0;
             foreach (var item in children)
                 childrenMap.Add(item.Value.ItemId, i++);
-            project.MapProjectNode(itemId, this);
+            items.Register(this);
         }
+
+        public uint ItemId { get; private set; }
 
         public uint NextSibling
         {
@@ -40,7 +42,7 @@ namespace Bistro.Designer.Projects.FSharp
                 if (parent == null)
                     return VSConstants.VSITEMID_NIL;
                 int index = parent.childrenMap[ItemId];
-                if (index+1 < parent.children.Count)
+                if (index + 1 < parent.children.Count)
                     return parent.children.Values[index + 1].ItemId;
                 return VSConstants.VSITEMID_NIL;
             }
@@ -60,14 +62,14 @@ namespace Bistro.Designer.Projects.FSharp
         {
             parent.children.RemoveAt(parent.childrenMap[ItemId]);
             parent.childrenMap.Remove(ItemId);
-            project.UnmapProjectNode(ItemId);
+            items.Unregister(ItemId);
         }
 
         internal void AddChild(uint itemidAdded)
         {
-            ProjectTreeNode node = new ProjectTreeNode(project, itemidAdded);
+            ItemNode node = new ItemNode(items, itemidAdded);
             node.parent = this;
-            children.Add(project.GetNodeKey(itemidAdded), node);
+            children.Add(items.GetNodeKey(itemidAdded), node);
             childrenMap.Clear();
             int i = 0;
             foreach (var item in children)

@@ -10,6 +10,9 @@ using System.Runtime.InteropServices;
 
 namespace Bistro.Designer.Projects.FSharp
 {
+    /// <summary>
+    /// Maintains a list of project items 
+    /// </summary>
     public class ItemList: IVsHierarchyEvents
     {
         ProjectManager project;
@@ -21,6 +24,7 @@ namespace Bistro.Designer.Projects.FSharp
             this.project = project;
             this.buildProject = buildProject;
             new ItemNode(this, VSConstants.VSITEMID_ROOT);
+
         }
 
         public int GetNextSibling(uint itemId, out object value)

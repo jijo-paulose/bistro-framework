@@ -109,41 +109,6 @@ namespace Bistro.Designer.Projects.FSharp
             return result;
         }
 
-
-        internal string GetNodeKey(uint itemId)
-        {
-            object name;
-            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_Caption, out name));
-            Guid type;
-            try
-            {
-                type = base.GetGuidProperty(itemId, (int)__VSHPROPID.VSHPROPID_TypeGuid);
-            }
-            catch (COMException e)
-            {
-                // FSharp project returns Guid.Empty as the type guid for reference nodes, which causes the WAP to throw an exception
-                var pinfo = e.GetType().GetProperty("HResult", BindingFlags.Instance | BindingFlags.NonPublic);
-                if ((int)pinfo.GetValue(e, new object[] { }) == VSConstants.DISP_E_MEMBERNOTFOUND)
-                    type = Guid.Empty;
-                else
-                    throw;
-            }
-
-            // set the sort order based on the item type
-            string sort_order = "";
-            if (type == Guid.Empty)
-                sort_order = "a";
-            else if (type == VSConstants.GUID_ItemType_PhysicalFile)
-                sort_order = "e";
-            else if (type == VSConstants.GUID_ItemType_PhysicalFolder)
-                sort_order = "d";
-            else if (type == VSConstants.GUID_ItemType_SubProject)
-                sort_order = "b";
-            else if (type == VSConstants.GUID_ItemType_VirtualFolder)
-                sort_order = "c";
-            return sort_order + ';' + (string)name;
-        }
-
         internal uint GetNodeChild(uint itemId)
         {
             object result;
@@ -165,11 +130,18 @@ namespace Bistro.Designer.Projects.FSharp
             base.Close();
         }
 
-        internal string GetBuildProperty(uint itemId, string property)
+        internal string GetMetadata(uint itemId, string property)
         {
             object browseObject;
             ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
-            return (string)browseObject.GetType().GetMethod("GetProperty").Invoke(browseObject, new object[] {property, null});
+            return (string)browseObject.GetType().GetMethod("GetMetadata").Invoke(browseObject, new object[] {property});
+        }
+
+        internal string SetMetadata(uint itemId, string property, string value)
+        {
+            object browseObject;
+            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
+            return (string)browseObject.GetType().GetMethod("SetMetadata").Invoke(browseObject, new object[] { property, value });
         }
 
         #region IProjectManager Members

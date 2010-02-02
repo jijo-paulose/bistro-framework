@@ -266,6 +266,7 @@
     <EmbeddedResource Include="ProjectBase\ProjectBase.resx">
       <Visible>true</Visible>
       <LogicalName>Bistro.Designer.ProjectBase.resources</LogicalName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectBase\SecurityWarningDialog.resx">
       <DependentUpon>SecurityWarningDialog.cs</DependentUpon>

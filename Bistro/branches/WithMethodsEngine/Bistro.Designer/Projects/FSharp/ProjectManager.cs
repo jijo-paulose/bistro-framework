@@ -22,6 +22,7 @@ namespace Bistro.Designer.Projects.FSharp
     public interface IProjectManager
     {
         Project MSBuildProject { get; }
+        ItemList ItemList { get; }
     }
 
     [ComVisible(true)]
@@ -134,14 +135,23 @@ namespace Bistro.Designer.Projects.FSharp
         {
             object browseObject;
             ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
-            return (string)browseObject.GetType().GetMethod("GetMetadata").Invoke(browseObject, new object[] {property});
+            return (string)browseObject.GetType().GetMethod("GetProperty").Invoke(browseObject, new object[] {property, null});
         }
 
         internal string SetMetadata(uint itemId, string property, string value)
         {
             object browseObject;
             ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
-            return (string)browseObject.GetType().GetMethod("SetMetadata").Invoke(browseObject, new object[] { property, value });
+            return (string)browseObject.GetType().GetMethod("SetProperty").Invoke(browseObject, new object[] { property, value });
+        }
+
+        internal BuildItem GetBuildItem(uint itemId)
+        {
+            object browseObject;
+            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
+            var fileNode = browseObject.GetType().GetProperty("Node").GetGetMethod().Invoke(browseObject, new object[] { });
+            var projectElement = fileNode.GetType().GetProperty("ItemNode", BindingFlags.Instance | BindingFlags.NonPublic).GetGetMethod(true).Invoke(fileNode, new object[] { });
+            return (BuildItem)projectElement.GetType().GetProperty("Item").GetGetMethod().Invoke(projectElement, new object[] { });
         }
 
         #region IProjectManager Members
@@ -150,6 +160,11 @@ namespace Bistro.Designer.Projects.FSharp
         {
             get;
             private set;
+        }
+
+        public ItemList ItemList
+        {
+            get { return itemList; }
         }
 
         #endregion

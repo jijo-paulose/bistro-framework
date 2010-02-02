@@ -114,25 +114,14 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
                         string name;
                         ErrorHandler.ThrowOnFailure(item.GetCanonicalName(VSConstants.VSITEMID_ROOT, out name));
-
-                        item.AdviseHierarchyEvents(this, out eventCookie);
-
-//                        project = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(name);
-
+                        ErrorHandler.ThrowOnFailure(item.AdviseHierarchyEvents(this, out eventCookie));
                         return;
                     }
                     catch (Exception)
                     {
-                        if (item != null)
-                            item.UnadviseHierarchyEvents(eventCookie);
                         item = null;
                         throw;
                     }
-
-            // if we could not get our hands on the project let us clear whatever we already have there
-            if (item != null)
-                item.UnadviseHierarchyEvents(eventCookie);
-            item = null;
         }
 
         IPropertyPageSite site;
@@ -168,7 +157,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
         int IVsHierarchyEvents.OnInvalidateItems(uint itemidParent)
         {
-            control.refresh_file_list();
+//            control.refresh_file_list();
             return VSConstants.S_OK;
         }
 
@@ -186,7 +175,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
         int IVsHierarchyEvents.OnItemsAppended(uint itemidParent)
         {
-            control.refresh_file_list();
+            //control.refresh_file_list();
             return VSConstants.S_OK;
         }
 

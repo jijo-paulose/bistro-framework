@@ -12,22 +12,17 @@ namespace Bistro.Designer.Explorer
         public Dictionary<string, List<ControllerDescription>> cashPatternsCtrl;
         public Dictionary<string, List<ControllerDescription>> dllPatternsCtrl;
         public Dictionary<string, Dictionary<string, Resource>> cashPatternsRes;
-
-        private ControllerDescription curCtrl;
-        private Resource curResource;
-        private NodeObject curObject;
-        private enum NodeObject
-        {
-            UrlPattern,
-            Controller,
-            Resource
-        }
         public DesignerControl()
         {
             InitializeComponent();
             TreeNode application = new TreeNode("Controllers");
             cashPatternsCtrl = new Dictionary<string, List<ControllerDescription>>();
             cashPatternsRes = new Dictionary<string, Dictionary<string, Resource>>();
+        }
+        public Bistro.MethodsEngine.Engine Engine
+        {
+            get { return engine; }
+            set { engine = value; }
         }
         public TreeView BindingTree
         {
@@ -37,57 +32,6 @@ namespace Bistro.Designer.Explorer
         {
             get { return propertiesTree; }
         }
-
-
-        private void BindingTree_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            propertiesTree.Nodes.Clear();
-            if (e.Node.Tag != null)
-            {
-                System.Type nodeType = e.Node.Tag.GetType();
-                if (nodeType == typeof(ControllerDescription))
-                {
-                    //store controller's name and value to be able 
-                    //to show additional info On_ShowBindingsResources
-
-                    curObject = NodeObject.Controller;
-                    curCtrl = (ControllerDescription)e.Node.Tag;
-                }
-                else if (nodeType == typeof(Resource))
-                {
-                    curObject = NodeObject.Resource;
-                    curResource = (Resource)e.Node.Tag;
-                }
-            }
-        }
-
-
-        private void On_MethodShowBindings(object sender, System.EventArgs e)
-        {
-            Debug.WriteLine("click on url pattern");
-        }
-
-        private void On_ShowBindingsResources(object sender, System.EventArgs e)
-        {
-            Debug.WriteLine("show controller's bindings and resources");
-            List<string> targs = new List<string>(15);
-            if (curCtrl != null)
-            {
-                foreach (IMethodsBindPointDesc bp in  curCtrl.Targets)
-                {
-                    if (!targs.Contains(bp.Target))
-                    {
-                        propertiesTree.Nodes.Add("Binding " + bp.Target);
-                        targs.Add(bp.Target);
-                    }
-                }
-                foreach (string res in curCtrl.Requires)
-                {
-                }
-
-            }
-        }
-
         /// <summary> 
         /// Let this control process the mnemonics.
         /// </summary>
@@ -112,6 +56,65 @@ namespace Bistro.Designer.Explorer
                 return true;
             }
         }
+        #region Private members
+        private Bistro.MethodsEngine.Engine engine;
+        private ControllerDescription curCtrl;
+        private Resource curResource;
+        private NodeObject curObject;
+        private enum NodeObject
+        {
+            UrlPattern,
+            Controller,
+            Resource
+        }
+
+
+        private void BindingTree_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            propertiesTree.Nodes.Clear();
+            if (e.Node.Tag != null)
+            {
+                System.Type nodeType = e.Node.Tag.GetType();
+                if (nodeType == typeof(ControllerDescription))
+                {
+                    //store controller's name and value to be able 
+                    //to show additional info On_ShowBindingsResources
+
+                    curObject = NodeObject.Controller;
+                    curCtrl = (ControllerDescription)e.Node.Tag;
+                }
+                else if (nodeType == typeof(Resource))
+                {
+                    curObject = NodeObject.Resource;
+                    curResource = (Resource)e.Node.Tag;
+                }
+            }
+        }
+        private void On_MethodShowBindings(object sender, System.EventArgs e)
+        {
+            Debug.WriteLine("click on url pattern");
+        }
+        private void On_ShowBindingsResources(object sender, System.EventArgs e)
+        {
+            Debug.WriteLine("show controller's bindings and resources");
+            List<string> targs = new List<string>(15);
+            if (curCtrl != null)
+            {
+                foreach (IMethodsBindPointDesc bp in  curCtrl.Targets)
+                {
+                    if (!targs.Contains(bp.Target))
+                    {
+                        propertiesTree.Nodes.Add("Binding " + bp.Target);
+                        targs.Add(bp.Target);
+                    }
+                }
+                foreach (string res in curCtrl.Requires)
+                {
+                }
+
+            }
+        }
+        #endregion
 
     }
 }

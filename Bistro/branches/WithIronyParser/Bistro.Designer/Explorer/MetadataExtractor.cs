@@ -72,9 +72,11 @@ namespace Bistro.Designer.Explorer
             bool equal = new AttributesComparer().Equals(infobyFiles[m_srcFilename],controllerInfo);
             if (!equal)
             {
-                infobyFiles[m_srcFilename].Remove(m_srcFilename);
-                ControllersTable curtbl = new ControllersTable(controllerInfo);
-                infobyFiles.Add(m_srcFilename, curtbl);
+                if (infobyFiles.Remove(m_srcFilename))
+                {
+                    ControllersTable curtbl = new ControllersTable(controllerInfo);
+                    infobyFiles.Add(m_srcFilename, curtbl);
+                }
                 return true;
             }
             return false;

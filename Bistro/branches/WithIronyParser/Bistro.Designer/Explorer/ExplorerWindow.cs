@@ -45,11 +45,6 @@ namespace Bistro.Designer.Explorer
         private EnvDTE.WindowEvents _windowsEvents;
         private EnvDTE.DocumentEvents _docEvents;
         private EnvDTE.SolutionEvents _slnEvents;
-        private Factory factory;
-        private DesignerControl control;
-        private MetadataExtractor extractor;
-        private Bistro.MethodsEngine.Engine engine;
-
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
@@ -66,11 +61,6 @@ namespace Bistro.Designer.Explorer
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
             control = new DesignerControl();
-            SectionHandler sh = new SectionHandler();
-            sh.Application = "BistroApplication";
-            sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
-            Bistro.Application.Initialize(sh);
-            engine = new Bistro.MethodsEngine.Engine(Bistro.Application.Instance);
         }
         public DesignerControl Control
         {
@@ -96,76 +86,20 @@ namespace Bistro.Designer.Explorer
         {
             _events = (EnvDTE80.Events2)dte.Events;
             //_windowsEvents = (EnvDTE.WindowEvents)_events.get_WindowEvents(null);
-           //_windowsEvents.WindowActivated += new EnvDTE._dispWindowEvents_WindowActivatedEventHandler(windowsEvents_WindowActivated);
+            //_windowsEvents.WindowActivated += new EnvDTE._dispWindowEvents_WindowActivatedEventHandler(windowsEvents_WindowActivated);
             _docEvents = (EnvDTE.DocumentEvents)_events.get_DocumentEvents(null);
             _docEvents.DocumentSaved += new EnvDTE._dispDocumentEvents_DocumentSavedEventHandler(ReloadTreeView);
             _slnEvents = (EnvDTE.SolutionEvents)_events.SolutionEvents;
-            _slnEvents.Opened += new EnvDTE._dispSolutionEvents_OpenedEventHandler(GetInitialControllerInfo);
+            _slnEvents.Opened += new EnvDTE._dispSolutionEvents_OpenedEventHandler(_slnEvents_Opened);
+            _slnEvents.AfterClosing += new EnvDTE._dispSolutionEvents_AfterClosingEventHandler(_slnEvents_AfterClosing);
         }
-        /*private void windowsEvents_WindowActivated(EnvDTE.Window gotFocus, EnvDTE.Window lostfocus)
-        {
-            try
-            {
-                Debug.Assert(gotFocus != null);
-                if (gotFocus == null)
-                {
-                    return;
-                }
+   
+        #region Private Members
+        private Factory factory;
+        private DesignerControl control;
+        private MetadataExtractor extractor;
 
-                if (gotFocus.Type.Equals(EnvDTE.vsWindowType.vsWindowTypeDocument) && gotFocus.Caption.EndsWith(".fs"))
-                {
-                    Trace.WriteLine("document wnd with F# file is activated");
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
-            }
-        }*/
-        /// <summary>
-        /// fills dictionary with info about controllers from all F# files of the project
-        /// must be called after ProjectManager was instantiated by Factory(OnSolutionOpened)
-        /// it may be called only once because when you add new item to the project,info will be added OnSave 
-        /// </summary>
-        internal void GetInitialControllerInfo()
-        {
-            
-            extractor = new MetadataExtractor("f#", String.Empty);
-            try
-            {
-                string path = factory.projectMngr.MSBuildProject.FullFileName;
-                int len = path.LastIndexOf("\\");
-                path = path.Substring(0,len + 1);
-                // Iterate through each ItemGroup in the Project to obtain the list of F# source files
-                foreach (BuildItemGroup ig in factory.projectMngr.MSBuildProject.ItemGroups)
-                {
-                    foreach (BuildItem item in ig)
-                    {
-                        if (String.Compare(item.Name,"Compile") != 0)
-                            break;
-                        if (item.Include.EndsWith(".fs"))
-                        {
-                            extractor.FileName = path + item.Include;
-                            extractor.FillControllerInfo();
-                            /*foreach (KeyValuePair<string,Dictionary<string,List<string>>> kvp in extractor.controllerInfo)
-                            {
-                                if (!totalCtrlInfo.ContainsKey(kvp.Key))
-                                totalCtrlInfo.Add(kvp.Key, kvp.Value);
-                            }*/
-                        }
-                    }
-                }
-                UpdateTreeData();
-                LoadTree(); 
-
-
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
-            }
-        }
+ 
         /// <summary>
         /// as there were changes in one or more files we need to reload bindingTreeView of control
         /// </summary>
@@ -174,19 +108,24 @@ namespace Bistro.Designer.Explorer
             extractor.FileName = target.FullName;
             if (extractor.FillControllerInfo())
             {
-                UpdateTreeData();//reevaluate dependencies
+                ///TODO:
+                ///how can we keep controllers' info got from dlls(if there were any)?
+                
+                ///keep this line commented until engine.Clean will be implemented
+                //UpdateTreeData();//reevaluate dependencies
+                
                 LoadTree();
             }
         }
         private void LoadTree()
         {
-            ///TODO:
-            ///how can we keep controllers' info got from dlls(if there were any)
+            Control.BindingTree.Nodes.Clear();
+
             Control.cashPatternsRes.Clear();
             Control.cashPatternsCtrl.Clear();
             Dictionary<string, List<ControllerDescription>> ctrlsStore = Control.cashPatternsCtrl;//temp obj at stack to decrease property's calls
             Dictionary<string, Dictionary<string, Resource>> resStore = Control.cashPatternsRes;//temp obj at stack to decrease property's calls
-            foreach (BistroMethod bm in engine.Processor.AllMethods)
+            foreach (BistroMethod bm in control.Engine.Processor.AllMethods)
             {
                 foreach (IMethodsBindPointDesc bp in bm.BindPointsList)
                 {
@@ -248,8 +187,7 @@ namespace Bistro.Designer.Explorer
         }
         /// <summary>
         /// Rebuilds all controller dependencies and bindings
-        /// Note : as engine was created in constructor,after this call you lose data got from dlls this project references
-        /// so it is necessary to store the data some way (or reinitialize engine each time?)
+        /// Note : engine.Clean is not implemented yet that's why it is impossible to update tree correctly now
         /// </summary>
         private void UpdateTreeData()
         {
@@ -261,18 +199,87 @@ namespace Bistro.Designer.Explorer
                 return;
             }
             ///TODO : clear controllers been added from source code 
-            //engine.Clear();//not implemented yet
+            //control.Engine.Clear();//not implemented yet
             foreach (KeyValuePair<string, ControllersTable> fileData in extractor.infobyFiles)
             {
                 foreach (KeyValuePair<string, Dictionary<string, List<string>>> ctrlsData in fileData.Value)
                 {
                     ControllerDescription ctrldesc = new ControllerDescription(ctrlsData.Key, ctrlsData.Value);
-                    engine.RegisterController(ctrldesc);
+                    control.Engine.RegisterController(ctrldesc);
                 }
             }
-            engine.ForceUpdateBindPoints();
-            
+            control.Engine.ForceUpdateBindPoints();
+
 
         }
+         /// <summary>
+        /// fills dictionary with info about controllers from all F# files of the project
+        /// must be called after ProjectManager was instantiated by Factory(OnSolutionOpened)
+        /// it may be called only once because when you add new item to the project,info will be added OnSave 
+        /// </summary>
+        private void _slnEvents_Opened()
+        {
+            SectionHandler sh = new SectionHandler();
+            sh.Application = "Bistro.Application";
+            sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
+            Bistro.Application.Initialize(sh);
+            control.Engine = new Bistro.MethodsEngine.Engine(Bistro.Application.Instance);
+            extractor = new MetadataExtractor("f#", String.Empty);
+            try
+            {
+                string path = factory.projectMngr.MSBuildProject.FullFileName;
+                int len = path.LastIndexOf("\\");
+                path = path.Substring(0, len + 1);
+                // Iterate through each ItemGroup in the Project to obtain the list of F# source files
+                foreach (BuildItemGroup ig in factory.projectMngr.MSBuildProject.ItemGroups)
+                {
+                    foreach (BuildItem item in ig)
+                    {
+                        if (String.Compare(item.Name, "Compile") != 0)
+                            break;
+                        if (item.Include.EndsWith(".fs"))
+                        {
+                            extractor.FileName = path + item.Include;
+                            extractor.FillControllerInfo();
+                        }
+                    }
+                }
+                UpdateTreeData();
+                LoadTree();
+
+
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
+        } 
+        private void _slnEvents_AfterClosing()
+        {
+            control.Engine = null;
+        }
+
+        /*private void windowsEvents_WindowActivated(EnvDTE.Window gotFocus, EnvDTE.Window lostfocus)
+        {
+            try
+            {
+                Debug.Assert(gotFocus != null);
+                if (gotFocus == null)
+                {
+                    return;
+                }
+
+                if (gotFocus.Type.Equals(EnvDTE.vsWindowType.vsWindowTypeDocument) && gotFocus.Caption.EndsWith(".fs"))
+                {
+                    Trace.WriteLine("document wnd with F# file is activated");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
+        }*/
+        #endregion
     }
 }

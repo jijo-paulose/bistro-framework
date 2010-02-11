@@ -102,12 +102,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bistro.DesignerPackage.cs" />
-    <Compile Include="Explorer\MyControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Explorer\MyControl.Designer.cs">
-      <DependentUpon>MyControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Explorer\ExplorerWindow.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="ProjectBase\AssemblyReferenceNode.cs" />
@@ -317,9 +311,6 @@
     <None Include="Resources\Images_24bit.bmp" />
     <EmbeddedResource Include="Explorer\DesignerControl.resx">
       <DependentUpon>DesignerControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Explorer\MyControl.resx">
-      <DependentUpon>MyControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Projects\FSharp\Properties\EditDependenciesDialog.resx">
       <DependentUpon>EditDependenciesDialog.cs</DependentUpon>

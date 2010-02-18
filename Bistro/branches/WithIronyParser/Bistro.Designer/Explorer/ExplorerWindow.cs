@@ -112,7 +112,7 @@ namespace Bistro.Designer.Explorer
                 ///how can we keep controllers' info got from dlls(if there were any)?
                 
                 ///keep this line commented until engine.Clean will be implemented
-                //UpdateTreeData();//reevaluate dependencies
+                UpdateTreeData();//reevaluate dependencies
                 
                 LoadTree();
             }
@@ -144,10 +144,19 @@ namespace Bistro.Designer.Explorer
                     //add resource required by controllers to process urls matching the target
                     foreach (KeyValuePair<string, Resource> res in bm.Resources)
                     {
+                        //check whether this resource is required by bindPoint
                         if (((List<IMethodsBindPointDesc>)res.Value.RequiredBy).Contains(bp)
                             && !resStore[bp.Target].ContainsValue(res.Value))
                         {
-                            resStore[bp.Target].Add(res.Key, res.Value);
+                            if (!resStore[bp.Target].ContainsKey(res.Key))
+                                resStore[bp.Target].Add(res.Key, res.Value);
+                        }
+                        //check whether bindPoint depends on this resource 
+                        if (((List<IMethodsBindPointDesc>)res.Value.Dependents).Contains(bp)
+                            && !resStore[bp.Target].ContainsValue(res.Value))
+                        {
+                            if (!resStore[bp.Target].ContainsKey(res.Key))
+                                resStore[bp.Target].Add(res.Key, res.Value);
                         }
                     }
                 }
@@ -199,7 +208,7 @@ namespace Bistro.Designer.Explorer
                 return;
             }
             ///TODO : clear controllers been added from source code 
-            //control.Engine.Clear();//not implemented yet
+            control.Engine.Clean();//not implemented yet
             foreach (KeyValuePair<string, ControllersTable> fileData in extractor.infobyFiles)
             {
                 foreach (KeyValuePair<string, Dictionary<string, List<string>>> ctrlsData in fileData.Value)

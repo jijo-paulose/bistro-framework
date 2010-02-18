@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DesignerControl));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.bindingTree = new System.Windows.Forms.TreeView();
             this.propertiesTree = new System.Windows.Forms.TreeView();
@@ -37,6 +38,7 @@
             this.ControllerMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showSourceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showBindingsResourcesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -84,7 +86,7 @@
             this.MethodMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showBindingsToolStripMenuItem});
             this.MethodMenu.Name = "MethodMenu";
-            this.MethodMenu.Size = new System.Drawing.Size(154, 48);
+            this.MethodMenu.Size = new System.Drawing.Size(154, 26);
             // 
             // showBindingsToolStripMenuItem
             // 
@@ -114,6 +116,16 @@
             this.showBindingsResourcesToolStripMenuItem.Text = "Show Bindings/Resources";
             this.showBindingsResourcesToolStripMenuItem.Click += new System.EventHandler(this.On_ShowBindingsResources);
             // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "0187_green_star.png");
+            this.imageList1.Images.SetKeyName(1, "0118_abullet.png");
+            this.imageList1.Images.SetKeyName(2, "alert_001.png");
+            this.imageList1.Images.SetKeyName(3, "212.gif");
+            this.imageList1.Images.SetKeyName(4, "21.gif");
+            // 
             // DesignerControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -140,5 +152,6 @@
         internal System.Windows.Forms.ContextMenuStrip ControllerMenu;
         internal System.Windows.Forms.ToolStripMenuItem showSourceToolStripMenuItem;
         internal System.Windows.Forms.ToolStripMenuItem showBindingsResourcesToolStripMenuItem;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }

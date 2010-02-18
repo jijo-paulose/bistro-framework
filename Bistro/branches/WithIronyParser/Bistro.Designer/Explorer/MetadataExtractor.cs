@@ -29,25 +29,25 @@ namespace Bistro.Designer.Explorer
         public Dictionary<string, ControllersTable> infobyFiles;
         public MetadataExtractor(string lang, string fname)
         {
-            m_parseTree = null;
+            parseTree = null;
             if (String.Compare(lang, "c#") == 0)
-                m_grammar = new CSharpGrammar();
+                grammar = new CSharpGrammar();
             else if (String.Compare(lang, "f#") == 0)
-                m_grammar = new FSharpGrammar();
+                grammar = new FSharpGrammar();
             else
             {
                 throw new Exception("The grammar name you've typed is not supported");
 
             }
-            m_parser = new Parser(new LanguageData(m_grammar));
-            m_srcFilename = fname;
+            parser = new Parser(new LanguageData(grammar));
+            srcFilename = fname;
             controllerInfo = new ControllersTable();
             infobyFiles = new Dictionary<string, ControllersTable>();
         }
         public string FileName
         {
-            set { m_srcFilename = value; }
-            get { return m_srcFilename; }
+            set { srcFilename = value; }
+            get { return srcFilename; }
         }
         /// <summary>
         /// Method is used to extract controllers' data from specified source file into ControllersTable 
@@ -56,54 +56,57 @@ namespace Bistro.Designer.Explorer
         /// else - otherwise</returns>
         public bool FillControllerInfo()
         {
-            TextReader rd = new StreamReader(m_srcFilename);
+            TextReader rd = new StreamReader(srcFilename);
             controllerInfo.Clear();
             Extract(rd.ReadToEnd(), "<source>");
-            if (m_parseTree == null) return false;
-            AddParseNodeRec(m_parseTree.Root);
+            if (parseTree == null) return false;
+            AddParseNodeRec(parseTree.Root);
             //if source file has been recently added to the project,add new row into ControllersTable
             //else if there were any changes in source file,update corresponding row in ControllersTable
-            if (!infobyFiles.ContainsKey(m_srcFilename))
+            if (!infobyFiles.ContainsKey(srcFilename))
             {
                 ControllersTable curtbl = new ControllersTable(controllerInfo);
-                infobyFiles.Add(m_srcFilename, curtbl);
+                infobyFiles.Add(srcFilename, curtbl);
                 return true;
             }
-            bool equal = new AttributesComparer().Equals(infobyFiles[m_srcFilename],controllerInfo);
-            if (!equal)
+            else
             {
-                if (infobyFiles.Remove(m_srcFilename))
+                bool equal = new AttributesComparer().Equals(infobyFiles[srcFilename], controllerInfo);
+                if (!equal)
                 {
-                    ControllersTable curtbl = new ControllersTable(controllerInfo);
-                    infobyFiles.Add(m_srcFilename, curtbl);
+                    if (infobyFiles.Remove(srcFilename))
+                    {
+                        ControllersTable curtbl = new ControllersTable(controllerInfo);
+                        infobyFiles.Add(srcFilename, curtbl);
+                        return true;
+                    }
                 }
-                return true;
+                return false;
             }
-            return false;
         }
 
         #region Private members
-        private ParseTree m_parseTree;
-        private Parser m_parser;
-        private Grammar m_grammar;
-        private string m_srcFilename;
+        private ParseTree parseTree;
+        private Parser parser;
+        private Grammar grammar;
+        private string srcFilename;
         private const string tail = " (identifier)";
         private string curCtrl;//name of the controller that is being processed
         private string curAttr;//name of the attribute that is being processed
-        private int nBindTargs;//as Dictionary key must be unique,so we'll save it like Bind0..BindN for each controller 
-        private bool bBindAttribute;//this flag shows whether curAttr is BindAttribute 
+        private int bindTargs;//as Dictionary key must be unique,so we'll save it like Bind0..BindN for each controller 
+        private bool isBindAttr;//this flag shows whether curAttr is BindAttribute 
         private void Extract(string srcText, string fname)
         {
             try
             {
-                m_parser.Parse(srcText, fname);
+                parser.Parse(srcText, fname);
             }
             catch (Exception ex)
             {
             }
             finally
             {
-                m_parseTree = m_parser.Context.CurrentParseTree;
+                parseTree = parser.Context.CurrentParseTree;
             }
         }
 
@@ -116,31 +119,35 @@ namespace Bistro.Designer.Explorer
                 if (token.Terminal.Category != TokenCategory.Content) return;
             }
             string txt = nodeInfo.ToString();
-            if (m_grammar.GetType() == typeof(FSharpGrammar)&& (String.Compare(txt, "FunctionDef") == 0) )
+            if (grammar.GetType() == typeof(FSharpGrammar)&& (String.Compare(txt, "FunctionDef") == 0) )
             {
                 Trace.WriteLine(txt + " of " + nodeInfo.ChildNodes[2] + " :");
                 curCtrl = nodeInfo.ChildNodes[2].ToString();
                 curCtrl = curCtrl.Substring(0,curCtrl.Length - tail.Length);
                 controllerInfo.Add(curCtrl, new Dictionary<string, List<string>>());
-                nBindTargs = 0;
+                controllerInfo[curCtrl].Add("DependsOn",new List<string>());
+                controllerInfo[curCtrl].Add("Provides",new List<string>());
+                controllerInfo[curCtrl].Add("Requires",new List<string>());
+                bindTargs = 0;
             }
-            else if (m_grammar.GetType() == typeof(CSharpGrammar) && (String.Compare(txt, "class_declaration") == 0))
+            else if (grammar.GetType() == typeof(CSharpGrammar) && (String.Compare(txt, "class_declaration") == 0))
             {
                 //Not implemented yet
                 Trace.WriteLine(txt + " of " + nodeInfo.ChildNodes[3] + " :");
                 curCtrl = nodeInfo.ChildNodes[3].ToString();
                 curCtrl = curCtrl.Substring(0, curCtrl.Length - tail.Length);
                 controllerInfo.Add(curCtrl, new Dictionary<string, List<string>>());
-                nBindTargs = 0;
+                bindTargs = 0;
 
             }
             foreach (var child in nodeInfo.ChildNodes)
             {
 
                 ParseTreeNode curChild = child;
-                bool bIsAttribute  = String.Compare(child.ToString(), "attribute") == 0;
-                bool bIsAttrArgs = String.Compare(child.ToString(), "attr_arg") == 0;
-                if (bIsAttribute)
+                bool isAttribute  = String.Compare(child.ToString(), "attribute") == 0;
+                bool isAttrArgs = String.Compare(child.ToString(), "attr_arg") == 0;
+                bool isParam = String.Compare(child.ToString(), "Param") == 0;
+                if (isAttribute)
                 {
                     while (curChild.ChildNodes.Count > 0)
                     {
@@ -149,51 +156,102 @@ namespace Bistro.Designer.Explorer
                     Trace.WriteLine("<attr name>:" + curChild.ToString());
                     curAttr = curChild.ToString();
                     curAttr = curAttr.Substring(0, curAttr.Length - tail.Length);
-                    bBindAttribute = String.Compare(curAttr, "Bind") == 0;
-                    if (bBindAttribute)
+                    isBindAttr = String.Compare(curAttr, "Bind") == 0;
+                    if (isBindAttr)
                     {
-                        curAttr += (nBindTargs++).ToString() ;
+                        curAttr += (bindTargs++).ToString() ;
                         
                     }
                     controllerInfo[curCtrl].Add(curAttr, new List<string>());
                 }
-                else if (bIsAttrArgs)
+                else if (isAttrArgs)
                 {
-                    string curVal="";
-                    bool bFullName = false;
+                    string curVal = String.Empty;
+                    bool isFullName = false;
                     //go down until we reach the leaf
-                    if (bBindAttribute)
+                    /// TODO : refactor this branch in more simple way
+                    ///
+                    if (isBindAttr)
                     {
                         //Bind("target") - arg is Literal NT is processed as other common attr_args
-                        //Bind("target",Priority=1,ControllerBindType = BindType.After)- args are Literal,BinExpr,Binexpr
+                        //Bind("target",Priority=1,ControllerBindType = BindType.After)- args are Literal,BinExpr,BinExpr
                         while (curChild.ChildNodes.Count > 0)
                         {
                             curChild = curChild.ChildNodes[0];
                             //Processing of named parameters
                             if (String.Compare(curChild.ToString(), "BinExpr") == 0)
                             {
-                                curVal += curChild.ChildNodes[0].ToString() + "= ";
-                                //[0] is identifier like "Priority",
-                                //[1] is assignment operation "="
-                                //[2] is the value of named parameter
-                                curChild = curChild.ChildNodes[2];
-                                bFullName = true;//the value of named parameter (it maybe NT - that's why always select the last(right) child)
-                                break;
+                                if (curChild.ChildNodes[0].ToString() == "Expr")
+                                {
+                                    //process Expr-Literal = Expr->Literal
+                                    ParseTreeNode node = (curChild.ChildNodes[0]).ChildNodes[0];
+                                    if (node.ToString() == "Literal")
+                                    {
+                                        curVal = node.ChildNodes[0].ToString() + "= ";//Expr -> Literal->""
+                                        curChild = curChild.ChildNodes[2];//right Expr
+                                        if (curChild.ChildNodes[0].ToString() == "qual_name_segments_opt")
+                                        {
+                                            curChild = (curChild.ChildNodes[0]).ChildNodes[node.ChildNodes.Count - 1];//Literal
+                                            curVal += curChild.ChildNodes[0].ToString();
+                                        }
+                                        else
+                                        {
+                                            curVal += (curChild.ChildNodes[0]).ChildNodes[0].ToString();
+
+                                        }
+                                    }
+                                    Trace.WriteLine("<val>:" + curChild.ToString());
+                                    (controllerInfo[curCtrl][curAttr]).Add(curVal);
+                                    break;
+                                }
 
                             }
                             else if (String.Compare(curChild.ToString(), "Literal") == 0)
                             {
-                                break;
+                                while (curChild.ChildNodes.Count > 0)
+                                {
+                                    curChild = (isFullName) ? curChild.ChildNodes[curChild.ChildNodes.Count - 1] : curChild.ChildNodes[0];
+                                }
+                                Trace.WriteLine("<val>:" + curChild.ToString());
+                                curVal += curChild.ToString();
+                                (controllerInfo[curCtrl][curAttr]).Add(curVal);
+
                             }
                         }
                     }
+                    else
+                    {
+                        while (curChild.ChildNodes.Count > 0)
+                        {
+                            curChild = (isFullName) ? curChild.ChildNodes[curChild.ChildNodes.Count - 1] : curChild.ChildNodes[0];
+                        }
+                        Trace.WriteLine("<val>:" + curChild.ToString());
+                        curVal += curChild.ToString();
+                        (controllerInfo[curCtrl][curAttr]).Add(curVal);
+                    }
+                }
+                else if (isParam)
+                {
+                    string paramName = curChild.ChildNodes[1].ToString();
+                    paramName = paramName.Substring(0, paramName.Length - tail.Length);
+                    /* According to the FSharpGrammar (see Irony.Samples):
+                     * curChild.ChildNodes[0] = param_attr_opt NT
+                     * curChild.ChildNodes[0]).ChildNodes[1] = qual_name_segment_opt NT
+                     */
+                    curChild = (curChild.ChildNodes[0]).ChildNodes[1];
+                    //go down until we reach the leaf - Attribute(StringLiteral)
                     while (curChild.ChildNodes.Count > 0)
                     {
-                        curChild = (bFullName)? curChild.ChildNodes[curChild.ChildNodes.Count-1]: curChild.ChildNodes[0];
+                        curChild = curChild.ChildNodes[curChild.ChildNodes.Count - 1];
                     }
-                    Trace.WriteLine("<val>:" + curChild.ToString());
-                    curVal += curChild.ToString();
-                    (controllerInfo[curCtrl][curAttr]).Add(curVal);
+                    string paramAttr = curChild.ToString();
+                    paramAttr = paramAttr.Substring(0, paramAttr.Length - tail.Length);
+                    bool needToStore = String.Compare("DependsOn",paramAttr) == 0 
+                        || String.Compare("Provides",paramAttr) == 0
+                        || String.Compare("Requires",paramAttr) == 0;
+                    //Note : DependsOn,Provides,Requires keys are added when curCtrl is added
+                    if (needToStore)
+                        controllerInfo[curCtrl][paramAttr].Add(paramName);
                 }
 
                 AddParseNodeRec(child);
@@ -228,6 +286,9 @@ namespace Bistro.Designer.Explorer
                 //TODO: usually target is the first parameter,but it can be set via named parameter Target
                 string[] splitTarget = ctrlDesc.attrs[strBind][0].Split(' ');
                 target =  splitTarget[0];
+                if ((String.Compare(target, "get") == 0 || String.Compare(target, "post") == 0) && splitTarget.Length > 1) 
+                    target = splitTarget[1];
+                
                 foreach (string param in ctrlDesc.attrs[strBind])
                 {
                     if (param.Contains("ControllerBindType"))
@@ -301,7 +362,6 @@ namespace Bistro.Designer.Explorer
     }
     public class ControllerDescription : IMethodsControllerDesc
     {
-        public Dictionary<string, List<string>> attrs;
         public ControllerDescription(string _name, Dictionary<string, List<string>> _attrs)
         {
             name = _name;
@@ -313,25 +373,13 @@ namespace Bistro.Designer.Explorer
                     nTargs++;
             }
             targs = new List<IMethodsBindPointDesc>(nTargs);
-            Initialize();
 
         }
+        public Dictionary<string, List<string>> attrs;
         private string name;
         private int nTargs;
         private List<IMethodsBindPointDesc> targs;
-        private List<string> dependsOn;
-        private List<string> provides;
-        private List<string> requires;
-        private bool bisSecurity;
 
-        private void Initialize()
-        {
-            dependsOn = (attrs.ContainsKey("DependsOn")) ? attrs["DependsOn"] : new List<string>();
-            bisSecurity = attrs.ContainsKey("IsSecurity");
-            provides = (attrs.ContainsKey("Provides")) ? attrs["Provides"] : new List<string>();
-            requires = (attrs.ContainsKey("Requires")) ? attrs["Requires"] : new List<string>();
-
-        }
         #region IMethodsControllerDesc Members
 
         public string ControllerTypeName
@@ -343,28 +391,28 @@ namespace Bistro.Designer.Explorer
         {
             get 
             {
-                return dependsOn;
+                return attrs["DependsOn"];
             }
         }
 
         public string GetResourceType(string resourceName)
         {
-            throw new NotImplementedException();
+            return resourceName + "resourceType";
         }
 
         public bool IsSecurity
         {
-            get { return bisSecurity; }
+            get { return attrs.ContainsKey("Security"); }
         }
 
         public List<string> Provides
         {
-            get { return provides; }  
+            get { return attrs["Provides"]; }  
         }
 
         public List<string> Requires
         {
-            get { return requires; }
+            get { return attrs["Requires"]; }
         }
 
         public IEnumerable<IMethodsBindPointDesc> Targets

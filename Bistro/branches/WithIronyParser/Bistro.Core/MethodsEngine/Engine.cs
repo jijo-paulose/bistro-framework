@@ -219,7 +219,6 @@ namespace Bistro.MethodsEngine
 			return GetControllers(requestUrl).Count > 0;
 		}
 
-
         internal virtual void RaiseResourceLoop(string methodUrl, IEnumerable<IMethodsControllerDesc> controllers, params string[] args)
         {
         }
@@ -231,7 +230,12 @@ namespace Bistro.MethodsEngine
         internal virtual void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<IMethodsControllerDesc> controllers, params string[] args)
         {
         }
-
+        public void Clean()
+        {
+            if (map !=null) map.Clear();
+            processor = null;
+            processor = new SubSetsProcessor(this);
+        }
 
 
     }

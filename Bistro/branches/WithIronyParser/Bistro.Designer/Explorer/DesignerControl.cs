@@ -107,22 +107,12 @@ namespace Bistro.Designer.Explorer
                     if (!targs.Contains(bp.Target))
                     {
                         propertiesTree.Nodes.Add("Binding " + bp.Target);
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 1;
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 1;
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 0;
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 0;
                         targs.Add(bp.Target);
                     }
                 }
                 foreach (string res in curCtrl.DependsOn)
-                {
-                    if (!resources.Contains(res))
-                    {
-                        propertiesTree.Nodes.Add("Resource " + res);
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 2;
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 2;
-                        resources.Add(res);
-                    }
-                }
-                foreach (string res in curCtrl.Requires)
                 {
                     if (!resources.Contains(res))
                     {
@@ -132,13 +122,23 @@ namespace Bistro.Designer.Explorer
                         resources.Add(res);
                     }
                 }
+                foreach (string res in curCtrl.Requires)
+                {
+                    if (!resources.Contains(res))
+                    {
+                        propertiesTree.Nodes.Add("Resource " + res);
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 2;
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 2;
+                        resources.Add(res);
+                    }
+                }
                 foreach (string res in curCtrl.Provides)
                 {
                     if (!resources.Contains(res))
                     {
                         propertiesTree.Nodes.Add("Resource " + res);
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 0;
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 0;
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 1;
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 1;
                         resources.Add(res);
                     }
                 }

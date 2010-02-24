@@ -120,11 +120,10 @@
             // 
             this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "0187_green_star.png");
-            this.imageList1.Images.SetKeyName(1, "0118_abullet.png");
-            this.imageList1.Images.SetKeyName(2, "alert_001.png");
-            this.imageList1.Images.SetKeyName(3, "212.gif");
-            this.imageList1.Images.SetKeyName(4, "21.gif");
+            this.imageList1.Images.SetKeyName(0, "mechanic.gif");
+            this.imageList1.Images.SetKeyName(1, "green_star.png");
+            this.imageList1.Images.SetKeyName(2, "lock.gif");
+            this.imageList1.Images.SetKeyName(3, "alert.png");
             // 
             // DesignerControl
             // 

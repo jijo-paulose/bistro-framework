@@ -322,6 +322,11 @@
       <Visible>true</Visible>
       <LogicalName>Resources.imagelis.bmp</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\alert.png" />
+    <EmbeddedResource Include="Resources\bullet.png" />
+    <EmbeddedResource Include="Resources\green_star.png" />
+    <Content Include="Resources\lock.gif" />
+    <Content Include="Resources\mechanic.gif" />
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <!-- Browser file -->

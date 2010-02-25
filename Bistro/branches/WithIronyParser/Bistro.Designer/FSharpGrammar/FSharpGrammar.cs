@@ -26,15 +26,12 @@ namespace Irony.Samples.FSharp
             var semicolon = ToTerm(";");
   #endregion
   #region 2. Non-terminals
+            var optionOpt = new NonTerminal("optionOpt", Empty | "option");
+            var typeOpt = new NonTerminal("typeOpt");
             var Open = new NonTerminal("Open");
             var Expr = new NonTerminal("Expr");
             var Term = new NonTerminal("Term");
 
-            var DummyString = new NonTerminal("DummyString");
-            var DummyDelim = new NonTerminal("DummyDelim");
-            var DummyStmt = new NonTerminal("DummyStmt");
-            var DummyList = new NonTerminal("DummyList");
-            
             var Literal = new NonTerminal("Literal");
             var BinExpr = new NonTerminal("BinExpr", typeof(BinExprNode));
             var CondExpr = new NonTerminal("CondExpr", typeof(IfNode));
@@ -57,8 +54,15 @@ namespace Irony.Samples.FSharp
             var CombinedParams = new NonTerminal("CombinedParams");
             var ExtParams = new NonTerminal("ExtParams", typeof(ParamListNode));
             var ArgList = new NonTerminal("ArgList", typeof(ExpressionListNode));
-            var FunctionDef = new NonTerminal("FunctionDef", typeof(FunctionDefNode));
             var FunctionCall = new NonTerminal("FunctionCall", typeof(FunctionCallNode));
+            
+            var DummyString = new NonTerminal("DummyString");
+            var DummyNested = new NonTerminal("DummyNested");
+            var DummyStmt = new NonTerminal("DummyStmt");
+            var DummyList = new NonTerminal("DummyList");
+            var Named = new NonTerminal("Named");
+            var RetValues = new NonTerminal("RetValues");
+            var FunctionDef = new NonTerminal("FunctionDef", typeof(FunctionDefNode));
             var FuncBody = new NonTerminal("FunctionBody");
 
             /********************************************************************************/
@@ -106,7 +110,10 @@ namespace Irony.Samples.FSharp
             qual_name_segments_opt.Rule = MakeStarRule(qual_name_segments_opt, dot, Literal);
             Literal.Rule = identifier |number | StringLiteral |"["+StringLiteral+"]"
                 | "let" | "[" | "]" | "(" | ")" | "|" | ":" |"&" | "&&" | "+" | "-" | "*" | "/"
-                | "::" | "<|" | "|>" | "=" | "->" | "<-" | "'" | ","| "<<" | "<<<" | ">>" | ">>>" | "^" | "{" | "}" | Eos;
+                | "::" | "<|" | "|>" | "=" | "->" | "<-" | "'" | ","
+                | "<<" | "<<<" | ">>" | ">>>" | "^" | "{" | "}" | Eos;
+            Named.Rule = DummyString + "|> named" + StringLiteral;
+            RetValues.Rule = MakeStarRule(RetValues, comma, Literal);
             Expr.Rule = Term | UnExpr | BinExpr;
             expr_opt.Rule = Empty | Expr;
             ParExpr.Rule = "(" + expr_opt + ")";
@@ -118,6 +125,7 @@ namespace Irony.Samples.FSharp
             CondExpr.Rule = "if" + Expr + "then" + Eos + Block + else_clause_opt;
             else_clause_opt.Rule = "else" + Eos + Block | Empty;
             AssignmentStmt.Rule = "let" + identifier + "=" + DummyStmt;
+            ArgList.Rule = MakeStarRule(ArgList, comma, Expr);
             Stmt.Rule = AssignmentStmt | Expr;
             ExtStmt.Rule = Stmt + Eos | FunctionDef | module_declarations_opt | type_declarations_opt;
             Block.Rule = Indent + StmtList + Dedent;
@@ -125,23 +133,23 @@ namespace Irony.Samples.FSharp
             StmtList.Rule = MakePlusRule(StmtList, ExtStmt);
 
        #region Functions
-            DummyString.Rule = MakeStarRule(DummyString, Term);
-            DummyStmt.Rule = DummyString | Indent + DummyString | Dedent + DummyString;
-            DummyList.Rule = Empty | MakeStarRule(DummyList, DummyStmt);
-            ParamList.Rule = Empty | SimpleParams1 | SimpleParams2 | "(" + ExtParams + ")"
-                            | CombinedParams | "(" + MakeStarRule(ParamList,comma,Param) + ")";
-            ParamListExt.Rule = MakePlusRule(ParamListExt, ParamList);
-            Param.Rule = param_attr_opt + identifier
-                            | param_attr_opt + identifier + ":" + identifier;
+
             SimpleParams1.Rule = MakeStarRule(SimpleParams1, comma, identifier);
             SimpleParams2.Rule = MakePlusRule(SimpleParams2, identifier);
-            param_attr_opt.Rule = "[<param" + ":" + qual_name_segments_opt  + ">]";
-            ParamWithType.Rule = identifier + ":" + identifier;
-            CombinedParams.Rule = "(" + ExtParams + SimpleParams2 + ")" | "(" + SimpleParams2 + ExtParams  + ")";
-            ExtParams.Rule = MakeStarRule(ExtParams, comma, ParamWithType);
-            ArgList.Rule = MakeStarRule(ArgList, comma, Expr);
+            param_attr_opt.Rule = "[<param" + ":" + qual_name_segments_opt + ">]" | Empty;
+            typeOpt.Rule = ":" + qual_name_segments_opt | Empty;
+            Param.Rule = param_attr_opt + identifier + typeOpt + optionOpt;
+            ExtParams.Rule = MakePlusRule(ExtParams, Param);
+            ParamList.Rule = Empty | SimpleParams1 | SimpleParams2 
+                | "(" + MakeStarRule(ParamList, comma, Param) + ")" |"(" + ExtParams + ")";
+            ParamListExt.Rule = MakePlusRule(ParamListExt, ParamList);
+            
+            DummyString.Rule = MakeStarRule(DummyString,Term) | Named;
+            DummyStmt.Rule = DummyString | Indent + DummyString | Dedent + DummyString;
+            DummyNested.Rule = MakeStarRule(DummyNested,Indent,DummyString);
+            DummyList.Rule = Empty | MakeStarRule(DummyList, DummyStmt)| DummyNested;
             FunctionDef.Rule = attributes_opt + "let" + identifier + ParamListExt + "=" + DummyString + Eos + FuncBody;
-            FuncBody.Rule = Indent + DummyList + Dedent | Empty;
+            FuncBody.Rule = Indent + DummyList + Dedent| Empty;
             FunctionCall.Rule = qual_name_segments_opt + ArgList;
       #endregion
 
@@ -187,10 +195,6 @@ namespace Irony.Samples.FSharp
 
             // 7. Error recovery rule
             FuncBody.ErrorRule = SyntaxError + Dedent;
-            FunctionDef.ErrorRule = SyntaxError + "[";
-            module_declarations_opt.ErrorRule = SyntaxError + Eos;
-            //modules.ErrorRule = SyntaxError + Dedent;
-            module_body.ErrorRule = SyntaxError + Dedent;
             // 8. Syntax error reporting
             AddNoReportGroup("(");
             AddNoReportGroup(Eos);

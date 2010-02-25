@@ -124,6 +124,8 @@
             this.imageList1.Images.SetKeyName(1, "green_star.png");
             this.imageList1.Images.SetKeyName(2, "lock.gif");
             this.imageList1.Images.SetKeyName(3, "alert.png");
+            this.imageList1.Images.SetKeyName(4, "bullet.png");
+            this.imageList1.Images.SetKeyName(5, "white.PNG");
             // 
             // DesignerControl
             // 

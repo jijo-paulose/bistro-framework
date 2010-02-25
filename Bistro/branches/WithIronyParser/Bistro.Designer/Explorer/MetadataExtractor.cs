@@ -95,6 +95,7 @@ namespace Bistro.Designer.Explorer
         private string curAttr;//name of the attribute that is being processed
         private int bindTargs;//as Dictionary key must be unique,so we'll save it like Bind0..BindN for each controller 
         private bool isBindAttr;//this flag shows whether curAttr is BindAttribute 
+
         private void Extract(string srcText, string fname)
         {
             try
@@ -144,120 +145,183 @@ namespace Bistro.Designer.Explorer
             {
 
                 ParseTreeNode curChild = child;
-                bool isAttribute  = String.Compare(child.ToString(), "attribute") == 0;
-                bool isAttrArgs = String.Compare(child.ToString(), "attr_arg") == 0;
-                bool isParam = String.Compare(child.ToString(), "Param") == 0;
-                if (isAttribute)
+                string curVal = String.Empty;
+                bool skipBranch = false;
+                switch (child.ToString())
                 {
-                    while (curChild.ChildNodes.Count > 0)
-                    {
-                        curChild = curChild.ChildNodes[0];
-                    }
-                    Trace.WriteLine("<attr name>:" + curChild.ToString());
-                    curAttr = curChild.ToString();
-                    curAttr = curAttr.Substring(0, curAttr.Length - tail.Length);
-                    isBindAttr = String.Compare(curAttr, "Bind") == 0;
-                    if (isBindAttr)
-                    {
-                        curAttr += (bindTargs++).ToString() ;
-                        
-                    }
-                    controllerInfo[curCtrl].Add(curAttr, new List<string>());
-                }
-                else if (isAttrArgs)
-                {
-                    string curVal = String.Empty;
-                    bool isFullName = false;
-                    //go down until we reach the leaf
-                    /// TODO : refactor this branch in more simple way
-                    ///
-                    if (isBindAttr)
-                    {
-                        //Bind("target") - arg is Literal NT is processed as other common attr_args
-                        //Bind("target",Priority=1,ControllerBindType = BindType.After)- args are Literal,BinExpr,BinExpr
+                    case "attribute":
+
                         while (curChild.ChildNodes.Count > 0)
                         {
                             curChild = curChild.ChildNodes[0];
-                            //Processing of named parameters
-                            if (String.Compare(curChild.ToString(), "BinExpr") == 0)
-                            {
-                                if (curChild.ChildNodes[0].ToString() == "Expr")
-                                {
-                                    //process Expr-Literal = Expr->Literal
-                                    ParseTreeNode node = (curChild.ChildNodes[0]).ChildNodes[0];
-                                    if (node.ToString() == "Literal")
-                                    {
-                                        curVal = node.ChildNodes[0].ToString() + "= ";//Expr -> Literal->""
-                                        curChild = curChild.ChildNodes[2];//right Expr
-                                        if (curChild.ChildNodes[0].ToString() == "qual_name_segments_opt")
-                                        {
-                                            curChild = (curChild.ChildNodes[0]).ChildNodes[node.ChildNodes.Count - 1];//Literal
-                                            curVal += curChild.ChildNodes[0].ToString();
-                                        }
-                                        else
-                                        {
-                                            curVal += (curChild.ChildNodes[0]).ChildNodes[0].ToString();
+                        }
+                        Trace.WriteLine("<attr name>:" + curChild.ToString());
+                        curAttr = curChild.ToString();
+                        curAttr = curAttr.Substring(0, curAttr.Length - tail.Length);
+                        isBindAttr = String.Compare(curAttr, "Bind") == 0;
+                        if (isBindAttr)
+                        {
+                            curAttr += (bindTargs++).ToString();
 
+                        }
+                        controllerInfo[curCtrl].Add(curAttr, new List<string>());
+                        break;
+
+                    case "attr_arg":
+                        bool isFullName = false;
+                        //go down until we reach the leaf
+                        /// TODO : refactor this branch in more simple way
+                        ///
+                        if (isBindAttr)
+                        {
+                            //Bind("target") - arg is Literal NT is processed as other common attr_args
+                            //Bind("target",Priority=1,ControllerBindType = BindType.After)- args are Literal,BinExpr,BinExpr
+                            while (curChild.ChildNodes.Count > 0)
+                            {
+                                curChild = curChild.ChildNodes[0];
+                                //Processing of named parameters
+                                if (String.Compare(curChild.ToString(), "BinExpr") == 0)
+                                {
+                                    if (curChild.ChildNodes[0].ToString() == "Expr")
+                                    {
+                                        //process Expr-Literal = Expr->Literal
+                                        ParseTreeNode node = (curChild.ChildNodes[0]).ChildNodes[0];
+                                        if (node.ToString() == "Literal")
+                                        {
+                                            curVal = node.ChildNodes[0].ToString() + "= ";//Expr -> Literal->""
+                                            curChild = curChild.ChildNodes[2];//right Expr
+                                            if (curChild.ChildNodes[0].ToString() == "qual_name_segments_opt")
+                                            {
+                                                curChild = (curChild.ChildNodes[0]).ChildNodes[node.ChildNodes.Count - 1];//Literal
+                                                curVal += curChild.ChildNodes[0].ToString();
+                                            }
+                                            else
+                                            {
+                                                curVal += (curChild.ChildNodes[0]).ChildNodes[0].ToString();
+
+                                            }
                                         }
+                                        Trace.WriteLine("<val>:" + curChild.ToString());
+                                        (controllerInfo[curCtrl][curAttr]).Add(curVal);
+                                        break;
+                                    }
+
+                                }
+                                else if (String.Compare(curChild.ToString(), "Literal") == 0)
+                                {
+                                    while (curChild.ChildNodes.Count > 0)
+                                    {
+                                        curChild = (isFullName) ? curChild.ChildNodes[curChild.ChildNodes.Count - 1] : curChild.ChildNodes[0];
                                     }
                                     Trace.WriteLine("<val>:" + curChild.ToString());
+                                    curVal += curChild.ToString();
                                     (controllerInfo[curCtrl][curAttr]).Add(curVal);
-                                    break;
-                                }
 
-                            }
-                            else if (String.Compare(curChild.ToString(), "Literal") == 0)
-                            {
-                                while (curChild.ChildNodes.Count > 0)
-                                {
-                                    curChild = (isFullName) ? curChild.ChildNodes[curChild.ChildNodes.Count - 1] : curChild.ChildNodes[0];
                                 }
-                                Trace.WriteLine("<val>:" + curChild.ToString());
-                                curVal += curChild.ToString();
-                                (controllerInfo[curCtrl][curAttr]).Add(curVal);
-
                             }
                         }
-                    }
-                    else
-                    {
-                        while (curChild.ChildNodes.Count > 0)
+                        else
                         {
-                            curChild = (isFullName) ? curChild.ChildNodes[curChild.ChildNodes.Count - 1] : curChild.ChildNodes[0];
+                            while (curChild.ChildNodes.Count > 0)
+                            {
+                                curChild = (isFullName) ? curChild.ChildNodes[curChild.ChildNodes.Count - 1] : curChild.ChildNodes[0];
+                            }
+                            Trace.WriteLine("<val>:" + curChild.ToString());
+                            curVal += curChild.ToString();
+                            (controllerInfo[curCtrl][curAttr]).Add(curVal);
                         }
-                        Trace.WriteLine("<val>:" + curChild.ToString());
-                        curVal += curChild.ToString();
-                        (controllerInfo[curCtrl][curAttr]).Add(curVal);
-                    }
-                }
-                else if (isParam)
-                {
-                    string paramName = curChild.ChildNodes[1].ToString();
-                    paramName = paramName.Substring(0, paramName.Length - tail.Length);
-                    /* According to the FSharpGrammar (see Irony.Samples):
-                     * curChild.ChildNodes[0] = param_attr_opt NT
-                     * curChild.ChildNodes[0]).ChildNodes[1] = qual_name_segment_opt NT
-                     */
-                    curChild = (curChild.ChildNodes[0]).ChildNodes[1];
-                    //go down until we reach the leaf - Attribute(StringLiteral)
-                    while (curChild.ChildNodes.Count > 0)
-                    {
-                        curChild = curChild.ChildNodes[curChild.ChildNodes.Count - 1];
-                    }
-                    string paramAttr = curChild.ToString();
-                    paramAttr = paramAttr.Substring(0, paramAttr.Length - tail.Length);
-                    bool needToStore = String.Compare("DependsOn",paramAttr) == 0 
-                        || String.Compare("Provides",paramAttr) == 0
-                        || String.Compare("Requires",paramAttr) == 0;
-                    //Note : DependsOn,Provides,Requires keys are added when curCtrl is added
-                    if (needToStore)
-                        controllerInfo[curCtrl][paramAttr].Add(paramName);
-                }
+                        break;
 
-                AddParseNodeRec(child);
+                    case "SimpleParams1":
+                        curVal = curChild.ChildNodes[0].ToString();
+                        curVal = curVal.Substring(0, curVal.Length - tail.Length);
+                        controllerInfo[curCtrl]["Requires"].Add(curVal);
+                        break;
+                    
+                    case "SimpleParams2":
+                        curVal = curChild.ChildNodes[0].ToString();
+                        curVal = curVal.Substring(0, curVal.Length - tail.Length);
+                        controllerInfo[curCtrl]["Requires"].Add(curVal);
+                        break;
+                    
+                    case "Param":
+                        curVal = curChild.ChildNodes[1].ToString();//parameter's name
+                        curVal = curVal.Substring(0, curVal.Length - tail.Length);//remove tail (identifier)
+                        if (curChild.ChildNodes.Count > 2 && curChild.ChildNodes[3].ChildNodes.Count > 0)//that's option parameter 
+                            controllerInfo[curCtrl]["DependsOn"].Add(curVal);
+                        else
+                            controllerInfo[curCtrl]["Requires"].Add(curVal);
+
+                        break;
+                    
+                    /*Note : it works until this NT occurs only inside FunctionBody
+                     * so trace changes in the fSharpGrammar
+                     */ 
+                    case "DummyString":
+
+                        int i = curChild.ChildNodes.Count - 1;
+                        string toCut = " (StringLiteral)";
+                        for (; i >= 0; i--)
+                        {
+                            ParseTreeNode elem = curChild.ChildNodes[i];
+                            if (elem.ToString() == "Named")//{Dummystring} {|> named} {resource}
+                            {
+                                curVal = elem.ChildNodes[2].ToString();
+                                curVal = curVal.Substring(0, curVal.Length - toCut.Length); 
+                                controllerInfo[curCtrl]["Provides"].Add(curVal);
+                                ParseTreeNode nestedNamed = elem.ChildNodes.FindLast(NamedNode);
+                                if (nestedNamed != null)
+                                {
+                                    curVal = nestedNamed.ChildNodes[2].ToString();
+                                    curVal = curVal.Substring(0, curVal.Length - toCut.Length);
+                                    controllerInfo[curCtrl]["Provides"].Add(curVal);
+                                }
+                                /*if there is named construction,so it is not likely there would be return values
+                                 * like str1,str2,...
+                                 * try to skip another DummyStrings
+                                */
+                                skipBranch = true;
+                                break;
+                            }
+                            else if (elem.ToString() == "Literal" && elem.ChildNodes.Count > 0
+                                     && elem.ChildNodes[0].ToString() == ", (Key symbol)")
+                            {
+                                if ( curChild.ChildNodes[i - 1].ToString() == "Literal" &&
+                                     curChild.ChildNodes[i - 1].ChildNodes.Count == 1 &&
+                                     curChild.ChildNodes[i + 1].ToString() == "Literal" &&
+                                     curChild.ChildNodes[i + 1].ChildNodes.Count == 1)//Literal->identifier
+                                {
+                                    string param1 = curChild.ChildNodes[i - 1].ChildNodes[0].ToString();
+                                    string rem = (param1.Contains(toCut)) ? toCut : tail; 
+                                    param1 = param1.Substring(0, param1.Length - rem.Length);
+                                    string param2 = curChild.ChildNodes[i + 1].ChildNodes[0].ToString();
+                                    rem = (param2.Contains(toCut)) ? toCut : tail;
+                                    param2 = param2.Substring(0, param2.Length - rem.Length);
+                                    
+                                    if (!controllerInfo[curCtrl]["Provides"].Contains(param1))
+                                        controllerInfo[curCtrl]["Provides"].Add(param1);
+                                    
+                                    if (!controllerInfo[curCtrl]["Provides"].Contains(param2))
+                                        controllerInfo[curCtrl]["Provides"].Add(param2);
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+
+                }
+                if (!skipBranch)
+                    AddParseNodeRec(child);
             }
 
         }
+        private static bool NamedNode(ParseTreeNode node)
+        {
+            return String.Compare(node.ToString(), "Named") == 0;
+             
+        }
+
         #endregion
 
 

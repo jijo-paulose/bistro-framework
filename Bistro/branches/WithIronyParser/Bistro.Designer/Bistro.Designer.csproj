@@ -328,6 +328,7 @@
     <Content Include="Resources\lock.gif" />
     <Content Include="Resources\mechanic.gif" />
     <Content Include="Resources\Package.ico" />
+    <Content Include="Resources\white.PNG" />
   </ItemGroup>
   <!-- Browser file -->
   <ItemGroup>

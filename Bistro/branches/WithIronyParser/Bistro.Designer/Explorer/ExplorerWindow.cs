@@ -173,6 +173,8 @@ namespace Bistro.Designer.Explorer
                     subNodes[i] = new TreeNode();
                     subNodes[i].Tag = kvp.Value[i];
                     subNodes[i].Text = kvp.Value[i].ControllerTypeName;
+                    subNodes[i].ImageIndex = 0;
+                    subNodes[i].SelectedImageIndex = 0;
                     subNodes[i].ContextMenuStrip = Control.ControllerMenu;
                 }
                 if (resStore.ContainsKey(kvp.Key))
@@ -183,10 +185,14 @@ namespace Bistro.Designer.Explorer
                         subNodes[i + j] = new TreeNode();
                         subNodes[i + j].Tag = res.Value;
                         subNodes[i + j].Text = res.Key;
+                        subNodes[i + j].ImageIndex = 5;
+                        subNodes[i + j].SelectedImageIndex = 5;
                         j++;
                     }
                 }
                 TreeNode patternNode = new TreeNode(kvp.Key, subNodes);
+                patternNode.ImageIndex = 4;
+                patternNode.SelectedImageIndex = 4;
                 patternNode.ContextMenuStrip = Control.MethodMenu;
                 Control.BindingTree.Nodes.Add(patternNode);
 

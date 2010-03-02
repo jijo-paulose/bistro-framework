@@ -15,7 +15,6 @@ namespace Bistro.Designer.Explorer
         public DesignerControl()
         {
             InitializeComponent();
-            TreeNode application = new TreeNode("Controllers");
             cashPatternsCtrl = new Dictionary<string, List<ControllerDescription>>();
             cashPatternsRes = new Dictionary<string, Dictionary<string, Resource>>();
             propertiesTree.ImageList = imageList1;
@@ -71,9 +70,60 @@ namespace Bistro.Designer.Explorer
         }
 
 
-        private void BindingTree_AfterSelect(object sender, TreeViewEventArgs e)
+        private void FillPropertiesTree()
         {
             propertiesTree.Nodes.Clear();
+            List<string> targs = new List<string>();
+            //List<string> resources = new List<string>();
+            if (curCtrl != null)
+            {
+                foreach (IMethodsBindPointDesc bp in curCtrl.Targets)
+                {
+                    if (!targs.Contains(bp.Target))
+                    {
+                        propertiesTree.Nodes.Add("Binding " + bp.Target);
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 4;
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 4;
+                        targs.Add(bp.Target);
+                    }
+                }
+                foreach (string res in curCtrl.DependsOn)
+                {
+                    //if (!resources.Contains(res))
+                    //{
+                    propertiesTree.Nodes.Add("Resource " + res);
+                    propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 3;
+                    propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 3;
+                    //    resources.Add(res);
+                    //}
+                }
+                foreach (string res in curCtrl.Requires)
+                {
+                    //if (!resources.Contains(res))
+                    //{
+                    propertiesTree.Nodes.Add("Resource " + res);
+                    propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 2;
+                    propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 2;
+                    //  resources.Add(res);
+                    //}
+                }
+                foreach (string res in curCtrl.Provides)
+                {
+                    //if (!resources.Contains(res))
+                    {
+                        propertiesTree.Nodes.Add("Resource " + res);
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 1;
+                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 1;
+                        //  resources.Add(res);
+                    }
+                }
+
+
+            }
+        }
+        private void BindingTree_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            
             if (e.Node.Tag != null)
             {
                 System.Type nodeType = e.Node.Tag.GetType();
@@ -91,63 +141,16 @@ namespace Bistro.Designer.Explorer
                     curResource = (Resource)e.Node.Tag;
                 }
             }
+            FillPropertiesTree();
         }
-        private void On_MethodShowBindings(object sender, System.EventArgs e)
-        {
-            Debug.WriteLine("click on url pattern");
-        }
-        private void On_ShowBindingsResources(object sender, System.EventArgs e)
+        private void On_Click(object sender, System.EventArgs e)
         {
             Debug.WriteLine("show controller's bindings and resources");
-            List<string> targs = new List<string>();
-            //List<string> resources = new List<string>();
-            if (curCtrl != null)
-            {
-                foreach (IMethodsBindPointDesc bp in  curCtrl.Targets)
-                {
-                    if (!targs.Contains(bp.Target))
-                    {
-                        propertiesTree.Nodes.Add("Binding " + bp.Target);
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 4;
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 4;
-                         targs.Add(bp.Target);
-                    }
-                }
-                foreach (string res in curCtrl.DependsOn)
-                {
-                    //if (!resources.Contains(res))
-                    //{
-                        propertiesTree.Nodes.Add("Resource " + res);
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 3;
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 3;
-                    //    resources.Add(res);
-                    //}
-                }
-                foreach (string res in curCtrl.Requires)
-                {
-                    //if (!resources.Contains(res))
-                    //{
-                        propertiesTree.Nodes.Add("Resource " + res);
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 2;
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 2;
-                      //  resources.Add(res);
-                    //}
-                }
-                foreach (string res in curCtrl.Provides)
-                {
-                    //if (!resources.Contains(res))
-                    {
-                        propertiesTree.Nodes.Add("Resource " + res);
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].ImageIndex = 1;
-                        propertiesTree.Nodes[propertiesTree.Nodes.Count - 1].SelectedImageIndex = 1;
-                      //  resources.Add(res);
-                    }
-                }
-
-
-            }
+            FillPropertiesTree();
+            
         }
         #endregion
+
 
     }
 }

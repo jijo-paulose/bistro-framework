@@ -91,6 +91,8 @@ namespace Bistro.Designer.Explorer
         private Grammar grammar;
         private string srcFilename;
         private const string tail = " (identifier)";
+        private const string toCut = " (StringLiteral)";
+
         private string curCtrl;//name of the controller that is being processed
         private string curAttr;//name of the attribute that is being processed
         private int bindTargs;//as Dictionary key must be unique,so we'll save it like Bind0..BindN for each controller 
@@ -247,7 +249,7 @@ namespace Bistro.Designer.Explorer
                     case "Param":
                         curVal = curChild.ChildNodes[1].ToString();//parameter's name
                         curVal = curVal.Substring(0, curVal.Length - tail.Length);//remove tail (identifier)
-                        if (curChild.ChildNodes.Count > 2 && curChild.ChildNodes[3].ChildNodes.Count > 0)//that's option parameter 
+                        if (curChild.ChildNodes.Count > 2 && curChild.ChildNodes[4].ChildNodes.Count > 0)//that's option parameter 
                             controllerInfo[curCtrl]["DependsOn"].Add(curVal);
                         else
                             controllerInfo[curCtrl]["Requires"].Add(curVal);
@@ -255,21 +257,29 @@ namespace Bistro.Designer.Explorer
                         break;
                     
                     /*Note : it works until this NT occurs only inside FunctionBody
-                     * so trace changes in the fSharpGrammar
+                     * so track changes in the FSharpGrammar.cs
                      */ 
-                    case "DummyString":
+                    case "DummyList":
 
-                        int i = curChild.ChildNodes.Count - 1;
-                        string toCut = " (StringLiteral)";
-                        for (; i >= 0; i--)
+                        //go down until we reach DummyString - select always last child in branch
+                        while (curChild.ChildNodes.Count > 0)
                         {
-                            ParseTreeNode elem = curChild.ChildNodes[i];
-                            if (elem.ToString() == "Named")//{Dummystring} {|> named} {resource}
+                            if (String.Compare(curChild.ToString(),"DummyString")==0)
+                                break;
+                            curChild = curChild.ChildNodes[curChild.ChildNodes.Count - 1];
+                        }
+
+                        //analysis of last  DummyString in function's body
+                        if (curChild.ChildNodes.Count > 0)
+                        {
+                            if (curChild.ChildNodes[0].ToString() == "Named")
                             {
-                                curVal = elem.ChildNodes[2].ToString();
-                                curVal = curVal.Substring(0, curVal.Length - toCut.Length); 
+                                //{Dummystring} {|> named} {resource}
+                                curChild = curChild.ChildNodes[0];
+                                curVal = curChild.ChildNodes[2].ToString();
+                                curVal = curVal.Substring(0, curVal.Length - toCut.Length);
                                 controllerInfo[curCtrl]["Provides"].Add(curVal);
-                                ParseTreeNode nestedNamed = elem.ChildNodes.FindLast(NamedNode);
+                                ParseTreeNode nestedNamed = curChild.ChildNodes[0].ChildNodes.FindLast(NamedNode);
                                 if (nestedNamed != null)
                                 {
                                     curVal = nestedNamed.ChildNodes[2].ToString();
@@ -283,26 +293,34 @@ namespace Bistro.Designer.Explorer
                                 skipBranch = true;
                                 break;
                             }
-                            else if (elem.ToString() == "Literal" && elem.ChildNodes.Count > 0
-                                     && elem.ChildNodes[0].ToString() == ", (Key symbol)")
+                            else
                             {
-                                if ( curChild.ChildNodes[i - 1].ToString() == "Literal" &&
-                                     curChild.ChildNodes[i - 1].ChildNodes.Count == 1 &&
-                                     curChild.ChildNodes[i + 1].ToString() == "Literal" &&
-                                     curChild.ChildNodes[i + 1].ChildNodes.Count == 1)//Literal->identifier
+                                for (int i = 1; i < curChild.ChildNodes.Count - 1; i++)
                                 {
-                                    string param1 = curChild.ChildNodes[i - 1].ChildNodes[0].ToString();
-                                    string rem = (param1.Contains(toCut)) ? toCut : tail; 
-                                    param1 = param1.Substring(0, param1.Length - rem.Length);
-                                    string param2 = curChild.ChildNodes[i + 1].ChildNodes[0].ToString();
-                                    rem = (param2.Contains(toCut)) ? toCut : tail;
-                                    param2 = param2.Substring(0, param2.Length - rem.Length);
-                                    
-                                    if (!controllerInfo[curCtrl]["Provides"].Contains(param1))
-                                        controllerInfo[curCtrl]["Provides"].Add(param1);
-                                    
-                                    if (!controllerInfo[curCtrl]["Provides"].Contains(param2))
-                                        controllerInfo[curCtrl]["Provides"].Add(param2);
+                                    ParseTreeNode elem = curChild.ChildNodes[i];
+                                    if (elem.ToString() == "Literal" && elem.ChildNodes.Count > 0
+                                             && elem.ChildNodes[0].ToString() == ", (Key symbol)")
+                                    {
+                                        /*if there are simple identifiers before and after comma then add them to Provides values*/
+                                        if ( curChild.ChildNodes[i - 1].ToString() == "Literal" &&
+                                             curChild.ChildNodes[i - 1].ChildNodes.Count == 1 &&
+                                             curChild.ChildNodes[i + 1].ToString() == "Literal" &&
+                                             curChild.ChildNodes[i + 1].ChildNodes.Count == 1)//Literal->identifier
+                                        {
+                                            string param1 = curChild.ChildNodes[i - 1].ChildNodes[0].ToString();
+                                            string rem = (param1.Contains(toCut)) ? toCut : tail; //parameter can be either identifier or StringLiteral
+                                            param1 = param1.Substring(0, param1.Length - rem.Length);
+                                            string param2 = curChild.ChildNodes[i + 1].ChildNodes[0].ToString();
+                                            rem = (param2.Contains(toCut)) ? toCut : tail;
+                                            param2 = param2.Substring(0, param2.Length - rem.Length);
+
+                                            if (!controllerInfo[curCtrl]["Provides"].Contains(param1))
+                                                controllerInfo[curCtrl]["Provides"].Add(param1);
+
+                                            if (!controllerInfo[curCtrl]["Provides"].Contains(param2))
+                                                controllerInfo[curCtrl]["Provides"].Add(param2);
+                                        }
+                                    }
                                 }
                             }
                         }

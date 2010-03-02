@@ -33,17 +33,10 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.bindingTree = new System.Windows.Forms.TreeView();
             this.propertiesTree = new System.Windows.Forms.TreeView();
-            this.MethodMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.showBindingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ControllerMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.showSourceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showBindingsResourcesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.MethodMenu.SuspendLayout();
-            this.ControllerMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -72,6 +65,7 @@
             this.bindingTree.Size = new System.Drawing.Size(267, 389);
             this.bindingTree.TabIndex = 0;
             this.bindingTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.BindingTree_AfterSelect);
+            this.bindingTree.Click += new System.EventHandler(this.On_Click);
             // 
             // propertiesTree
             // 
@@ -80,41 +74,6 @@
             this.propertiesTree.Name = "propertiesTree";
             this.propertiesTree.Size = new System.Drawing.Size(267, 219);
             this.propertiesTree.TabIndex = 0;
-            // 
-            // MethodMenu
-            // 
-            this.MethodMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showBindingsToolStripMenuItem});
-            this.MethodMenu.Name = "MethodMenu";
-            this.MethodMenu.Size = new System.Drawing.Size(154, 26);
-            // 
-            // showBindingsToolStripMenuItem
-            // 
-            this.showBindingsToolStripMenuItem.Name = "showBindingsToolStripMenuItem";
-            this.showBindingsToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.showBindingsToolStripMenuItem.Text = "Show Bindings";
-            this.showBindingsToolStripMenuItem.Click += new System.EventHandler(this.On_MethodShowBindings);
-            // 
-            // ControllerMenu
-            // 
-            this.ControllerMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showSourceToolStripMenuItem,
-            this.showBindingsResourcesToolStripMenuItem});
-            this.ControllerMenu.Name = "contextMenuStrip1";
-            this.ControllerMenu.Size = new System.Drawing.Size(208, 48);
-            // 
-            // showSourceToolStripMenuItem
-            // 
-            this.showSourceToolStripMenuItem.Name = "showSourceToolStripMenuItem";
-            this.showSourceToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.showSourceToolStripMenuItem.Text = "Go To Source";
-            // 
-            // showBindingsResourcesToolStripMenuItem
-            // 
-            this.showBindingsResourcesToolStripMenuItem.Name = "showBindingsResourcesToolStripMenuItem";
-            this.showBindingsResourcesToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.showBindingsResourcesToolStripMenuItem.Text = "Show Bindings/Resources";
-            this.showBindingsResourcesToolStripMenuItem.Click += new System.EventHandler(this.On_ShowBindingsResources);
             // 
             // imageList1
             // 
@@ -137,8 +96,6 @@
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
-            this.MethodMenu.ResumeLayout(false);
-            this.ControllerMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -147,12 +104,12 @@
 
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TreeView bindingTree;
-        internal System.Windows.Forms.ContextMenuStrip MethodMenu;
         private System.Windows.Forms.TreeView propertiesTree;
-        internal System.Windows.Forms.ToolStripMenuItem showBindingsToolStripMenuItem;
-        internal System.Windows.Forms.ContextMenuStrip ControllerMenu;
-        internal System.Windows.Forms.ToolStripMenuItem showSourceToolStripMenuItem;
-        internal System.Windows.Forms.ToolStripMenuItem showBindingsResourcesToolStripMenuItem;
         private System.Windows.Forms.ImageList imageList1;
+        //internal System.Windows.Forms.ToolStripMenuItem showBindingsToolStripMenuItem;
+        //internal System.Windows.Forms.ToolStripMenuItem showSourceToolStripMenuItem;
+        //internal System.Windows.Forms.ToolStripMenuItem showBindingsResourcesToolStripMenuItem;
+        //internal System.Windows.Forms.ContextMenuStrip MethodMenu;
+        //internal System.Windows.Forms.ContextMenuStrip ControllerMenu;
     }
 }

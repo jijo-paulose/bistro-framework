@@ -26,35 +26,32 @@ namespace Irony.Samples.FSharp
             var semicolon = ToTerm(";");
   #endregion
   #region 2. Non-terminals
-            var optionOpt = new NonTerminal("optionOpt", Empty | "option");
-            var typeOpt = new NonTerminal("typeOpt");
             var Open = new NonTerminal("Open");
             var Expr = new NonTerminal("Expr");
             var Term = new NonTerminal("Term");
 
             var Literal = new NonTerminal("Literal");
-            var BinExpr = new NonTerminal("BinExpr", typeof(BinExprNode));
-            var CondExpr = new NonTerminal("CondExpr", typeof(IfNode));
+            var BinExpr = new NonTerminal("BinExpr");
+            var CondExpr = new NonTerminal("CondExpr");
             var ParExpr = new NonTerminal("ParExpr");
-            var UnExpr = new NonTerminal("UnExpr", typeof(UnExprNode));
+            var UnExpr = new NonTerminal("UnExpr");
             var UnOp = new NonTerminal("UnOp", "operator");
             var BinOp = new NonTerminal("BinOp", "operator");
-            var AssignmentStmt = new NonTerminal("AssignmentStmt", typeof(AssigmentNode));
+            var AssignmentStmt = new NonTerminal("AssignmentStmt");
             var Stmt = new NonTerminal("Stmt");
             var ExtStmt = new NonTerminal("ExtStmt");
-            var Block = new NonTerminal("Block", typeof(BlockNode));
-            var StmtList = new NonTerminal("StmtList", typeof(StatementListNode));
+            var Block = new NonTerminal("Block");
+            var StmtList = new NonTerminal("StmtList");
 
-            var ParamWithType = new NonTerminal("ParamWithType");
             var Param = new NonTerminal("Param");
-            var ParamList = new NonTerminal("ParamList", typeof(ParamListNode));
+            var ParamList = new NonTerminal("ParamList");
             var ParamListExt = new NonTerminal("ParamListExt");
-            var SimpleParams1 = new NonTerminal("SimpleParams1", typeof(ParamListNode));
-            var SimpleParams2 = new NonTerminal("SimpleParams2", typeof(ParamListNode));
+            var SimpleParams1 = new NonTerminal("SimpleParams1");
+            var SimpleParams2 = new NonTerminal("SimpleParams2");
             var CombinedParams = new NonTerminal("CombinedParams");
-            var ExtParams = new NonTerminal("ExtParams", typeof(ParamListNode));
-            var ArgList = new NonTerminal("ArgList", typeof(ExpressionListNode));
-            var FunctionCall = new NonTerminal("FunctionCall", typeof(FunctionCallNode));
+            var ExtParams = new NonTerminal("ExtParams");
+            var ArgList = new NonTerminal("ArgList");
+            var FunctionCall = new NonTerminal("FunctionCall");
             
             var DummyString = new NonTerminal("DummyString");
             var DummyNested = new NonTerminal("DummyNested");
@@ -62,11 +59,15 @@ namespace Irony.Samples.FSharp
             var DummyList = new NonTerminal("DummyList");
             var Named = new NonTerminal("Named");
             var RetValues = new NonTerminal("RetValues");
-            var FunctionDef = new NonTerminal("FunctionDef", typeof(FunctionDefNode));
+            var FunctionDef = new NonTerminal("FunctionDef");
             var FuncBody = new NonTerminal("FunctionBody");
 
             /********************************************************************************/
             //Namespaces,modules,types
+            NonTerminal option_opt = new NonTerminal("option_opt");
+            NonTerminal type_opt = new NonTerminal("type_opt");
+            NonTerminal scope_opt = new NonTerminal("scope_opt"); 
+
             NonTerminal namespace_declaration = new NonTerminal("namespace_declaration");
             //NonTerminal namespace_declarations_opt = new NonTerminal("namespace_declarations_opt");
             NonTerminal qual_name_segments_opt = new NonTerminal("qual_name_segments_opt");
@@ -137,8 +138,10 @@ namespace Irony.Samples.FSharp
             SimpleParams1.Rule = MakeStarRule(SimpleParams1, comma, identifier);
             SimpleParams2.Rule = MakePlusRule(SimpleParams2, identifier);
             param_attr_opt.Rule = "[<param" + ":" + qual_name_segments_opt + ">]" | Empty;
-            typeOpt.Rule = ":" + qual_name_segments_opt | Empty;
-            Param.Rule = param_attr_opt + identifier + typeOpt + optionOpt;
+            type_opt.Rule = ":" + qual_name_segments_opt | Empty;
+            option_opt.Rule = "option" | Empty;
+            scope_opt.Rule = "form" | Empty | "session";
+            Param.Rule = param_attr_opt + identifier + type_opt + scope_opt + option_opt;
             ExtParams.Rule = MakePlusRule(ExtParams, Param);
             ParamList.Rule = Empty | SimpleParams1 | SimpleParams2 
                 | "(" + MakeStarRule(ParamList, comma, Param) + ")" |"(" + ExtParams + ")";

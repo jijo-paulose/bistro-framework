@@ -306,8 +306,8 @@
     <None Include="ProjectBase\Diagrams\HierarchyClasses.cd" />
     <None Include="ProjectBase\Diagrams\PropertiesClasses.cd" />
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
-    <None Include="Resources\Images_32bit.bmp" />
-    <None Include="Resources\Images_24bit.bmp" />
+    <EmbeddedResource Include="Resources\Images_32bit.bmp" />
+    <EmbeddedResource Include="Resources\Images_24bit.bmp" />
     <EmbeddedResource Include="Explorer\DesignerControl.resx">
       <DependentUpon>DesignerControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -325,10 +325,10 @@
     <EmbeddedResource Include="Resources\alert.png" />
     <EmbeddedResource Include="Resources\bullet.png" />
     <EmbeddedResource Include="Resources\green_star.png" />
-    <Content Include="Resources\lock.gif" />
-    <Content Include="Resources\mechanic.gif" />
+    <EmbeddedResource Include="Resources\lock.gif" />
+    <EmbeddedResource Include="Resources\mechanic.gif" />
     <Content Include="Resources\Package.ico" />
-    <Content Include="Resources\white.PNG" />
+    <EmbeddedResource Include="Resources\white.PNG" />
   </ItemGroup>
   <!-- Browser file -->
   <ItemGroup>

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Diagnostics;
 using System.Data;
+using System.Reflection;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -88,9 +89,10 @@ namespace Bistro.Designer.Explorer
             //_windowsEvents = (EnvDTE.WindowEvents)_events.get_WindowEvents(null);
             //_windowsEvents.WindowActivated += new EnvDTE._dispWindowEvents_WindowActivatedEventHandler(windowsEvents_WindowActivated);
             _docEvents = (EnvDTE.DocumentEvents)_events.get_DocumentEvents(null);
+            //_docEvents.DocumentOpened += new EnvDTE._dispDocumentEvents_DocumentOpenedEventHandler(InitParser);
             _docEvents.DocumentSaved += new EnvDTE._dispDocumentEvents_DocumentSavedEventHandler(ReloadTreeView);
             _slnEvents = (EnvDTE.SolutionEvents)_events.SolutionEvents;
-            _slnEvents.Opened += new EnvDTE._dispSolutionEvents_OpenedEventHandler(_slnEvents_Opened);
+            _slnEvents.Opened += new EnvDTE._dispSolutionEvents_OpenedEventHandler(InitParser);
             _slnEvents.AfterClosing += new EnvDTE._dispSolutionEvents_AfterClosingEventHandler(_slnEvents_AfterClosing);
         }
    
@@ -98,7 +100,7 @@ namespace Bistro.Designer.Explorer
         private Factory factory;
         private DesignerControl control;
         private MetadataExtractor extractor;
-
+        private bool initialized;
  
         /// <summary>
         /// as there were changes in one or more files we need to reload bindingTreeView of control
@@ -232,14 +234,18 @@ namespace Bistro.Designer.Explorer
         /// must be called after ProjectManager was instantiated by Factory(OnSolutionOpened)
         /// it may be called only once because when you add new item to the project,info will be added OnSave 
         /// </summary>
-        private void _slnEvents_Opened()
+        private void InitParser()
         {
+            if (initialized) return;
             SectionHandler sh = new SectionHandler();
             sh.Application = "Bistro.Application";
             sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
             Bistro.Application.Initialize(sh);
             control.Engine = new Bistro.MethodsEngine.Engine(Bistro.Application.Instance);
-            extractor = new MetadataExtractor("f#", String.Empty);
+            List<Assembly> refDlls = new List<Assembly>();
+            string ext = ".fs";//default while CSharp Bistro project is not developed
+            string lang = "f#";
+            extractor = new MetadataExtractor(lang, String.Empty);
             try
             {
                 string path = factory.projectMngr.MSBuildProject.FullFileName;
@@ -250,15 +256,46 @@ namespace Bistro.Designer.Explorer
                 {
                     foreach (BuildItem item in ig)
                     {
-                        if (String.Compare(item.Name, "Compile") != 0)
-                            break;
-                        if (item.Include.EndsWith(".fs"))
+                        if (String.Compare(item.Name, "Compile") == 0)
                         {
-                            extractor.FileName = path + item.Include;
-                            extractor.FillControllerInfo();
+                            if (item.Include.EndsWith(ext))
+                            {
+                                extractor.FileName = path + item.Include;
+                                extractor.FillControllerInfo();
+                            }
+
                         }
+                        /*else if (String.Compare(item.Name, "Reference") == 0)
+                        {
+                            foreach (string meta in item.MetadataNames)
+                            {
+                                Debug.WriteLine(item.Include + " " + meta + " " + item.GetMetadata(meta));
+                                if (String.Compare(meta,"HintPath") == 0)
+                                {
+                                    string refPath = item.GetMetadata(meta);
+                                    if (!refPath.Contains("System") && !refPath.Contains("Microsoft"))
+                                    {
+                                        try
+                                        {
+                                            //Note:absolute path is required
+                                            string[] info = refPath.Split(',');//<fileName>,<version>
+                                            refDlls.Add(Assembly.LoadFile(info[0]));
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            //if reference is broken,just skip 
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }*/
+                        else
+                            break;
                     }
                 }
+                //MetadataFromDll.LoadAssemblies(refDlls, Control.Engine);
                 UpdateTreeData();
                 LoadTree();
 

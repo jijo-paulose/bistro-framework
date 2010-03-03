@@ -70,7 +70,7 @@ namespace Bistro.Controllers.Dispatch
         /// <returns></returns>
         public virtual IControllerDispatcher GetDispatcherImpl(Application application)
         {
-            return new Engine(application);
+            return new EngineControllerDispatcher(application);
         }
     }
 }

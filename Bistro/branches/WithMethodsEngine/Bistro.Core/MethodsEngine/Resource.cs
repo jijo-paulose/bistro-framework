@@ -37,7 +37,7 @@ namespace Bistro.MethodsEngine
         /// </summary>
         /// <param name="engine">The engine.</param>
         /// <param name="name">The resource name.</param>
-        internal Resource(Engine engine, string _name)
+        internal Resource(EngineControllerDispatcher engine, string _name)
         {
             this.name = _name;
             this.engine = engine;
@@ -46,7 +46,7 @@ namespace Bistro.MethodsEngine
         /// <summary>
         /// Link to the engine
         /// </summary>
-        private Engine engine;
+        private EngineControllerDispatcher engine;
 
         /// <summary>
         /// Resource name

@@ -123,14 +123,14 @@
     <Compile Include="Http\StatusCodes.cs" />
     <Compile Include="Http\WebException.cs" />
     <Compile Include="MethodsEngine\DependencyGraph.cs" />
-    <Compile Include="MethodsEngine\Engine.cs" />
+    <Compile Include="MethodsEngine\EngineControllerDispatcher.cs" />
     <Compile Include="MethodsEngine\Reflection\IMemberInfo.cs" />
     <Compile Include="MethodsEngine\Reflection\IMethodsBindPointDesc.cs" />
     <Compile Include="MethodsEngine\Reflection\IMethodsControllerDesc.cs" />
     <Compile Include="MethodsEngine\Resource.cs" />
-    <Compile Include="MethodsEngine\Subsets\GenBinding.cs" />
+    <Compile Include="MethodsEngine\Subsets\MethodBinding.cs" />
     <Compile Include="MethodsEngine\Subsets\BistroMethod.cs" />
-    <Compile Include="MethodsEngine\Subsets\SubSetsProcessor.cs" />
+    <Compile Include="MethodsEngine\Subsets\MethodsProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\ApplicationValidationResult.cs" />
     <Compile Include="Validation\InferValidationFromAttribute.cs" />

@@ -95,9 +95,10 @@ namespace Bistro
             AssemblySkipped
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Application"/> class.
-        /// </summary>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Application"/> class.
+		/// </summary>
+		/// <param name="loggerFactory">The logger factory.</param>
         public Application(ILoggerFactory loggerFactory)
         {
             LoggerFactory = loggerFactory;
@@ -139,7 +140,7 @@ namespace Bistro
 
 			// Invoke application startup event
 			var methodDispatcher = new MethodDispatcher(this);
-			// Application startup should be defined explicitly.
+			// Application startup method should be defined explicitly.
 			if (methodDispatcher.IsMethodDefinedExplicitly(ApplicationStartup))
 				methodDispatcher.InvokeMethod(null, ApplicationStartup, new EventContext(null, false));
 		}

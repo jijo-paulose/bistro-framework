@@ -224,13 +224,13 @@ namespace Bistro.MethodsEngine
         /// <summary>
         /// Bistro Engine
         /// </summary>
-        internal Engine Engine;
+        internal EngineControllerDispatcher Engine;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DependencyGraph"/> class.
         /// </summary>
         /// <param name="vertices">List of the bind points.</param>
-        public DependencyGraph(Engine _engine, List<IMethodsBindPointDesc> vertices)
+        public DependencyGraph(EngineControllerDispatcher _engine, List<IMethodsBindPointDesc> vertices)
         {
             Engine = _engine;
             listToSort = vertices;

@@ -20,7 +20,7 @@ namespace Bistro.Designer.Explorer
             propertiesTree.ImageList = imageList1;
             bindingTree.ImageList = imageList1;
         }
-        public Bistro.MethodsEngine.Engine Engine
+        public Bistro.MethodsEngine.EngineControllerDispatcher Engine
         {
             get { return engine; }
             set { engine = value; }
@@ -58,7 +58,7 @@ namespace Bistro.Designer.Explorer
             }
         }
         #region Private members
-        private Bistro.MethodsEngine.Engine engine;
+        private Bistro.MethodsEngine.EngineControllerDispatcher engine;
         private ControllerDescription curCtrl;
         private Resource curResource;
         private NodeObject curObject;

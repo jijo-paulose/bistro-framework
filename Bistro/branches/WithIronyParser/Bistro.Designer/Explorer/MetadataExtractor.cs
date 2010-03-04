@@ -671,7 +671,7 @@ namespace Bistro.Designer.Explorer
         /// Loads the assembly.
         /// </summary>
         /// <param name="assm">The assm.</param>
-        public static bool LoadAssemblies(List<Assembly> assmlist,Engine engine)
+        public static bool LoadAssemblies(List<Assembly> assmlist,EngineControllerDispatcher engine)
         {
             bool controllerFound = false;
             int k = 0;

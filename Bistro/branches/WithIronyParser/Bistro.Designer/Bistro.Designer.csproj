@@ -251,6 +251,8 @@
       <DependentUpon>DesignerControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Explorer\MetadataExtractor.cs" />
+    <Compile Include="Projects\CSharp\Factory.cs" />
+    <Compile Include="Projects\CSharp\ProjectManager.cs" />
     <Compile Include="Projects\FSharp\ItemList.cs" />
     <Compile Include="Projects\FSharp\ItemNode.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
@@ -272,6 +274,9 @@
     <Compile Include="Projects\FSharp\Properties\FSharpPropertiesConstants.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Projects\IProjectData.cs" />
+    <ZipItem Include="Templates\ProjectItems\CSharpControllers\ControllerClass.cs" />
+    <ZipProject Include="Templates\Projects\CSharp\Controller1.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">
@@ -306,6 +311,8 @@
     <None Include="ProjectBase\Diagrams\HierarchyClasses.cd" />
     <None Include="ProjectBase\Diagrams\PropertiesClasses.cd" />
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
+    <ZipProject Include="Templates\Projects\CSharp\index.django" />
+    <ZipProject Include="Templates\Projects\CSharp\Web.config" />
     <EmbeddedResource Include="Resources\Images_32bit.bmp" />
     <EmbeddedResource Include="Resources\Images_24bit.bmp" />
     <EmbeddedResource Include="Explorer\DesignerControl.resx">
@@ -328,6 +335,22 @@
     <EmbeddedResource Include="Resources\lock.gif" />
     <EmbeddedResource Include="Resources\mechanic.gif" />
     <Content Include="Resources\Package.ico" />
+    <ZipItem Include="Templates\ProjectItems\CSharpControllers\ControllerClass.vstemplate" />
+    <ZipProject Include="Templates\Projects\CSharp\Bistro.Core.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\Bistro.Core.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\Bistro.Extensions.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\Bistro.Extensions.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\CSharpProject.vstemplate" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.BistroIntegration.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.BistroIntegration.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.Core.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.Core.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.Filters.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.Filters.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\StructureMap.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\default.htm" />
+    <ZipProject Include="Templates\Projects\CSharp\CSharpProject.csproj" />
+    <ZipProject Include="Templates\Projects\CSharp\__TemplateIcon.ico" />
     <EmbeddedResource Include="Resources\white.PNG" />
   </ItemGroup>
   <!-- Browser file -->

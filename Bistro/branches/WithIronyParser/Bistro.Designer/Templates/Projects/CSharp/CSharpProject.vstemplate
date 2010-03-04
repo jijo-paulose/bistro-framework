@@ -1,0 +1,43 @@
+<VSTemplate Version="2.0.0" Type="Project"
+    xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+    <TemplateData>
+        <Name>Bistro Web Application (C#)</Name>
+        <Description>A project for a Bistro Web application written in C#</Description>
+        <Icon>WebProject.ico</Icon>
+        <TemplateID>Hill30.Bistro.WebCSharp</TemplateID>
+        <ProjectType>Bistro</ProjectType>
+        <DefaultName>BistroApp</DefaultName>
+        <ProvideDefaultName>true</ProvideDefaultName>
+        <LocationField>Enabled</LocationField>
+        <CreateNewFolder>true</CreateNewFolder>
+    </TemplateData>
+  <TemplateContent>
+    <Project File="CSharpProject.csproj" ReplaceParameters="true">
+      <Folder Name="App_Data" TargetFolderName="App_Data" />
+      <Folder Name="Controllers" TargetFolderName="Controllers">
+            <ProjectItem ReplaceParameters="true" OpenInEditor="true">Controller1.cs</ProjectItem>
+      </Folder>
+      <Folder Name="lib" TargetFolderName="lib">
+            <ProjectItem>Bistro.Core.dll</ProjectItem>
+            <ProjectItem>Bistro.Core.pdb</ProjectItem>
+            <ProjectItem>Bistro.Extensions.dll</ProjectItem>
+            <ProjectItem>Bistro.Extensions.pdb</ProjectItem>
+            <ProjectItem>NDjango.BistroIntegration.dll</ProjectItem>
+            <ProjectItem>NDjango.BistroIntegration.pdb</ProjectItem>
+            <ProjectItem>NDjango.Core.dll</ProjectItem>
+            <ProjectItem>NDjango.Core.pdb</ProjectItem>
+            <ProjectItem>NDjango.Filters.dll</ProjectItem>
+            <ProjectItem>NDjango.Filters.pdb</ProjectItem>
+            <ProjectItem>StructureMap.dll</ProjectItem>
+      </Folder>
+
+      <Folder Name="Views" TargetFolderName="Views">
+            <ProjectItem ReplaceParameters="false" TargetFileName="index.django">index.django</ProjectItem>
+      </Folder>
+
+      <ProjectItem ReplaceParameters="true" TargetFileName="default.htm">default.htm</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Web.config">Web.config</ProjectItem>
+    
+    </Project>
+  </TemplateContent>
+</VSTemplate>

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.Build.BuildEngine;
 using Bistro.Designer.Projects.FSharp;
 using Bistro;
@@ -76,11 +77,10 @@ namespace Bistro.Designer.Explorer
         {
             get { return (IWin32Window)control; }
         }
-        public void Initialize(EnvDTE.DTE _dte, Factory _factory)
+        public void Initialize(EnvDTE.DTE _dte)
         {
             // Store the dte so that it can be used later.
             dte = _dte;
-            factory = _factory;
 
         }
         public void AddEvents()
@@ -97,10 +97,12 @@ namespace Bistro.Designer.Explorer
         }
    
         #region Private Members
-        private Factory factory;
         private DesignerControl control;
         private MetadataExtractor extractor;
-        private bool initialized;
+        /// <summary>
+        /// TODO:Explorer should not contain projMngr,but get it dynamically on init...
+        /// </summary>
+        private Projects.CSharp.ProjectManager projectMngr;
  
         /// <summary>
         /// as there were changes in one or more files we need to reload bindingTreeView of control
@@ -115,7 +117,6 @@ namespace Bistro.Designer.Explorer
                 
                 ///keep this line commented until engine.Clean will be implemented
                 UpdateTreeData();//reevaluate dependencies
-                
                 LoadTree();
             }
         }
@@ -125,8 +126,8 @@ namespace Bistro.Designer.Explorer
 
             Control.cashPatternsRes.Clear();
             Control.cashPatternsCtrl.Clear();
-            Dictionary<string, List<ControllerDescription>> ctrlsStore = Control.cashPatternsCtrl;//temp obj at stack to decrease property's calls
-            Dictionary<string, Dictionary<string, Resource>> resStore = Control.cashPatternsRes;//temp obj at stack to decrease property's calls
+            Dictionary<string, List<ControllerDescription>> ctrlsStore = Control.cashPatternsCtrl;
+            Dictionary<string, Dictionary<string, Resource>> resStore = Control.cashPatternsRes;
             foreach (BistroMethod bm in control.Engine.Processor.AllMethods)
             {
                 foreach (IMethodsBindPointDesc bp in bm.BindPointsList)
@@ -236,66 +237,22 @@ namespace Bistro.Designer.Explorer
         /// </summary>
         private void InitParser()
         {
-            if (initialized) return;
             SectionHandler sh = new SectionHandler();
             sh.Application = "Bistro.Application";
             sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
             Bistro.Application.Initialize(sh);
             control.Engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
-            List<Assembly> refDlls = new List<Assembly>();
+            //List<Assembly> refDlls = new List<Assembly>();
             string ext = ".fs";//default while CSharp Bistro project is not developed
             string lang = "f#";
             extractor = new MetadataExtractor(lang, String.Empty);
             try
             {
-                string path = factory.projectMngr.MSBuildProject.FullFileName;
-                int len = path.LastIndexOf("\\");
-                path = path.Substring(0, len + 1);
-                // Iterate through each ItemGroup in the Project to obtain the list of F# source files
-                foreach (BuildItemGroup ig in factory.projectMngr.MSBuildProject.ItemGroups)
+                /*List<string> files = projectMngr.GetSourceFiles();
+                foreach (string file in files)
                 {
-                    foreach (BuildItem item in ig)
-                    {
-                        if (String.Compare(item.Name, "Compile") == 0)
-                        {
-                            if (item.Include.EndsWith(ext))
-                            {
-                                extractor.FileName = path + item.Include;
-                                extractor.FillControllerInfo();
-                            }
-
-                        }
-                        /*else if (String.Compare(item.Name, "Reference") == 0)
-                        {
-                            foreach (string meta in item.MetadataNames)
-                            {
-                                Debug.WriteLine(item.Include + " " + meta + " " + item.GetMetadata(meta));
-                                if (String.Compare(meta,"HintPath") == 0)
-                                {
-                                    string refPath = item.GetMetadata(meta);
-                                    if (!refPath.Contains("System") && !refPath.Contains("Microsoft"))
-                                    {
-                                        try
-                                        {
-                                            //Note:absolute path is required
-                                            string[] info = refPath.Split(',');//<fileName>,<version>
-                                            refDlls.Add(Assembly.LoadFile(info[0]));
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            //if reference is broken,just skip 
-                                            break;
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }*/
-                        else
-                            break;
-                    }
-                }
-                //MetadataFromDll.LoadAssemblies(refDlls, Control.Engine);
+                    extractor.FillControllerInfo();
+                }*/
                 UpdateTreeData();
                 LoadTree();
 

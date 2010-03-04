@@ -10,9 +10,12 @@ using Microsoft.Win32;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Flavor;
 using Bistro.Designer.Explorer;
 using Bistro.Designer.ProjectBase;
 using Bistro.Designer.Projects.FSharp.Properties;
+using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+
 
 namespace Bistro.Designer
 {
@@ -61,10 +64,13 @@ namespace Bistro.Designer
                                                         // will also be used as the name of the node grouping
                                                         // projects in the AddNewProject dialog
 
-    [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
+    [ProvideProjectFactory(typeof(Projects.CSharp.Factory), null, null, null, null, @".\NullPath", LanguageVsTemplate = "Bistro")]
+    [WAProvideProjectFactory(typeof(Projects.CSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
     [WAProvideProjectFactoryTemplateMapping("{" + "f2a71f9b-5d33-465a-a702-920d77279786" + "}", typeof(Projects.FSharp.DummyWebFactory))]
+    [WAProvideProjectFactoryTemplateMapping("{" + "fae04ec0-301f-11d3-bf4b-00c04f79efbc" + "}", typeof(Projects.CSharp.DummyWebFactory))]
 
     [ProvideObject(typeof(CompileOrderPage))]
+
 
     [Guid(Guids.guidBistro_DesignerPkgString)]
     public sealed class DesignerPackage : Package
@@ -108,7 +114,6 @@ namespace Bistro.Designer
         #region Package Members
         private Explorer.ExplorerWindow window;
         private EnvDTE.DTE dte;
-        private Projects.FSharp.Factory factory;
 
 
         /// <summary>
@@ -129,12 +134,14 @@ namespace Bistro.Designer
                 MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
                 mcs.AddCommand( menuToolWin );
             }
+            RegisterProjectFactory(new Projects.FSharp.Factory(this));
+            RegisterProjectFactory(new Projects.CSharp.Factory(this));
             dte = GetService(typeof(EnvDTE._DTE)) as EnvDTE.DTE;
-            factory = new Projects.FSharp.Factory(this);
-            RegisterProjectFactory(factory);
             window = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
-           // _window.Package = this;
-            window.Initialize(dte,factory);
+
+            //TODO: remove projectMngr initialization from DesignerPackage,from Explorer
+            window.Initialize(dte);
+            //end of temporary solution
             window.AddEvents();
 
         }

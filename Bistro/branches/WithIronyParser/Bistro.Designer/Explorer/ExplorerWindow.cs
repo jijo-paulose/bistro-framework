@@ -241,7 +241,7 @@ namespace Bistro.Designer.Explorer
             sh.Application = "Bistro.Application";
             sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
             Bistro.Application.Initialize(sh);
-            control.Engine = new Bistro.MethodsEngine.Engine(Bistro.Application.Instance);
+            control.Engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
             List<Assembly> refDlls = new List<Assembly>();
             string ext = ".fs";//default while CSharp Bistro project is not developed
             string lang = "f#";
@@ -311,27 +311,6 @@ namespace Bistro.Designer.Explorer
             control.Engine = null;
         }
 
-        /*private void windowsEvents_WindowActivated(EnvDTE.Window gotFocus, EnvDTE.Window lostfocus)
-        {
-            try
-            {
-                Debug.Assert(gotFocus != null);
-                if (gotFocus == null)
-                {
-                    return;
-                }
-
-                if (gotFocus.Type.Equals(EnvDTE.vsWindowType.vsWindowTypeDocument) && gotFocus.Caption.EndsWith(".fs"))
-                {
-                    Trace.WriteLine("document wnd with F# file is activated");
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
-            }
-        }*/
         #endregion
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.Build.BuildEngine;
-using Bistro.Designer.Projects.FSharp;
+
 using Bistro;
 using Bistro.Configuration;
 using Bistro.Configuration.Logging;
@@ -20,6 +20,7 @@ using Bistro.Controllers;
 using Bistro.MethodsEngine;
 using Bistro.MethodsEngine.Reflection;
 using Bistro.MethodsEngine.Subsets;
+using Bistro.Designer.Projects;
 
 namespace Bistro.Designer.Explorer
 {
@@ -63,6 +64,7 @@ namespace Bistro.Designer.Explorer
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
             control = new DesignerControl();
+            
         }
         public DesignerControl Control
         {
@@ -86,10 +88,7 @@ namespace Bistro.Designer.Explorer
         public void AddEvents()
         {
             _events = (EnvDTE80.Events2)dte.Events;
-            //_windowsEvents = (EnvDTE.WindowEvents)_events.get_WindowEvents(null);
-            //_windowsEvents.WindowActivated += new EnvDTE._dispWindowEvents_WindowActivatedEventHandler(windowsEvents_WindowActivated);
             _docEvents = (EnvDTE.DocumentEvents)_events.get_DocumentEvents(null);
-            //_docEvents.DocumentOpened += new EnvDTE._dispDocumentEvents_DocumentOpenedEventHandler(InitParser);
             _docEvents.DocumentSaved += new EnvDTE._dispDocumentEvents_DocumentSavedEventHandler(ReloadTreeView);
             _slnEvents = (EnvDTE.SolutionEvents)_events.SolutionEvents;
             _slnEvents.Opened += new EnvDTE._dispSolutionEvents_OpenedEventHandler(InitParser);
@@ -99,10 +98,7 @@ namespace Bistro.Designer.Explorer
         #region Private Members
         private DesignerControl control;
         private MetadataExtractor extractor;
-        /// <summary>
-        /// TODO:Explorer should not contain projMngr,but get it dynamically on init...
-        /// </summary>
-        private Projects.CSharp.ProjectManager projectMngr;
+        internal IProjectManager projectMngr;
  
         /// <summary>
         /// as there were changes in one or more files we need to reload bindingTreeView of control
@@ -128,7 +124,7 @@ namespace Bistro.Designer.Explorer
             Control.cashPatternsCtrl.Clear();
             Dictionary<string, List<ControllerDescription>> ctrlsStore = Control.cashPatternsCtrl;
             Dictionary<string, Dictionary<string, Resource>> resStore = Control.cashPatternsRes;
-            foreach (BistroMethod bm in control.Engine.Processor.AllMethods)
+            foreach (BistroMethod bm in projectMngr.Engine.Processor.AllMethods)
             {
                 foreach (IMethodsBindPointDesc bp in bm.BindPointsList)
                 {
@@ -217,16 +213,16 @@ namespace Bistro.Designer.Explorer
                 return;
             }
             ///TODO : clear controllers been added from source code 
-            control.Engine.Clean();//not implemented yet
+            projectMngr.Engine.Clean();//not implemented yet
             foreach (KeyValuePair<string, ControllersTable> fileData in extractor.infobyFiles)
             {
                 foreach (KeyValuePair<string, Dictionary<string, List<string>>> ctrlsData in fileData.Value)
                 {
                     ControllerDescription ctrldesc = new ControllerDescription(ctrlsData.Key, ctrlsData.Value);
-                    control.Engine.RegisterController(ctrldesc);
+                    projectMngr.Engine.RegisterController(ctrldesc);
                 }
             }
-            control.Engine.ForceUpdateBindPoints();
+            projectMngr.Engine.ForceUpdateBindPoints();
 
 
         }
@@ -237,22 +233,16 @@ namespace Bistro.Designer.Explorer
         /// </summary>
         private void InitParser()
         {
-            SectionHandler sh = new SectionHandler();
-            sh.Application = "Bistro.Application";
-            sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
-            Bistro.Application.Initialize(sh);
-            control.Engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
-            //List<Assembly> refDlls = new List<Assembly>();
-            string ext = ".fs";//default while CSharp Bistro project is not developed
-            string lang = "f#";
-            extractor = new MetadataExtractor(lang, String.Empty);
             try
             {
-                /*List<string> files = projectMngr.GetSourceFiles();
+                string lang = (projectMngr.GetType() == typeof(Projects.CSharp.ProjectManager)) ? "c#" : "f#";
+                extractor = new MetadataExtractor(lang, String.Empty);
+                List<string> files = projectMngr.GetSourceFiles();
                 foreach (string file in files)
                 {
+                    extractor.FileName = file;
                     extractor.FillControllerInfo();
-                }*/
+                }
                 UpdateTreeData();
                 LoadTree();
 
@@ -265,7 +255,8 @@ namespace Bistro.Designer.Explorer
         } 
         private void _slnEvents_AfterClosing()
         {
-            control.Engine = null;
+            projectMngr.Engine = null;
+            extractor = null;
         }
 
         #endregion

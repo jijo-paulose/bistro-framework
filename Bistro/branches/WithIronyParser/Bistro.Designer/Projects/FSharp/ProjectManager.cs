@@ -25,7 +25,14 @@ namespace Bistro.Designer.Projects.FSharp
     public class ProjectManager : FlavoredProjectBase, IProjectManager
     {
         
-        /// <summary>
+         private DesignerPackage package;
+
+         public ProjectManager(DesignerPackage package)
+            : base()
+        {
+            this.package = package;
+        }
+    /// <summary>
         /// Sets the service provider from which to access the services. 
         /// </summary>
         /// <param name="site">An instance to an Microsoft.VisualStudio.OLE.Interop object</param>
@@ -39,7 +46,7 @@ namespace Bistro.Designer.Projects.FSharp
         // the fsharp debug project propety page - we need to suppress it
         const string debug_page_guid = "{9CFBEB2A-6824-43e2-BD3B-B112FEBC3772}";
         uint hierarchy_event_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
-        string fileName;
+        internal string fileName;
         internal ItemList itemList;
 
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
@@ -52,6 +59,7 @@ namespace Bistro.Designer.Projects.FSharp
         {
             base.OnAggregationComplete();
             MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
+            package.explorer.projectMngrs.Add(fileName, this);
             SectionHandler sh = new SectionHandler();
             sh.Application = "Bistro.Application";
             sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
@@ -155,13 +163,17 @@ namespace Bistro.Designer.Projects.FSharp
             get;
             set;
         }
-
+        public string ProjectPath
+        {
+            get;
+            set;
+        }
         public List<string> GetSourceFiles()
         {
             List<string> files = new List<string>();
             string path = this.MSBuildProject.FullFileName;
             int len = path.LastIndexOf("\\");
-            path = path.Substring(0, len + 1);
+            ProjectPath = path.Substring(0, len + 1);
             // Iterate through each ItemGroup in the Project to obtain the list of F# source files
             foreach (BuildItemGroup ig in this.MSBuildProject.ItemGroups)
             {
@@ -171,7 +183,7 @@ namespace Bistro.Designer.Projects.FSharp
                     {
                         if (item.Include.EndsWith(".fs"))
                         {
-                            files.Add(path + item.Include);
+                            files.Add(ProjectPath + item.Include);
                         }
 
                     }

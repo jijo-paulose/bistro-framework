@@ -29,6 +29,13 @@ namespace Bistro.Designer.Projects.CSharp
     public class ProjectManager : FlavoredProjectBase, IProjectManager
     {
 
+        private DesignerPackage package;
+
+        public ProjectManager(DesignerPackage package)
+            : base()
+        {
+            this.package = package;
+        }
         /// <summary>
         /// Sets the service provider from which to access the services. 
         /// </summary>
@@ -40,7 +47,7 @@ namespace Bistro.Designer.Projects.CSharp
             return VSConstants.S_OK;
         }
 
-        string fileName;
+        internal string fileName;
 
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
         {
@@ -52,6 +59,7 @@ namespace Bistro.Designer.Projects.CSharp
         {
             base.OnAggregationComplete();
             MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
+            package.explorer.projectMngrs.Add(fileName, this);
             SectionHandler sh = new SectionHandler();
             sh.Application = "Bistro.Application";
             sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
@@ -80,13 +88,17 @@ namespace Bistro.Designer.Projects.CSharp
             get;
             set;
         }
-
+        public string ProjectPath
+        {
+            get;
+            set;
+        }
         public List<string> GetSourceFiles()
         {
             List<string> files = new List<string>();
             string path = this.MSBuildProject.FullFileName;
             int len = path.LastIndexOf("\\");
-            path = path.Substring(0, len + 1);
+            ProjectPath = path.Substring(0, len + 1);
             // Iterate through each ItemGroup in the Project to obtain the list of F# source files
             foreach (BuildItemGroup ig in this.MSBuildProject.ItemGroups)
             {
@@ -96,7 +108,7 @@ namespace Bistro.Designer.Projects.CSharp
                     {
                         if (item.Include.EndsWith(".cs"))
                         {
-                            files.Add(path + item.Include);
+                            files.Add(ProjectPath + item.Include);
                         }
 
                     }

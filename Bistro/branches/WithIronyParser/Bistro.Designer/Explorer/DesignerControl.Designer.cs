@@ -34,6 +34,8 @@
             this.bindingTree = new System.Windows.Forms.TreeView();
             this.propertiesTree = new System.Windows.Forms.TreeView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.label1 = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -48,6 +50,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.label1);
+            this.splitContainer1.Panel1.Controls.Add(this.comboBox1);
             this.splitContainer1.Panel1.Controls.Add(this.bindingTree);
             // 
             // splitContainer1.Panel2
@@ -59,10 +63,9 @@
             // 
             // bindingTree
             // 
-            this.bindingTree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bindingTree.Location = new System.Drawing.Point(0, 0);
+            this.bindingTree.Location = new System.Drawing.Point(0, 21);
             this.bindingTree.Name = "bindingTree";
-            this.bindingTree.Size = new System.Drawing.Size(267, 389);
+            this.bindingTree.Size = new System.Drawing.Size(267, 391);
             this.bindingTree.TabIndex = 0;
             this.bindingTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.BindingTree_AfterSelect);
             this.bindingTree.Click += new System.EventHandler(this.On_Click);
@@ -86,6 +89,23 @@
             this.imageList1.Images.SetKeyName(4, "bullet.png");
             this.imageList1.Images.SetKeyName(5, "white.PNG");
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 5);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(81, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Choose project:";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(93, 0);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(174, 21);
+            this.comboBox1.TabIndex = 1;
+            // 
             // DesignerControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -94,6 +114,7 @@
             this.Name = "DesignerControl";
             this.Size = new System.Drawing.Size(267, 612);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -106,6 +127,8 @@
         private System.Windows.Forms.TreeView bindingTree;
         private System.Windows.Forms.TreeView propertiesTree;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox comboBox1;
         //internal System.Windows.Forms.ToolStripMenuItem showBindingsToolStripMenuItem;
         //internal System.Windows.Forms.ToolStripMenuItem showSourceToolStripMenuItem;
         //internal System.Windows.Forms.ToolStripMenuItem showBindingsResourcesToolStripMenuItem;

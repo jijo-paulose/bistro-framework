@@ -274,7 +274,7 @@
     <Compile Include="Projects\FSharp\Properties\FSharpPropertiesConstants.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Projects\IProjectData.cs" />
+    <Compile Include="Projects\IProjectManager.cs" />
     <ZipItem Include="Templates\ProjectItems\CSharpControllers\ControllerClass.cs" />
     <ZipProject Include="Templates\Projects\CSharp\Controller1.cs" />
   </ItemGroup>

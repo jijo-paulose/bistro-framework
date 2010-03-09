@@ -70,8 +70,6 @@ namespace Bistro.Designer
     [WAProvideProjectFactoryTemplateMapping("{" + "fae04ec0-301f-11d3-bf4b-00c04f79efbc" + "}", typeof(Projects.CSharp.DummyWebFactory))]
 
     [ProvideObject(typeof(CompileOrderPage))]
-
-
     [Guid(Guids.guidBistro_DesignerPkgString)]
     public sealed class DesignerPackage : Package
     {
@@ -104,7 +102,7 @@ namespace Bistro.Designer
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());*/
-            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            IVsWindowFrame windowFrame = (IVsWindowFrame)explorer.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
@@ -112,7 +110,7 @@ namespace Bistro.Designer
         /////////////////////////////////////////////////////////////////////////////
         // Overriden Package Implementation
         #region Package Members
-        private Explorer.ExplorerWindow window;
+        internal Explorer.ExplorerWindow explorer;
         private EnvDTE.DTE dte;
 
 
@@ -137,12 +135,9 @@ namespace Bistro.Designer
             RegisterProjectFactory(new Projects.FSharp.Factory(this));
             RegisterProjectFactory(new Projects.CSharp.Factory(this));
             dte = GetService(typeof(EnvDTE._DTE)) as EnvDTE.DTE;
-            window = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
-
-            //TODO: remove projectMngr initialization from DesignerPackage,from Explorer
-            window.Initialize(dte);
-            //end of temporary solution
-            window.AddEvents();
+            explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
+            explorer.Initialize(dte);
+            explorer.AddEvents();
 
         }
         #endregion

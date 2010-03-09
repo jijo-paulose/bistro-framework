@@ -15,7 +15,6 @@ namespace Bistro.Designer.Projects.FSharp
     public class Factory : FlavoredProjectFactoryBase
     {
         private DesignerPackage package;
-        internal ProjectManager projectMngr;
         public Factory(DesignerPackage package)
             : base() 
         {
@@ -24,11 +23,10 @@ namespace Bistro.Designer.Projects.FSharp
 
         protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
         {
-            //var project = new ProjectManager();
-            projectMngr = new ProjectManager();
-            projectMngr.SetSite((IOleServiceProvider)((IServiceProvider)package).GetService(typeof(IOleServiceProvider)));
-            //return project;
-            return projectMngr;
+            var project = new ProjectManager();
+            project.SetSite((IOleServiceProvider)((IServiceProvider)package).GetService(typeof(IOleServiceProvider)));
+            package.explorer.projectMngr = project;
+            return project;
         }
 
     }

@@ -16,16 +16,17 @@ using System.Reflection;
 using Microsoft.Build.BuildEngine;
 using System.ComponentModel;
 
+using Bistro;
+using Bistro.Configuration;
+using Bistro.Configuration.Logging;
+using Bistro.Controllers;
+using Bistro.MethodsEngine;
+
 namespace Bistro.Designer.Projects.CSharp
 {
-    [ComVisible(true)]
-    public interface IProjectManager
-    {
-        Project MSBuildProject { get; }
-    }
 
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProjectBase, IProjectManager,IProjectData
+    public class ProjectManager : FlavoredProjectBase, IProjectManager
     {
 
         /// <summary>
@@ -39,9 +40,6 @@ namespace Bistro.Designer.Projects.CSharp
             return VSConstants.S_OK;
         }
 
-        // the fsharp debug project propety page - we need to suppress it
-        const string debug_page_guid = "{9CFBEB2A-6824-43e2-BD3B-B112FEBC3772}";
-        uint hierarchy_event_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
         string fileName;
 
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
@@ -54,106 +52,34 @@ namespace Bistro.Designer.Projects.CSharp
         {
             base.OnAggregationComplete();
             MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
-            //itemList = new ItemList(this, MSBuildProject);
-            //hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
+            SectionHandler sh = new SectionHandler();
+            sh.Application = "Bistro.Application";
+            sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
+            Bistro.Application.Initialize(sh);
+            Engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
+
         }
 
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
-            switch ((__VSHPROPID)propId)
-            {
-                case __VSHPROPID.VSHPROPID_FirstChild:
-                case __VSHPROPID.VSHPROPID_FirstVisibleChild:
-                    //return itemList.GetFirstChild(itemId, out property);
-                case __VSHPROPID.VSHPROPID_NextSibling:
-                case __VSHPROPID.VSHPROPID_NextVisibleSibling:
-                   // return itemList.GetNextSibling(itemId, out property);
-                default:
-                    break;
-            }
+ 
+            return  base.GetProperty(itemId, propId, out property);
 
-            int result = base.GetProperty(itemId, propId, out property);
-            if (result != VSConstants.S_OK)
-                return result;
-
-            if (itemId == VSConstants.VSITEMID_ROOT)
-            {
-                switch ((__VSHPROPID2)propId)
-                {
-                    case __VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList:
-                        //Remove the Debug page
-                        property = property.ToString().Split(';')
-                            .Aggregate("", (a, next) => next.Equals(debug_page_guid, StringComparison.OrdinalIgnoreCase) ? a : a + ';' + next).Substring(1);
-                        return VSConstants.S_OK;
-                    case __VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList:
-                        {
-                            //Add the CompileOrder property page.
-                            var properties = new List<string>(property.ToString().Split(';'));
-                            properties.Add(typeof(CompileOrderPage).GUID.ToString("B"));
-                            property = properties.Aggregate("", (a, next) => a + ';' + next).Substring(1);
-                            return VSConstants.S_OK;
-                        }
-                    case __VSHPROPID2.VSHPROPID_PriorityPropertyPagesCLSIDList:
-                        {
-                            // set the order for the project property pages
-                            var properties = new List<string>(property.ToString().Split(';'));
-                            properties.Insert(1, typeof(CompileOrderPage).GUID.ToString("B"));
-                            property = properties.Aggregate("", (a, next) => a + ';' + next).Substring(1);
-                            return VSConstants.S_OK;
-                        }
-                    default:
-                        break;
-                }
-            }
-            return result;
-        }
-
-        internal uint GetNodeChild(uint itemId)
-        {
-            object result;
-            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_FirstChild, out result));
-            return (uint)(int)result;
-        }
-
-        internal uint GetNodeSibling(uint itemId)
-        {
-            object result;
-            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_NextSibling, out result));
-            return (uint)(int)result;
         }
 
         protected override void Close()
         {
-            if (hierarchy_event_cookie != (uint)ShellConstants.VSCOOKIE_NIL)
-                UnadviseHierarchyEvents(hierarchy_event_cookie);
             base.Close();
         }
 
-        internal string GetMetadata(uint itemId, string property)
-        {
-            object browseObject;
-            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
-            return (string)browseObject.GetType().GetMethod("GetMetadata").Invoke(browseObject, new object[] { property });
-        }
-
-        internal string SetMetadata(uint itemId, string property, string value)
-        {
-            object browseObject;
-            ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
-            return (string)browseObject.GetType().GetMethod("SetMetadata").Invoke(browseObject, new object[] { property, value });
-        }
 
         #region IProjectManager Members
 
         public Project MSBuildProject
         {
             get;
-            private set;
+            set;
         }
-
-        #endregion
-
-        #region IProjectData Members
 
         public List<string> GetSourceFiles()
         {
@@ -189,7 +115,8 @@ namespace Bistro.Designer.Projects.CSharp
 
         public Bistro.MethodsEngine.EngineControllerDispatcher Engine
         {
-            get { throw new NotImplementedException(); }
+            get;
+            set;
         }
 
         #endregion

@@ -15,15 +15,12 @@ using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 using System.Reflection;
 using Microsoft.Build.BuildEngine;
 using System.ComponentModel;
-
+using Bistro;
+using Bistro.Configuration;
+using Bistro.Configuration.Logging;
+using Bistro.Controllers;
 namespace Bistro.Designer.Projects.FSharp
 {
-    [ComVisible(true)]
-    public interface IProjectManager
-    {
-        Project MSBuildProject { get; }
-    }
-
     [ComVisible(true)]
     public class ProjectManager : FlavoredProjectBase, IProjectManager
     {
@@ -55,6 +52,11 @@ namespace Bistro.Designer.Projects.FSharp
         {
             base.OnAggregationComplete();
             MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
+            SectionHandler sh = new SectionHandler();
+            sh.Application = "Bistro.Application";
+            sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
+            Bistro.Application.Initialize(sh);
+            Engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
             itemList = new ItemList(this, MSBuildProject);
             hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
         }
@@ -144,12 +146,51 @@ namespace Bistro.Designer.Projects.FSharp
             return (string)browseObject.GetType().GetMethod("SetMetadata").Invoke(browseObject, new object[] { property, value });
         }
 
+
+
         #region IProjectManager Members
 
         public Project MSBuildProject
         {
             get;
-            private set;
+            set;
+        }
+
+        public List<string> GetSourceFiles()
+        {
+            List<string> files = new List<string>();
+            string path = this.MSBuildProject.FullFileName;
+            int len = path.LastIndexOf("\\");
+            path = path.Substring(0, len + 1);
+            // Iterate through each ItemGroup in the Project to obtain the list of F# source files
+            foreach (BuildItemGroup ig in this.MSBuildProject.ItemGroups)
+            {
+                foreach (BuildItem item in ig)
+                {
+                    if (String.Compare(item.Name, "Compile") == 0)
+                    {
+                        if (item.Include.EndsWith(".fs"))
+                        {
+                            files.Add(path + item.Include);
+                        }
+
+                    }
+                    else
+                        break;
+                }
+            }
+            return files;
+        }
+
+        public List<string> GetRefencedAssemblies()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Bistro.MethodsEngine.EngineControllerDispatcher Engine
+        {
+            get;
+            set;
         }
 
         #endregion

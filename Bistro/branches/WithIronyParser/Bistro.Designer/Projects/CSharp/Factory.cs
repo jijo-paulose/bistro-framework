@@ -24,9 +24,9 @@ namespace Bistro.Designer.Projects.CSharp
 
         protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
         {
-            var project = new ProjectManager();
+            var project = new ProjectManager(package);
             project.SetSite((IOleServiceProvider)((IServiceProvider)package).GetService(typeof(IOleServiceProvider)));
-            package.explorer.projectMngr = project;
+
             return project;
         }
 

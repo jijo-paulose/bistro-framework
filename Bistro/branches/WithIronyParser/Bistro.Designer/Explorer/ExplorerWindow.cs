@@ -64,6 +64,7 @@ namespace Bistro.Designer.Explorer
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
             control = new DesignerControl();
+            projectMngrs = new Dictionary<string, IProjectManager>();
             
         }
         public DesignerControl Control
@@ -88,32 +89,52 @@ namespace Bistro.Designer.Explorer
         public void AddEvents()
         {
             _events = (EnvDTE80.Events2)dte.Events;
+            _events.SolutionItemsEvents.ItemAdded += new EnvDTE._dispProjectItemsEvents_ItemAddedEventHandler(_events_ItemAdded);
             _docEvents = (EnvDTE.DocumentEvents)_events.get_DocumentEvents(null);
-            _docEvents.DocumentSaved += new EnvDTE._dispDocumentEvents_DocumentSavedEventHandler(ReloadTreeView);
+            _docEvents.DocumentSaved += new EnvDTE._dispDocumentEvents_DocumentSavedEventHandler(_docEvents_DocumentSaved);
             _slnEvents = (EnvDTE.SolutionEvents)_events.SolutionEvents;
-            _slnEvents.Opened += new EnvDTE._dispSolutionEvents_OpenedEventHandler(InitParser);
-            _slnEvents.AfterClosing += new EnvDTE._dispSolutionEvents_AfterClosingEventHandler(_slnEvents_AfterClosing);
+            _slnEvents.Opened += new EnvDTE._dispSolutionEvents_OpenedEventHandler(_slnEvents_SolutionOpened);
+            _slnEvents.ProjectAdded += new EnvDTE._dispSolutionEvents_ProjectAddedEventHandler(_slnEvents_ProjectAdded);
+            _slnEvents.ProjectRemoved += new EnvDTE._dispSolutionEvents_ProjectRemovedEventHandler(_slnEvents_ProjectRemoved);
+            _slnEvents.BeforeClosing += new EnvDTE._dispSolutionEvents_BeforeClosingEventHandler(_slnEvents_BeforeClosing);
         }
+
+
    
         #region Private Members
         private DesignerControl control;
         private MetadataExtractor extractor;
-        internal IProjectManager projectMngr;
+        internal Dictionary<string,IProjectManager> projectMngrs;
+        string activeProject;
  
+
+        
+        private void GetStartupProject()
+        {
+            
+            string msg = "";
+            foreach (String item in (Array)dte.Solution.SolutionBuild.StartupProjects)
+            {
+                msg += item;
+            }
+            EnvDTE.Project startupProj = dte.Solution.Item(msg);
+            activeProject = startupProj.FullName;
+           
+        }
+
         /// <summary>
         /// as there were changes in one or more files we need to reload bindingTreeView of control
         /// </summary>
-        private void ReloadTreeView(EnvDTE.Document target)
+        private void ReloadTreeView(string filename)
         {
-            extractor.FileName = target.FullName;
+            GetStartupProject();
+            extractor.FileName = filename;
             if (extractor.FillControllerInfo())
             {
-                ///TODO:
-                ///how can we keep controllers' info got from dlls(if there were any)?
-                
-                ///keep this line commented until engine.Clean will be implemented
-                UpdateTreeData();//reevaluate dependencies
-                LoadTree();
+                if (UpdateTreeData())//reevaluate dependencies
+                {
+                    LoadTree();
+                }
             }
         }
         private void LoadTree()
@@ -124,7 +145,7 @@ namespace Bistro.Designer.Explorer
             Control.cashPatternsCtrl.Clear();
             Dictionary<string, List<ControllerDescription>> ctrlsStore = Control.cashPatternsCtrl;
             Dictionary<string, Dictionary<string, Resource>> resStore = Control.cashPatternsRes;
-            foreach (BistroMethod bm in projectMngr.Engine.Processor.AllMethods)
+            foreach (BistroMethod bm in projectMngrs[activeProject].Engine.Processor.AllMethods)
             {
                 foreach (IMethodsBindPointDesc bp in bm.BindPointsList)
                 {
@@ -203,49 +224,46 @@ namespace Bistro.Designer.Explorer
         /// Rebuilds all controller dependencies and bindings
         /// Note : engine.Clean is not implemented yet that's why it is impossible to update tree correctly now
         /// </summary>
-        private void UpdateTreeData()
+        private bool UpdateTreeData()
         {
-
+            if (!projectMngrs.ContainsKey(activeProject) || extractor.infobyFiles.Count == 0 ) return false;
             Control.BindingTree.Nodes.Clear();
-            if (extractor.infobyFiles.Count == 0)
-            {
-                Control.BindingTree.Nodes.Add("Failed to parse source code");
-                return;
-            }
-            ///TODO : clear controllers been added from source code 
-            projectMngr.Engine.Clean();//not implemented yet
+            projectMngrs[activeProject].Engine.Clean();//not implemented yet
             foreach (KeyValuePair<string, ControllersTable> fileData in extractor.infobyFiles)
             {
                 foreach (KeyValuePair<string, Dictionary<string, List<string>>> ctrlsData in fileData.Value)
                 {
                     ControllerDescription ctrldesc = new ControllerDescription(ctrlsData.Key, ctrlsData.Value);
-                    projectMngr.Engine.RegisterController(ctrldesc);
+                    projectMngrs[activeProject].Engine.RegisterController(ctrldesc);
                 }
             }
-            projectMngr.Engine.ForceUpdateBindPoints();
+            projectMngrs[activeProject].Engine.ForceUpdateBindPoints();
+            return true;
 
 
         }
-         /// <summary>
-        /// fills dictionary with info about controllers from all F# files of the project
-        /// must be called after ProjectManager was instantiated by Factory(OnSolutionOpened)
-        /// it may be called only once because when you add new item to the project,info will be added OnSave 
-        /// </summary>
-        private void InitParser()
+        private void _slnEvents_SolutionOpened()
         {
             try
             {
-                string lang = (projectMngr.GetType() == typeof(Projects.CSharp.ProjectManager)) ? "c#" : "f#";
+                GetStartupProject();
+                string lang = (projectMngrs[activeProject].GetType() == typeof(Projects.CSharp.ProjectManager)) ? "c#" : "f#";
                 extractor = new MetadataExtractor(lang, String.Empty);
-                List<string> files = projectMngr.GetSourceFiles();
-                foreach (string file in files)
+                foreach (KeyValuePair<string,IProjectManager> kvp in projectMngrs)
                 {
-                    extractor.FileName = file;
-                    extractor.FillControllerInfo();
+                    List<string> files = kvp.Value.GetSourceFiles();
+                    string str = kvp.Key.Substring(kvp.Value.ProjectPath.Length);
+                    control.ComboProjects.Items.Add(str);
+                    if (String.Compare(activeProject, kvp.Key) == 0)
+                        control.ComboProjects.SelectedItem = str;
+                    foreach (string file in files)
+                    {
+                        extractor.FileName = file;
+                        extractor.FillControllerInfo();
+                    }
                 }
                 UpdateTreeData();
                 LoadTree();
-
 
             }
             catch (Exception ex)
@@ -253,10 +271,33 @@ namespace Bistro.Designer.Explorer
                 Trace.WriteLine(ex);
             }
         } 
-        private void _slnEvents_AfterClosing()
+        private void _slnEvents_BeforeClosing()
         {
-            projectMngr.Engine = null;
+            projectMngrs.Clear();
             extractor = null;
+        }
+        private void _events_ItemAdded(EnvDTE.ProjectItem item)
+        {
+            ReloadTreeView(item.Document.FullName);
+        }
+        private void _docEvents_DocumentSaved(EnvDTE.Document target)
+        {
+            ReloadTreeView(target.FullName);
+        }
+        /// <summary>
+        ///In general,there can be different projects in one solution (C#,F#).As it is impossible to parse both languages simultaneously :
+        ///1) we can store information only for the last added project
+        ///2) add OnSave information if project's language is the same - see ReloadTreeView.
+        ///If project's language is different from 
+
+        /// </summary>
+        /// <param name="project"></param>
+        private void _slnEvents_ProjectAdded(EnvDTE.Project project)
+        {
+        }
+        private void _slnEvents_ProjectRemoved(EnvDTE.Project project)
+        {
+            projectMngrs.Remove(project.FullName);
         }
 
         #endregion

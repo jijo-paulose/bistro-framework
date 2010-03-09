@@ -28,6 +28,10 @@ namespace Bistro.Designer.Explorer
         {
             get { return propertiesTree; }
         }
+        public ComboBox ComboProjects
+        {
+            get { return comboBox1; }
+        }
         /// <summary> 
         /// Let this control process the mnemonics.
         /// </summary>

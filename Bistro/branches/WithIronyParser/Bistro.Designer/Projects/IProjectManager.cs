@@ -10,13 +10,13 @@ using System.ComponentModel;
 namespace Bistro.Designer.Projects
 {
 
-    [ComVisible(true)]
     public interface IProjectManager
     {
         Project MSBuildProject { get; set; }
         List<string> GetSourceFiles();
         List<string> GetRefencedAssemblies();
         EngineControllerDispatcher Engine { get; set; }
+        string ProjectPath { get; set; }
     }
 
 }

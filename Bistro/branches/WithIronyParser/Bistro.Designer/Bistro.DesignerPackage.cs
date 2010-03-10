@@ -48,8 +48,11 @@ namespace Bistro.Designer
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource(1000, 1)]
     // This attribute registers a tool window exposed by this package.
+    //[ProvideToolWindow(typeof(ExplorerWindow),Transient = false, Style = VsDockStyle.Tabbed, Orientation = ToolWindowOrientation.Right, 
+    //    Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
+    [ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidFSharpProjectFactoryString)]
+    [ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidCSharpProjectFactoryString)]
     [ProvideToolWindow(typeof(ExplorerWindow))]
-
     [ProvideProjectFactory(
         typeof(Projects.FSharp.Factory), 
         null,
@@ -100,7 +103,7 @@ namespace Bistro.Designer
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
-            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            IVsWindowFrame windowFrame = (IVsWindowFrame)_window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());*/
             IVsWindowFrame windowFrame = (IVsWindowFrame)explorer.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
@@ -135,6 +138,8 @@ namespace Bistro.Designer
             RegisterProjectFactory(new Projects.FSharp.Factory(this));
             RegisterProjectFactory(new Projects.CSharp.Factory(this));
             dte = GetService(typeof(EnvDTE._DTE)) as EnvDTE.DTE;
+            //explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
+            //System.IServiceProvider service = (System.IServiceProvider)this.GetService(typeof(System.IServiceProvider));
             explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
             explorer.Initialize(dte);
             explorer.AddEvents();

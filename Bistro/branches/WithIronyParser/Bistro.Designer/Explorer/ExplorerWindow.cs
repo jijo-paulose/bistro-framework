@@ -54,13 +54,7 @@ namespace Bistro.Designer.Explorer
         public ExplorerWindow() :
             base(null)
         {
-            // Set the window title reading it from the resources.
             this.Caption = Resources.ToolWindowTitle;
-            // Set the image that will appear on the tab of the window frame
-            // when docked with an other window
-            // The resource ID correspond to the one defined in the resx file
-            // while the Index is the offset in the bitmap strip. Each image in
-            // the strip being 16x16.
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
             control = new DesignerControl(this);
@@ -307,8 +301,9 @@ namespace Bistro.Designer.Explorer
         /// <param name="project"></param>
         private void _slnEvents_ProjectAdded(EnvDTE.Project project)
         {
-            List<string> files = projectMngrs[project.FullName].GetSourceFiles();
-            string str = project.FullName.Substring(projectMngrs[project.FullName].ProjectPath.Length);
+            string key = project.FullName;
+            List<string> files = projectMngrs[key].GetSourceFiles();
+            string str = key.Substring(projectMngrs[key].ProjectPath.Length);
             control.ComboProjects.Items.Add(str);
             control.ComboProjects.SelectedItem = str;
             foreach (string file in files)
@@ -323,6 +318,7 @@ namespace Bistro.Designer.Explorer
         }
         private void _slnEvents_ProjectRemoved(EnvDTE.Project project)
         {
+            if (!projectMngrs.ContainsKey(project.FullName)) return;
             List<string> toDelete = projectMngrs[project.FullName].GetSourceFiles();
             control.ComboProjects.Items.Remove(project.FullName.Substring(projectMngrs[project.FullName].ProjectPath.Length));
             foreach (string file in toDelete)

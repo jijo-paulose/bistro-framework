@@ -55,6 +55,8 @@ namespace Bistro.Designer.Projects.CSharp
             base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
         }
 
+        public FSharp.ItemList ItemList { get { return null; } }
+
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();

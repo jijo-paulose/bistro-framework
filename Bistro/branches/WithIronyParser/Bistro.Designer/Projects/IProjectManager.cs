@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 namespace Bistro.Designer.Projects
 {
-
+    [ComVisible(true)]
     public interface IProjectManager
     {
         Project MSBuildProject { get; set; }
@@ -17,6 +17,7 @@ namespace Bistro.Designer.Projects
         List<string> GetRefencedAssemblies();
         EngineControllerDispatcher Engine { get; set; }
         string ProjectPath { get; set; }
+        FSharp.ItemList ItemList { get; }
     }
 
 }

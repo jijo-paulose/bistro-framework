@@ -3,34 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using Microsoft.VisualStudio.Shell;
 
-namespace Bistro.Designer.Projects.FSharp
+namespace FSharp.ProjectExtender
 {
-    [Guid(Guids.guidFSharpProjectFactoryString)]
+    [Guid(Constants.guidProjectExtenderFactoryString)]
     public class Factory : FlavoredProjectFactoryBase
     {
-        private DesignerPackage package;
-        public Factory(DesignerPackage package)
-            : base() 
+        private Package package;
+        public Factory(Package package)
+            : base()
         {
             this.package = package;
         }
 
         protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
         {
-            var project = new ProjectManager(package);
+            var project = new ProjectManager();
             project.SetSite((IOleServiceProvider)((IServiceProvider)package).GetService(typeof(IOleServiceProvider)));
             return project;
         }
 
     }
-
-    [Guid("C39A00F4-B2A4-478e-A0B2-C3E69B3BD899")]
-    public class DummyWebFactory { }
 }

@@ -13,7 +13,6 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Bistro.Designer.Explorer;
 using Bistro.Designer.ProjectBase;
-using Bistro.Designer.Projects.FSharp.Properties;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 
@@ -67,12 +66,15 @@ namespace Bistro.Designer
                                                         // will also be used as the name of the node grouping
                                                         // projects in the AddNewProject dialog
 
+    [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), null, null, null, null, @".\NullPath")]
+
     [ProvideProjectFactory(typeof(Projects.CSharp.Factory), null, null, null, null, @".\NullPath", LanguageVsTemplate = "Bistro")]
     [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
     [WAProvideProjectFactoryTemplateMapping("{" + "f2a71f9b-5d33-465a-a702-920d77279786" + "}", typeof(Projects.FSharp.DummyWebFactory))]
     [WAProvideProjectFactoryTemplateMapping("{" + "fae04ec0-301f-11d3-bf4b-00c04f79efbc" + "}", typeof(Projects.CSharp.DummyWebFactory))]
 
-    [ProvideObject(typeof(CompileOrderPage))]
+    [ProvideObject(typeof(FSharp.ProjectExtender.Page))]
+
     [Guid(Guids.guidBistro_DesignerPkgString)]
     public sealed class DesignerPackage : Package
     {
@@ -137,6 +139,7 @@ namespace Bistro.Designer
             }
             RegisterProjectFactory(new Projects.FSharp.Factory(this));
             RegisterProjectFactory(new Projects.CSharp.Factory(this));
+            RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
             dte = GetService(typeof(EnvDTE._DTE)) as EnvDTE.DTE;
             //explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
             //System.IServiceProvider service = (System.IServiceProvider)this.GetService(typeof(System.IServiceProvider));

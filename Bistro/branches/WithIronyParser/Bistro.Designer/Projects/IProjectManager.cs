@@ -17,7 +17,6 @@ namespace Bistro.Designer.Projects
         List<string> GetRefencedAssemblies();
         EngineControllerDispatcher Engine { get; set; }
         string ProjectPath { get; set; }
-        FSharp.ItemList ItemList { get; }
     }
 
 }

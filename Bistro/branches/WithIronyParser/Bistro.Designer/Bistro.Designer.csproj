@@ -252,27 +252,7 @@
     <Compile Include="Explorer\MetadataExtractor.cs" />
     <Compile Include="Projects\CSharp\Factory.cs" />
     <Compile Include="Projects\CSharp\ProjectManager.cs" />
-    <Compile Include="Projects\FSharp\ItemList.cs" />
-    <Compile Include="Projects\FSharp\ItemNode.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
-    <Compile Include="Projects\FSharp\Properties\EditDependenciesDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\EditDependenciesDialog.Designer.cs">
-      <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\CompileOrderPage.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\CompileOrderViewer.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\CompileOrderViewer.Designer.cs">
-      <DependentUpon>CompileOrderViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\FSharpPropertiesConstants.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Projects\IProjectManager.cs" />
     <Compile Include="Projects\ProjectExtender\Factory.cs" />
     <Compile Include="Projects\ProjectExtender\Constants.cs" />
@@ -342,12 +322,6 @@
     <EmbeddedResource Include="Resources\Images_24bit.bmp" />
     <EmbeddedResource Include="Explorer\DesignerControl.resx">
       <DependentUpon>DesignerControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Projects\FSharp\Properties\EditDependenciesDialog.resx">
-      <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Projects\FSharp\Properties\CompileOrderViewer.resx">
-      <DependentUpon>CompileOrderViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Root.bmp" />
     <EmbeddedResource Include="Resources\imagelis.bmp">

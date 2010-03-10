@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Bistro.Designer.Projects.FSharp.Properties;
 using Microsoft.VisualStudio.OLE.Interop;
 
 using IOLEServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
@@ -54,8 +53,6 @@ namespace Bistro.Designer.Projects.CSharp
             this.fileName = fileName;
             base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
         }
-
-        public FSharp.ItemList ItemList { get { return null; } }
 
         protected override void OnAggregationComplete()
         {

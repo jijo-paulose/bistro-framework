@@ -68,7 +68,7 @@ namespace Bistro.Designer
                                                         // projects in the AddNewProject dialog
 
     [ProvideProjectFactory(typeof(Projects.CSharp.Factory), null, null, null, null, @".\NullPath", LanguageVsTemplate = "Bistro")]
-    [WAProvideProjectFactory(typeof(Projects.CSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
+    [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
     [WAProvideProjectFactoryTemplateMapping("{" + "f2a71f9b-5d33-465a-a702-920d77279786" + "}", typeof(Projects.FSharp.DummyWebFactory))]
     [WAProvideProjectFactoryTemplateMapping("{" + "fae04ec0-301f-11d3-bf4b-00c04f79efbc" + "}", typeof(Projects.CSharp.DummyWebFactory))]
 

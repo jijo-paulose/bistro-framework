@@ -1,5 +1,0 @@
-C:\AIM\Bistro\branches\WithIronyParser\Bistro.Core\obj\Debug\ResolveAssemblyReference.cache
-C:\AIM\Bistro\branches\WithIronyParser\Bistro.Core\bin\Bistro.Core.dll
-C:\AIM\Bistro\branches\WithIronyParser\Bistro.Core\bin\Bistro.Core.pdb
-C:\AIM\Bistro\branches\WithIronyParser\Bistro.Core\obj\Debug\Bistro.Core.dll
-C:\AIM\Bistro\branches\WithIronyParser\Bistro.Core\obj\Debug\Bistro.Core.pdb

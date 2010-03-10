@@ -99,11 +99,21 @@ namespace Bistro.UnitTests.Tests
 
 		#region Url tests creation methods
 
-		private UrlControllersTest UrlTest(string name, string url, params object[] controllersGroups)
+		private UrlControllersTest UrlTest(string name, string url, bool hasDuplicate, params object[] controllersGroups)
 		{
 			url = url.Replace(" ", "");
-			return new UrlControllersTest(name, url, controllersGroups);
+			return new UrlControllersTest(name, url, hasDuplicate, controllersGroups);
 		}
+
+        private UrlControllersTest UrlTest(string name, string url, params object[] controllersGroups)
+        {
+            return UrlTest(name, url, false, controllersGroups);
+        }
+
+        private UrlControllersTest UrlTestDuplicate(string name, string url, params object[] controllersGroups)
+        {
+            return UrlTest(name, url, true, controllersGroups);
+        }
 		/// <summary>
 		/// UnOrdered group
 		/// </summary>
@@ -127,6 +137,7 @@ namespace Bistro.UnitTests.Tests
 		#endregion
 
 		List<TestDescriptor> tests = new List<TestDescriptor>();
+        private bool hasDuplicate;
 
 		#region Test Creation Methods
 
@@ -199,10 +210,11 @@ namespace Bistro.UnitTests.Tests
 
 			#region Test part
 
-
+            int urlNumber = 0;
 			foreach (UrlControllersTest urlTest in descriptor.UrlTests)
 			{
-				urlTest.Validate(dispatcher);
+				urlTest.Validate(dispatcher, urlNumber);
+                urlNumber++;
 			}
 
 			#endregion

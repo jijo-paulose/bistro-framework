@@ -274,6 +274,25 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Projects\IProjectManager.cs" />
+    <Compile Include="Projects\ProjectExtender\Factory.cs" />
+    <Compile Include="Projects\ProjectExtender\Constants.cs" />
+    <Compile Include="Projects\ProjectExtender\IProjectManager.cs" />
+    <Compile Include="Projects\ProjectExtender\ItemList.cs" />
+    <Compile Include="Projects\ProjectExtender\ItemNode.cs" />
+    <Compile Include="Projects\ProjectExtender\ProjectManager.cs" />
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Page.cs" />
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.Designer.cs">
+      <DependentUpon>Viewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.Designer.cs">
+      <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
+    </Compile>
     <ZipItem Include="Templates\ProjectItems\CSharpControllers\ControllerClass.cs" />
     <ZipProject Include="Templates\Projects\CSharp\Controller1.cs" />
   </ItemGroup>
@@ -313,6 +332,12 @@
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
     <ZipProject Include="Templates\Projects\CSharp\index.django" />
     <ZipProject Include="Templates\Projects\CSharp\Web.config" />
+    <EmbeddedResource Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.resx">
+      <DependentUpon>Viewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.resx">
+      <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Images_32bit.bmp" />
     <EmbeddedResource Include="Resources\Images_24bit.bmp" />
     <EmbeddedResource Include="Explorer\DesignerControl.resx">

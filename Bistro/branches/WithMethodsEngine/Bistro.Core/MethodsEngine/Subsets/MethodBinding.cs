@@ -139,9 +139,15 @@ namespace Bistro.MethodsEngine.Subsets
         private static Regex subSplitRegex = new Regex(@"/", RegexOptions.Compiled);
 
         /// <summary>
-        /// Regex to test for wildcards
+        /// Regex to test for wildcards and params
         /// </summary>
         private static Regex wildCardRegex = new Regex(@"\A(?:\*|{[^}]+})\z", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Regex to test for wildcards only
+        /// </summary>
+        private static Regex wildCardOnlyRegex = new Regex(@"\A(?:\*)\z", RegexOptions.Compiled);
+
 
         /// <summary>
         /// Regex to test for parameters
@@ -269,7 +275,7 @@ namespace Bistro.MethodsEngine.Subsets
 			Dictionary<string, string> tempParamsValues = new Dictionary<string, string>();
 
 			List<string> splitQueryString = requestUrl.Split('?').ToList();
-			List<string> requestComponents = smartUrlSplit(splitQueryString[0]).Where(str => str != String.Empty).ToList();
+            List<string> requestComponents = smartUrlSplit(splitQueryString[0]).ToList();//.Where(str => str != String.Empty).ToList();
 
 			if ((requestComponents.Count == 1) || (lengthWithoutEndParams == 1 && this.items.Count == 1))
 				return new Dictionary<string, string>();
@@ -295,10 +301,11 @@ namespace Bistro.MethodsEngine.Subsets
 
 			while (currentMatchPart != null)
 			{
-				if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Count)
-				{
+                //if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Count)
+                //{
 					tempParamsValues.Clear();
 					bool placed = true;
+                    bool breakWhile = false;
 					for (int i = 0; i < currentMatchPart.Count; i++)
 					{
 						if (paramsRegex.IsMatch(currentMatchPart[i]))
@@ -308,11 +315,20 @@ namespace Bistro.MethodsEngine.Subsets
 						}
 						if (wildCardRegex.IsMatch(currentMatchPart[i]))
 							continue;
+
+                        if ((i + positionInMatchPart) >= requestComponents.Count)
+                        {
+                            breakWhile = true;
+                            break;
+                        }
+
 						if (currentMatchPart[i] == requestComponents[i + positionInMatchPart])
 							continue;
 						placed = false;
 						break;
 					}
+                    if (breakWhile)
+                        break;
 
 					if (placed)
 					{
@@ -323,11 +339,11 @@ namespace Bistro.MethodsEngine.Subsets
 					}
 					else
 						positionInMatchPart++;
-				}
-				else
-				{
-					engine.Logger.Report(Errors.ErrorExtractingParams,requestUrl);
-				}
+                //}
+                //else
+                //{
+                //    engine.Logger.Report(Errors.ErrorExtractingParams,requestUrl);
+                //}
 			}
 
 
@@ -358,14 +374,15 @@ namespace Bistro.MethodsEngine.Subsets
 
 			// Actually url will be split into two parts. - before ? and after.
             List<string> splitQueryString = requestUrl.Split('?').ToList();
-            List<string> requestComponents = smartUrlSplit(splitQueryString[0]).Where(str => str != String.Empty).ToList();
+            List<string> requestComponents = smartUrlSplit(splitQueryString[0]).ToList();//.Reverse().SkipWhile(str => String.IsNullOrEmpty(str)).Reverse().ToList();
 			
 			//special case for root match / /
 			// Check that we have only bind verb 
-			if ((requestComponents.Count == 1) || (lengthWithoutEndParams == 1 && this.items.Count == 1))
+//			if ((requestComponents.Count == 1) || (lengthWithoutEndParams == 1 && this.items.Count == 1))
+            if (lengthWithoutEndParams == 1 && this.items.Count == 1)
 			{
 				// return true if bind verb is equal with request's bind verb
-				return ((requestComponents.Count == 1) && (lengthWithoutEndParams == 1) && ((this.items.Count == 1) ||(this.items.Count == 2)) && (requestComponents[0] == this.items[0][0]));
+				return ((requestComponents.Count == 2) && String.IsNullOrEmpty(requestComponents[1]) && (requestComponents[0] == this.items[0][0]));
 			}
 
             // if there are more bind components than there are url components, we don't have a match.
@@ -396,13 +413,15 @@ namespace Bistro.MethodsEngine.Subsets
 
             while (currentMatchPart != null)
             {
-                if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Count)
-                {
+                //if ((positionInMatchPart + currentMatchPart.Count) <= requestComponents.Count)
+                //{
                     bool placed = true;
                     for (int i = 0; i < currentMatchPart.Count; i++)
                     {
                         if (wildCardRegex.IsMatch(currentMatchPart[i]))
                             continue;
+                        if ((i + positionInMatchPart) >= requestComponents.Count)
+                            return false;
                         if (currentMatchPart[i] == requestComponents[i + positionInMatchPart])
                             continue;
                         placed = false;
@@ -417,11 +436,11 @@ namespace Bistro.MethodsEngine.Subsets
 					}
                     else 
                         positionInMatchPart++;
-                }
-                else
-                {
-                    return false;
-                }
+                //}
+                //else
+                //{
+                //    return false;
+                //}
             }
 
             return true;
@@ -540,7 +559,7 @@ namespace Bistro.MethodsEngine.Subsets
             bool firstItemMatchImpossible = false;
             for (int i = 0; i < firstPartOfThis.Count; i++)
             {
-                if ((wildCardRegex.IsMatch(firstPartOfThis[i])) || (firstPart[i] == firstPartOfThis[i]))
+                if ((wildCardRegex.IsMatch(firstPartOfThis[i]) && !(wildCardOnlyRegex.IsMatch(firstPartOfThis[i]) && (i< firstPart.Count) &&  paramsRegex.IsMatch(firstPart[i])))  || (firstPart[i] == firstPartOfThis[i]))
                     continue;
 
                 firstItemMatchImpossible = true;
@@ -571,7 +590,7 @@ namespace Bistro.MethodsEngine.Subsets
                     bool placed = true;
                     for (int i = 0; i < currentNoMatchPart.Count; i++)
                     {
-                        if (wildCardRegex.IsMatch(currentNoMatchPart[i]))
+                        if (wildCardRegex.IsMatch(currentNoMatchPart[i]) && !(wildCardOnlyRegex.IsMatch(currentNoMatchPart[i]) && ((i + positionInMatchPart)< currentMatchPart.Count) &&  paramsRegex.IsMatch(currentMatchPart[i+positionInMatchPart])))
                             continue;
                         if (currentNoMatchPart[i] == currentMatchPart[i + positionInMatchPart])
                             continue;

@@ -63,7 +63,7 @@ namespace Bistro.Designer.Explorer
             // the strip being 16x16.
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
-            control = new DesignerControl();
+            control = new DesignerControl(this);
             projectMngrs = new Dictionary<string, IProjectManager>();
             
         }
@@ -106,9 +106,23 @@ namespace Bistro.Designer.Explorer
         private MetadataExtractor extractor;
         internal Dictionary<string,IProjectManager> projectMngrs;
         string activeProject;
- 
 
-        
+
+        internal void ChangeActiveProject()
+        {
+            foreach (string key in projectMngrs.Keys)
+            {
+                if (key.EndsWith(control.ComboProjects.SelectedItem.ToString()))
+                {
+                    if (key == activeProject) return;
+                    string path = projectMngrs[key].ProjectPath;
+                    activeProject = path + control.ComboProjects.SelectedItem.ToString();
+                    ReloadTreeView("forced");
+                }
+            }
+
+            
+        }
         private void GetStartupProject()
         {
             
@@ -123,19 +137,16 @@ namespace Bistro.Designer.Explorer
         }
 
         /// <summary>
-        /// as there were changes in one or more files we need to reload bindingTreeView of control
+        /// As there were changes in source code we need to reload bindingTreeView of the control
         /// </summary>
-        private void ReloadTreeView(string filename)
+        /// <param name="param">either a fullname of updated file or flag for forced update("forced")</param> 
+        private void ReloadTreeView(string param)
         {
-            GetStartupProject();
-            extractor.FileName = filename;
-            if (extractor.FillControllerInfo())
-            {
-                if (UpdateTreeData())//reevaluate dependencies
-                {
+            if (param != "forced") extractor.FileName = param;
+            if (param == "forced" ||
+                (projectMngrs[activeProject].GetSourceFiles().Contains(param) && extractor.FillControllerInfo()))
+                if (UpdateTreeData())
                     LoadTree();
-                }
-            }
         }
         private void LoadTree()
         {
@@ -229,9 +240,11 @@ namespace Bistro.Designer.Explorer
             if (!projectMngrs.ContainsKey(activeProject) || extractor.infobyFiles.Count == 0 ) return false;
             Control.BindingTree.Nodes.Clear();
             projectMngrs[activeProject].Engine.Clean();//not implemented yet
-            foreach (KeyValuePair<string, ControllersTable> fileData in extractor.infobyFiles)
+            List<string> files = projectMngrs[activeProject].GetSourceFiles();
+            foreach (string file in files)
             {
-                foreach (KeyValuePair<string, Dictionary<string, List<string>>> ctrlsData in fileData.Value)
+                ControllersTable fileData = extractor.infobyFiles[file];
+                foreach (KeyValuePair<string, Dictionary<string, List<string>>> ctrlsData in fileData)
                 {
                     ControllerDescription ctrldesc = new ControllerDescription(ctrlsData.Key, ctrlsData.Value);
                     projectMngrs[activeProject].Engine.RegisterController(ctrldesc);
@@ -294,10 +307,30 @@ namespace Bistro.Designer.Explorer
         /// <param name="project"></param>
         private void _slnEvents_ProjectAdded(EnvDTE.Project project)
         {
+            List<string> files = projectMngrs[project.FullName].GetSourceFiles();
+            string str = project.FullName.Substring(projectMngrs[project.FullName].ProjectPath.Length);
+            control.ComboProjects.Items.Add(str);
+            control.ComboProjects.SelectedItem = str;
+            foreach (string file in files)
+            {
+                extractor.FileName = file;
+                extractor.FillControllerInfo();
+            }
+            activeProject = project.FullName;
+            ReloadTreeView("forced");
+
+
         }
         private void _slnEvents_ProjectRemoved(EnvDTE.Project project)
         {
+            List<string> toDelete = projectMngrs[project.FullName].GetSourceFiles();
+            control.ComboProjects.Items.Remove(project.FullName.Substring(projectMngrs[project.FullName].ProjectPath.Length));
+            foreach (string file in toDelete)
+            {
+                extractor.infobyFiles.Remove(file);
+            }
             projectMngrs.Remove(project.FullName);
+
         }
 
         #endregion

@@ -12,13 +12,14 @@ namespace Bistro.Designer.Explorer
         public Dictionary<string, List<ControllerDescription>> cashPatternsCtrl;
         public Dictionary<string, List<ControllerDescription>> dllPatternsCtrl;
         public Dictionary<string, Dictionary<string, Resource>> cashPatternsRes;
-        public DesignerControl()
+        public DesignerControl(ExplorerWindow dockWnd)
         {
             InitializeComponent();
             cashPatternsCtrl = new Dictionary<string, List<ControllerDescription>>();
             cashPatternsRes = new Dictionary<string, Dictionary<string, Resource>>();
             propertiesTree.ImageList = imageList1;
             bindingTree.ImageList = imageList1;
+            parentContainer = dockWnd;
         }
         public TreeView BindingTree
         {
@@ -57,6 +58,7 @@ namespace Bistro.Designer.Explorer
             }
         }
         #region Private members
+        private ExplorerWindow parentContainer;
         private ControllerDescription curCtrl;
         private Resource curResource;
         private NodeObject curObject;
@@ -147,7 +149,14 @@ namespace Bistro.Designer.Explorer
             FillPropertiesTree();
             
         }
+        private void comboBox1_SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+            parentContainer.ChangeActiveProject();
+            propertiesTree.Nodes.Clear();
+        }
         #endregion
+
+
 
 
     }

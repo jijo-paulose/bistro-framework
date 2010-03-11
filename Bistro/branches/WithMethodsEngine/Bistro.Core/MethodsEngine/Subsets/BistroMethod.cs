@@ -261,7 +261,10 @@ namespace Bistro.MethodsEngine.Subsets
         /// Dictionary of resources
         /// </summary>
         private Dictionary<string, Resource> resources;
-
+        public Dictionary<string, Resource> Resources
+        {
+            get { return resources; }
+        }
 
         /// <summary>
         /// List of bindings involved in this method subset.
@@ -272,6 +275,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// BindPoints list associated with bindings.
         /// </summary>
         private List<IMethodsBindPointDesc> bindPointsList;
+       
 
 		/// <summary>
 		/// BindPoint to GenBinding relation
@@ -295,7 +299,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// Gets the bind points list.
         /// </summary>
         /// <value>The bind points list.</value>
-        internal List<IMethodsBindPointDesc> BindPointsList
+        public List<IMethodsBindPointDesc> BindPointsList
         {
             get { return bindPointsList; }
         }
@@ -304,7 +308,7 @@ namespace Bistro.MethodsEngine.Subsets
 		/// Gets the bindpoint to genbinding relation.
 		/// </summary>
 		/// <value>The bindpoint to genbinding relation.</value>
-		internal Dictionary<IMethodsBindPointDesc, List<MethodBinding>> PointBindRelation
+		public Dictionary<IMethodsBindPointDesc, List<MethodBinding>> PointBindRelation
 		{
 			get { return pointBindRelation; }
 		}

@@ -35,7 +35,7 @@ namespace Bistro.MethodsEngine.Subsets
     /// <summary>
     /// This class is responsible for handling of all the url subsets and bindings registered in the engine.
     /// </summary>
-    internal class MethodsProcessor
+    public class MethodsProcessor
     {
 
 
@@ -62,7 +62,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// Initializes a new instance of the <see cref="SubSetsProcessor"/> class.
         /// </summary>
         /// <param name="_engine">The engine.</param>
-        internal MethodsProcessor(EngineControllerDispatcher _engine)
+        public MethodsProcessor(EngineControllerDispatcher _engine)
         {
             engine = _engine;
             allMethods = new List<BistroMethod>();
@@ -85,7 +85,10 @@ namespace Bistro.MethodsEngine.Subsets
         /// List to store all the methods.
         /// </summary>
         private List<BistroMethod> allMethods;
-
+        public List<BistroMethod> AllMethods
+        {
+            get { return allMethods; }
+        }
 
 		private Dictionary<string, BistroMethod> methodsDictionary;
 

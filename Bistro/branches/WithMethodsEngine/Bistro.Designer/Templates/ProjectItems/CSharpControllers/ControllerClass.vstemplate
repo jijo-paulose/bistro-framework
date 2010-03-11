@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+    <TemplateData>
+        <Name>C# Source File</Name>
+        <Description>A C# controller (.cs)</Description>
+        <Icon Package="{349C585A-65DF-11DA-9384-00065B846F21}" ID="9001" />
+        <TemplateID>Microsoft.CSharp.CodeFile</TemplateID>
+        <ProjectType>Bistro</ProjectType>
+        <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
+        <SortOrder>10</SortOrder>
+        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+        <DefaultName>Controller.cs</DefaultName>
+    </TemplateData>
+    <TemplateContent>
+        <ProjectItem ReplaceParameters="true">Controller.cs</ProjectItem>
+    </TemplateContent>
+</VSTemplate>

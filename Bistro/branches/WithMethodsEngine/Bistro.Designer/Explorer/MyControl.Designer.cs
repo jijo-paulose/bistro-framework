@@ -30,33 +30,32 @@ namespace Bistro.Designer.Explorer
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Controllers");
+            this.treeView = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
             // 
-            // button1
+            // treeView
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-                | System.Windows.Forms.AnchorStyles.Left) 
-                | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.BackColor = System.Drawing.SystemColors.Control;
-            this.button1.Location = new System.Drawing.Point(40, 32);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 80);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "&Click Me!";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.treeView.Location = new System.Drawing.Point(0, 0);
+            this.treeView.Name = "treeView";
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "Controllers";
+            this.treeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode1});
+            this.treeView.Size = new System.Drawing.Size(179, 180);
+            this.treeView.TabIndex = 1;
             // 
-            // MyToolWindow
+            // Explorer
             // 
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.Controls.Add(this.button1);
-            this.Name = "MyToolWindow";
+            this.Controls.Add(this.treeView);
+            this.Name = "Explorer";
+            this.Size = new System.Drawing.Size(179, 198);
             this.ResumeLayout(false);
 
         }
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TreeView treeView;
     }
 }

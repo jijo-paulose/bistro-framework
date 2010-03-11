@@ -37,7 +37,7 @@ namespace Bistro.MethodsEngine
     /// <summary>
     /// Main methods engine class.
     /// </summary>
-	internal class EngineControllerDispatcher : IControllerDispatcher
+	public class EngineControllerDispatcher : IControllerDispatcher
     {
 
         enum Errors
@@ -67,12 +67,15 @@ namespace Bistro.MethodsEngine
         /// url sebsets processor.
         /// </summary>
         private MethodsProcessor processor;
-
+        public MethodsProcessor Processor
+        {
+            get { return processor; }
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="Engine"/> class.
         /// </summary>
         /// <param name="logger">The logger.</param>
-        internal EngineControllerDispatcher(Application application)
+        public EngineControllerDispatcher(Application application)
         {
 			Logger = application.LoggerFactory.GetLogger(GetType());
             processor = new MethodsProcessor(this);
@@ -101,7 +104,7 @@ namespace Bistro.MethodsEngine
         /// Registers the controller in the engine.
         /// </summary>
         /// <param name="info">The controller descriptor.</param>
-        internal void RegisterController(IMethodsControllerDesc info)
+        public void RegisterController(IMethodsControllerDesc info)
         {
             List<string> newBindUrls = new List<string>();
             foreach (IMethodsBindPointDesc bindPoint in info.Targets)
@@ -230,6 +233,13 @@ namespace Bistro.MethodsEngine
         internal virtual void RaiseInconsistentResourceType(string methodUrl, string resName, IEnumerable<IMethodsControllerDesc> controllers, params string[] args)
         {
         }
+        public void Clean()
+        {
+            if (map != null) map.Clear();
+            processor = null;
+            processor = new MethodsProcessor(this);
+        }
+
 
 
 

@@ -96,7 +96,7 @@ namespace Bistro.MethodsEngine.Subsets
     /// Class, which represents a half of the url field. It contains a bind url and match status, which sets - 
     /// whether this half contains urls mathching that bind, or not.
     /// </summary>
-    internal class MethodBinding
+    public class MethodBinding
     {
         /// <summary>
         /// Error messages
@@ -116,7 +116,7 @@ namespace Bistro.MethodsEngine.Subsets
         /// </summary>
         /// <param name="_verbNormalizedUrl">The bind url with verb in form verb/url (i.e. GET/a/b/c/).</param>
         /// <param name="_matchStatus">status - whether target half of the url field must match this bind, or not.</param>
-        internal MethodBinding(string _verbNormalizedUrl, bool _matchStatus, EngineControllerDispatcher _engine)
+        public MethodBinding(string _verbNormalizedUrl, bool _matchStatus, EngineControllerDispatcher _engine)
         {
             engine = _engine;
             InitialUrl = _verbNormalizedUrl;

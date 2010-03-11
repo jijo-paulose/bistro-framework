@@ -12,10 +12,10 @@ using Microsoft.VisualStudio.Shell.Interop;
 using NativeMethods = Bistro.Designer.ProjectBase.NativeMethods;
 using MSProject = Microsoft.Build.BuildEngine.Project;
 
-namespace Bistro.Designer.Projects.FSharp.Properties
+namespace FSharp.ProjectExtender
 {
-    [CLSCompliant(false), ComVisible(true), Guid("D43926CD-8001-42fd-999E-F5B4BA050107")]
-    public class CompileOrderPage : IPropertyPage, IVsHierarchyEvents
+    [CLSCompliant(false), ComVisible(true), Guid(Constants.guidCompilerOrderPageString)]
+    public class Page : IPropertyPage, IVsHierarchyEvents
     {
 
         CompileOrderViewer control;
@@ -78,7 +78,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
             info.dwHelpContext = 0;
             info.pszDocString = null;
             info.pszHelpFile = null;
-            info.pszTitle = FSharpPropertiesConstants.CompileOrder;
+            info.pszTitle = Constants.CompileOrder;
             info.SIZE.cx = 550;
             info.SIZE.cy = 300;
             pPageInfo[0] = info;
@@ -114,14 +114,21 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
                         string name;
                         ErrorHandler.ThrowOnFailure(item.GetCanonicalName(VSConstants.VSITEMID_ROOT, out name));
-                        ErrorHandler.ThrowOnFailure(item.AdviseHierarchyEvents(this, out eventCookie));
+                        item.AdviseHierarchyEvents(this, out eventCookie);
                         return;
                     }
                     catch (Exception)
                     {
+                        if (item != null)
+                            item.UnadviseHierarchyEvents(eventCookie);
                         item = null;
                         throw;
                     }
+
+            // if we could not get our hands on the project let us clear whatever we already have there
+            if (item != null)
+                item.UnadviseHierarchyEvents(eventCookie);
+            item = null;
         }
 
         IPropertyPageSite site;
@@ -157,7 +164,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
         int IVsHierarchyEvents.OnInvalidateItems(uint itemidParent)
         {
-//            control.refresh_file_list();
+            control.refresh_file_list();
             return VSConstants.S_OK;
         }
 
@@ -175,7 +182,7 @@ namespace Bistro.Designer.Projects.FSharp.Properties
 
         int IVsHierarchyEvents.OnItemsAppended(uint itemidParent)
         {
-            //control.refresh_file_list();
+            control.refresh_file_list();
             return VSConstants.S_OK;
         }
 

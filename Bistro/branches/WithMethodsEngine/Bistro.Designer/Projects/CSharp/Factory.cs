@@ -4,20 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
+using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
-
-namespace Bistro.Designer.Projects.FSharp
+namespace Bistro.Designer.Projects.CSharp
 {
-    [Guid(Guids.guidFSharpProjectFactoryString)]
+    [Guid(Guids.guidCSharpProjectFactoryString)]
     public class Factory : FlavoredProjectFactoryBase
     {
         private DesignerPackage package;
+       
         public Factory(DesignerPackage package)
-            : base() 
+            : base()
         {
             this.package = package;
         }
@@ -26,11 +26,12 @@ namespace Bistro.Designer.Projects.FSharp
         {
             var project = new ProjectManager(package);
             project.SetSite((IOleServiceProvider)((IServiceProvider)package).GetService(typeof(IOleServiceProvider)));
+
             return project;
         }
 
     }
-
-    [Guid("C39A00F4-B2A4-478e-A0B2-C3E69B3BD899")]
+    [Guid("BA26ED4A-8279-40FD-8D03-3A36795578AD")]
     public class DummyWebFactory { }
+
 }

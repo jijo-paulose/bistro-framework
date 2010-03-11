@@ -109,14 +109,15 @@ namespace Bistro.MethodsEngine
             List<string> newBindUrls = new List<string>();
             foreach (IMethodsBindPointDesc bindPoint in info.Targets)
             {
-                List<IMethodsBindPointDesc> descriptors = null;
-
-                if (!map.TryGetValue(bindPoint.Target, out descriptors))
-                {
-                    descriptors = new List<IMethodsBindPointDesc>();
-                    map.Add(bindPoint.Target, descriptors);
-                    newBindUrls.Add(bindPoint.Target);
-                }
+                List<IMethodsBindPointDesc> descriptors;
+                //Manually written "?" at the end of binding indicates that there whould be 
+                //at least one item on this position.
+                //In this case we replace "?" with "?/*".
+                if (bindPoint.Target.EndsWith("?"))
+                    descriptors = RegisterBindPointTarget(newBindUrls, bindPoint.Target.Remove(bindPoint.Target.Length - 1).Insert(bindPoint.Target.Length - 1, "*/?"));
+                else
+                    //common case
+                    descriptors = RegisterBindPointTarget(newBindUrls, bindPoint.Target);
 
                 int i = 0;
                 foreach (IMethodsBindPointDesc comparedBindPoint in descriptors)
@@ -134,7 +135,28 @@ namespace Bistro.MethodsEngine
                 processor.AddNewBinding(bindUrl);
             }
 
+        }
 
+        /// <summary>
+        /// Adds bind point target to corresponding dictionary.
+        /// The method will return either new list of descriptors or null depending on 
+        /// existing bindPointTarget in the dictionary. New targets will also be added to newBindUrls dictionary
+        /// to be given later to the processor.
+        /// </summary>
+        /// <param name="newBindUrls"></param>
+        /// <param name="bindPointTarget"></param>
+        /// <returns></returns>
+        private List<IMethodsBindPointDesc> RegisterBindPointTarget(List<string> newBindUrls, string bindPointTarget)
+        {
+            List<IMethodsBindPointDesc> descriptors = null;
+
+            if (!map.TryGetValue(bindPointTarget, out descriptors))
+            {
+                descriptors = new List<IMethodsBindPointDesc>();
+                map.Add(bindPointTarget, descriptors);
+                newBindUrls.Add(bindPointTarget);
+            }
+            return descriptors;
         }
 
 

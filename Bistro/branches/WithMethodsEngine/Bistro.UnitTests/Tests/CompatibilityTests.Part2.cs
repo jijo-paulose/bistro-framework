@@ -968,7 +968,7 @@ namespace Bistro.UnitTests.Tests
                         ),
                     Type("WithPaging",
                         Attributes(
-                            BindAttribute("GET /a")
+                            BindAttribute("GET /a/?/c3")
                         )
                         ),
                     Type("Data14sRender",
@@ -987,12 +987,12 @@ namespace Bistro.UnitTests.Tests
                     UrlTest("GET /a/abcde/edcba/aaaa123/bbb124", "GET /a/abcde/edcba/aaaa123/bbb124", "DataRoot"),
                     UrlTest("GET /a/bbb124", "GET /a/bbb124", "DataRoot"),
                     UrlTest("GET /a/aaaa123/bbb124", "GET /a/aaaa123/bbb124", "DataRoot"),
-                    UrlTest("GET /a/c3", "GET /a/c3", "WithPaging", "DataRoot"),
-                    UrlTest("GET /a/abcde/edcba/aaaa123/bbb124/c3", "GET /a/abcde/edcba/aaaa123/bbb124/c3", "WithPaging", "DataRoot"),
-                    UrlTest("GET /a/bbb124/c3", "GET /a/bbb124/c3", "WithPaging", "DataRoot"),
-                    UrlTest("GET /a/aaaa123/bbb124/c3", "GET /a/aaaa123/bbb124/c3", "WithPaging", "DataRoot"),
-                    UrlTest("GET /a/b/c2", "GET /a/b/c2", "DataRoot", "Data14sRender"),
-                    UrlTest("GET /a/b/c1", "GET /a/b/c1", "DataRoot", "Data14sRenderBis")
+                    UrlTest("GET /a/c3", "GET /a/c3", CtrUnOrdGrp("WithPaging", "DataRoot")),
+                    UrlTest("GET /a/abcde/edcba/aaaa123/bbb124/c3", "GET /a/abcde/edcba/aaaa123/bbb124/c3", CtrUnOrdGrp("WithPaging", "DataRoot")),
+                    UrlTest("GET /a/bbb124/c3", "GET /a/bbb124/c3", CtrUnOrdGrp("WithPaging", "DataRoot")),
+                    UrlTest("GET /a/aaaa123/bbb124/c3", "GET /a/aaaa123/bbb124/c3", CtrUnOrdGrp("WithPaging", "DataRoot")),
+                    UrlTest("GET /a/b/c2", "GET /a/b/c2", CtrUnOrdGrp("DataRoot", "Data14sRender")),
+                    UrlTest("GET /a/b/c1", "GET /a/b/c1", CtrUnOrdGrp("DataRoot", "Data14sRenderBis"))
 
 					//Node("GET /a", Controllers(),// is empty because it's not a method node
 				//    Node("/?", Controllers("DataRoot"),
@@ -1081,11 +1081,11 @@ namespace Bistro.UnitTests.Tests
                     UrlTest("PUT /path2", "PUT /path2", "Controller1"),
                     UrlTest("DELETE /path2", "DELETE /path2", "Controller1"),
                     UrlTest("HEAD /path2", "HEAD /path2", "Controller1"),
-                    UrlTest("GET /path2/more", "GET /path2/more", "Controller1", "Controller1"),
-                    UrlTest("POST /path2/more", "POST /path2/more", "Controller1", "Controller1"),
-                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller1"),
-                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller1"),
-                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller1")
+                    UrlTestDuplicate("GET /path2/more", "GET /path2/more", "Controller1", "Controller1"),
+                    UrlTestDuplicate("POST /path2/more", "POST /path2/more", "Controller1", "Controller1"),
+                    UrlTestDuplicate("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller1"),
+                    UrlTestDuplicate("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller1"),
+                    UrlTestDuplicate("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller1")
 
 				//Node("* /default", "Controller1"),
 				//Node("* /path2", Controllers("Controller1"),
@@ -1106,21 +1106,21 @@ namespace Bistro.UnitTests.Tests
                         ),
                     Type("Controller2", BindAttribute("/?"))
                     ),
-                    UrlTest("GET /default", "GET /default", "Controller2", "Controller1"),
-                    UrlTest("POST /default", "POST /default", "Controller2", "Controller1"),
-                    UrlTest("PUT /default", "PUT /default", "Controller2", "Controller1"),
-                    UrlTest("DELETE /default", "DELETE /default", "Controller2", "Controller1"),
-                    UrlTest("HEAD /default", "HEAD /default", "Controller2", "Controller1"),
-                    UrlTest("GET /path2", "GET /path2", "Controller2", "Controller1"),
-                    UrlTest("POST /path2", "POST /path2", "Controller2", "Controller1"),
-                    UrlTest("PUT /path2", "PUT /path2", "Controller2", "Controller1"),
-                    UrlTest("DELETE /path2", "DELETE /path2", "Controller2", "Controller1"),
-                    UrlTest("HEAD /path2", "HEAD /path2", "Controller2", "Controller1"),
-                    UrlTest("GET /path2/more", "GET /path2/more", "Controller2", "Controller1", "Controller1"),
-                    UrlTest("POST /path2/more", "POST /path2/more", "Controller2", "Controller1", "Controller1"),
-                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller2", "Controller1", "Controller1"),
-                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller2", "Controller1", "Controller1"),
-                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller2", "Controller1", "Controller1"),
+                    UrlTest("GET /default", "GET /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("POST /default", "POST /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("PUT /default", "PUT /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("DELETE /default", "DELETE /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("HEAD /default", "HEAD /default", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("GET /path2", "GET /path2", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("POST /path2", "POST /path2", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("PUT /path2", "PUT /path2", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("DELETE /path2", "DELETE /path2", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTest("HEAD /path2", "HEAD /path2", CtrUnOrdGrp("Controller2", "Controller1")),
+                    UrlTestDuplicate("GET /path2/more", "GET /path2/more", CtrUnOrdGrp("Controller2", "Controller1", "Controller1")),
+                    UrlTestDuplicate("POST /path2/more", "POST /path2/more", CtrUnOrdGrp("Controller2", "Controller1", "Controller1")),
+                    UrlTestDuplicate("PUT /path2/more", "PUT /path2/more", CtrUnOrdGrp("Controller2", "Controller1", "Controller1")),
+                    UrlTestDuplicate("DELETE /path2/more", "DELETE /path2/more", CtrUnOrdGrp("Controller2", "Controller1", "Controller1")),
+                    UrlTestDuplicate("HEAD /path2/more", "HEAD /path2/more", CtrUnOrdGrp("Controller2", "Controller1", "Controller1")),
                     UrlTest("GET /abcde/edcba/aaaa123/bbb124", "GET /abcde/edcba/aaaa123/bbb124", "Controller2"),
                     UrlTest("GET /bbb124", "GET /bbb124", "Controller2"),
                     UrlTest("GET /aaaa123/bbb124", "GET /aaaa123/bbb124", "Controller2"),
@@ -1170,11 +1170,11 @@ namespace Bistro.UnitTests.Tests
                     UrlTest("PUT /path2", "PUT /path2", "Controller1", "Controller2"),
                     UrlTest("DELETE /path2", "DELETE /path2", "Controller1", "Controller2"),
                     UrlTest("HEAD /path2", "HEAD /path2", "Controller1", "Controller2"),
-                    UrlTest("GET /path2/more", "GET /path2/more", "Controller1", "Controller2", "Controller1"),
-                    UrlTest("POST /path2/more", "POST /path2/more", "Controller1", "Controller2", "Controller1"),
-                    UrlTest("PUT /path2/more", "PUT /path2/more", "Controller1", "Controller2", "Controller1"),
-                    UrlTest("DELETE /path2/more", "DELETE /path2/more", "Controller1", "Controller2", "Controller1"),
-                    UrlTest("HEAD /path2/more", "HEAD /path2/more", "Controller1", "Controller2", "Controller1")
+                    UrlTestDuplicate("GET /path2/more", "GET /path2/more", CtrUnOrdGrp("Controller1", "Controller1", "Controller2")),
+                    UrlTestDuplicate("POST /path2/more", "POST /path2/more", CtrUnOrdGrp("Controller1", "Controller1", "Controller2")),
+                    UrlTestDuplicate("PUT /path2/more", "PUT /path2/more", CtrUnOrdGrp("Controller1", "Controller1", "Controller2")),
+                    UrlTestDuplicate("DELETE /path2/more", "DELETE /path2/more", CtrUnOrdGrp("Controller1", "Controller1", "Controller2")),
+                    UrlTestDuplicate("HEAD /path2/more", "HEAD /path2/more", CtrUnOrdGrp("Controller1", "Controller1", "Controller2"))
                 //Node("* ?", "Controller2"),
                 //Node("* /default", "Controller1", "Controller2"),
                 //Node("* /path2", Controllers("Controller1", "Controller2"),

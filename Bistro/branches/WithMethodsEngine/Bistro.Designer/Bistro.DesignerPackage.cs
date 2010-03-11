@@ -10,9 +10,11 @@ using Microsoft.Win32;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Flavor;
 using Bistro.Designer.Explorer;
 using Bistro.Designer.ProjectBase;
-using Bistro.Designer.Projects.FSharp.Properties;
+using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+
 
 namespace Bistro.Designer
 {
@@ -45,8 +47,11 @@ namespace Bistro.Designer
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource(1000, 1)]
     // This attribute registers a tool window exposed by this package.
+    //[ProvideToolWindow(typeof(ExplorerWindow),Transient = false, Style = VsDockStyle.Tabbed, Orientation = ToolWindowOrientation.Right, 
+    //    Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
+    [ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidFSharpProjectFactoryString)]
+    [ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidCSharpProjectFactoryString)]
     [ProvideToolWindow(typeof(ExplorerWindow))]
-
     [ProvideProjectFactory(
         typeof(Projects.FSharp.Factory), 
         null,
@@ -61,10 +66,14 @@ namespace Bistro.Designer
                                                         // will also be used as the name of the node grouping
                                                         // projects in the AddNewProject dialog
 
+    [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), null, null, null, null, @".\NullPath")]
+
+    [ProvideProjectFactory(typeof(Projects.CSharp.Factory), null, null, null, null, @".\NullPath", LanguageVsTemplate = "Bistro")]
     [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
     [WAProvideProjectFactoryTemplateMapping("{" + "f2a71f9b-5d33-465a-a702-920d77279786" + "}", typeof(Projects.FSharp.DummyWebFactory))]
+    [WAProvideProjectFactoryTemplateMapping("{" + "fae04ec0-301f-11d3-bf4b-00c04f79efbc" + "}", typeof(Projects.CSharp.DummyWebFactory))]
 
-    [ProvideObject(typeof(CompileOrderPage))]
+    [ProvideObject(typeof(FSharp.ProjectExtender.Page))]
 
     [Guid(Guids.guidBistro_DesignerPkgString)]
     public sealed class DesignerPackage : Package
@@ -91,12 +100,14 @@ namespace Bistro.Designer
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
-            ToolWindowPane window = this.FindToolWindow(typeof(ExplorerWindow), 0, true);
-            if ((null == window) || (null == window.Frame))
+            /*ToolWindowPane _window = this.FindToolWindow(typeof(ExplorerWindow), 0, true);
+            if ((null == _window) || (null == _window.Frame))
             {
                 throw new NotSupportedException(Resources.CanNotCreateWindow);
             }
-            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            IVsWindowFrame windowFrame = (IVsWindowFrame)_window.Frame;
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());*/
+            IVsWindowFrame windowFrame = (IVsWindowFrame)explorer.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
@@ -104,6 +115,9 @@ namespace Bistro.Designer
         /////////////////////////////////////////////////////////////////////////////
         // Overriden Package Implementation
         #region Package Members
+        internal Explorer.ExplorerWindow explorer;
+        private EnvDTE.DTE dte;
+
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -123,11 +137,19 @@ namespace Bistro.Designer
                 MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
                 mcs.AddCommand( menuToolWin );
             }
-
             RegisterProjectFactory(new Projects.FSharp.Factory(this));
+            RegisterProjectFactory(new Projects.CSharp.Factory(this));
+            RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
+            dte = GetService(typeof(EnvDTE._DTE)) as EnvDTE.DTE;
+            //explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
+            //System.IServiceProvider service = (System.IServiceProvider)this.GetService(typeof(System.IServiceProvider));
+            explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
+            explorer.Initialize(dte);
+            explorer.AddEvents();
 
         }
         #endregion
+
 
     }
 }

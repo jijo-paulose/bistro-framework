@@ -1,4 +1,4 @@
-﻿namespace Bistro.Designer.Projects.FSharp.Properties
+﻿namespace FSharp.ProjectExtender
 {
     partial class CompileOrderViewer
     {

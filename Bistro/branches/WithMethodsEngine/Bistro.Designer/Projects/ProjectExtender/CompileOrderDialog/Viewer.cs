@@ -11,57 +11,81 @@ using System.Xml;
 using System.Reflection;
 using System.IO;
 
-namespace Bistro.Designer.Projects.FSharp.Properties
+namespace FSharp.ProjectExtender
 {
     public partial class CompileOrderViewer : UserControl
     {
         IProjectManager project;
+        class BuildElement
+        {
+            public BuildElement(BuildItemGroup BuildItemGroup, BuildItem BuildItem)
+            {
+                this.BuildItem = BuildItem;
+                this.BuildItemGroup = BuildItemGroup;
+            }
+            public BuildItemGroup BuildItemGroup { get; private set; }
+            public BuildItem BuildItem { get; private set; }
+
+            public override string ToString()
+            {
+                return BuildItem.Include;
+            }
+
+            internal string GetDependencies()
+            {
+                return BuildItem.GetMetadata(Constants.DependsOn);
+            }
+
+            internal void UpdateDependencies(List<BuildElement> dependencies)
+            {
+                if (dependencies.Count == 0)
+                    BuildItem.RemoveMetadata(Constants.DependsOn);
+                else
+                    BuildItem.SetMetadata(Constants.DependsOn, dependencies.ConvertAll(elem => elem.ToString()).Aggregate("", (a, item) => a + ',' + item).Substring(1));
+            }
+        }
 
         public CompileOrderViewer(IProjectManager project)
         {
             this.project = project;
             InitializeComponent();
-            CompileItems.BeginUpdate();
-            remap_file_nodes();
-            CompileItems.EndUpdate();
-            project.ItemList.ItemAdded += new EventHandler(ItemList_ItemAdded);
-        }
-
-        void ItemList_ItemAdded(object sender, EventArgs e)
-        {
-            remap_file_nodes();
-        }
-
-        private void remap_file_nodes()
-        {
-            int i = 0;
-            foreach (ItemNode item in project.ItemList.Items)
-                if (i >= CompileItems.Nodes.Count)
-                    insert_item(item, i++);
-                else if (CompileItems.Nodes[i++].Tag != item)
-                    insert_item(item, i - 1);
-        }
-
-        private void insert_item(ItemNode item, int index)
-        {
-            TreeNode compileItem = new TreeNode();
-            compileItem.Name = item.ItemId.ToString();
-            compileItem.Tag = item;
-            compileItem.Text = item.Name;
-            item.Deleting += (sender, args) => CompileItems.Nodes.Remove(compileItem);
-            compileItem.ContextMenuStrip = compileItemMenu;
-            build_dependencies(compileItem);
-            CompileItems.Nodes.Insert(index, compileItem);
-        }
-
-        private void build_dependencies(TreeNode node)
-        {
-            node.Nodes.Clear();
-            foreach (ItemNode dependency in ((ItemNode)node.Tag).Dependencies)
-                node.Nodes.Add(dependency.Name);
+            refresh_file_list();
+            var service = (ProjectManager)GetService(typeof(ProjectManager));
         }
 
         public event EventHandler OnPageUpdated;
+
+        void project_OnProjectModified(object sender, EventArgs e)
+        {
+            refresh_file_list();
+        }
+
+        public void refresh_file_list()
+        {
+            CompileItems.Nodes.Clear();
+            foreach (BuildItemGroup group in project.MSBuildProject.ItemGroups)
+            {
+                foreach (BuildItem item in group)
+                    if (item.Name == "Compile" && Path.GetExtension(item.Include) == ".fs")
+                    {
+                        TreeNode compileItem = new TreeNode(item.Include);
+                        compileItem.Tag = new BuildElement(group, item);
+                        compileItem.ContextMenuStrip = compileItemMenu;
+                        BuildDependencies(compileItem);
+                        CompileItems.Nodes.Add(compileItem);
+                    }
+            }           
+        }
+
+        private void BuildDependencies(TreeNode node)
+        {
+            node.Nodes.Clear();
+            string dependencies = ((BuildElement)node.Tag).GetDependencies();
+            if (dependencies != null)
+                foreach (var d in dependencies.Split(','))
+                    if (d != "")
+                        node.Nodes.Add(d);
+        }
 
         private void CompileItems_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -110,27 +134,26 @@ namespace Bistro.Designer.Projects.FSharp.Properties
             if (OnPageUpdated != null)
                 OnPageUpdated(this, EventArgs.Empty);
 
-            ItemNode fst = (ItemNode)n.Tag;
-            ItemNode snd = (ItemNode)CompileItems.Nodes[new_index].Tag;
+            BuildElement fst = (BuildElement)n.Tag;
+            BuildElement snd = (BuildElement)CompileItems.Nodes[new_index].Tag;
 
             CompileItems.Nodes.Remove(n);
             CompileItems.Nodes.Insert(new_index, n);
             CompileItems.SelectedNode = n;
 
-            BuildItemGroup fst_grp = fst.GetBuildGroup();
-            BuildItemGroup snd_grp = snd.GetBuildGroup();
-
-            int fst_loc = Locate(fst_grp, fst);
-            int snd_loc = Locate(snd_grp, snd);
-            fst_grp.RemoveItemAt(fst_loc);
-            AddItemAt(snd_grp, fst.BuildItem, snd_loc);
+            int fst_loc = Locate(fst);
+            int snd_loc = Locate(snd);
+            fst.BuildItemGroup.RemoveItem(fst.BuildItem);
+            AddItemAt(snd.BuildItemGroup, fst.BuildItem, snd_loc);
+            snd.BuildItemGroup.RemoveItem(snd.BuildItem);
+            AddItemAt(fst.BuildItemGroup, snd.BuildItem, fst_loc);
         }
 
-        private int Locate(BuildItemGroup group, ItemNode node)
+        int Locate(BuildElement elem)
         {
             int result = -1;
-            foreach (BuildItem b in group)
-                if (group[++result].Include == node.BuildItem.Include)
+            foreach (BuildItem b in elem.BuildItemGroup)
+                if (elem.BuildItemGroup[++result] == elem.BuildItem)
                     return result;
             return result;
         }
@@ -177,28 +200,28 @@ namespace Bistro.Designer.Projects.FSharp.Properties
                 InvokeMember("get_ItemElement", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, bi, new object[] {});
         }
 
+
         private void compileItemMenu_Click(object sender, EventArgs e)
         {
             EditDependenciesDialog addForm = new EditDependenciesDialog();
-            Point p = ((Control)sender).PointToScreen(new Point(0,0));
-            var origin = CompileItems.HitTest(CompileItems.PointToClient(p));
-            if (origin.Node == null || origin.Node.Tag == null)
+            var origin = CompileItems.HitTest(((MouseEventArgs)e).Location);
+            if (origin.Node == null)
                 return;
             foreach (TreeNode n in CompileItems.Nodes)
             {
                 if (origin.Node != n)
                     addForm.Dependencies.Items.Add(n.Tag);
-                if (((ItemNode)origin.Node.Tag).Dependencies.Contains((ItemNode)n.Tag))
+                if (((BuildElement)origin.Node.Tag).GetDependencies().IndexOf(n.Tag.ToString()) >= 0)
                     addForm.Dependencies.SetItemChecked(addForm.Dependencies.Items.Count - 1, true);
             }
             if (addForm.ShowDialog() == DialogResult.OK)
             {
-                List<ItemNode> dependencies = new List<ItemNode>();
-                foreach (ItemNode item in addForm.Dependencies.CheckedItems)
+                List<BuildElement> dependencies = new List<BuildElement>();
+                foreach (BuildElement item in addForm.Dependencies.CheckedItems)
                     dependencies.Add(item);
 
-                ((ItemNode)origin.Node.Tag).Dependencies = dependencies;
-                build_dependencies(origin.Node);
+                ((BuildElement)origin.Node.Tag).UpdateDependencies(dependencies);
+                BuildDependencies(origin.Node);
             }
             addForm.Dispose();
         }

@@ -30,14 +30,14 @@ namespace Bistro.MethodsEngine
     /// <summary>
     /// Class for resource dependenies analysis
     /// </summary>
-    internal class Resource
+    public class Resource
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Resource"/> class.
         /// </summary>
         /// <param name="engine">The engine.</param>
         /// <param name="name">The resource name.</param>
-        internal Resource(EngineControllerDispatcher engine, string _name)
+        public Resource(EngineControllerDispatcher engine, string _name)
         {
             this.name = _name;
             this.engine = engine;

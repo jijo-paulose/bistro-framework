@@ -1,5 +1,7 @@
 ﻿using System.Security.Permissions;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using Bistro.MethodsEngine;
 
 namespace Bistro.Designer.Explorer
 {
@@ -8,9 +10,13 @@ namespace Bistro.Designer.Explorer
     /// </summary>
     public partial class Explorer : UserControl
     {
+        public Dictionary<string,List<ControllerDescription>> cashPatternsCtrl;
+        public Dictionary<string,Dictionary<string,Resource>> cashPatternsRes;
         public Explorer()
         {
             InitializeComponent();
+            cashPatternsCtrl = new Dictionary<string,List<ControllerDescription>>();
+            cashPatternsRes = new Dictionary<string,Dictionary<string,Resource>>();
         }
 
         /// <summary> 
@@ -37,13 +43,20 @@ namespace Bistro.Designer.Explorer
                 return true;
             }
         }
+        public TreeView Tree
+        {
+            get
+            {
+                return treeView;
+            }
+        }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
+        /*[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
         private void button1_Click(object sender, System.EventArgs e)
         {
             MessageBox.Show(this,
                             string.Format(System.Globalization.CultureInfo.CurrentUICulture, "We are inside {0}.button1_Click()", this.ToString()),
                             "Bistro Explorer");
-        }
+        }*/
     }
 }

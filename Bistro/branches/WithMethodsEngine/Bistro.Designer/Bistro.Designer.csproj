@@ -33,10 +33,20 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bistro.Core, Version=0.9.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Bistro.Core.dll</HintPath>
+    </Reference>
     <Reference Include="EnvDTE" />
     <Reference Include="EnvDTE80" />
-    <Reference Include="FSharp.ProjectSystem.Base, Version=1.9.7.8, Culture=neutral, PublicKeyToken=a19089b1c74d0809, processorArchitecture=MSIL" />
-    <Reference Include="FSharp.ProjectSystem.PropertyPages, Version=1.9.7.8, Culture=neutral, PublicKeyToken=a19089b1c74d0809, processorArchitecture=MSIL" />
+    <Reference Include="Irony, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ca48ace7223ead47, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Irony.dll</HintPath>
+    </Reference>
+    <Reference Include="Irony.Samples, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Irony.Samples.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Build.Engine, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>Microsoft.Build.Engine.dll</HintPath>
       <Name>Microsoft.Build.Engine</Name>
@@ -73,6 +83,7 @@
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0" />
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -89,12 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bistro.DesignerPackage.cs" />
-    <Compile Include="Explorer\MyControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Explorer\MyControl.Designer.cs">
-      <DependentUpon>MyControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Explorer\ExplorerWindow.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="ProjectBase\AssemblyReferenceNode.cs" />
@@ -237,27 +242,39 @@
     <Compile Include="$(CommonRegAttributes)\ProvideMSBuildTargetAttribute.cs">
       <Link>RegistrationAttributes\ProvideMSBuildTargetAttribute.cs</Link>
     </Compile>
-    <Compile Include="Projects\FSharp\ItemList.cs" />
-    <Compile Include="Projects\FSharp\ItemNode.cs" />
-    <Compile Include="Projects\FSharp\ProjectManager.cs" />
-    <Compile Include="Projects\FSharp\Properties\EditDependenciesDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\EditDependenciesDialog.Designer.cs">
-      <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\CompileOrderPage.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Projects\FSharp\Properties\CompileOrderViewer.cs">
+    <Compile Include="Explorer\Common.cs" />
+    <Compile Include="Explorer\DesignerControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Projects\FSharp\Properties\CompileOrderViewer.Designer.cs">
-      <DependentUpon>CompileOrderViewer.cs</DependentUpon>
+    <Compile Include="Explorer\DesignerControl.designer.cs">
+      <DependentUpon>DesignerControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Projects\FSharp\Properties\FSharpPropertiesConstants.cs">
-      <SubType>Code</SubType>
+    <Compile Include="Explorer\MetadataExtractor.cs" />
+    <Compile Include="Projects\CSharp\Factory.cs" />
+    <Compile Include="Projects\CSharp\ProjectManager.cs" />
+    <Compile Include="Projects\FSharp\ProjectManager.cs" />
+    <Compile Include="Projects\IProjectManager.cs" />
+    <Compile Include="Projects\ProjectExtender\Factory.cs" />
+    <Compile Include="Projects\ProjectExtender\Constants.cs" />
+    <Compile Include="Projects\ProjectExtender\IProjectManager.cs" />
+    <Compile Include="Projects\ProjectExtender\ItemList.cs" />
+    <Compile Include="Projects\ProjectExtender\ItemNode.cs" />
+    <Compile Include="Projects\ProjectExtender\ProjectManager.cs" />
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Page.cs" />
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.cs">
+      <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.Designer.cs">
+      <DependentUpon>Viewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.Designer.cs">
+      <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
+    </Compile>
+    <ZipItem Include="Templates\ProjectItems\CSharpControllers\ControllerClass.cs" />
+    <ZipProject Include="Templates\Projects\CSharp\Controller1.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">
@@ -293,20 +310,47 @@
     <None Include="ProjectBase\Diagrams\HierarchyClasses.cd" />
     <None Include="ProjectBase\Diagrams\PropertiesClasses.cd" />
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
-    <None Include="Resources\Images_32bit.bmp" />
-    <None Include="Resources\Images_24bit.bmp" />
-    <EmbeddedResource Include="Projects\FSharp\Properties\EditDependenciesDialog.resx">
+    <ZipProject Include="Templates\Projects\CSharp\index.django" />
+    <ZipProject Include="Templates\Projects\CSharp\Web.config" />
+    <EmbeddedResource Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.resx">
+      <DependentUpon>Viewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.resx">
       <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Projects\FSharp\Properties\CompileOrderViewer.resx">
-      <DependentUpon>CompileOrderViewer.cs</DependentUpon>
+    <EmbeddedResource Include="Resources\Images_32bit.bmp" />
+    <EmbeddedResource Include="Resources\Images_24bit.bmp" />
+    <EmbeddedResource Include="Explorer\DesignerControl.resx">
+      <DependentUpon>DesignerControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Root.bmp" />
     <EmbeddedResource Include="Resources\imagelis.bmp">
       <Visible>true</Visible>
       <LogicalName>Resources.imagelis.bmp</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\alert.png" />
+    <EmbeddedResource Include="Resources\bullet.png" />
+    <EmbeddedResource Include="Resources\green_star.png" />
+    <EmbeddedResource Include="Resources\lock.gif" />
+    <EmbeddedResource Include="Resources\mechanic.gif" />
     <Content Include="Resources\Package.ico" />
+    <ZipItem Include="Templates\ProjectItems\CSharpControllers\ControllerClass.vstemplate" />
+    <ZipProject Include="Templates\Projects\CSharp\Bistro.Core.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\Bistro.Core.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\Bistro.Extensions.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\Bistro.Extensions.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\CSharpProject.vstemplate" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.BistroIntegration.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.BistroIntegration.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.Core.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.Core.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.Filters.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\NDjango.Filters.pdb" />
+    <ZipProject Include="Templates\Projects\CSharp\StructureMap.dll" />
+    <ZipProject Include="Templates\Projects\CSharp\default.htm" />
+    <ZipProject Include="Templates\Projects\CSharp\CSharpProject.csproj" />
+    <ZipProject Include="Templates\Projects\CSharp\__TemplateIcon.ico" />
+    <EmbeddedResource Include="Resources\white.PNG" />
   </ItemGroup>
   <!-- Browser file -->
   <ItemGroup>

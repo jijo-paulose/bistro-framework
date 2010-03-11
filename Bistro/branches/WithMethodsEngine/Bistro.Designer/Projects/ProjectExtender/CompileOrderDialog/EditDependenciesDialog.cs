@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Bistro.Designer.Projects.FSharp.Properties
+namespace FSharp.ProjectExtender
 {
     public partial class EditDependenciesDialog : Form
     {

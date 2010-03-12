@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using Bistro.MethodsEngine;
 using Microsoft.Build.BuildEngine;
 using System.ComponentModel;
-
+using Bistro.Designer;
 namespace Bistro.Designer.Projects
 {
     [ComVisible(true)]
@@ -14,7 +14,6 @@ namespace Bistro.Designer.Projects
     {
         Project MSBuildProject { get; set; }
         List<string> GetSourceFiles();
-        List<string> GetRefencedAssemblies();
         EngineControllerDispatcher Engine { get; set; }
         string ProjectPath { get; set; }
     }

@@ -53,7 +53,7 @@ namespace Bistro.Designer.Projects.FSharp
         {
             base.OnAggregationComplete();
             MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
-            package.explorer.projectMngrs.Add(fileName, this);
+            //package.explorer.projectMngrs.Add(fileName, this);
             SectionHandler sh = new SectionHandler();
             sh.Application = "Bistro.Application";
             sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
@@ -122,18 +122,11 @@ namespace Bistro.Designer.Projects.FSharp
             }
             return files;
         }
-
-        public List<string> GetRefencedAssemblies()
-        {
-            throw new NotImplementedException();
-        }
-
         public Bistro.MethodsEngine.EngineControllerDispatcher Engine
         {
             get;
             set;
         }
-
         #endregion
     }
 }

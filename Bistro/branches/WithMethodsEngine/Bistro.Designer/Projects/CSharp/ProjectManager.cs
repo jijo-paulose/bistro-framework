@@ -14,12 +14,8 @@ using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 using System.Reflection;
 using Microsoft.Build.BuildEngine;
 using System.ComponentModel;
-
-using Bistro;
 using Bistro.Configuration;
-using Bistro.Configuration.Logging;
-using Bistro.Controllers;
-using Bistro.MethodsEngine;
+
 
 namespace Bistro.Designer.Projects.CSharp
 {
@@ -34,6 +30,7 @@ namespace Bistro.Designer.Projects.CSharp
             : base()
         {
             this.package = package;
+
         }
         /// <summary>
         /// Sets the service provider from which to access the services. 
@@ -47,7 +44,7 @@ namespace Bistro.Designer.Projects.CSharp
         }
 
         internal string fileName;
-
+        
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
         {
             this.fileName = fileName;
@@ -57,16 +54,18 @@ namespace Bistro.Designer.Projects.CSharp
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();
+            //Seems to be a weak point as filename can be temp...
             MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
-            package.explorer.projectMngrs.Add(fileName, this);
+            //package.explorer.projectMngrs.Add(fileName, this);
             SectionHandler sh = new SectionHandler();
             sh.Application = "Bistro.Application";
             sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
             Bistro.Application.Initialize(sh);
             Engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
+            string lang = (fileName.EndsWith(".csproj"))? "c#" : "f#";
+
 
         }
-
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
  
@@ -118,17 +117,12 @@ namespace Bistro.Designer.Projects.CSharp
             return files;
 
         }
-
-        public List<string> GetRefencedAssemblies()
-        {
-            throw new NotImplementedException();
-        }
-
         public Bistro.MethodsEngine.EngineControllerDispatcher Engine
         {
             get;
             set;
         }
+
 
         #endregion
     }

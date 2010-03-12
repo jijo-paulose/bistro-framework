@@ -250,6 +250,7 @@
       <DependentUpon>DesignerControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Explorer\MetadataExtractor.cs" />
+    <Compile Include="Explorer\SelectionEventsHandler.cs" />
     <Compile Include="Projects\CSharp\Factory.cs" />
     <Compile Include="Projects\CSharp\ProjectManager.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />

@@ -43,11 +43,11 @@ namespace Bistro.Designer.Explorer
         // using the Window property. Note that, even if this class implements IDispose, we are
         // not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
         // the object returned by the Window property.
-        private EnvDTE.DTE dte;
+        /*private EnvDTE.DTE dte;
         private EnvDTE.Events _events;
         private EnvDTE.WindowEvents _windowsEvents;
         private EnvDTE.DocumentEvents _docEvents;
-        private EnvDTE.SolutionEvents _slnEvents;
+        private EnvDTE.SolutionEvents _slnEvents;*/
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
@@ -57,8 +57,7 @@ namespace Bistro.Designer.Explorer
             this.Caption = Resources.ToolWindowTitle;
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
-            control = new DesignerControl(this);
-            projectMngrs = new Dictionary<string, IProjectManager>();
+            control = new DesignerControl();
             
         }
         public DesignerControl Control
@@ -74,73 +73,14 @@ namespace Bistro.Designer.Explorer
         {
             get { return (IWin32Window)control; }
         }
-        public void Initialize(EnvDTE.DTE _dte)
-        {
-            // Store the dte so that it can be used later.
-            dte = _dte;
-
-        }
-        public void AddEvents()
-        {
-            _events = (EnvDTE80.Events2)dte.Events;
-            _events.SolutionItemsEvents.ItemAdded += new EnvDTE._dispProjectItemsEvents_ItemAddedEventHandler(_events_ItemAdded);
-            _docEvents = (EnvDTE.DocumentEvents)_events.get_DocumentEvents(null);
-            _docEvents.DocumentSaved += new EnvDTE._dispDocumentEvents_DocumentSavedEventHandler(_docEvents_DocumentSaved);
-            _slnEvents = (EnvDTE.SolutionEvents)_events.SolutionEvents;
-            _slnEvents.Opened += new EnvDTE._dispSolutionEvents_OpenedEventHandler(_slnEvents_SolutionOpened);
-            _slnEvents.ProjectAdded += new EnvDTE._dispSolutionEvents_ProjectAddedEventHandler(_slnEvents_ProjectAdded);
-            _slnEvents.ProjectRemoved += new EnvDTE._dispSolutionEvents_ProjectRemovedEventHandler(_slnEvents_ProjectRemoved);
-            _slnEvents.BeforeClosing += new EnvDTE._dispSolutionEvents_BeforeClosingEventHandler(_slnEvents_BeforeClosing);
-        }
-
-
-   
         #region Private Members
         private DesignerControl control;
-        private MetadataExtractor extractor;
-        internal Dictionary<string,IProjectManager> projectMngrs;
-        string activeProject;
-
-
-        internal void ChangeActiveProject()
-        {
-            foreach (string key in projectMngrs.Keys)
-            {
-                if (key.EndsWith(control.ComboProjects.SelectedItem.ToString()))
-                {
-                    if (key == activeProject) return;
-                    string path = projectMngrs[key].ProjectPath;
-                    activeProject = path + control.ComboProjects.SelectedItem.ToString();
-                    ReloadTreeView("forced");
-                }
-            }
-
-            
-        }
-        private void GetStartupProject()
-        {
-            
-            string msg = "";
-            foreach (String item in (Array)dte.Solution.SolutionBuild.StartupProjects)
-            {
-                msg += item;
-            }
-            EnvDTE.Project startupProj = dte.Solution.Item(msg);
-            activeProject = startupProj.FullName;
-           
-        }
-
         /// <summary>
         /// As there were changes in source code we need to reload bindingTreeView of the control
         /// </summary>
         /// <param name="param">either a fullname of updated file or flag for forced update("forced")</param> 
         private void ReloadTreeView(string param)
         {
-            if (param != "forced") extractor.FileName = param;
-            if (param == "forced" ||
-                (projectMngrs[activeProject].GetSourceFiles().Contains(param) && extractor.FillControllerInfo()))
-                if (UpdateTreeData())
-                    LoadTree();
         }
         private void LoadTree()
         {
@@ -150,7 +90,7 @@ namespace Bistro.Designer.Explorer
             Control.cashPatternsCtrl.Clear();
             Dictionary<string, List<ControllerDescription>> ctrlsStore = Control.cashPatternsCtrl;
             Dictionary<string, Dictionary<string, Resource>> resStore = Control.cashPatternsRes;
-            foreach (BistroMethod bm in projectMngrs[activeProject].Engine.Processor.AllMethods)
+            /*foreach (BistroMethod bm in projectMngrs[activeProject].Engine.Processor.AllMethods)
             {
                 foreach (IMethodsBindPointDesc bp in bm.BindPointsList)
                 {
@@ -185,7 +125,7 @@ namespace Bistro.Designer.Explorer
                         }
                     }
                 }
-            }
+            }*/
             #region Fill TreeViewControl
             foreach (KeyValuePair<string, List<ControllerDescription>> kvp in ctrlsStore)
             {
@@ -231,104 +171,16 @@ namespace Bistro.Designer.Explorer
         /// </summary>
         private bool UpdateTreeData()
         {
-            if (!projectMngrs.ContainsKey(activeProject) || extractor.infobyFiles.Count == 0 ) return false;
-            Control.BindingTree.Nodes.Clear();
-            projectMngrs[activeProject].Engine.Clean();//not implemented yet
-            List<string> files = projectMngrs[activeProject].GetSourceFiles();
-            foreach (string file in files)
-            {
-                ControllersTable fileData = extractor.infobyFiles[file];
-                foreach (KeyValuePair<string, Dictionary<string, List<string>>> ctrlsData in fileData)
-                {
-                    ControllerDescription ctrldesc = new ControllerDescription(ctrlsData.Key, ctrlsData.Value);
-                    projectMngrs[activeProject].Engine.RegisterController(ctrldesc);
-                }
-            }
-            projectMngrs[activeProject].Engine.ForceUpdateBindPoints();
             return true;
-
-
         }
-        private void _slnEvents_SolutionOpened()
-        {
-            try
-            {
-                GetStartupProject();
-                string lang = (projectMngrs[activeProject].GetType() == typeof(Projects.CSharp.ProjectManager)) ? "c#" : "f#";
-                extractor = new MetadataExtractor(lang, String.Empty);
-                foreach (KeyValuePair<string,IProjectManager> kvp in projectMngrs)
-                {
-                    List<string> files = kvp.Value.GetSourceFiles();
-                    string str = kvp.Key.Substring(kvp.Value.ProjectPath.Length);
-                    control.ComboProjects.Items.Add(str);
-                    if (String.Compare(activeProject, kvp.Key) == 0)
-                        control.ComboProjects.SelectedItem = str;
-                    foreach (string file in files)
-                    {
-                        extractor.FileName = file;
-                        extractor.FillControllerInfo();
-                    }
-                }
-                UpdateTreeData();
-                LoadTree();
-
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
-            }
-        } 
-        private void _slnEvents_BeforeClosing()
-        {
-            projectMngrs.Clear();
-            extractor = null;
-        }
-        private void _events_ItemAdded(EnvDTE.ProjectItem item)
-        {
-            ReloadTreeView(item.Document.FullName);
-        }
-        private void _docEvents_DocumentSaved(EnvDTE.Document target)
-        {
-            ReloadTreeView(target.FullName);
-        }
-        /// <summary>
-        ///In general,there can be different projects in one solution (C#,F#).As it is impossible to parse both languages simultaneously :
-        ///1) we can store information only for the last added project
-        ///2) add OnSave information if project's language is the same - see ReloadTreeView.
-        ///If project's language is different from 
-
-        /// </summary>
-        /// <param name="project"></param>
-        private void _slnEvents_ProjectAdded(EnvDTE.Project project)
-        {
-            string key = project.FullName;
-            List<string> files = projectMngrs[key].GetSourceFiles();
-            string str = key.Substring(projectMngrs[key].ProjectPath.Length);
-            control.ComboProjects.Items.Add(str);
-            control.ComboProjects.SelectedItem = str;
-            foreach (string file in files)
-            {
-                extractor.FileName = file;
-                extractor.FillControllerInfo();
-            }
-            activeProject = project.FullName;
-            ReloadTreeView("forced");
-
-
-        }
-        private void _slnEvents_ProjectRemoved(EnvDTE.Project project)
-        {
-            if (!projectMngrs.ContainsKey(project.FullName)) return;
-            List<string> toDelete = projectMngrs[project.FullName].GetSourceFiles();
-            control.ComboProjects.Items.Remove(project.FullName.Substring(projectMngrs[project.FullName].ProjectPath.Length));
-            foreach (string file in toDelete)
-            {
-                extractor.infobyFiles.Remove(file);
-            }
-            projectMngrs.Remove(project.FullName);
-
-        }
-
+        private IVsSolution sln;
+        /*private EnvDTE.DTE dte;
+        private EnvDTE.Events _events;
+        private EnvDTE.WindowEvents _windowsEvents;
+        private EnvDTE.DocumentEvents _docEvents;
+        private EnvDTE.SolutionEvents _slnEvents;*/
         #endregion
+
+      
     }
 }

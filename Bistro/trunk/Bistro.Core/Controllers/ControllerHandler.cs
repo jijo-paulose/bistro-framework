@@ -31,6 +31,7 @@ using Bistro.Configuration.Logging;
 using Bistro.Controllers.OutputHandling;
 using Bistro.Controllers.Descriptor.Data;
 using Bistro.Entity;
+using System.Globalization;
 
 namespace Bistro.Controllers
 {
@@ -44,7 +45,9 @@ namespace Bistro.Controllers
 			[DefaultMessage("For FormField file variables, please use Types of HttpPostedFile, string, byte[], or Stream.")]
 			InvalidFormFieldFileType,
             [DefaultMessage("Unable to set {0}.{1} to \"{2}\" because \"{3}\"")]
-            UnableToSetValue
+            UnableToSetValue,
+            [DefaultMessage("Unable to parse the specific date: {0}")]
+            UnableToParseDate
 		}
 
 		/// <summary>
@@ -326,12 +329,18 @@ namespace Bistro.Controllers
                 if (pInfo == null)
                 {
                     FieldInfo fInfo = (FieldInfo)member;
+                    if (fInfo.FieldType.Equals(typeof(System.DateTime)))
+                        ConvertToDateTime(ref value);
                     fInfo.SetValue(instance, value == null ? null : Coerce(value, member, fInfo.FieldType));
                 }
                 else
                 {
                     if (pInfo.CanWrite)
+                    {
+                        if (pInfo.PropertyType.Equals(typeof(System.DateTime)))
+                            ConvertToDateTime(ref value);
                         pInfo.SetValue(instance, value == null ? null : Coerce(value, member, pInfo.PropertyType), null);
+                    }
                 }
             }
             catch (Exception ex)
@@ -340,6 +349,21 @@ namespace Bistro.Controllers
                 logger.Report(Messages.UnableToSetValue, member.DeclaringType.Name, member.Name, Convert.ToString(value), ex.Message);
             }
 		}
+
+        //Tries to convert the specific string to System.DateTime using different cultures. en-US culture is default.
+        private void ConvertToDateTime(ref object value)
+        {
+
+            var date = new DateTime();
+            if (!DateTime.TryParse(HttpUtility.UrlDecode(value.ToString()), CultureInfo.CreateSpecificCulture("en-US"), DateTimeStyles.None, out date))
+            {
+                if (!DateTime.TryParse(HttpUtility.UrlDecode(value.ToString()),
+                CultureInfo.CreateSpecificCulture("ru-RU"), DateTimeStyles.None, out date))
+                    logger.Report(Messages.UnableToParseDate, value.ToString());
+            }
+
+            value = (object)date ?? value;
+        }
 
         /// <summary>
         /// Coerces the value to the specified type. If the types are assignable, nothing is done. 

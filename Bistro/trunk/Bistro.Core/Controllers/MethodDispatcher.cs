@@ -220,6 +220,11 @@ namespace Bistro.Controllers
 			}
 			catch (Exception ex)
 			{
+                //Assume that there are some other ctrls which match UnhandledException url and cause an exception.
+                //In this case, removing this check may cause an infinite recursion of InvokeMethod and StackOverflow at the end.
+                if (requestPoint == Application.UnhandledException)
+                    throw new ApplicationException("Cannot process UnhandledException url, maybe some other controllers also match this url and cause an exception", ex);
+
 				if (!IsMethodDefinedExplicitly(Application.UnhandledException))
 				{
 					//Special branch for web exception
@@ -233,6 +238,7 @@ namespace Bistro.Controllers
 				requestContext.Add("unhandledException", ex);
 
 				InvokeMethod(context, Application.UnhandledException, requestContext);
+                
 			}
         }
     }

@@ -28,10 +28,9 @@ namespace Bistro.Designer.Projects.CSharp
 
         private DesignerPackage package;
         string fileName;
-        string activeSrcFile;
         string projectName;
         string projectDir;
-        string lang;
+        string projectExt;
         bool initialized;
         public ProjectManager(DesignerPackage package)
             : base()
@@ -60,8 +59,8 @@ namespace Bistro.Designer.Projects.CSharp
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();
-            lang = (fileName.EndsWith(".csproj")) ? "c#" : "f#";
-            Tracker = new Explorer.ChangesTracker(lang);
+            projectExt = ".csproj";
+            Tracker = new Explorer.ChangesTracker(projectExt);
             Tracker.RegisterObserver(package.explorer);
         }
         protected override int GetProperty(uint itemId, int propId, out object property)
@@ -85,8 +84,8 @@ namespace Bistro.Designer.Projects.CSharp
                        }
                        if (!initialized)
                        {
-                           string ext = (lang == "c#") ? ".csproj" : ".fsproj";
-                           string path = projectDir + "\\" + projectName + ext;
+                           
+                           string path = projectDir + "\\" + projectName + projectExt;
                            MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(path);
                            Tracker.OnProjectOpened(GetSourceFiles());
                            initialized = true;
@@ -131,11 +130,6 @@ namespace Bistro.Designer.Projects.CSharp
         #region IProjectManager Members
 
         public Project MSBuildProject
-        {
-            get;
-            set;
-        }
-        public string ProjectPath
         {
             get;
             set;

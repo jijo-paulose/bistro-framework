@@ -21,6 +21,11 @@ namespace Bistro.Designer.Projects.FSharp
     {
         
          private DesignerPackage package;
+         string fileName;
+         string projectName;
+         string projectDir;
+         string projectExt;
+         bool initialized;
 
          public ProjectManager(DesignerPackage package)
             : base()
@@ -41,8 +46,6 @@ namespace Bistro.Designer.Projects.FSharp
 
         // the fsharp debug project propety page - we need to suppress it
         const string debug_page_guid = "{9CFBEB2A-6824-43e2-BD3B-B112FEBC3772}";
-        internal string fileName;
-
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
         {
             this.fileName = fileName;
@@ -52,11 +55,9 @@ namespace Bistro.Designer.Projects.FSharp
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();
-            MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
-        }
-        protected override void UnadviseHierarchyEvents(uint cookie)
-        {
-            base.UnadviseHierarchyEvents(cookie);
+            projectExt = ".fsproj";
+            Tracker = new Explorer.ChangesTracker(projectExt);
+            Tracker.RegisterObserver(package.explorer);
         }
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
@@ -74,7 +75,48 @@ namespace Bistro.Designer.Projects.FSharp
                         property = property.ToString().Split(';')
                             .Aggregate("", (a, next) => next.Equals(debug_page_guid, StringComparison.OrdinalIgnoreCase) ? a : a + ';' + next).Substring(1);
                         return VSConstants.S_OK;
+
                     default:
+                        break;
+                }
+                switch ((__VSHPROPID)propId)
+                {
+                    case __VSHPROPID.VSHPROPID_ProjectDir:
+                        projectDir = property.ToString();
+                        break;
+                    case __VSHPROPID.VSHPROPID_Name:
+                        if (projectName != property.ToString())
+                        {
+                            projectName = property.ToString();
+                            Tracker.OnProjectRenamed(projectName);
+                        }
+                        if (!initialized)
+                        {
+
+                            string path = projectDir + "\\" + projectName + projectExt;
+                            MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(path);
+                            Tracker.OnProjectOpened(GetSourceFiles());
+                            initialized = true;
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+            else
+            {
+                switch ((__VSHPROPID)propId)
+                {
+                    case __VSHPROPID.VSHPROPID_Name:
+                        if (property.ToString().EndsWith(".fs"))
+                        {
+                            Tracker.ActiveFile = projectDir + "\\Controllers\\" + property.ToString();
+                        }
+                        break;
+                    case __VSHPROPID.VSHPROPID_SaveName:
+                        //property is a new name of the project item -> need to rename corresponding key
                         break;
                 }
             }
@@ -84,22 +126,10 @@ namespace Bistro.Designer.Projects.FSharp
 
         #region IProjectManager Members
 
-        public Project MSBuildProject
-        {
-            get;
-            set;
-        }
-        public string ProjectPath
-        {
-            get;
-            set;
-        }
+        public Project MSBuildProject{get;set;}
         public List<string> GetSourceFiles()
         {
             List<string> files = new List<string>();
-            string path = this.MSBuildProject.FullFileName;
-            int len = path.LastIndexOf("\\");
-            ProjectPath = path.Substring(0, len + 1);
             // Iterate through each ItemGroup in the Project to obtain the list of F# source files
             foreach (BuildItemGroup ig in this.MSBuildProject.ItemGroups)
             {
@@ -109,7 +139,7 @@ namespace Bistro.Designer.Projects.FSharp
                     {
                         if (item.Include.EndsWith(".fs"))
                         {
-                            files.Add(ProjectPath + item.Include);
+                            files.Add(projectDir + "\\" + item.Include);
                         }
 
                     }
@@ -117,13 +147,10 @@ namespace Bistro.Designer.Projects.FSharp
                         break;
                 }
             }
+            initialized = true;
             return files;
         }
-        public Explorer.ChangesTracker Tracker
-        {
-            get;
-            set;
-        }
+        public Explorer.ChangesTracker Tracker{get;set;}
         #endregion
     }
 }

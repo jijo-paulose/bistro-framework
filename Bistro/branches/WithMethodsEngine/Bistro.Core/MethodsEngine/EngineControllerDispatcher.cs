@@ -67,6 +67,10 @@ namespace Bistro.MethodsEngine
         /// url sebsets processor.
         /// </summary>
         private MethodsProcessor processor;
+        public Dictionary<string, List<IMethodsBindPointDesc>> Map
+        {
+            get { return map; }
+        }
         public MethodsProcessor Processor
         {
             get { return processor; }

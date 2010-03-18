@@ -14,8 +14,8 @@ namespace Bistro.Designer.Projects
     {
         Project MSBuildProject { get; set; }
         List<string> GetSourceFiles();
-        EngineControllerDispatcher Engine { get; set; }
         string ProjectPath { get; set; }
+        Explorer.ChangesTracker Tracker { get; set; } 
     }
 
 }

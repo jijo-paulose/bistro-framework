@@ -53,14 +53,11 @@ namespace Bistro.Designer.Projects.FSharp
         {
             base.OnAggregationComplete();
             MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(fileName);
-            //package.explorer.projectMngrs.Add(fileName, this);
-            SectionHandler sh = new SectionHandler();
-            sh.Application = "Bistro.Application";
-            sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
-            Bistro.Application.Initialize(sh);
-            Engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
         }
-
+        protected override void UnadviseHierarchyEvents(uint cookie)
+        {
+            base.UnadviseHierarchyEvents(cookie);
+        }
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
 
@@ -122,7 +119,7 @@ namespace Bistro.Designer.Projects.FSharp
             }
             return files;
         }
-        public Bistro.MethodsEngine.EngineControllerDispatcher Engine
+        public Explorer.ChangesTracker Tracker
         {
             get;
             set;

@@ -12,6 +12,6 @@
         <DefaultName>Controller.cs</DefaultName>
     </TemplateData>
     <TemplateContent>
-        <ProjectItem ReplaceParameters="true">Controller.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true">CodeFile.cs</ProjectItem>
     </TemplateContent>
 </VSTemplate>

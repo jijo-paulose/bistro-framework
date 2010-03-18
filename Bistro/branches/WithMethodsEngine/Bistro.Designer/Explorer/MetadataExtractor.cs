@@ -14,11 +14,14 @@ using Bistro.Interfaces;
 using Bistro.Controllers;
 using Bistro.Controllers.Descriptor;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio;
+
 namespace Bistro.Designer.Explorer
 {
     
     using ControllersTable = Dictionary<string, Dictionary<string, List<string>>>;
-    public class MetadataExtractor : IVsHierarchyEvents
+    
+    public class MetadataExtractor
     {
 
         /// <summary>
@@ -489,43 +492,6 @@ namespace Bistro.Designer.Explorer
 
         #endregion
 
-
-
-
-
-        #region IVsHierarchyEvents Members
-
-        int IVsHierarchyEvents.OnInvalidateIcon(IntPtr hicon)
-        {
-            throw new NotImplementedException();
-        }
-
-        int IVsHierarchyEvents.OnInvalidateItems(uint itemidParent)
-        {
-            throw new NotImplementedException();
-        }
-
-        int IVsHierarchyEvents.OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded)
-        {
-            throw new NotImplementedException();
-        }
-
-        int IVsHierarchyEvents.OnItemDeleted(uint itemid)
-        {
-            throw new NotImplementedException();
-        }
-
-        int IVsHierarchyEvents.OnItemsAppended(uint itemidParent)
-        {
-            throw new NotImplementedException();
-        }
-
-        int IVsHierarchyEvents.OnPropertyChanged(uint itemid, int propid, uint flags)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
     public class BindPointDescription : IMethodsBindPointDesc
     {

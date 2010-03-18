@@ -60,6 +60,7 @@ namespace Bistro.Designer.Explorer
         private NodeObject curObject;
         private enum NodeObject
         {
+            Project,
             UrlPattern,
             Controller,
             Resource

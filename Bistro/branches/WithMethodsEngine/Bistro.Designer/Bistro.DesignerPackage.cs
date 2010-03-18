@@ -142,11 +142,12 @@ namespace Bistro.Designer
             RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
             dte = GetService(typeof(EnvDTE._DTE)) as EnvDTE.DTE;
             explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
-            ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)this);
-
+            
+            ///This is an alternative way to handle solution events.Decided to use ProjectManager for each project instead
+            /*ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)this);
             IVsMonitorSelection monitorSelectionService = GetGlobalService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
             uint cookie = 0;
-            monitorSelectionService.AdviseSelectionEvents(new SelectionEventsHandler(), out cookie);
+            monitorSelectionService.AdviseSelectionEvents(new SelectionEventsHandler(), out cookie);*/
 
         }
         #endregion

@@ -242,6 +242,7 @@
     <Compile Include="$(CommonRegAttributes)\ProvideMSBuildTargetAttribute.cs">
       <Link>RegistrationAttributes\ProvideMSBuildTargetAttribute.cs</Link>
     </Compile>
+    <Compile Include="Explorer\ChangesTracker.cs" />
     <Compile Include="Explorer\Common.cs" />
     <Compile Include="Explorer\DesignerControl.cs">
       <SubType>UserControl</SubType>
@@ -250,7 +251,7 @@
       <DependentUpon>DesignerControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Explorer\MetadataExtractor.cs" />
-    <Compile Include="Explorer\SelectionEventsHandler.cs" />
+    <None Include="Explorer\SelectionEventsHandler.cs" />
     <Compile Include="Projects\CSharp\Factory.cs" />
     <Compile Include="Projects\CSharp\ProjectManager.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
@@ -274,7 +275,7 @@
     <Compile Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.Designer.cs">
       <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
     </Compile>
-    <ZipItem Include="Templates\ProjectItems\CSharpControllers\ControllerClass.cs" />
+    <ZipItem Include="Templates\ProjectItems\CSharpControllers\CodeFile.cs" />
     <ZipProject Include="Templates\Projects\CSharp\Controller1.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -335,7 +336,7 @@
     <EmbeddedResource Include="Resources\lock.gif" />
     <EmbeddedResource Include="Resources\mechanic.gif" />
     <Content Include="Resources\Package.ico" />
-    <ZipItem Include="Templates\ProjectItems\CSharpControllers\ControllerClass.vstemplate" />
+    <ZipItem Include="Templates\ProjectItems\CSharpControllers\CodeFile.vstemplate" />
     <ZipProject Include="Templates\Projects\CSharp\Bistro.Core.dll" />
     <ZipProject Include="Templates\Projects\CSharp\Bistro.Core.pdb" />
     <ZipProject Include="Templates\Projects\CSharp\Bistro.Extensions.dll" />

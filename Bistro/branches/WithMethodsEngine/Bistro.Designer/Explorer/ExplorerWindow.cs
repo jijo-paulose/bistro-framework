@@ -60,11 +60,54 @@ namespace Bistro.Designer.Explorer
             control = new DesignerControl();
             
         }
+        public void Notify(object sender, UpdateEventArgs e)
+        {
+
+            TreeNode[] nodesToUpdate;
+            if (e.ParentName != null)
+            {
+                //update subnode
+                if (e.OldValue != null)
+                {
+                    nodesToUpdate = control.BindingTree.Nodes.Find(e.OldValue, true);
+                    nodesToUpdate[0].Tag = e.NewValue.tag;
+                    nodesToUpdate[0].Text = e.NewValue.text;
+                }
+                //add new subnode
+                else
+                {
+                    nodesToUpdate = control.BindingTree.Nodes.Find(e.ParentName, true);
+                    TreeNode newNode = new TreeNode();
+                    newNode.Text = e.NewValue.text;
+                    newNode.Tag = e.NewValue.tag;
+                    nodesToUpdate[0].Nodes.Add(newNode);
+                }
+
+            }
+            else
+            {
+                if (null == e.OldValue)
+                {
+                    //add node to the highest level of hierarchy (Project)
+                    control.BindingTree.Nodes.Add(new TreeNode(e.NewValue.text));
+                }
+                else
+                {
+                    //rename node of the highest level of hierarchy (Project)
+                    nodesToUpdate = control.BindingTree.Nodes.Find(e.ParentName, false);
+                    nodesToUpdate[0].Text = e.NewValue.text;
+                }
+
+            }
+        }
+        public void InsertBranch(string project,TreeNode projectBranch)
+        {
+            control.BindingTree.Nodes.Find(project, false)[0].Nodes.Add(projectBranch);
+        }
         public DesignerControl Control
         {
             get { return control; }
         }
-
         /// <summary>
         /// This property returns the handle to the user control that should
         /// be hosted in the Tool Window.
@@ -73,113 +116,7 @@ namespace Bistro.Designer.Explorer
         {
             get { return (IWin32Window)control; }
         }
-        #region Private Members
         private DesignerControl control;
-        /// <summary>
-        /// As there were changes in source code we need to reload bindingTreeView of the control
-        /// </summary>
-        /// <param name="param">either a fullname of updated file or flag for forced update("forced")</param> 
-        private void ReloadTreeView(string param)
-        {
-        }
-        private void LoadTree()
-        {
-            Control.BindingTree.Nodes.Clear();
-
-            Control.cashPatternsRes.Clear();
-            Control.cashPatternsCtrl.Clear();
-            Dictionary<string, List<ControllerDescription>> ctrlsStore = Control.cashPatternsCtrl;
-            Dictionary<string, Dictionary<string, Resource>> resStore = Control.cashPatternsRes;
-            /*foreach (BistroMethod bm in projectMngrs[activeProject].Engine.Processor.AllMethods)
-            {
-                foreach (IMethodsBindPointDesc bp in bm.BindPointsList)
-                {
-                    //add controller that process urls matching this target
-                    if (ctrlsStore.ContainsKey(bp.Target))
-                    {
-                        if (!ctrlsStore[bp.Target].Contains((ControllerDescription)(bp.Controller)))
-                            ctrlsStore[bp.Target].Add((ControllerDescription)bp.Controller);
-                    }
-                    else
-                    {
-                        ctrlsStore.Add(bp.Target, new List<ControllerDescription>());
-                        ctrlsStore[bp.Target].Add((ControllerDescription)bp.Controller);
-                        resStore.Add(bp.Target, new Dictionary<string, Resource>());
-                    }
-                    //add resource required by controllers to process urls matching the target
-                    foreach (KeyValuePair<string, Resource> res in bm.Resources)
-                    {
-                        //check whether this resource is required by bindPoint
-                        if (((List<IMethodsBindPointDesc>)res.Value.RequiredBy).Contains(bp)
-                            && !resStore[bp.Target].ContainsValue(res.Value))
-                        {
-                            if (!resStore[bp.Target].ContainsKey(res.Key))
-                                resStore[bp.Target].Add(res.Key, res.Value);
-                        }
-                        //check whether bindPoint depends on this resource 
-                        if (((List<IMethodsBindPointDesc>)res.Value.Dependents).Contains(bp)
-                            && !resStore[bp.Target].ContainsValue(res.Value))
-                        {
-                            if (!resStore[bp.Target].ContainsKey(res.Key))
-                                resStore[bp.Target].Add(res.Key, res.Value);
-                        }
-                    }
-                }
-            }*/
-            #region Fill TreeViewControl
-            foreach (KeyValuePair<string, List<ControllerDescription>> kvp in ctrlsStore)
-            {
-                int nSubNodes = kvp.Value.Count;
-                nSubNodes = (resStore.ContainsKey(kvp.Key)) ? nSubNodes + resStore[kvp.Key].Count : nSubNodes;
-                TreeNode[] subNodes = new TreeNode[nSubNodes];
-                int i = 0;
-                for (; i < kvp.Value.Count; i++)
-                {
-                    subNodes[i] = new TreeNode();
-                    subNodes[i].Tag = kvp.Value[i];
-                    subNodes[i].Text = kvp.Value[i].ControllerTypeName;
-                    subNodes[i].ImageIndex = 0;
-                    subNodes[i].SelectedImageIndex = 0;
-                    //subNodes[i].ContextMenuStrip = Control.ControllerMenu;
-                }
-                if (resStore.ContainsKey(kvp.Key))
-                {
-                    int j = 0;
-                    foreach (KeyValuePair<string, Resource> res in resStore[kvp.Key])
-                    {
-                        subNodes[i + j] = new TreeNode();
-                        subNodes[i + j].Tag = res.Value;
-                        subNodes[i + j].Text = res.Key;
-                        subNodes[i + j].ImageIndex = 5;
-                        subNodes[i + j].SelectedImageIndex = 5;
-                        j++;
-                    }
-                }
-                TreeNode patternNode = new TreeNode(kvp.Key, subNodes);
-                patternNode.ImageIndex = 4;
-                patternNode.SelectedImageIndex = 4;
-                //patternNode.ContextMenuStrip = Control.MethodMenu;
-                Control.BindingTree.Nodes.Add(patternNode);
-
-            }
-            #endregion
-
-        }
-        /// <summary>
-        /// Rebuilds all controller dependencies and bindings
-        /// Note : engine.Clean is not implemented yet that's why it is impossible to update tree correctly now
-        /// </summary>
-        private bool UpdateTreeData()
-        {
-            return true;
-        }
-        private IVsSolution sln;
-        /*private EnvDTE.DTE dte;
-        private EnvDTE.Events _events;
-        private EnvDTE.WindowEvents _windowsEvents;
-        private EnvDTE.DocumentEvents _docEvents;
-        private EnvDTE.SolutionEvents _slnEvents;*/
-        #endregion
 
       
     }

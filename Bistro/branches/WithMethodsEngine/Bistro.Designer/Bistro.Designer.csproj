@@ -260,10 +260,12 @@
     <Compile Include="Projects\IProjectManager.cs" />
     <Compile Include="Projects\ProjectExtender\Factory.cs" />
     <Compile Include="Projects\ProjectExtender\Constants.cs" />
-    <Compile Include="Projects\ProjectExtender\IProjectManager.cs" />
-    <Compile Include="Projects\ProjectExtender\ItemList.cs" />
-    <Compile Include="Projects\ProjectExtender\ItemNode.cs" />
-    <Compile Include="Projects\ProjectExtender\ProjectManager.cs" />
+    <Compile Include="Projects\ProjectExtender\ProjectManager\IProjectManager.cs" />
+    <Compile Include="Projects\ProjectExtender\ProjectManager\ItemList.cs" />
+    <Compile Include="Projects\ProjectExtender\ProjectManager\ItemNode.cs" />
+    <Compile Include="Projects\ProjectExtender\MSBuildUtilities\BuildElement.cs" />
+    <Compile Include="Projects\ProjectExtender\MSBuildUtilities\MSBuildManager.cs" />
+    <Compile Include="Projects\ProjectExtender\ProjectManager\ProjectManager.cs" />
     <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Page.cs" />
     <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.cs">
       <SubType>UserControl</SubType>
@@ -498,6 +500,9 @@
     <ZipProject Include="Templates\Projects\FSharp\StructureMap.dll">
       <OutputSubPath>Bistro</OutputSubPath>
     </ZipProject>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Projects\ProjectExtender\ProjectFixer\" />
   </ItemGroup>
   <PropertyGroup>
     <!--

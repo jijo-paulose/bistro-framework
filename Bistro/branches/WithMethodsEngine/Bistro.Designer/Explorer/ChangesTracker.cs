@@ -44,7 +44,7 @@ namespace Bistro.Designer.Explorer
 
     public class ChangesTracker : IVsTextManagerEvents,IVsTextLinesEvents
     {
-        public ChangesTracker(string lang)
+        public ChangesTracker(string ext)
         {
 
             this.vsTextMgr =  Package.GetGlobalService(typeof(SVsTextManager)) as IVsTextManager2;
@@ -52,8 +52,15 @@ namespace Bistro.Designer.Explorer
             sh.Application = "Bistro.Application";
             sh.LoggerFactory = "Bistro.Logging.DefaultLoggerFactory";
             Bistro.Application.Initialize(sh);
-            engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
-            parser = new Explorer.MetadataExtractor(lang, String.Empty);
+            this.engine = new Bistro.MethodsEngine.EngineControllerDispatcher(Bistro.Application.Instance);
+            if ( ext == ".csproj")
+            {
+                this.parser = new CSharpParser();
+            }
+            else
+            {
+               this.parser =  new FSharpParser();
+            }
             IConnectionPointContainer container = vsTextMgr as IConnectionPointContainer;
             IConnectionPoint textManagerEventsConnection = null;
             Guid tmEventGuid = typeof(IVsTextManagerEvents).GUID;
@@ -236,7 +243,7 @@ namespace Bistro.Designer.Explorer
 
         #endregion
         private ExplorerWindow explorer;
-        private MetadataExtractor parser;
+        private MetadataParserBase parser;
         private EngineControllerDispatcher engine;
         private IVsTextManager2 vsTextMgr;
         private IVsTextLines buffer;

@@ -244,13 +244,15 @@
     </Compile>
     <Compile Include="Explorer\ChangesTracker.cs" />
     <Compile Include="Explorer\Common.cs" />
+    <Compile Include="Explorer\CSharpParser.cs" />
     <Compile Include="Explorer\DesignerControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Explorer\DesignerControl.designer.cs">
       <DependentUpon>DesignerControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Explorer\MetadataExtractor.cs" />
+    <Compile Include="Explorer\FSharpParser.cs" />
+    <Compile Include="Explorer\MetadataParserBase.cs" />
     <None Include="Explorer\SelectionEventsHandler.cs" />
     <Compile Include="Projects\CSharp\Factory.cs" />
     <Compile Include="Projects\CSharp\ProjectManager.cs" />

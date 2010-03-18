@@ -28,7 +28,7 @@ namespace FSharp.ProjectExtender
         {
             CompileItems.Nodes.Clear();
             foreach (BuildElement element in 
-                project.BuildManager.GetElements(item => item.Name == "Compile" && Path.GetExtension(item.Include) == ".fs"))
+                project.BuildManager.GetElements(item => item.Name == "Compile"))
             {
                         TreeNode compileItem = new TreeNode(element.Path);
                         compileItem.Tag = element;

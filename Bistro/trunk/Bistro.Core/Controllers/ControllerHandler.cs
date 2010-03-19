@@ -350,19 +350,20 @@ namespace Bistro.Controllers
             }
 		}
 
-        //Tries to convert the specific string to System.DateTime using different cultures. en-US culture is default.
+        //Tries to convert the specific string to System.DateTime current culture.
         private void ConvertToDateTime(ref object value)
         {
+            if (value == null)
+                return;
 
-            var date = new DateTime();
-            if (!DateTime.TryParse(HttpUtility.UrlDecode(value.ToString()), CultureInfo.CreateSpecificCulture("en-US"), DateTimeStyles.None, out date))
+            DateTime date;
+            if (!DateTime.TryParse(HttpUtility.UrlDecode(value.ToString()), CultureInfo.CurrentCulture, DateTimeStyles.None, out date))
             {
-                if (!DateTime.TryParse(HttpUtility.UrlDecode(value.ToString()),
-                CultureInfo.CreateSpecificCulture("ru-RU"), DateTimeStyles.None, out date))
-                    logger.Report(Messages.UnableToParseDate, value.ToString());
+                logger.Report(Messages.UnableToParseDate, value.ToString());
+                return;
             }
 
-            value = (object)date ?? value;
+            value = (object)date;
         }
 
         /// <summary>

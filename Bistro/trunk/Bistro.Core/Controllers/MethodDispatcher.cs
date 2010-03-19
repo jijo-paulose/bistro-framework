@@ -102,6 +102,7 @@ namespace Bistro.Controllers
             return dispatcher.HasExactBind(method);
         }
 
+        
         /// <summary>
         /// Enables processing of HTTP Web requests by a custom HttpHandler that implements the <see cref="T:System.Web.IHttpHandler"/> interface.
         /// </summary>
@@ -114,7 +115,7 @@ namespace Bistro.Controllers
         /// <param name="context">The context.</param>
         /// <param name="requestPoint">The request point.</param>
         /// <param name="requestContext">The request context.</param>
-        public virtual void InvokeMethod(HttpContextBase context, string requestPoint, IContext requestContext)
+        public virtual void InvokeMethod(HttpContextBase context, string requestPoint, IContext requestContext, bool handleException)
         {
             logger.Report(Messages.ProcessingRequest, requestPoint);
 
@@ -222,7 +223,7 @@ namespace Bistro.Controllers
 			{
                 //Assume that there are some other ctrls which match UnhandledException url and cause an exception.
                 //In this case, removing this check may cause an infinite recursion of InvokeMethod and StackOverflow at the end.
-                if (requestPoint == Application.UnhandledException)
+                if (handleException)
                     throw new ApplicationException("Cannot process UnhandledException url, maybe some other controllers also match this url and cause an exception", ex);
 
 				if (!IsMethodDefinedExplicitly(Application.UnhandledException))
@@ -237,9 +238,13 @@ namespace Bistro.Controllers
 				requestContext.Clear();
 				requestContext.Add("unhandledException", ex);
 
-				InvokeMethod(context, Application.UnhandledException, requestContext);
+				InvokeMethod(context, Application.UnhandledException, requestContext, true);
                 
 			}
+        }
+        public virtual void InvokeMethod(HttpContextBase context, string requestPoint, IContext requestContext)
+        {
+            InvokeMethod(context, requestPoint, requestContext, false);
         }
     }
 }

@@ -18,6 +18,14 @@ namespace FSharp.ProjectExtender
         public const string RootNamespaceDescription = "RootNamespaceDescription";
         public const string CompileOrder = "Compilation Order";
         public const string DependsOn = "DependsOn";
+
+        public static readonly Guid guidStandardCommandSet97 = new Guid("5efc7975-14bc-11cf-9b2b-00aa00573819");
+        public static readonly Guid guidStandardCommandSet2K = new Guid("1496A755-94DE-11D0-8C3F-00C04FC2AAE2");
+        public static readonly Guid guidFSharpProjectCmdSet = new Guid("75AC5611-A912-4195-8A65-457AE17416FB");
+
+        public const uint cmdidExploreFolderInWindows = 0x663;
+        public const uint cmdidNewFolder = 0xf5;
+
     };
 
 }

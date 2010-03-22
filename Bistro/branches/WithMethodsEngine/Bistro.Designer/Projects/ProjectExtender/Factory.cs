@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
 
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using System.ComponentModel.Design;
 
 namespace FSharp.ProjectExtender
 {
@@ -13,12 +14,18 @@ namespace FSharp.ProjectExtender
     public class Factory : FlavoredProjectFactoryBase, IVsSolutionEvents
     {
         private Package package;
+
         public Factory(Package package)
             : base()
         {
             this.package = package;
             var solution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
             ErrorHandler.ThrowOnFailure(solution.AdviseSolutionEvents(this, out solutionCookie));
+            //OleMenuCommandService mcs = (OleMenuCommandService)Package.GetGlobalService(typeof(IMenuCommandService));
+
+            //foreach (var command in fsharpUIMenuCommands)
+            //    mcs.FindCommand(command).Visible = false;
+
         }
 
         uint solutionCookie;

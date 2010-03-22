@@ -501,9 +501,6 @@
       <OutputSubPath>Bistro</OutputSubPath>
     </ZipProject>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Projects\ProjectExtender\ProjectFixer\" />
-  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

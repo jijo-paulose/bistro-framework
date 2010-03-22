@@ -10,11 +10,13 @@ using Microsoft.VisualStudio;
 using IOLEServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.OLE.Interop;
+using System.ComponentModel.Design;
 
 namespace FSharp.ProjectExtender
 {
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProjectBase, IProjectManager
+    public class ProjectManager : FlavoredProjectBase, IProjectManager, IOleCommandTarget
     {
 
         public ProjectManager()
@@ -49,7 +51,7 @@ namespace FSharp.ProjectExtender
             itemList = new ItemList(this);
             hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
         }
-
+        
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
             switch ((__VSHPROPID)propId)
@@ -109,6 +111,13 @@ namespace FSharp.ProjectExtender
             return (uint)(int)result;
         }
 
+        protected override void SetInnerProject(IntPtr innerIUnknown)
+        {
+            base.SetInnerProject(innerIUnknown);
+            innerTarget = (IOleCommandTarget)Marshal.GetObjectForIUnknown(innerIUnknown);
+        }
+        IOleCommandTarget innerTarget;
+
         protected override void Close()
         {
             if (hierarchy_event_cookie != (uint)ShellConstants.VSCOOKIE_NIL)
@@ -133,6 +142,33 @@ namespace FSharp.ProjectExtender
         #region IProjectManager Members
 
         public MSBuildManager BuildManager { get; private set; }
+
+        #endregion
+
+        #region IOleCommandTarget Members
+
+        int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            return innerTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
+        {
+
+            int result = innerTarget.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
+            if (result != VSConstants.S_OK)
+                return result;
+
+            // hide the FSharp project commands on the file nodes (moveup movedown, add above, add below)
+            if (pguidCmdGroup.Equals(Constants.guidFSharpProjectCmdSet))
+                prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_INVISIBLE;
+
+            // show the Add new folder command on the project node
+            if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet97) && prgCmds[0].cmdID == 245)
+                prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
+
+            return VSConstants.S_OK;
+        }
 
         #endregion
     }

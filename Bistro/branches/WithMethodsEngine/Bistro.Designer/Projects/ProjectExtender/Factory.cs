@@ -21,11 +21,6 @@ namespace FSharp.ProjectExtender
             this.package = package;
             var solution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
             ErrorHandler.ThrowOnFailure(solution.AdviseSolutionEvents(this, out solutionCookie));
-            //OleMenuCommandService mcs = (OleMenuCommandService)Package.GetGlobalService(typeof(IMenuCommandService));
-
-            //foreach (var command in fsharpUIMenuCommands)
-            //    mcs.FindCommand(command).Visible = false;
-
         }
 
         uint solutionCookie;
@@ -67,7 +62,8 @@ namespace FSharp.ProjectExtender
 
         public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
-            ((IProjectManager)pHierarchy).BuildManager.FixupProject();
+            if (pHierarchy is IProjectManager)
+                ((IProjectManager)pHierarchy).BuildManager.FixupProject();
             return VSConstants.S_OK;
         }
 

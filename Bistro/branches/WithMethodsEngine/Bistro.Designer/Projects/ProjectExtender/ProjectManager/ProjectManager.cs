@@ -16,7 +16,7 @@ using System.ComponentModel.Design;
 namespace FSharp.ProjectExtender
 {
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProjectBase, IProjectManager, IOleCommandTarget
+    public class ProjectManager : FlavoredProjectBase, IProjectManager, IOleCommandTarget, IVsTrackProjectDocumentsEvents2
     {
 
         public ProjectManager()
@@ -35,6 +35,7 @@ namespace FSharp.ProjectExtender
         }
 
         uint hierarchy_event_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
+        uint document_tracker_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
         private string fileName;
         private ItemList itemList;
 
@@ -50,21 +51,25 @@ namespace FSharp.ProjectExtender
             BuildManager = new MSBuildManager(fileName);
             itemList = new ItemList(this);
             hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
+            IVsTrackProjectDocuments2 documentTracker = (IVsTrackProjectDocuments2)Package.GetGlobalService(typeof(SVsTrackProjectDocuments));
+            ErrorHandler.ThrowOnFailure(documentTracker.AdviseTrackProjectDocumentsEvents(this, out document_tracker_cookie));
         }
-        
+
+        bool renaimng_in_progress = false;
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
-            switch ((__VSHPROPID)propId)
-            {
-                case __VSHPROPID.VSHPROPID_FirstChild:
-                case __VSHPROPID.VSHPROPID_FirstVisibleChild:
-                    return itemList.GetFirstChild(itemId, out property);
-                case __VSHPROPID.VSHPROPID_NextSibling:
-                case __VSHPROPID.VSHPROPID_NextVisibleSibling:
-                    return itemList.GetNextSibling(itemId, out property);
-                default:
-                    break;
-            }
+            if (! renaimng_in_progress)
+                switch ((__VSHPROPID)propId)
+                {
+                    case __VSHPROPID.VSHPROPID_FirstChild:
+                    case __VSHPROPID.VSHPROPID_FirstVisibleChild:
+                        return itemList.GetFirstChild(itemId, out property);
+                    case __VSHPROPID.VSHPROPID_NextSibling:
+                    case __VSHPROPID.VSHPROPID_NextVisibleSibling:
+                        return itemList.GetNextSibling(itemId, out property);
+                    default:
+                        break;
+                }
 
             int result = base.GetProperty(itemId, propId, out property);
             if (result != VSConstants.S_OK)
@@ -167,6 +172,77 @@ namespace FSharp.ProjectExtender
             if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet97) && prgCmds[0].cmdID == 245)
                 prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
 
+            return VSConstants.S_OK;
+        }
+
+        #endregion
+
+        #region IVsTrackProjectDocumentsEvents2 Members
+
+        public int OnAfterAddDirectoriesEx(int cProjects, int cDirectories, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSADDDIRECTORYFLAGS[] rgFlags)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterAddFilesEx(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSADDFILEFLAGS[] rgFlags)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterRemoveDirectories(int cProjects, int cDirectories, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSREMOVEDIRECTORYFLAGS[] rgFlags)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterRemoveFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSREMOVEFILEFLAGS[] rgFlags)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterRenameDirectories(int cProjects, int cDirs, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEDIRECTORYFLAGS[] rgFlags)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags)
+        {
+            renaimng_in_progress = false;
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterSccStatusChanged(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, uint[] rgdwSccStatus)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryAddDirectories(IVsProject pProject, int cDirectories, string[] rgpszMkDocuments, VSQUERYADDDIRECTORYFLAGS[] rgFlags, VSQUERYADDDIRECTORYRESULTS[] pSummaryResult, VSQUERYADDDIRECTORYRESULTS[] rgResults)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryAddFiles(IVsProject pProject, int cFiles, string[] rgpszMkDocuments, VSQUERYADDFILEFLAGS[] rgFlags, VSQUERYADDFILERESULTS[] pSummaryResult, VSQUERYADDFILERESULTS[] rgResults)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryRemoveDirectories(IVsProject pProject, int cDirectories, string[] rgpszMkDocuments, VSQUERYREMOVEDIRECTORYFLAGS[] rgFlags, VSQUERYREMOVEDIRECTORYRESULTS[] pSummaryResult, VSQUERYREMOVEDIRECTORYRESULTS[] rgResults)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryRemoveFiles(IVsProject pProject, int cFiles, string[] rgpszMkDocuments, VSQUERYREMOVEFILEFLAGS[] rgFlags, VSQUERYREMOVEFILERESULTS[] pSummaryResult, VSQUERYREMOVEFILERESULTS[] rgResults)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryRenameDirectories(IVsProject pProject, int cDirs, string[] rgszMkOldNames, string[] rgszMkNewNames, VSQUERYRENAMEDIRECTORYFLAGS[] rgFlags, VSQUERYRENAMEDIRECTORYRESULTS[] pSummaryResult, VSQUERYRENAMEDIRECTORYRESULTS[] rgResults)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryRenameFiles(IVsProject pProject, int cFiles, string[] rgszMkOldNames, string[] rgszMkNewNames, VSQUERYRENAMEFILEFLAGS[] rgFlags, VSQUERYRENAMEFILERESULTS[] pSummaryResult, VSQUERYRENAMEFILERESULTS[] rgResults)
+        {
+            renaimng_in_progress = true;
             return VSConstants.S_OK;
         }
 

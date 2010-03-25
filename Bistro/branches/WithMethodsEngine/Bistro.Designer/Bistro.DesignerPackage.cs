@@ -116,7 +116,6 @@ namespace Bistro.Designer
         // Overriden Package Implementation
         #region Package Members
         internal Explorer.ExplorerWindow explorer;
-        private EnvDTE.DTE dte;
 
 
         /// <summary>
@@ -140,8 +139,7 @@ namespace Bistro.Designer
             RegisterProjectFactory(new Projects.FSharp.Factory(this));
             RegisterProjectFactory(new Projects.CSharp.Factory(this));
             RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
-            dte = GetService(typeof(EnvDTE._DTE)) as EnvDTE.DTE;
-            explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
+//            explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
             
             ///This is an alternative way to handle solution events.Decided to use ProjectManager for each project instead
             /*ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)this);

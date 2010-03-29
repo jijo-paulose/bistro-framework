@@ -23,6 +23,9 @@
     <Compile Include="Setup.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+    </WixExtension>
     <WixExtension Include="WixNetFxExtension">
       <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
     </WixExtension>
@@ -34,6 +37,11 @@
     <Content Include="editTemplates.exe" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\BistroIntegration\BistroIntegration.csproj">
+      <Name>BistroIntegration</Name>
+      <Project>{2a3cc2fe-ab0e-44f6-b1cb-3290581da442}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Bistro.Core\Bistro.Core.csproj">
       <Name>Bistro.Core</Name>
       <Project>{8a5337bb-438f-4ad7-b695-89df28f778df}</Project>

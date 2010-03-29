@@ -1,8 +1,11 @@
 Bistro Framework Requirements:
 NET Framework 3.5 SP1
 Visual Studio 2008
-F# CTP v.1.9.6.2 (You can download it from: http://www.microsoft.com/downloads/info.aspx?na=46&p=2&SrcDisplayLang=en&SrcCategoryId=&SrcFamilyId=61ad6924-93ad-48dc-8c67-60f7e7803d3c&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f7%2f5%2fc%2f75c5ac35-9c13-4737-b363-3c930002259a%2fInstallFSharp.msi)
+F# CTP v.1.9.9.9 (You can download it from: http://www.microsoft.com/downloads/details.aspx?FamilyID=ba52e650-4e77-4b0b-b987-9f9ecd3bab3b&displaylang=en)
 
+New in 0.9.2.0
+1. Added NDjango.BistroIntegration.dll assembly
+2. Added latest NDjango 0.9.7.2 with NDjango Editor for VS 2010 RC.
 
 New in 0.9.1.0:
 

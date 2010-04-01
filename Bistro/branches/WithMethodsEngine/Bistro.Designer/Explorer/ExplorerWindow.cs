@@ -43,11 +43,6 @@ namespace Bistro.Designer.Explorer
         // using the Window property. Note that, even if this class implements IDispose, we are
         // not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
         // the object returned by the Window property.
-        /*private EnvDTE.DTE dte;
-        private EnvDTE.Events _events;
-        private EnvDTE.WindowEvents _windowsEvents;
-        private EnvDTE.DocumentEvents _docEvents;
-        private EnvDTE.SolutionEvents _slnEvents;*/
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
@@ -60,49 +55,36 @@ namespace Bistro.Designer.Explorer
             control = new DesignerControl();
             
         }
-        public void Notify(object sender, UpdateEventArgs e)
+        public void NotifyRename(object sender, UpdateEventArgs e)
         {
-
-            TreeNode[] nodesToUpdate;
-            if (e.ParentName != null)
+            if (e.NewNode.oldtext != null)
             {
-                //update subnode
-                if (e.OldValue != null)
-                {
-                    nodesToUpdate = control.BindingTree.Nodes.Find(e.OldValue, true);
-                    nodesToUpdate[0].Tag = e.NewValue.tag;
-                    nodesToUpdate[0].Text = e.NewValue.text;
-                }
-                //add new subnode
-                else
-                {
-                    nodesToUpdate = control.BindingTree.Nodes.Find(e.ParentName, true);
-                    TreeNode newNode = new TreeNode();
-                    newNode.Text = e.NewValue.text;
-                    newNode.Tag = e.NewValue.tag;
-                    nodesToUpdate[0].Nodes.Add(newNode);
-                }
-
+                bool search = e.NewNode.parent != null;
+                TreeNode[] nodesToUpdate = control.BindingTree.Nodes.Find(e.NewNode.oldtext, search);
+                nodesToUpdate[0].Tag = e.NewNode.tag;
+                nodesToUpdate[0].Text = e.NewNode.newtext;
+                nodesToUpdate[0].Name = e.NewNode.newtext;
             }
-            else
+            else if (null == e.NewNode.parent)
             {
-                if (null == e.OldValue)
-                {
-                    //add node to the highest level of hierarchy (Project)
-                    control.BindingTree.Nodes.Add(new TreeNode(e.NewValue.text));
-                }
-                else
-                {
-                    //rename node of the highest level of hierarchy (Project)
-                    nodesToUpdate = control.BindingTree.Nodes.Find(e.ParentName, false);
-                    nodesToUpdate[0].Text = e.NewValue.text;
-                }
-
+                TreeNode node = new TreeNode(e.NewNode.newtext);
+                node.Name = e.NewNode.newtext;
+                control.BindingTree.Nodes.Add(node);
             }
         }
-        public void InsertBranch(string project,TreeNode projectBranch)
+        public void NotifyRemove(object sender, UpdateEventArgs e)
         {
-            control.BindingTree.Nodes.Find(project, false)[0].Nodes.Add(projectBranch);
+            TreeNode[] nodesToUpdate = control.BindingTree.Nodes.Find(e.NewNode.oldtext, true);
+            nodesToUpdate[0].Remove();
+        }
+        public void NotifyInsert(object sender, UpdateEventArgs e)
+        {
+            TreeNode[] nodesToUpdate = control.BindingTree.Nodes.Find(e.NewNode.parent, true);
+            TreeNode node = new TreeNode();
+            node.Text = e.NewNode.newtext;
+            node.Tag = e.NewNode.tag;
+            node.Name = e.NewNode.newtext;
+            nodesToUpdate[0].Nodes.Add(node);
         }
         public DesignerControl Control
         {

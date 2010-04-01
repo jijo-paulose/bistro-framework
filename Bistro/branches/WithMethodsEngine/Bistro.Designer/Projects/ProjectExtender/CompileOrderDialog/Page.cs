@@ -58,6 +58,7 @@ namespace FSharp.ProjectExtender
 
         public int Apply()
         {
+            IsDirty = false;
             return VSConstants.S_OK;
         }
 

@@ -17,16 +17,11 @@ using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 namespace Bistro.Designer.Projects.FSharp
 {
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProjectBase, IProjectManager
+    public class ProjectManager : FlavoredProject
     {
         
          private DesignerPackage package;
          string fileName;
-         string projectName;
-         string projectDir;
-         string projectExt;
-         bool initialized;
-
          public ProjectManager(DesignerPackage package)
             : base()
         {
@@ -55,102 +50,15 @@ namespace Bistro.Designer.Projects.FSharp
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();
-            projectExt = ".fsproj";
-            Tracker = new Explorer.ChangesTracker(projectExt);
-            Tracker.RegisterObserver(package.explorer);
         }
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
-
-            int result = base.GetProperty(itemId, propId, out property);
-            if (result != VSConstants.S_OK)
-                return result;
-
-            if (itemId == VSConstants.VSITEMID_ROOT)
-            {
-                switch ((__VSHPROPID2)propId)
-                {
-                    case __VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList:
-                        //Remove the Debug page
-                        property = property.ToString().Split(';')
-                            .Aggregate("", (a, next) => next.Equals(debug_page_guid, StringComparison.OrdinalIgnoreCase) ? a : a + ';' + next).Substring(1);
-                        return VSConstants.S_OK;
-
-                    default:
-                        break;
-                }
-                switch ((__VSHPROPID)propId)
-                {
-                    case __VSHPROPID.VSHPROPID_ProjectDir:
-                        projectDir = property.ToString();
-                        break;
-                    case __VSHPROPID.VSHPROPID_Name:
-                        if (projectName != property.ToString())
-                        {
-                            projectName = property.ToString();
-                            Tracker.OnProjectRenamed(projectName);
-                        }
-                        if (!initialized)
-                        {
-
-                            string path = projectDir + "\\" + projectName + projectExt;
-                            MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(path);
-                            Tracker.OnProjectOpened(GetSourceFiles());
-                            initialized = true;
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
-
-            }
-            else
-            {
-                switch ((__VSHPROPID)propId)
-                {
-                    case __VSHPROPID.VSHPROPID_Name:
-                        if (property.ToString().EndsWith(".fs"))
-                        {
-                            Tracker.ActiveFile = projectDir + "\\Controllers\\" + property.ToString();
-                        }
-                        break;
-                    case __VSHPROPID.VSHPROPID_SaveName:
-                        //property is a new name of the project item -> need to rename corresponding key
-                        break;
-                }
-            }
-            return result;
+            return base.GetProperty(itemId, propId, out property);
         }
-
-
-        #region IProjectManager Members
-
-        public Project MSBuildProject{get;set;}
-        public List<string> GetSourceFiles()
+        protected override void Close()
         {
-            List<string> files = new List<string>();
-            // Iterate through each ItemGroup in the Project to obtain the list of F# source files
-            foreach (BuildItemGroup ig in this.MSBuildProject.ItemGroups)
-            {
-                foreach (BuildItem item in ig)
-                {
-                    if (String.Compare(item.Name, "Compile") == 0)
-                    {
-                        if (item.Include.EndsWith(".fs"))
-                        {
-                            files.Add(projectDir + "\\" + item.Include);
-                        }
-
-                    }
-                    else
-                        break;
-                }
-            }
-            initialized = true;
-            return files;
+            base.Close();
         }
-        public Explorer.ChangesTracker Tracker{get;set;}
-        #endregion
+
     }
 }

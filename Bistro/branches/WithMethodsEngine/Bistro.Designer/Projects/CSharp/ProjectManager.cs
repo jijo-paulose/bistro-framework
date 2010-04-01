@@ -23,15 +23,12 @@ namespace Bistro.Designer.Projects.CSharp
 {
 
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProjectBase,IProjectManager
+    public class ProjectManager : FlavoredProject
     {
 
         private DesignerPackage package;
+        private Explorer.ProjectFileManager observer;
         string fileName;
-        string projectName;
-        string projectDir;
-        string projectExt;
-        bool initialized;
         public ProjectManager(DesignerPackage package)
             : base()
         {
@@ -48,7 +45,7 @@ namespace Bistro.Designer.Projects.CSharp
             serviceProvider = new ServiceProvider(site);
             return VSConstants.S_OK;
         }
-
+        
 
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
         {
@@ -59,63 +56,14 @@ namespace Bistro.Designer.Projects.CSharp
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();
-            projectExt = ".csproj";
-            Tracker = new Explorer.ChangesTracker(projectExt);
-            Tracker.RegisterObserver(package.explorer);
+            observer = new Explorer.ProjectFileManager(this as IVsProject,"csproj",package.explorer);
+
         }
+
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
            
-          int result = base.GetProperty(itemId, propId, out property);
-          if (itemId == VSConstants.VSITEMID_ROOT)
-           {
-               switch ((__VSHPROPID)propId)
-               {
-                   
-                   case __VSHPROPID.VSHPROPID_ProjectDir:
-                       projectDir = property.ToString();
-                       break;
-
-                   case __VSHPROPID.VSHPROPID_Name:
-                       if (projectName != property.ToString())
-                       {
-                           projectName = property.ToString();
-                           Tracker.OnProjectRenamed(projectName);
-                       }
-                       if (!initialized)
-                       {
-                           
-                           string path = projectDir + "\\" + projectName + projectExt;
-                           MSBuildProject = Microsoft.Build.BuildEngine.Engine.GlobalEngine.GetLoadedProject(path);
-                           Tracker.OnProjectOpened(GetSourceFiles());
-                           initialized = true;
-                       }
-
-                       break;
-                   case __VSHPROPID.VSHPROPID_SaveName:
-                       //property is a new name of the project - notify TreeView
-                       if (property != null)
-                        Tracker.RaiseNodesChanged(null, property.ToString(), projectName,false);
-
-                       break;
-               }
-           }
-           else
-           {
-              switch ((__VSHPROPID)propId)
-              {
-                  case __VSHPROPID.VSHPROPID_Name:
-                      if (property.ToString().EndsWith(".cs"))
-                      {
-                          Tracker.ActiveFile = projectDir + "\\Controllers\\" + property.ToString();
-                      }
-                      break;
-                  case __VSHPROPID.VSHPROPID_SaveName:
-                      //property is a new name of the project item -> need to rename corresponding key
-                      break;
-              }
-           }
-           return result;
+          return base.GetProperty(itemId, propId, out property);
         }
         protected override int SetProperty(uint itemId, int propId, object property)
         {
@@ -124,42 +72,19 @@ namespace Bistro.Designer.Projects.CSharp
         protected override void Close()
         {
             base.Close();
-            Tracker = null;
+            //delete object - dispose
+            observer.Dispose();
         }
+        
 
         #region IProjectManager Members
 
-        public Project MSBuildProject
+        internal Project MSBuildProject
         {
             get;
             set;
         }
-        public List<string> GetSourceFiles()
-        {
-            List<string> files = new List<string>();
-            // Iterate through each ItemGroup in the Project to obtain the list of F# source files
-            foreach (BuildItemGroup ig in this.MSBuildProject.ItemGroups)
-            {
-                foreach (BuildItem item in ig)
-                {
-                    if (String.Compare(item.Name, "Compile") == 0)
-                    {
-                        if (item.Include.EndsWith(".cs"))
-                        {
-                            files.Add(projectDir + "\\" + item.Include);
-                        }
-
-                    }
-                    else
-                        break;
-                }
-            }
-            return files;
-
-        }
-        public Explorer.ChangesTracker Tracker { get; set; }
-
-
+        internal Explorer.ProjectFileManager Observer { get; set; }
         #endregion
     }
 }

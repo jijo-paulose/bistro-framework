@@ -65,7 +65,6 @@ namespace Bistro.Designer
         LanguageVsTemplate = "Bistro")]                 // the value of the template registration key. This value 
                                                         // will also be used as the name of the node grouping
                                                         // projects in the AddNewProject dialog
-
     [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), null, null, null, null, @".\NullPath")]
 
     [ProvideProjectFactory(typeof(Projects.CSharp.Factory), null, null, null, null, @".\NullPath", LanguageVsTemplate = "Bistro")]
@@ -139,7 +138,7 @@ namespace Bistro.Designer
             RegisterProjectFactory(new Projects.FSharp.Factory(this));
             RegisterProjectFactory(new Projects.CSharp.Factory(this));
             RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
-//            explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
+            explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
             
             ///This is an alternative way to handle solution events.Decided to use ProjectManager for each project instead
             /*ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)this);

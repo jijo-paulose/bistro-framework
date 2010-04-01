@@ -13,7 +13,7 @@ using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 namespace Bistro.Designer.Projects.FSharp
 {
     [Guid(Guids.guidFSharpProjectFactoryString)]
-    public class Factory : FlavoredProjectFactoryBase
+    public class Factory : FlavoredProjectFactory
     {
         private DesignerPackage package;
         public Factory(DesignerPackage package)
@@ -22,7 +22,7 @@ namespace Bistro.Designer.Projects.FSharp
             this.package = package;
         }
 
-        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
+        protected override object PreCreateForOuter(object outerProjectIUnknown)
         {
             var project = new ProjectManager(package);
             project.SetSite((IOleServiceProvider)((IServiceProvider)package).GetService(typeof(IOleServiceProvider)));

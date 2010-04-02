@@ -120,15 +120,15 @@ namespace FSharp.ProjectExtender
         {
             base.SetInnerProject(innerIUnknown);
             innerTarget = (IOleCommandTarget)Marshal.GetObjectForIUnknown(innerIUnknown);
-            var mi = typeof(Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode).GetProperty("Caption");
-            try
-            {
-                var v = mi.GetValue(innerTarget, null);
-            }
-            catch (Exception e)
-            {
-                var s = e.Message;
-            }
+            //var mi = typeof(Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode).GetProperty("Caption");
+            //try
+            //{
+            //    var v = mi.GetValue(innerTarget, null);
+            //}
+            //catch (Exception e)
+            //{
+            //    var s = e.Message;
+            //}
         }
         IOleCommandTarget innerTarget;
 

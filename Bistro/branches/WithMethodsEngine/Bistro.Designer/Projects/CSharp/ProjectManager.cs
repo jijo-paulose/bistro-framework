@@ -60,15 +60,6 @@ namespace Bistro.Designer.Projects.CSharp
 
         }
 
-        protected override int GetProperty(uint itemId, int propId, out object property)
-        {
-           
-          return base.GetProperty(itemId, propId, out property);
-        }
-        protected override int SetProperty(uint itemId, int propId, object property)
-        {
-            return base.SetProperty(itemId, propId, property);
-        }
         protected override void Close()
         {
             base.Close();

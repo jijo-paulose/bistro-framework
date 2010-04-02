@@ -120,6 +120,15 @@ namespace FSharp.ProjectExtender
         {
             base.SetInnerProject(innerIUnknown);
             innerTarget = (IOleCommandTarget)Marshal.GetObjectForIUnknown(innerIUnknown);
+            var mi = typeof(Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode).GetProperty("Caption");
+            try
+            {
+                var v = mi.GetValue(innerTarget, null);
+            }
+            catch (Exception e)
+            {
+                var s = e.Message;
+            }
         }
         IOleCommandTarget innerTarget;
 
@@ -154,7 +163,15 @@ namespace FSharp.ProjectExtender
 
         int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            return innerTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+            int result = innerTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+            if ((uint)result == 0x80131509) // Invalid Operation Exception
+            {
+                System.Diagnostics.Debug.Write("\n***** Supressing COM exception *****\n");
+                System.Diagnostics.Debug.Write(Marshal.GetExceptionForHR(result));
+                System.Diagnostics.Debug.Write("\n***** Supressed *****\n");
+                return VSConstants.S_OK;
+            }
+            return result;
         }
 
         int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)

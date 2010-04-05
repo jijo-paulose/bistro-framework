@@ -34,9 +34,6 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="editTemplates.exe" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\BistroIntegration\BistroIntegration.csproj">
       <Name>BistroIntegration</Name>
       <Project>{2a3cc2fe-ab0e-44f6-b1cb-3290581da442}</Project>
@@ -52,6 +49,9 @@
       <Project>{81d48228-73a8-4a92-84b9-ecd57f86db72}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="editBistroTemplates.exe" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

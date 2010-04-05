@@ -120,15 +120,6 @@ namespace FSharp.ProjectExtender
         {
             base.SetInnerProject(innerIUnknown);
             innerTarget = (IOleCommandTarget)Marshal.GetObjectForIUnknown(innerIUnknown);
-            //var mi = typeof(Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode).GetProperty("Caption");
-            //try
-            //{
-            //    var v = mi.GetValue(innerTarget, null);
-            //}
-            //catch (Exception e)
-            //{
-            //    var s = e.Message;
-            //}
         }
         IOleCommandTarget innerTarget;
 
@@ -151,6 +142,29 @@ namespace FSharp.ProjectExtender
             object browseObject;
             ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_BrowseObject, out browseObject));
             return (string)browseObject.GetType().GetMethod("SetMetadata").Invoke(browseObject, new object[] { property, value });
+        }
+
+        void InvalidateParentItems(string fileName)
+        {
+            IVsProject project = (IVsProject)innerTarget;
+            int pfFound;
+            VSDOCUMENTPRIORITY[] pdwPriority = new VSDOCUMENTPRIORITY[1];
+            uint pItemid;
+            ErrorHandler.ThrowOnFailure(project.IsDocumentInProject(fileName, out pfFound, pdwPriority, out pItemid));
+            if (pfFound == 0)
+                return;
+
+            IOLEServiceProvider sp;
+            ErrorHandler.ThrowOnFailure(project.GetItemContext(pItemid, out sp));
+
+            IntPtr objPtr;
+            Guid hierGuid = typeof(EnvDTE.ProjectItem).GUID;
+            Guid UNKguid = Bistro.Designer.ProjectBase.NativeMethods.IID_IUnknown;
+            ErrorHandler.ThrowOnFailure(sp.QueryService(ref hierGuid, ref UNKguid, out objPtr));
+
+            EnvDTE.ProjectItem projectItem = (EnvDTE.ProjectItem)Marshal.GetObjectForIUnknown(objPtr);
+            var hierNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)projectItem.Object;
+            hierNode.OnInvalidateItems(hierNode.Parent);
         }
 
         #region IProjectManager Members
@@ -224,6 +238,7 @@ namespace FSharp.ProjectExtender
         public int OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags)
         {
             renaimng_in_progress = false;
+            InvalidateParentItems(rgszMkNewNames[0]);
             return VSConstants.S_OK;
         }
 

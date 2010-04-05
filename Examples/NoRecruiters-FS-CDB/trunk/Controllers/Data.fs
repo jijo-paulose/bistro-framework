@@ -6,6 +6,8 @@ module Data =
     open Divan
     open FunctionalDivan.Dsl
     open NoRecruiters.Enums
+    open System.Text.RegularExpressions
+    open System
 
     let database = 
         server "localhost" 5984 |>
@@ -13,7 +15,7 @@ module Data =
 
     module Entities =
         type tag = {
-            id: string; rev: string;
+//            id: string; rev: string;
             tagText: string
             safeText: string
             }
@@ -36,14 +38,47 @@ module Data =
             contentType: int
             }
 
+        type user = {
+            id: string
+            rev: string
+            roles: string list
+            userName: string
+            password: string
+            email: string
+            firstName: string
+            lastName: string
+            postingId: string
+            userType: int
+            }
+
     module Tags =
+        open Entities
+
+        let maxTagLength = 50
         let rankedTags num = 
-            selectRecords<Entities.tag> (
-                query "items" "alltags" database |> limitTo num
+            Fti.selectRecords<Entities.tag> (
+                Fti.query "items" "alltags" database |> Fti.limitTo num
                 )
+
+        let rec private doParseAndDedupe tagMap = function
+        | h::t -> 
+            if Map.containsKey h tagMap then doParseAndDedupe tagMap t
+            else doParseAndDedupe (Map.add h (Util.sanitize h) tagMap) t
+        | _ -> tagMap
             
+        let parseAndDedupe (tags: string) =
+            (doParseAndDedupe 
+                Map.empty 
+                (List.map (fun (elem: string) -> 
+                            let trimmed = elem.Trim()
+                            trimmed.Substring(0, System.Math.Min(maxTagLength, trimmed.Length)))
+                <| (Array.toList (tags.Split([|','|], StringSplitOptions.RemoveEmptyEntries)))) |> 
+             Map.toList) |>
+            List.map (fun (name, safeName) -> { tagText = name; safeText = safeName })
+            
+                          
     module Postings =
-        open FunctionalDivan.Dsl.Fti
+        open Entities
 
         let search text tags contentType =
             let t = 
@@ -53,10 +88,52 @@ module Data =
                         (System.String.Join(" or tag:", Array.ofList (List.map (fun (e: Entities.tag) -> e.safeText)  t)))
                 | _ -> sprintf "text:\"%s\" or title:\"%s\"" text text 
                 
-            selectRecords<Entities.posting> (
-                query "items" "all" database |>
-                q t
+            Fti.selectRecords<Entities.posting> (
+                Fti.query "items" "all" database |>
+                Fti.q t
                 )
                 
-        let byName name = 
-            name |> from<Entities.posting> database
+        let byId id = 
+            id |> from<Entities.posting> database
+
+        let byShortName name =
+            selectRecords<Entities.posting> (
+                query "items" "byShortName" database |>
+                byKey name
+            )
+
+        let save (posting: Entities.posting) =
+            let newId, newRev = posting |> into database
+            { posting with id = newId; rev = newRev }
+
+        // make it be a unit function so that createdOn/updatedOn are set correctly
+        let empty() = {
+            id = null; rev = null
+            tags = []
+            userId = System.String.Empty
+            createdOn = System.DateTime.Now
+            updatedOn = System.DateTime.Now
+            heading = System.String.Empty
+            shortname = System.String.Empty
+            shorttext = System.String.Empty
+            views = 0
+            deleted = false
+            flagged = false
+            published = false
+            active = false
+            contents = System.String.Empty
+            contentType = -1
+        }
+
+        let htmlPattern = Regex(@"<(.|\n)*?>", RegexOptions.Compiled)
+        let makeShortText (contents: string) = 
+            let starting = contents.LastIndexOf('>')
+            let ending = contents.LastIndexOf('<')
+            let s = if ending > starting then contents.Substring(0, ending + 1) else contents
+            htmlPattern.Replace(s, System.String.Empty)
+
+        let shortNameLength = 100
+        let makeShortName (heading: string) =
+            let salt = Random().Next(1000000).ToString()
+            let sanitzed = Util.sanitize heading
+            sanitzed.[0..System.Math.Min(heading.Length-salt.Length, sanitzed.Length)]

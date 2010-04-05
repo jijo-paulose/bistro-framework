@@ -40,7 +40,7 @@ namespace NoRecruiters.Controllers
                 ctx.Response.RenderWith(sprintf "static/%s.django" contentId)
                 
         [<Bind("?", Priority = 1); ReflectedDefinition>]
-        let defaultC = 
+        let defaultC (ctx: ictx) = 
             let defaultContentType = 
                 match HttpContext.Current.Request.Cookies.["nrDefaultContentType"] with 
                 | null -> null | _ as cookie -> cookie.Value

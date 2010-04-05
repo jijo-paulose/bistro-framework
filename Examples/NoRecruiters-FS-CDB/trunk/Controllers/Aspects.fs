@@ -35,4 +35,3 @@ namespace NoRecruiters.Controllers
             (if System.String.IsNullOrEmpty(tag) then tags 
              else List.filter (fun t -> not (t = tag)) tags) |>
             named "currentTags"
-            

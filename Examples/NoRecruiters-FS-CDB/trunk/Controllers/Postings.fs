@@ -20,6 +20,7 @@ namespace NoRecruiters.Controllers
     open NoRecruiters.Enums.Common
     
     open NoRecruiters.Data
+    open NoRecruiters.Util
 
     module View =
         [<Bind("get /postings/{contentType}?{firstTime}"); ReflectedDefinition>]
@@ -45,7 +46,7 @@ namespace NoRecruiters.Controllers
         [<Bind("get /resume/{shortName}")>]
         [<RenderWith("Views/Posting/view.django"); ReflectedDefinition>]
         let viewC shortName (contentType: string option) (defaultContentType: string) =
-            Postings.byName shortName |> named "posting",
+            Postings.byShortName shortName |> named "posting",
             defaultContentType |> named "contentType"
             
     module Manage =
@@ -63,8 +64,15 @@ namespace NoRecruiters.Controllers
 
             [<Bind("post /posting/ad/byname/{shortName}")>]
             [<RenderWith("Views/Posting/Ad/edit.django"); ReflectedDefinition>]
-            let updateC (data: adForm) shortName = ()
-                if System.String.IsNullOrEmpty(data.published) then
-                    
-                else
-                
+            let updateC (data: adForm) shortName (posting: Entities.posting) (currentUser: Entities.user) = 
+                (match normalize data.published with 
+                 | "" -> Postings.save { posting with 
+                                            userId = currentUser.id
+                                            heading = data.heading
+                                            shortname = Postings.makeShortName data.heading
+                                            shorttext = Postings.makeShortText data.detail
+                                            updatedOn = System.DateTime.Now
+                                            contents = data.detail 
+                                            tags = Tags.parseAndDedupe data.tags}
+                 | _ -> Postings.save { posting with published = (data.published.ToLower() = "true") })
+                 |> named "posting"

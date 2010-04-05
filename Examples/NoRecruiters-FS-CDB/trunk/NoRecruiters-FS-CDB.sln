@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoRecruiters", "NoRecruiters\NoRecruiters.csproj", "{F85CB47D-FF92-4E62-8741-82CB3799C354}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Controllers", "Controllers\Controllers.fsproj", "{9F05303F-7B98-4527-B568-1BF5A2851443}"

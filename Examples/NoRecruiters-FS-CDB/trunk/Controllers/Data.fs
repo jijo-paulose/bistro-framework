@@ -56,8 +56,8 @@ module Data =
 
         let maxTagLength = 50
         let rankedTags num = 
-            Fti.selectRecords<Entities.tag> (
-                Fti.query "items" "alltags" database |> Fti.limitTo num
+            selectRecords<Entities.tag> (
+                query "items" "alltags" database |> limitTo num
                 )
 
         let rec private doParseAndDedupe tagMap = function

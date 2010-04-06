@@ -1,4 +1,4 @@
-﻿{% extends "Templates\base.django" %} 
+﻿{% extends "Views\base.django" %} 
 
 {% block title %} 
 NoRecruiters :: Search
@@ -22,7 +22,7 @@ NoRecruiters :: Search
                 <br />
                 &nbsp;
                 <div class="searchBox">
-                    <form name="frmSearch" action="{% url "/postings/{0} contentType %}" method="post">
+                    <form name="frmSearch" action="{% url "/postings/{0}" contentType %}" method="post">
                     <table>
                         <tr>
                             <td style="text-align: right; padding-right: 5px;">
@@ -61,8 +61,8 @@ NoRecruiters :: Search
     <div class="listItemHeader">
         <h3>
             <a href="{% url '/{0}/{1}' contentType posting.ShortName">{{posting.Heading}}</a><span
-                class="flags">( <a href="{% url "/posting/flag/{0}/1/{1} contentType posting.ShortName %}">
-                    recruiter!</a>, <a href="{% url "/posting/flag/{0}/3/{1} contentType posting.ShortName %}">
+                class="flags">( <a href="{% url "/posting/flag/{0}/1/{1}" contentType posting.ShortName %}">
+                    recruiter!</a>, <a href="{% url "/posting/flag/{0}/3/{1}" contentType posting.ShortName %}">
                         spam</a>)</span>
         </h3>
     </div>

@@ -62,6 +62,7 @@ namespace FSharp.ProjectExtender
         {
             parent.children.RemoveAt(parent.childrenMap[ItemId]);
             parent.childrenMap.Remove(ItemId);
+            parent.remapChildren();
             items.Unregister(ItemId);
         }
 
@@ -70,6 +71,11 @@ namespace FSharp.ProjectExtender
             ItemNode node = new ItemNode(items, itemidAdded);
             node.parent = this;
             children.Add(items.GetNodeKey(itemidAdded), node);
+            remapChildren();
+        }
+
+        private void remapChildren()
+        {
             childrenMap.Clear();
             int i = 0;
             foreach (var item in children)

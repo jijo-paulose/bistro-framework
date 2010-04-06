@@ -146,30 +146,41 @@ namespace FSharp.ProjectExtender
             return (string)browseObject.GetType().GetMethod("SetMetadata").Invoke(browseObject, new object[] { property, value });
         }
 
-        internal void InvalidateParentItems(uint itemId)
+        private void InvalidateParentItems(List<uint> itemIds)
         {
-            IOLEServiceProvider sp;
-            ErrorHandler.ThrowOnFailure(innerProject.GetItemContext(itemId, out sp));
+            var updates = new Dictionary<Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode, Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode>(); 
+            foreach (var itemId in itemIds)
+            {
+                IOLEServiceProvider sp;
+                ErrorHandler.ThrowOnFailure(innerProject.GetItemContext(itemId, out sp));
 
-            IntPtr objPtr;
-            Guid hierGuid = typeof(EnvDTE.ProjectItem).GUID;
-            Guid UNKguid = Bistro.Designer.ProjectBase.NativeMethods.IID_IUnknown;
-            ErrorHandler.ThrowOnFailure(sp.QueryService(ref hierGuid, ref UNKguid, out objPtr));
+                IntPtr objPtr;
+                Guid hierGuid = typeof(EnvDTE.ProjectItem).GUID;
+                Guid UNKguid = Bistro.Designer.ProjectBase.NativeMethods.IID_IUnknown;
+                ErrorHandler.ThrowOnFailure(sp.QueryService(ref hierGuid, ref UNKguid, out objPtr));
 
-            EnvDTE.ProjectItem projectItem = (EnvDTE.ProjectItem)Marshal.GetObjectForIUnknown(objPtr);
-            var hierNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)projectItem.Object;
-            hierNode.OnInvalidateItems(hierNode.Parent);
+                EnvDTE.ProjectItem projectItem = (EnvDTE.ProjectItem)Marshal.GetObjectForIUnknown(objPtr);
+                var hierNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)projectItem.Object;
+                updates[hierNode.Parent] = hierNode;
+            }
+            foreach (var item in updates)
+                item.Value.OnInvalidateItems(item.Key);
         }
 
-        void InvalidateParentItems(string fileName)
+        void InvalidateParentItems(IEnumerable<string> fileNames)
         {
             int pfFound;
             VSDOCUMENTPRIORITY[] pdwPriority = new VSDOCUMENTPRIORITY[1];
             uint pItemid;
-            ErrorHandler.ThrowOnFailure(innerProject.IsDocumentInProject(fileName, out pfFound, pdwPriority, out pItemid));
-            if (pfFound == 0)
-                return;
-            InvalidateParentItems(pItemid);
+            List<uint> itemIds = new List<uint>();
+            foreach (var fileName in fileNames)
+            {
+                ErrorHandler.ThrowOnFailure(innerProject.IsDocumentInProject(fileName, out pfFound, pdwPriority, out pItemid));
+                if (pfFound == 0)
+                    continue;
+                itemIds.Add(pItemid);
+            }
+            InvalidateParentItems(itemIds);
         }
 
         #region IProjectManager Members
@@ -243,7 +254,7 @@ namespace FSharp.ProjectExtender
         public int OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags)
         {
             renaimng_in_progress = false;
-            InvalidateParentItems(rgszMkNewNames[0]);
+            InvalidateParentItems(rgszMkNewNames);
             return VSConstants.S_OK;
         }
 

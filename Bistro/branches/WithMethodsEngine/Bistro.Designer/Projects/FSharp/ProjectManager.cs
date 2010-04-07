@@ -17,11 +17,10 @@ using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 namespace Bistro.Designer.Projects.FSharp
 {
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProject
+    public class ProjectManager : FlavoredProjectBase
     {
         
          private DesignerPackage package;
-         string fileName;
          public ProjectManager(DesignerPackage package)
             : base()
         {
@@ -43,21 +42,30 @@ namespace Bistro.Designer.Projects.FSharp
         const string debug_page_guid = "{9CFBEB2A-6824-43e2-BD3B-B112FEBC3772}";
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
         {
-            this.fileName = fileName;
             base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
         }
 
-        protected override void OnAggregationComplete()
-        {
-            base.OnAggregationComplete();
-        }
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
-            return base.GetProperty(itemId, propId, out property);
-        }
-        protected override void Close()
-        {
-            base.Close();
+
+            int result = base.GetProperty(itemId, propId, out property);
+            if (result != VSConstants.S_OK)
+                return result;
+
+            if (itemId == VSConstants.VSITEMID_ROOT)
+            {
+                switch ((__VSHPROPID2)propId)
+                {
+                    case __VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList:
+                        //Remove the Debug page
+                        property = property.ToString().Split(';')
+                            .Aggregate("", (a, next) => next.Equals(debug_page_guid, StringComparison.OrdinalIgnoreCase) ? a : a + ';' + next).Substring(1);
+                        return VSConstants.S_OK;
+                    default:
+                        break;
+                }
+            }
+            return result;
         }
 
     }

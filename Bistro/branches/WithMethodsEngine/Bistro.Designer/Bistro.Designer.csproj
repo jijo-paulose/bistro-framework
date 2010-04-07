@@ -261,8 +261,6 @@
     <Compile Include="Explorer\Parsers\FSharpParser.cs" />
     <Compile Include="Explorer\Parsers\MetadataParserBase.cs" />
     <Compile Include="Explorer\ProjectFileManager.cs" />
-    <Compile Include="Projects\CSharp\Factory.cs" />
-    <Compile Include="Projects\CSharp\ProjectManager.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
     <Compile Include="Projects\ProjectExtender\Factory.cs" />
     <Compile Include="Projects\ProjectExtender\Constants.cs" />
@@ -285,8 +283,6 @@
     <Compile Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.Designer.cs">
       <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
     </Compile>
-    <ZipItem Include="Templates\ProjectItems\CSharpControllers\CodeFile.cs" />
-    <ZipProject Include="Templates\Projects\CSharp\Controller1.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">
@@ -322,8 +318,6 @@
     <None Include="ProjectBase\Diagrams\HierarchyClasses.cd" />
     <None Include="ProjectBase\Diagrams\PropertiesClasses.cd" />
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
-    <ZipProject Include="Templates\Projects\CSharp\index.django" />
-    <ZipProject Include="Templates\Projects\CSharp\Web.config" />
     <EmbeddedResource Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.resx">
       <DependentUpon>Viewer.cs</DependentUpon>
     </EmbeddedResource>
@@ -346,22 +340,6 @@
     <EmbeddedResource Include="Resources\lock.gif" />
     <EmbeddedResource Include="Resources\mechanic.gif" />
     <Content Include="Resources\Package.ico" />
-    <ZipItem Include="Templates\ProjectItems\CSharpControllers\CodeFile.vstemplate" />
-    <ZipProject Include="Templates\Projects\CSharp\Bistro.Core.dll" />
-    <ZipProject Include="Templates\Projects\CSharp\Bistro.Core.pdb" />
-    <ZipProject Include="Templates\Projects\CSharp\Bistro.Extensions.dll" />
-    <ZipProject Include="Templates\Projects\CSharp\Bistro.Extensions.pdb" />
-    <ZipProject Include="Templates\Projects\CSharp\CSharpProject.vstemplate" />
-    <ZipProject Include="Templates\Projects\CSharp\NDjango.BistroIntegration.dll" />
-    <ZipProject Include="Templates\Projects\CSharp\NDjango.BistroIntegration.pdb" />
-    <ZipProject Include="Templates\Projects\CSharp\NDjango.Core.dll" />
-    <ZipProject Include="Templates\Projects\CSharp\NDjango.Core.pdb" />
-    <ZipProject Include="Templates\Projects\CSharp\NDjango.Filters.dll" />
-    <ZipProject Include="Templates\Projects\CSharp\NDjango.Filters.pdb" />
-    <ZipProject Include="Templates\Projects\CSharp\StructureMap.dll" />
-    <ZipProject Include="Templates\Projects\CSharp\default.htm" />
-    <ZipProject Include="Templates\Projects\CSharp\CSharpProject.csproj" />
-    <ZipProject Include="Templates\Projects\CSharp\__TemplateIcon.ico" />
     <EmbeddedResource Include="Resources\white.PNG" />
   </ItemGroup>
   <!-- Browser file -->

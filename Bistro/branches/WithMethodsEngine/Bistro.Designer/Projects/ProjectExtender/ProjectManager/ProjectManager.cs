@@ -12,11 +12,13 @@ using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using System.ComponentModel.Design;
+using Microsoft.Build.BuildEngine;
 
 namespace FSharp.ProjectExtender
 {
     [ComVisible(true)]
     public class ProjectManager : FlavoredProjectBase, IProjectManager, IOleCommandTarget, IVsTrackProjectDocumentsEvents2
+                                    
     {
 
         public ProjectManager()
@@ -38,27 +40,26 @@ namespace FSharp.ProjectExtender
         uint document_tracker_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
         private string fileName;
         private ItemList itemList;
-
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
         {
-            this.fileName = fileName;
+            //this.fileName = fileName;
             base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
         }
 
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();
+            this.GetCanonicalName(VSConstants.VSITEMID_ROOT, out fileName);
             BuildManager = new MSBuildManager(fileName);
             itemList = new ItemList(this);
             hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
             IVsTrackProjectDocuments2 documentTracker = (IVsTrackProjectDocuments2)Package.GetGlobalService(typeof(SVsTrackProjectDocuments));
             ErrorHandler.ThrowOnFailure(documentTracker.AdviseTrackProjectDocumentsEvents(this, out document_tracker_cookie));
         }
-
         bool renaimng_in_progress = false;
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
-            if (! renaimng_in_progress)
+            if (!renaimng_in_progress)
                 switch ((__VSHPROPID)propId)
                 {
                     case __VSHPROPID.VSHPROPID_FirstChild:
@@ -186,7 +187,6 @@ namespace FSharp.ProjectExtender
         #region IProjectManager Members
 
         public MSBuildManager BuildManager { get; private set; }
-
         #endregion
 
         #region IOleCommandTarget Members

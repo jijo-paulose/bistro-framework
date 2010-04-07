@@ -16,21 +16,6 @@
 					Controllers.fs
 				</ProjectItem>
 			</Folder>
-			<Folder Name="lib" TargetFolderName="lib">
-				<ProjectItem>Bistro.Core.dll</ProjectItem>
-				<ProjectItem>Bistro.Core.pdb</ProjectItem>
-				<ProjectItem>Bistro.Extensions.dll</ProjectItem>
-				<ProjectItem>Bistro.Extensions.pdb</ProjectItem>
-				<ProjectItem>Bistro.FSharpExtensions.dll</ProjectItem>
-				<ProjectItem>Bistro.FSharpExtensions.pdb</ProjectItem>
-				<ProjectItem>NDjango.BistroIntegration.dll</ProjectItem>
-				<ProjectItem>NDjango.BistroIntegration.pdb</ProjectItem>
-				<ProjectItem>NDjango.Core.dll</ProjectItem>
-				<ProjectItem>NDjango.Core.pdb</ProjectItem>
-				<ProjectItem>NDjango.Filters.dll</ProjectItem>
-				<ProjectItem>NDjango.Filters.pdb</ProjectItem>
-				<ProjectItem>StructureMap.dll</ProjectItem>
-			</Folder>
 			<Folder Name="Views">
 				<ProjectItem ReplaceParameters="true">base.django</ProjectItem>
 				<ProjectItem ReplaceParameters="true">home.django</ProjectItem>

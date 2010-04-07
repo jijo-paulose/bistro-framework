@@ -45,13 +45,13 @@ namespace Bistro.Designer
     // package has a load key embedded in its resources.
     [ProvideLoadKey("Standard", "0.9", "Bistro Designer", "Hill30 Inc", 1)]
     // This attribute is needed to let the shell know that this package exposes some menus.
-    [ProvideMenuResource(1000, 1)]
+    //[ProvideMenuResource(1000, 1)]
     // This attribute registers a tool window exposed by this package.
     //[ProvideToolWindow(typeof(ExplorerWindow),Transient = false, Style = VsDockStyle.Tabbed, Orientation = ToolWindowOrientation.Right, 
     //    Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
-    [ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidFSharpProjectFactoryString)]
-    [ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidCSharpProjectFactoryString)]
-    [ProvideToolWindow(typeof(ExplorerWindow))]
+    //[ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidFSharpProjectFactoryString)]
+    //[ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidCSharpProjectFactoryString)]
+    //[ProvideToolWindow(typeof(ExplorerWindow))]
     [ProvideProjectFactory(
         typeof(Projects.FSharp.Factory), 
         null,
@@ -66,12 +66,9 @@ namespace Bistro.Designer
                                                         // will also be used as the name of the node grouping
                                                         // projects in the AddNewProject dialog
     [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), null, null, null, null, @".\NullPath")]
-
-    [ProvideProjectFactory(typeof(Projects.CSharp.Factory), null, null, null, null, @".\NullPath", LanguageVsTemplate = "Bistro")]
     [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
     [WAProvideProjectFactoryTemplateMapping("{" + "f2a71f9b-5d33-465a-a702-920d77279786" + "}", typeof(Projects.FSharp.DummyWebFactory))]
-    [WAProvideProjectFactoryTemplateMapping("{" + "fae04ec0-301f-11d3-bf4b-00c04f79efbc" + "}", typeof(Projects.CSharp.DummyWebFactory))]
-
+ 
     [ProvideObject(typeof(FSharp.ProjectExtender.Page))]
 
     [Guid(Guids.guidBistro_DesignerPkgString)]
@@ -136,10 +133,8 @@ namespace Bistro.Designer
                 mcs.AddCommand( menuToolWin );
             }
             RegisterProjectFactory(new Projects.FSharp.Factory(this));
-            RegisterProjectFactory(new Projects.CSharp.Factory(this));
             RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
-            explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
-            
+            //explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
             ///This is an alternative way to handle solution events.Decided to use ProjectManager for each project instead
             /*ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)this);
             IVsMonitorSelection monitorSelectionService = GetGlobalService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;

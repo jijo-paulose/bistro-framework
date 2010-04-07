@@ -31,6 +31,15 @@ namespace Bistro.Designer.Explorer
         internal int bindLen;
         internal ControllerMetadata controller;
         public BindPointInfo() { }
+        public BindPointInfo(BindPointInfo info)
+        {
+            
+            this.target = info.target;
+            this.controller = info.controller;
+            this.bindType = info.bindType;
+            this.bindLen = info.bindLen;
+            this.priority = info.priority;
+        }
         /*public BindPointInfo(string target, int priority, ControllerMetadata controller)
         {
             //BindPointInfo(target,"all",-1,BindType.Before,controller);
@@ -200,6 +209,8 @@ namespace Bistro.Designer.Explorer
 
         protected string curCtrl;//name of the controller that is being processed
         protected string curAttr;//name of the attribute that is being processed
+        protected BindPointInfo curbpi = new BindPointInfo();
+
         private void Extract(string srcText, string fname)
         {
             try

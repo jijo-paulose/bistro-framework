@@ -13,7 +13,7 @@ using System.Threading;
 namespace Bistro.Designer.Explorer
 {
     
-    internal abstract partial class FileManager : IDisposable, IVsRunningDocTableEvents, 
+    internal partial class FileManager : IDisposable, IVsRunningDocTableEvents, 
         IVsRunningDocTableEvents4, IVsTextLinesEvents
     {
         
@@ -32,18 +32,17 @@ namespace Bistro.Designer.Explorer
             {
                 this.project = project;
                 this.projExt = projExt;
-                vsRDT = (IVsRunningDocumentTable)Package.GetGlobalService(typeof(SVsRunningDocumentTable));
                 tracker = new ChangesTracker(projExt);
                 notifier = new Notifier(this);
                 watchers = new Dictionary<string, FileSystemWatcher>();
                 codeFiles = BuildCodeFileList();
+                AdviseEvents();
                 tracker.OnProjectOpened(codeFiles);
                 tracker.Explorer = (ExplorerWindow)UIControl;
             }
         }
 
         internal List<string> CodeFiles { get { return codeFiles; } }
-        protected abstract List<string> BuildCodeFileList();
         protected IVsProject Project { get { return project; } }
         protected IVsTextView _textView = null;
         private IVsProject project;
@@ -65,21 +64,24 @@ namespace Bistro.Designer.Explorer
         /// </summary>
         private Timer updateTimer;
         private string projExt;
-        internal virtual void AdviseEvents()
+        internal void AdviseEvents()
         {
 
+            vsRDT = (IVsRunningDocumentTable)Package.GetGlobalService(typeof(SVsRunningDocumentTable));
             // 1. subscribe to internal file events - events initiated from within VS
             ErrorHandler.ThrowOnFailure(vsRDT.AdviseRunningDocTableEvents(this, out rdtCookie));
 
             // 2. subscribe to external file events
             foreach (string fileName in codeFiles)
                     AddWatcher(fileName);
+            vsTPD = (IVsTrackProjectDocuments2)Package.GetGlobalService(typeof(SVsTrackProjectDocuments));
+            ErrorHandler.ThrowOnFailure(vsTPD.AdviseTrackProjectDocumentsEvents(this, out tpdCookie));
+
         }
 
         #endregion
 
 
-        protected abstract bool ToBeParsed(string path);
 
         private bool NeedsNotify(string path) 
         { 
@@ -391,7 +393,7 @@ namespace Bistro.Designer.Explorer
             // unmanaged resources here.
             // If disposing is false, 
             // only the following code is executed.
-            DisposeUnmanaged();
+            //DisposeUnmanaged();
         }
 
         /// <summary>
@@ -421,9 +423,6 @@ namespace Bistro.Designer.Explorer
 
         }
 
-        protected virtual void DisposeUnmanaged()
-        {
-        }
 
         // Use C# destructor syntax for finalization code.
         // This destructor will run only if the Dispose method 

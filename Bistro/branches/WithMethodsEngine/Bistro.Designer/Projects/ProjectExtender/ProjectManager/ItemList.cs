@@ -59,7 +59,10 @@ namespace FSharp.ProjectExtender
         {
             IVsHierarchy hier = (IVsHierarchy)project;
             object name;
+            string fullName;
             ErrorHandler.ThrowOnFailure(hier.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_Caption, out name));
+            ErrorHandler.ThrowOnFailure(hier.GetCanonicalName(itemId,out fullName));
+
             Guid type;
             try
             {
@@ -87,7 +90,11 @@ namespace FSharp.ProjectExtender
                 sort_order = "b";
             else if (type == VSConstants.GUID_ItemType_VirtualFolder)
                 sort_order = "c";
-            return sort_order + ';' + (string)name;
+            if (!String.IsNullOrEmpty(fullName))
+                return sort_order + ';' + fullName;
+
+            else
+                return sort_order + ';' + (string)name;
         }
 
         internal uint GetNodeSibling(uint itemId)

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Bistro.Designer.Explorer
 {
-    internal abstract partial class FileManager
+    internal partial class FileManager
     {
         /// <summary>
         /// Compound notifications: All notifications are compounded together in a single package. 

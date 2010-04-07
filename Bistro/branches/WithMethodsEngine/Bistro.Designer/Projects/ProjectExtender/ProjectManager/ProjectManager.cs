@@ -164,8 +164,19 @@ namespace FSharp.ProjectExtender
                 var hierNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)projectItem.Object;
                 updates[hierNode.Parent] = hierNode;
             }
+
+            uint lastItemId = VSConstants.VSITEMID_NIL;
             foreach (var item in updates)
+            {
                 item.Value.OnInvalidateItems(item.Key);
+                lastItemId = item.Value.ID;
+            }
+
+            if (lastItemId != VSConstants.VSITEMID_NIL)
+            {
+                IVsUIHierarchyWindow uiWindow = Bistro.Designer.ProjectBase.UIHierarchyUtilities.GetUIHierarchyWindow(serviceProvider, new Guid(EnvDTE.Constants.vsWindowKindSolutionExplorer));
+                ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this, lastItemId, EXPANDFLAGS.EXPF_SelectItem));
+            }
         }
 
         void InvalidateParentItems(IEnumerable<string> fileNames)
@@ -195,6 +206,13 @@ namespace FSharp.ProjectExtender
         {
             int result = innerTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
             if ((uint)result == 0x80131509) // Invalid Operation Exception
+            {
+                System.Diagnostics.Debug.Write("\n***** Supressing COM exception *****\n");
+                System.Diagnostics.Debug.Write(Marshal.GetExceptionForHR(result));
+                System.Diagnostics.Debug.Write("\n***** Supressed *****\n");
+                return VSConstants.S_OK;
+            }
+            if ((uint)result == 0x80004003) // Null Pointer Exception
             {
                 System.Diagnostics.Debug.Write("\n***** Supressing COM exception *****\n");
                 System.Diagnostics.Debug.Write(Marshal.GetExceptionForHR(result));

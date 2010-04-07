@@ -260,7 +260,7 @@
     <Compile Include="Explorer\FileManager.Notifier.cs" />
     <Compile Include="Explorer\Parsers\FSharpParser.cs" />
     <Compile Include="Explorer\Parsers\MetadataParserBase.cs" />
-    <Compile Include="Explorer\ProjectFileManager.cs" />
+    <Compile Include="Explorer\FileManager.TrackDocChanges.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
     <Compile Include="Projects\ProjectExtender\Factory.cs" />
     <Compile Include="Projects\ProjectExtender\Constants.cs" />

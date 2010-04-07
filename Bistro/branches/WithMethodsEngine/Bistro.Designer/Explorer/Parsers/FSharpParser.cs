@@ -34,6 +34,8 @@ namespace Bistro.Designer.Explorer
                     curCtrl = nodeInfo.ChildNodes[2].ToString();
                     curCtrl = curCtrl.Substring(0, curCtrl.Length - tail.Length);
                     controllerInfo.Add(new ControllerMetadata(curCtrl));
+                    curbpi.controller = controllerInfo[controllerInfo.Count - 1];
+
                 }
                 AnalyzeTree(nodeInfo);
             }
@@ -71,8 +73,7 @@ namespace Bistro.Designer.Explorer
                             /// 
                             if (curAttr == "Bind")
                             {
-                                BindPointInfo bpi = new BindPointInfo();
-                                bpi.controller = controllerInfo[controllerInfo.Count - 1];
+                                curbpi.controller = controllerInfo[controllerInfo.Count - 1];
                                 //Bind("target") - arg is Literal NT is processed as other common attr_args
                                 //Bind("target",Priority=1,ControllerBindType = BindType.After)- args are Literal,BinExpr,BinExpr
                                 while (curChild.ChildNodes.Count > 0)
@@ -92,17 +93,26 @@ namespace Bistro.Designer.Explorer
                                                 if (curChild.ChildNodes[0].ToString() == "qual_name_segments_opt")
                                                 {
                                                     curChild = (curChild.ChildNodes[0]).ChildNodes[node.ChildNodes.Count - 1];//Literal
-                                                    curVal += curChild.ChildNodes[0].ToString();
+                                                    //curVal += curChild.ChildNodes[0].ToString();
                                                 }
                                                 else
                                                 {
-                                                    curVal += (curChild.ChildNodes[0]).ChildNodes[0].ToString();
+                                                    //curVal += (curChild.ChildNodes[0]).ChildNodes[0].ToString();
 
+                                                }
+                                                if (curVal.Contains("Priority"))
+                                                {
+                                                }
+                                                else if (curVal.Contains("BindType"))
+                                                {
+                                                }
+                                                else
+                                                {
                                                 }
                                             }
                                             //TODO switch target,bindType,priority and etc!!!
                                             Trace.WriteLine("<val>:" + curChild.ToString());
-                                            controllerInfo[controllerInfo.Count-1].Binds.Add(bpi);
+                                            controllerInfo[controllerInfo.Count-1].Binds.Add(new BindPointInfo(curbpi));
                                             break;
                                         }
 
@@ -116,8 +126,8 @@ namespace Bistro.Designer.Explorer
                                         Trace.WriteLine("<val>:" + curChild.ToString());
                                         curVal += curChild.ToString();
                                         //TODO switch target,bindType,priority and etc!!!
-                                        bpi.target = curVal;
-                                        controllerInfo[controllerInfo.Count - 1].Binds.Add(bpi);
+                                        curbpi.target = curVal;
+                                        controllerInfo[controllerInfo.Count - 1].Binds.Add(new BindPointInfo(curbpi));
 
                                     }
                                 }

@@ -33,6 +33,7 @@ namespace Bistro.Designer.Explorer
                     curCtrl = nodeInfo.ChildNodes[3].ToString();
                     curCtrl = curCtrl.Substring(0, curCtrl.Length - tail.Length);
                     controllerInfo.Add(new ControllerMetadata(curCtrl));
+                    curbpi.controller = controllerInfo[controllerInfo.Count - 1];
                     curFieldOrProp = String.Empty;
                 }
                 if (isClassField)
@@ -123,7 +124,6 @@ namespace Bistro.Designer.Explorer
                         if (curAttr == "Bind" && String.IsNullOrEmpty(curFieldOrProp))
                         {
                             ParseTreeNode expr;
-                            BindPointInfo bpi = new BindPointInfo();
                             if (child.ChildNodes.Count > 1)
                             {
                                 //Priority = 1 : [0]Priority [1] = [2]primary expression->identifier
@@ -131,8 +131,27 @@ namespace Bistro.Designer.Explorer
                                 expr = child.ChildNodes[2];
                                 while (expr.ChildNodes.Count > 0)
                                     expr = expr.ChildNodes[expr.ChildNodes.Count - 1];
-                                curVal += expr.ToString();
-                                bpi.priority = Convert.ToInt32(expr);
+                                //curVal += expr.ToString();
+                                if (curVal.Contains("Priority"))
+                                    curbpi.priority = Convert.ToInt32(expr);
+                                else if (curVal.Contains("BindType"))
+                                {
+                                    switch (expr.ToString()) 
+                                    {
+                                        case "After":
+                                            curbpi.bindType = Bistro.Controllers.Descriptor.BindType.After;
+                                            break;
+                                        case "Payload":
+                                            curbpi.bindType = Bistro.Controllers.Descriptor.BindType.Payload;
+                                            break;
+                                        case "Teardown":
+                                             curbpi.bindType = Bistro.Controllers.Descriptor.BindType.Teardown;
+                                             break;
+
+                                        default:
+                                             break;
+                                    }
+                                }
                                 //curVal is  like this: Priority (Identifier)= 1 (Number)
                             }
                             else
@@ -142,10 +161,10 @@ namespace Bistro.Designer.Explorer
                                 while (expr.ChildNodes.Count > 0)
                                     expr = expr.ChildNodes[expr.ChildNodes.Count - 1];
                                 curVal = expr.ToString();
-                                bpi.target = curVal;
+                                curbpi.target = curVal;
+                                curbpi.bindLen = curbpi.target.Split('\\').Length;
                             }
-                            bpi.controller = controllerInfo[controllerInfo.Count - 1];
-                            controllerInfo[controllerInfo.Count - 1].Binds.Add(bpi);
+                            controllerInfo[controllerInfo.Count - 1].Binds.Add(new BindPointInfo(curbpi));
 
                         }
                         else if (curAttr == "RenderWith" && String.IsNullOrEmpty(curFieldOrProp))

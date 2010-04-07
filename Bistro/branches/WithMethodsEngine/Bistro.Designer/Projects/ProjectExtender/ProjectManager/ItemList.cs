@@ -13,6 +13,12 @@ namespace FSharp.ProjectExtender
     /// <summary>
     /// Maintains a list of project items 
     /// </summary>
+    /// <remarks>
+    /// The purpose of this class is to maintain a shadow list of all project items for the project
+    /// When the Solution Explorer displays the project tree it traverses the project using
+    /// the IVsHierarchy.GetProperty method. The ProjectExtender redirects the GetProperty method calls to 
+    /// provide them in the order defined by ItemList rather than the order of F# Project Manager
+    /// </remarks>
     public class ItemList: IVsHierarchyEvents
     {
         ProjectManager project;

@@ -88,6 +88,10 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0" />
+    <Reference Include="ProjectExtender, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ProjectExtender\bin\Debug\ProjectExtender.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
@@ -261,27 +265,6 @@
     <Compile Include="Explorer\Parsers\FSharpParser.cs" />
     <Compile Include="Explorer\Parsers\MetadataParserBase.cs" />
     <Compile Include="Projects\FSharp\ProjectManager.cs" />
-    <Compile Include="Projects\ProjectExtender\Factory.cs" />
-    <Compile Include="Projects\ProjectExtender\Constants.cs" />
-    <Compile Include="Projects\ProjectExtender\ProjectManager\IProjectManager.cs" />
-    <Compile Include="Projects\ProjectExtender\ProjectManager\ItemList.cs" />
-    <Compile Include="Projects\ProjectExtender\ProjectManager\ItemNode.cs" />
-    <Compile Include="Projects\ProjectExtender\MSBuildUtilities\BuildElement.cs" />
-    <Compile Include="Projects\ProjectExtender\MSBuildUtilities\MSBuildManager.cs" />
-    <Compile Include="Projects\ProjectExtender\ProjectManager\ProjectManager.cs" />
-    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Page.cs" />
-    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.Designer.cs">
-      <DependentUpon>Viewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.Designer.cs">
-      <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectBase\DontShowAgainDialog.resx">
@@ -317,12 +300,6 @@
     <None Include="ProjectBase\Diagrams\HierarchyClasses.cd" />
     <None Include="ProjectBase\Diagrams\PropertiesClasses.cd" />
     <None Include="ProjectBase\Diagrams\ReferenceClasses.cd" />
-    <EmbeddedResource Include="Projects\ProjectExtender\CompileOrderDialog\Viewer.resx">
-      <DependentUpon>Viewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Projects\ProjectExtender\CompileOrderDialog\EditDependenciesDialog.resx">
-      <DependentUpon>EditDependenciesDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Images_32bit.bmp" />
     <EmbeddedResource Include="Resources\Images_24bit.bmp" />
     <EmbeddedResource Include="Explorer\DesignerControl.resx">

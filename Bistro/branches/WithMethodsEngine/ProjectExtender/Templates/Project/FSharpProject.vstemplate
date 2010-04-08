@@ -1,0 +1,19 @@
+﻿<VSTemplate Version="2.0.0" Type="Project"
+    xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+	<TemplateData>
+		<Name>F# Application Extender</Name>
+		<Description>A project for a Bistro Web application written in F#</Description>
+		<Icon>FSharp.ico</Icon>
+		<TemplateID>Hill30.FSharpEx</TemplateID>
+		<ProjectType>FSharp</ProjectType>
+		<DefaultName>Application</DefaultName>
+		<ProvideDefaultName>true</ProvideDefaultName>
+	</TemplateData>
+	<TemplateContent>
+		<Project File="FSharpProject.fsproj" ReplaceParameters="true">
+				<ProjectItem ReplaceParameters="true" OpenInEditor="true">
+					app.fs
+				</ProjectItem>
+		</Project>
+	</TemplateContent>
+</VSTemplate>

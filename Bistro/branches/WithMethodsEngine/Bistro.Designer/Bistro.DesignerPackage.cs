@@ -69,7 +69,7 @@ namespace Bistro.Designer
     [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
     [WAProvideProjectFactoryTemplateMapping("{" + "f2a71f9b-5d33-465a-a702-920d77279786" + "}", typeof(Projects.FSharp.DummyWebFactory))]
  
-    [ProvideObject(typeof(FSharp.ProjectExtender.Page))]
+    //[ProvideObject(typeof(FSharp.ProjectExtender.Page),RegisterUsing=RegistrationMethod.CodeBase)]
 
     [Guid(Guids.guidBistro_DesignerPkgString)]
     public sealed class DesignerPackage : Package

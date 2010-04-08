@@ -40,10 +40,6 @@ namespace Bistro.Designer.Projects.FSharp
 
         // the fsharp debug project propety page - we need to suppress it
         const string debug_page_guid = "{9CFBEB2A-6824-43e2-BD3B-B112FEBC3772}";
-        protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
-        {
-            base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
-        }
 
         protected override int GetProperty(uint itemId, int propId, out object property)
         {

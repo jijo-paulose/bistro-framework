@@ -50,6 +50,29 @@ module Data =
             postingId: string
             userType: int
             }
+    
+    module Users =
+        open Entities
+        open System.Security.Cryptography
+        open System.Text
+
+        let hashPassword (password: string) =
+             let crypto = SHA1.Create()
+             let encoding = UnicodeEncoding.UTF8
+             encoding.GetString(crypto.ComputeHash(encoding.GetBytes(password)))
+
+        let byCredentials username password =
+            match selectRecords<Entities.user> (
+                                                query "users" "all" database |> limitTo 1
+                                                ) with
+            | user::[] ->
+                if user.password = hashPassword password then Some user
+                else None
+            | _ -> None
+
+        let saveUser (user: Entities.user) =
+            let id, rev = user |> into database
+            { user with id = id; rev = rev }
 
     module Tags =
         open Entities

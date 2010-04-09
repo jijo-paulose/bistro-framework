@@ -28,6 +28,11 @@ namespace NoRecruiters.Controllers
 
         type UserProfile() = 
             let mutable (data: Entities.user option) = None
+            
+            new (userData: Entities.user) as this = 
+                UserProfile()
+                then 
+                    this.Data <- Some userData
 
             member x.Data with get() = data and set(d) = data <- d
             interface IIdentity with

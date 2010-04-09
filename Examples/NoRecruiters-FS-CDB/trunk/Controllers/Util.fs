@@ -44,3 +44,15 @@
 
         let sanitize s = 
             String.collect (fun c -> match Map.tryFind c charMap with | Some r -> r | None -> c.ToString()) s
+
+        let reportError (errors: Map<string, string> option) errorCode errorText =
+            match errors with 
+            | Some e -> 
+                if Map.containsKey errorCode e then 
+                    let current = e.[errorCode]
+                    (Map.remove errorCode e) |>
+                    Map.add errorCode (current + ". " + errorText)
+                else
+                    Map.add errorCode errorText e
+            | None ->
+                Map.add errorCode errorText Map.empty

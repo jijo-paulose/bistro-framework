@@ -29,9 +29,9 @@ namespace NoRecruiters.Controllers
             HttpContext.Current.Response.Cookies.Add(new HttpCookie("nrDefaultContentType", defaultContentType))
             newContentType |> named "defaultContentType"
         
-        [<Bind("get /postings/{contentType}?{firstTime}")>]
+        [<Bind("get /postings/{contentType}?{firstTime}&{txtQuery}")>]
         [<RenderWith("Views/Posting/search.django"); ReflectedDefinition>]
-        let searchC (txtQuery: string form) currentTags contentType =
+        let searchC txtQuery currentTags contentType =
             let popularTags = 
                 match currentTags with
                 | Some l ->
@@ -40,7 +40,8 @@ namespace NoRecruiters.Controllers
                 | None -> Tags.rankedTags 15
             
             popularTags, 
-            (Postings.search (txtQuery.Value) currentTags (Content.fromString contentType)) |> named "searchResults"
+            contentType,
+            (Postings.search txtQuery currentTags (Content.fromString contentType)) |> named "searchResults"
             
         [<Bind("get /ad/{shortName}")>]
         [<Bind("get /resume/{shortName}")>]

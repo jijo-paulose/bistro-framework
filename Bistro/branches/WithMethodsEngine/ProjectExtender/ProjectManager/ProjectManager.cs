@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using System.ComponentModel.Design;
 using Microsoft.Build.BuildEngine;
+using System.IO;
 
 namespace FSharp.ProjectExtender
 {
@@ -38,24 +39,33 @@ namespace FSharp.ProjectExtender
 
         uint hierarchy_event_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
         uint document_tracker_cookie = (uint)ShellConstants.VSCOOKIE_NIL;
-        private string fileName;
         private ItemList itemList;
-        protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
-        {
-            //this.fileName = fileName;
-            base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
-        }
+        Microsoft.VisualStudio.FSharp.ProjectSystem.ProjectNode FSProjectManager;
 
         protected override void OnAggregationComplete()
         {
             base.OnAggregationComplete();
-            this.GetCanonicalName(VSConstants.VSITEMID_ROOT, out fileName);
-            BuildManager = new MSBuildManager(fileName);
+
+            IOLEServiceProvider sp;
+            ErrorHandler.ThrowOnFailure(innerProject.GetItemContext(VSConstants.VSITEMID_ROOT, out sp));
+
+            IntPtr objPtr;
+            Guid hierGuid = typeof(VSLangProj.VSProject).GUID;
+            Guid UNKguid = NativeMethods.IID_IUnknown;
+            ErrorHandler.ThrowOnFailure(sp.QueryService(ref hierGuid, ref UNKguid, out objPtr));
+
+            var OAVSProject = (VSLangProj.VSProject)Marshal.GetObjectForIUnknown(objPtr);
+            var OAProject = (Microsoft.VisualStudio.FSharp.ProjectSystem.Automation.OAProject)OAVSProject.Project;
+            FSProjectManager = OAProject.Project;
+
+            BuildManager = new MSBuildManager(FSProjectManager.BuildProject);
+
             itemList = new ItemList(this);
             hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
             IVsTrackProjectDocuments2 documentTracker = (IVsTrackProjectDocuments2)Package.GetGlobalService(typeof(SVsTrackProjectDocuments));
             ErrorHandler.ThrowOnFailure(documentTracker.AdviseTrackProjectDocumentsEvents(this, out document_tracker_cookie));
         }
+        
         bool renaimng_in_progress = false;
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
@@ -147,22 +157,33 @@ namespace FSharp.ProjectExtender
             return (string)browseObject.GetType().GetMethod("SetMetadata").Invoke(browseObject, new object[] { property, value });
         }
 
-        private void InvalidateParentItems(List<uint> itemIds)
+        internal void InvalidateParentItems(IEnumerable<uint> itemIds)
         {
             var updates = new Dictionary<Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode, Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode>(); 
             foreach (var itemId in itemIds)
             {
-                IOLEServiceProvider sp;
-                ErrorHandler.ThrowOnFailure(innerProject.GetItemContext(itemId, out sp));
+                //IOLEServiceProvider sp;
+                //ErrorHandler.ThrowOnFailure(innerProject.GetItemContext(itemId, out sp));
 
-                IntPtr objPtr;
-                Guid hierGuid = typeof(EnvDTE.ProjectItem).GUID;
-                Guid UNKguid = Hill30Inc.ProjectExtender.ProjectBase.NativeMethods.IID_IUnknown;
-                ErrorHandler.ThrowOnFailure(sp.QueryService(ref hierGuid, ref UNKguid, out objPtr));
+                //IntPtr objPtr;
+                //Guid hierGuid = typeof(EnvDTE.ProjectItem).GUID;
+                //Guid UNKguid = NativeMethods.IID_IUnknown;
+                //Guid vsHierarchyGuid = typeof(IVsHierarchy).GUID;
+                //Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode hierarchyNode;
+                //if (ErrorHandler.Succeeded(sp.QueryService(ref hierGuid, ref UNKguid, out objPtr)))
+                //{
+                //    EnvDTE.ProjectItem projectItem = (EnvDTE.ProjectItem)Marshal.GetObjectForIUnknown(objPtr);
+                //    hierarchyNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)projectItem.Object;
+                //}
+                //else
+                //{
+                //    ErrorHandler.ThrowOnFailure(sp.QueryService(ref vsHierarchyGuid, ref UNKguid, out objPtr));
+                //    hierarchyNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)Marshal.GetObjectForIUnknown(objPtr);
+                //}
+                
+                var hierarchyNode = FSProjectManager.NodeFromItemId(itemId);
 
-                EnvDTE.ProjectItem projectItem = (EnvDTE.ProjectItem)Marshal.GetObjectForIUnknown(objPtr);
-                var hierNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)projectItem.Object;
-                updates[hierNode.Parent] = hierNode;
+                updates[hierarchyNode.Parent] = hierarchyNode;
             }
 
             uint lastItemId = VSConstants.VSITEMID_NIL;
@@ -174,20 +195,32 @@ namespace FSharp.ProjectExtender
 
             if (lastItemId != VSConstants.VSITEMID_NIL)
             {
-                IVsUIHierarchyWindow uiWindow = Hill30Inc.ProjectExtender.ProjectBase.UIHierarchyUtilities.GetUIHierarchyWindow(serviceProvider, new Guid(EnvDTE.Constants.vsWindowKindSolutionExplorer));
-                ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this, lastItemId, EXPANDFLAGS.EXPF_SelectItem));
+                IVsUIShell shell = serviceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;
+
+                object pvar = null;
+                IVsWindowFrame frame = null;
+                Guid persistenceSlot = new Guid(EnvDTE.Constants.vsWindowKindSolutionExplorer);
+
+                ErrorHandler.ThrowOnFailure(shell.FindToolWindow(0, ref persistenceSlot, out frame));
+                ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out pvar));
+
+                if (pvar != null)
+                    ErrorHandler.ThrowOnFailure(((IVsUIHierarchyWindow)pvar).ExpandItem(this, lastItemId, EXPANDFLAGS.EXPF_SelectItem));
+
             }
         }
 
-        void InvalidateParentItems(IEnumerable<string> fileNames)
+        private void InvalidateParentItems(string[] oldFileNames, string[] newFileNames)
         {
             int pfFound;
             VSDOCUMENTPRIORITY[] pdwPriority = new VSDOCUMENTPRIORITY[1];
             uint pItemid;
             List<uint> itemIds = new List<uint>();
-            foreach (var fileName in fileNames)
+            for (int i = 0; i < newFileNames.Length; i++)
             {
-                ErrorHandler.ThrowOnFailure(innerProject.IsDocumentInProject(fileName, out pfFound, pdwPriority, out pItemid));
+                if (Path.GetFileName(newFileNames[i]) == Path.GetFileName(oldFileNames[i]))
+                    continue;
+                ErrorHandler.ThrowOnFailure(innerProject.IsDocumentInProject(newFileNames[i], out pfFound, pdwPriority, out pItemid));
                 if (pfFound == 0)
                     continue;
                 itemIds.Add(pItemid);
@@ -205,6 +238,10 @@ namespace FSharp.ProjectExtender
         int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             int result = innerTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+            // In certain situations the F# project manager throws an exception while adding files
+            // to subdirectories. We are lucky that this is happening after all the job of adding the file
+            // to the project is completed. Whereas we are handling the file ordering ourselves anyway
+            // all we need to do is to supress the error message
             if ((uint)result == 0x80131509) // Invalid Operation Exception
             {
                 System.Diagnostics.Debug.Write("\n***** Supressing COM exception *****\n");
@@ -267,14 +304,13 @@ namespace FSharp.ProjectExtender
         public int OnAfterRenameDirectories(int cProjects, int cDirs, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEDIRECTORYFLAGS[] rgFlags)
         {
             renaimng_in_progress = false;
-            InvalidateParentItems(rgszMkNewNames);
             return VSConstants.S_OK;
         }
 
         public int OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags)
         {
             renaimng_in_progress = false;
-            InvalidateParentItems(rgszMkNewNames);
+            InvalidateParentItems(rgszMkOldNames, rgszMkNewNames);
             return VSConstants.S_OK;
         }
 

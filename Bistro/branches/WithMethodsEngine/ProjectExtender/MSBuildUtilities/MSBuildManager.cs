@@ -42,9 +42,9 @@ namespace FSharp.ProjectExtender
         /// <see cref="M:FixupProject"/> method. After the FSharp base project system is done loading the project these 
         /// elements are moevd back to their original positions
         /// </remarks>
-        public MSBuildManager(string projectFile)
+        public MSBuildManager(Project project)
         {
-            project = Engine.GlobalEngine.GetLoadedProject(projectFile);
+            this.project = project;
 
             var item_list = new List<BuildElement>();
             var fixup_list = new List<Tuple<BuildElement, int, int>>();

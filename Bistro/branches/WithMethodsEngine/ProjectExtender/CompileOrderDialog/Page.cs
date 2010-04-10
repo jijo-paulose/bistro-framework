@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 using System.Drawing;
 using Microsoft.VisualStudio.Shell.Interop;
 
-using NativeMethods = Hill30Inc.ProjectExtender.ProjectBase.NativeMethods;
+//using NativeMethods = Hill30Inc.ProjectExtender.ProjectBase.NativeMethods;
 using MSProject = Microsoft.Build.BuildEngine.Project;
 
 namespace FSharp.ProjectExtender
@@ -35,7 +35,7 @@ namespace FSharp.ProjectExtender
                 {
                     this.dirty = value;
                     if (this.site != null)
-                        site.OnStatusChange((uint)(this.dirty ? Hill30Inc.ProjectExtender.ProjectBase.PropPageStatus.Dirty : Hill30Inc.ProjectExtender.ProjectBase.PropPageStatus.Clean));
+                        site.OnStatusChange((uint)(this.dirty ? StructuresEnums.PropPageStatus.Dirty : StructuresEnums.PropPageStatus.Clean));
                 }
             }
         }

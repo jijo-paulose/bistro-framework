@@ -158,6 +158,16 @@ namespace FSharp.ProjectExtender
 
         int IVsHierarchyEvents.OnPropertyChanged(uint itemid, int propid, uint flags)
         {
+
+            if (propid == (int)__VSHPROPID.VSHPROPID_Caption)
+            {
+                ItemNode n;
+                if (!itemMap.TryGetValue(itemid, out n))
+                    return VSConstants.E_INVALIDARG;
+
+                n.Remap();
+                project.InvalidateParentItems(new uint[] {itemid});
+            }
             return VSConstants.S_OK;
         }
 

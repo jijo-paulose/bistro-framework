@@ -26,10 +26,7 @@ namespace FSharp.ProjectExtender
                 children.Add(items.GetNodeKey(child), node);
                 child = items.GetNodeSibling(child);
             }
-            childrenMap = new Dictionary<uint, int>(children.Count);
-            int i = 0;
-            foreach (var item in children)
-                childrenMap.Add(item.Value.ItemId, i++);
+            mapChildren();
             items.Register(this);
         }
 
@@ -62,7 +59,7 @@ namespace FSharp.ProjectExtender
         {
             parent.children.RemoveAt(parent.childrenMap[ItemId]);
             parent.childrenMap.Remove(ItemId);
-            parent.remapChildren();
+            parent.mapChildren();
             items.Unregister(ItemId);
         }
 
@@ -71,15 +68,26 @@ namespace FSharp.ProjectExtender
             ItemNode node = new ItemNode(items, itemidAdded);
             node.parent = this;
             children.Add(items.GetNodeKey(itemidAdded), node);
-            remapChildren();
+            mapChildren();
         }
 
-        private void remapChildren()
+        private void mapChildren()
         {
-            childrenMap.Clear();
+            if (childrenMap == null)
+                childrenMap = new Dictionary<uint, int>(children.Count);
+            else
+                childrenMap.Clear();
             int i = 0;
             foreach (var item in children)
                 childrenMap.Add(item.Value.ItemId, i++);
+        }
+
+        internal void Remap()
+        {
+            parent.children.RemoveAt(parent.childrenMap[ItemId]);
+            parent.childrenMap.Remove(ItemId);
+            parent.children.Add(items.GetNodeKey(ItemId), this);
+            parent.mapChildren();
         }
     }
 }

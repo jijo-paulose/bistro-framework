@@ -13,8 +13,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell;
 
-namespace Hill30Inc.ProjectExtender.ProjectBase
+namespace FSharp.ProjectExtender.StructuresEnums
 {
 	#region structures
 	[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -29,70 +30,6 @@ namespace Hill30Inc.ProjectExtender.ProjectBase
 	#endregion
 
 	#region enums
-	/// <summary>
-	/// Defines possible types of output that can produced by a language project
-	/// </summary>
-	[PropertyPageTypeConverterAttribute(typeof(OutputTypeConverter))]
-	public enum OutputType
-	{
-		/// <summary>
-		/// The output type is a class library.
-		/// </summary>
-		Library,
-
-		/// <summary>
-		/// The output type is a windows executable.
-		/// </summary>
-		WinExe,
-
-		/// <summary>
-		/// The output type is an executable.
-		/// </summary>
-		Exe
-	}
-
-	/// <summary>
-	/// Debug values used by DebugModeConverter.
-	/// </summary>
-	[PropertyPageTypeConverterAttribute(typeof(DebugModeConverter))]
-	public enum DebugMode
-	{
-		Project,
-		Program,
-		[SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "URL")]
-		URL
-	}
-
-	/// <summary>
-	/// An enumeration that describes the type of action to be taken by the build.
-	/// </summary>
-	[PropertyPageTypeConverterAttribute(typeof(BuildActionConverter))]
-	public enum BuildAction
-	{
-		None,
-		Compile,
-		Content,
-		EmbeddedResource
-	}
-
-	/// <summary>
-	/// Defines the version of the CLR that is appropriate to the project.
-	/// </summary>
-	[PropertyPageTypeConverterAttribute(typeof(PlatformTypeConverter))]
-	public enum PlatformType
-	{
-		[SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "not")]
-		notSpecified,
-		[SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "v")]
-		v1,
-		[SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "v")]
-		v11,
-		[SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "v")]
-		v2,
-		[SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "cli")]
-		[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "cli")]
-		cli1
-	}
 
 	/// <summary>
 	/// Defines the currect state of a property page.
@@ -474,24 +411,6 @@ namespace Hill30Inc.ProjectExtender.ProjectBase
 			this.removed = removed;
 		}
 		#endregion
-	}
-
-	/// <summary>
-	/// This class is used for the events raised by a HierarchyNode object.
-	/// </summary>
-	internal class HierarchyNodeEventArgs : EventArgs
-	{
-		private HierarchyNode child;
-
-		internal HierarchyNodeEventArgs(HierarchyNode child)
-		{
-			this.child = child;
-		}
-
-		public HierarchyNode Child
-		{
-			get { return this.child; }
-		}
 	}
 
 	/// <summary>

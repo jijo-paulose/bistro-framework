@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VsSDK.UnitTestLibrary;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Hill30Inc.ProjectExtender;
+using FSharp.ProjectExtender;
 
 namespace UnitTestProject
 {

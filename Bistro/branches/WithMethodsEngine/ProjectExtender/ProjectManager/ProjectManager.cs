@@ -162,27 +162,7 @@ namespace FSharp.ProjectExtender
             var updates = new Dictionary<Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode, Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode>(); 
             foreach (var itemId in itemIds)
             {
-                //IOLEServiceProvider sp;
-                //ErrorHandler.ThrowOnFailure(innerProject.GetItemContext(itemId, out sp));
-
-                //IntPtr objPtr;
-                //Guid hierGuid = typeof(EnvDTE.ProjectItem).GUID;
-                //Guid UNKguid = NativeMethods.IID_IUnknown;
-                //Guid vsHierarchyGuid = typeof(IVsHierarchy).GUID;
-                //Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode hierarchyNode;
-                //if (ErrorHandler.Succeeded(sp.QueryService(ref hierGuid, ref UNKguid, out objPtr)))
-                //{
-                //    EnvDTE.ProjectItem projectItem = (EnvDTE.ProjectItem)Marshal.GetObjectForIUnknown(objPtr);
-                //    hierarchyNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)projectItem.Object;
-                //}
-                //else
-                //{
-                //    ErrorHandler.ThrowOnFailure(sp.QueryService(ref vsHierarchyGuid, ref UNKguid, out objPtr));
-                //    hierarchyNode = (Microsoft.VisualStudio.FSharp.ProjectSystem.HierarchyNode)Marshal.GetObjectForIUnknown(objPtr);
-                //}
-                
                 var hierarchyNode = FSProjectManager.NodeFromItemId(itemId);
-
                 updates[hierarchyNode.Parent] = hierarchyNode;
             }
 

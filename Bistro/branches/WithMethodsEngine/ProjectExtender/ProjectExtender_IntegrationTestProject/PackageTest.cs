@@ -50,7 +50,7 @@ namespace IntegrationTestProject
 
                 //Validate package load
                 IVsPackage package;
-                Guid packageGuid = new Guid(Hill30Inc.ProjectExtender.GuidList.guidProjectExtenderPkgString);
+                Guid packageGuid = new Guid(FSharp.ProjectExtender.Constants.guidProjectExtenderPkgString);
                 Assert.IsTrue(0 == shellService.LoadPackage(ref packageGuid, out package));
                 Assert.IsNotNull(package, "Package failed to load");
 

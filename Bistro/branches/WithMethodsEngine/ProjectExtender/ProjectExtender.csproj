@@ -6,7 +6,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hill30Inc.ProjectExtender</RootNamespace>
+    <RootNamespace>FSharp.ProjectExtender</RootNamespace>
     <AssemblyName>ProjectExtender</AssemblyName>
     <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
@@ -134,6 +134,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <VSCTCompile Include="ProjectExtender.vsct" >
+      <ResourceName>1000</ResourceName>
+    </VSCTCompile>
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>

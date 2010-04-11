@@ -34,11 +34,13 @@ namespace Hill30Inc.ProjectExtender
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration(false, "#110", "#112", "1.0", IconResourceID = 400)]
+    // This attribute is needed to let the shell know that this package exposes some menus.
+    [ProvideMenuResource(1000, 1)]
     // In order be loaded inside Visual Studio in a machine that has not the VS SDK installed, 
     // package needs to have a valid load key (it can be requested at 
     // http://msdn.microsoft.com/vstudio/extend/). This attributes tells the shell that this 
     // package has a load key embedded in its resources.
-    [ProvideLoadKey("Standard", "1.0", "F# Project System Extender", "Hill30 Inc", 1)]
+    //[ProvideLoadKey("Standard", "1.0", "F# Project System Extender", "Hill30 Inc", 1)]
     [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), "ProjectExtender", null, "fsproj", null,
         @".\NullPath", LanguageVsTemplate = "FSharp")]
     [ProvideObject(typeof(FSharp.ProjectExtender.Page),RegisterUsing=RegistrationMethod.CodeBase)]

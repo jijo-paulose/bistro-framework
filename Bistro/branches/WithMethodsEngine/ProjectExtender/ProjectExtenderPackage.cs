@@ -10,8 +10,12 @@ using Microsoft.Win32;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio;
+using System.Xml;
+using System.Collections.Generic;
+using System.IO;
 
-namespace Hill30Inc.ProjectExtender
+namespace FSharp.ProjectExtender
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -44,7 +48,7 @@ namespace Hill30Inc.ProjectExtender
     [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), "ProjectExtender", null, "fsproj", null,
         @".\NullPath", LanguageVsTemplate = "FSharp")]
     [ProvideObject(typeof(FSharp.ProjectExtender.Page),RegisterUsing=RegistrationMethod.CodeBase)]
-    [Guid(GuidList.guidProjectExtenderPkgString)]
+    [Guid(Constants.guidProjectExtenderPkgString)]
     public sealed class ProjectExtenderPackage : Package
     {
         /// <summary>
@@ -56,7 +60,6 @@ namespace Hill30Inc.ProjectExtender
         /// </summary>
         public ProjectExtenderPackage()
         {
-            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
 
@@ -75,8 +78,67 @@ namespace Hill30Inc.ProjectExtender
             base.Initialize();
             RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
 
+            ErrorHandler.ThrowOnFailure(((IVsMonitorSelection2)Package.GetGlobalService(typeof(IVsMonitorSelection))).GetEmptySelectionContext(out this.selectionTracker));
+            solution = (IVsSolution)GetService(typeof(SVsSolution));
+
+            // Create the command for the project extender
+            CommandID toolwndCommandID = new CommandID(Constants.guidProjectExtenderCmdSet, (int)Constants.cmdidProjectExtender);
+            MenuCommand menuToolWin = new MenuCommand(ProjectExtender, toolwndCommandID);
+            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            mcs.AddCommand(menuToolWin);
         }
+
+        IVsTrackSelectionEx selectionTracker;
+        IVsSolution solution;
+
         #endregion
 
+        private void ProjectExtender(object sender, EventArgs e)
+        {
+            IntPtr ppHier;
+            uint pitemid;
+            IVsMultiItemSelect ppMIS;
+            IntPtr ppSC;
+            ErrorHandler.ThrowOnFailure(selectionTracker.GetCurrentSelection(out ppHier, out pitemid, out ppMIS, out ppSC));
+            var projectRoot = (IVsHierarchy)(IVsProject)Marshal.GetObjectForIUnknown(ppHier);
+            string projFile;
+            ErrorHandler.ThrowOnFailure(projectRoot.GetCanonicalName(VSConstants.VSITEMID_ROOT, out projFile));
+            ErrorHandler.ThrowOnFailure(solution.CloseSolutionElement(0, projectRoot, 0));
+
+            var buildFile = new XmlDocument();
+            var projReader = new XmlTextReader(projFile);
+            var nsmgr = new XmlNamespaceManager(projReader.NameTable);
+            nsmgr.AddNamespace("default", "http://schemas.microsoft.com/developer/msbuild/2003");
+            buildFile.Load(projReader);
+            var projectTypeGuids = buildFile.SelectSingleNode("//default:Project/default:PropertyGroup/default:ProjectTypeGuids", nsmgr);
+            if (projectTypeGuids == null)
+            {
+                projectTypeGuids = buildFile.CreateElement("ProjectTypeGuids");
+                var projectGuid = buildFile.SelectSingleNode("//default:Project/default:PropertyGroup/default:ProjectGuid", nsmgr);
+                projectGuid.ParentNode.InsertAfter(projectTypeGuids, projectGuid);
+                projectTypeGuids.InnerText = "{" + Constants.guidProjectExtenderFactoryString + "};{" + Constants.guidFSharpProject + "}";
+            }
+            else
+            {
+                var types = new List<string>(projectTypeGuids.InnerText.Split(';'));
+                if (types[types.Count - 1] != '{' + Constants.guidFSharpProject + '}')
+                {
+                    types.Insert(types.Count - 1, '{' + Constants.guidProjectExtenderFactoryString + '}');
+                    
+                    var typestring = "";
+                    types.ForEach(type => typestring += ';' + type);
+
+                    projectTypeGuids.InnerText = typestring.Substring(1);
+                }
+            }
+            buildFile.WriteContentTo(new XmlTextWriter(new StreamWriter(projFile)));
+
+            var rguidProjectType = Guid.Empty;
+            var iidProject = Guid.Empty;
+            IntPtr ppProject;
+            ErrorHandler.ThrowOnFailure(solution.CreateProject(ref rguidProjectType, projFile, null, null,
+                (uint)__VSCREATEPROJFLAGS.CPF_OPENFILE,
+                ref iidProject, out ppProject));
+        }
     }
 }

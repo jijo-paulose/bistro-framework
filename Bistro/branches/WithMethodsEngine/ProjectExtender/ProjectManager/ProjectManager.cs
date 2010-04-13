@@ -221,6 +221,9 @@ namespace FSharp.ProjectExtender
 
         int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
+            if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet2K) && nCmdID == (uint)VSConstants.VSStd2KCmdID.SHOWALLFILES)
+                return VSConstants.S_OK;
+
             int result = innerTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
             // In certain situations the F# project manager throws an exception while adding files
             // to subdirectories. We are lucky that this is happening after all the job of adding the file
@@ -255,8 +258,16 @@ namespace FSharp.ProjectExtender
                 prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_INVISIBLE;
 
             // show the Add new folder command on the project node
-            if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet97) && prgCmds[0].cmdID == 245)
+            if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet97) && prgCmds[0].cmdID == (uint)VSConstants.VSStd97CmdID.NewFolder)
                 prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
+
+            // show the Add new folder command on the project node
+            if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet2K) && prgCmds[0].cmdID == (uint)VSConstants.VSStd2KCmdID.SHOWALLFILES)
+                prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
+
+            // show the Add new folder command on the project node
+            //if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet97) && prgCmds[0].cmdID == (uint)VSConstants.VSStd97CmdID.Refresh)
+            //    prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
 
             return VSConstants.S_OK;
         }

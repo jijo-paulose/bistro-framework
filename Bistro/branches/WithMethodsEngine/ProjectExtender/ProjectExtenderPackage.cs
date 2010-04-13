@@ -45,9 +45,12 @@ namespace FSharp.ProjectExtender
     // http://msdn.microsoft.com/vstudio/extend/). This attributes tells the shell that this 
     // package has a load key embedded in its resources.
     //[ProvideLoadKey("Standard", "1.0", "F# Project System Extender", "Hill30 Inc", 1)]
-    [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), "ProjectExtender", null, "fsproj", null,
-        @".\NullPath", LanguageVsTemplate = "FSharp")]
+    // Provide the F# project extender project project factory. This is a flavored project and it does not
+    // introduce any new templates
+    [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), "ProjectExtender", null, null, null, null)]
+    // Provide object so it can be created through the ILocalRegistry interface - in this case the new property page
     [ProvideObject(typeof(FSharp.ProjectExtender.Page),RegisterUsing=RegistrationMethod.CodeBase)]
+
     [Guid(Constants.guidProjectExtenderPkgString)]
     public sealed class ProjectExtenderPackage : Package
     {
@@ -58,11 +61,7 @@ namespace FSharp.ProjectExtender
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public ProjectExtenderPackage()
-        {
-        }
-
-
+        public ProjectExtenderPackage() { }
 
         /////////////////////////////////////////////////////////////////////////////
         // Overriden Package Implementation
@@ -74,7 +73,6 @@ namespace FSharp.ProjectExtender
         /// </summary>
         protected override void Initialize()
         {
-            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
             RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
 
@@ -87,6 +85,7 @@ namespace FSharp.ProjectExtender
             projectExtenderCommand.BeforeQueryStatus += new EventHandler(projectExtenderCommand_BeforeQueryStatus);
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             mcs.AddCommand(projectExtenderCommand);
+
         }
 
         static IVsTrackSelectionEx selectionTracker;
@@ -96,7 +95,12 @@ namespace FSharp.ProjectExtender
 
         string enable_extender_text = "Enable F# project extender";
         string disable_extender_text = "Disable F# project extender";
-
+        
+        /// <summary>
+        /// Modifies caption on the project extender command
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void projectExtenderCommand_BeforeQueryStatus(object sender, EventArgs e)
         {
             if (get_current_project() is IProjectManager)
@@ -105,23 +109,30 @@ namespace FSharp.ProjectExtender
                 ((OleMenuCommand)sender).Text = enable_extender_text;
         }
 
+        /// <summary>
+        /// retrieves the IVsProject interface for currentll selected project
+        /// </summary>
+        /// <returns></returns>
         private static IVsProject get_current_project()
         {
             IntPtr ppHier = IntPtr.Zero;
             uint pitemid;
             IVsMultiItemSelect ppMIS;
             IntPtr ppSC;
-            try
-            {
-                ErrorHandler.ThrowOnFailure(selectionTracker.GetCurrentSelection(out ppHier, out pitemid, out ppMIS, out ppSC));
-                return (IVsProject)Marshal.GetObjectForIUnknown(ppHier);
-            }
-            finally
-            {
-                Marshal.Release(ppHier);
-            }
+
+            ErrorHandler.ThrowOnFailure(selectionTracker.GetCurrentSelection(out ppHier, out pitemid, out ppMIS, out ppSC));
+            var result = (IVsProject)Marshal.GetObjectForIUnknown(ppHier);
+            Marshal.Release(ppHier);
+            if (!IntPtr.Zero.Equals(ppSC))
+                Marshal.Release(ppSC);
+            return result;
         }
 
+        /// <summary>
+        /// Project Extender command handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ProjectExtenderCommand(object sender, EventArgs e)
         {
             var project = get_current_project();
@@ -131,16 +142,31 @@ namespace FSharp.ProjectExtender
                 ModifyProject(project, enable_extender);
         }
 
+        /// <summary>
+        /// Modifies the loaded project by changing the project's proj file
+        /// </summary>
+        /// <param name="vsProject">project to be modified</param>
+        /// <param name="effector"></param>
         private void ModifyProject(IVsProject vsProject, Action<XmlDocument> effector)
         {
             var project = ProjectManager.getFSharpProjectNode(vsProject);
             var MSBuildProject = project.BuildProject;
 
-            var minfo = typeof(Microsoft.Build.BuildEngine.Project).GetMethod("get_XmlDocument", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            // method get_XmlDocument on the MSBuild project is internal
+            // We will have to use reflection to call it
+            var minfo = typeof(Microsoft.Build.BuildEngine.Project)
+                .GetMethod("get_XmlDocument", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
+            // apply modifications to XML
             effector((XmlDocument)minfo.Invoke(MSBuildProject, new object[] { }));
+            
+            // Set dirty flag to true to force project save
             project.SetProjectFileDirty(true);
             
+            // Unload the project - also saves the modifications
             ErrorHandler.ThrowOnFailure(solution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, project, 0));
+
+            // Reload the project
             ((EnvDTE.DTE)GetService(typeof(SDTE))).ExecuteCommand("Project.ReloadProject", "");
         }
 
@@ -154,34 +180,49 @@ namespace FSharp.ProjectExtender
             return result;
         }
 
+        /// <summary>
+        /// Modifies the XML to enable the extender
+        /// </summary>
+        /// <param name="project"></param>
         private static void enable_extender(XmlDocument project)
         {
+            // Locate the ProjectTypeGuids node
             var projectTypeGuids = project.SelectSingleNode("//default:Project/default:PropertyGroup/default:ProjectTypeGuids", namespace_manager);
             if (projectTypeGuids == null)
             {
+                // Not found - create a new one
                 projectTypeGuids = project.CreateElement("ProjectTypeGuids", msBuildNamespace);
                 var projectGuid = project.SelectSingleNode("//default:Project/default:PropertyGroup/default:ProjectGuid", namespace_manager);
+                // insert it after the ProjectGuid node
                 projectGuid.ParentNode.InsertAfter(projectTypeGuids, projectGuid);
+                // initialize the project type guid list
                 projectTypeGuids.InnerText = "{" + Constants.guidProjectExtenderFactoryString + "};{" + Constants.guidFSharpProject + "}";
             }
             else
             {
+                // parse the existing guid list
                 var types = new List<string>(projectTypeGuids.InnerText.Split(';'));
-                if (types[types.Count - 1] != '{' + Constants.guidFSharpProject + '}')
-                {
-                    types.Insert(0, '{' + Constants.guidProjectExtenderFactoryString + '}');
+                
+                // prepend the guid list with the extender project type 
+                types.Insert(0, '{' + Constants.guidProjectExtenderFactoryString + '}');
 
-                    var typestring = "";
-                    types.ForEach(type => typestring += ';' + type);
-
-                    projectTypeGuids.InnerText = typestring.Substring(1);
-                }
+                // format the guid list
+                var typestring = "";
+                types.ForEach(type => typestring += ';' + type);
+                // replace the guid list
+                projectTypeGuids.InnerText = typestring.Substring(1);
             }
         }
 
+        /// <summary>
+        /// Modifies XML to disable extender
+        /// </summary>
+        /// <param name="project"></param>
         private static void disable_extender(XmlDocument project)
         {
+            // locate the ProjectTypeGuids node
             var projectTypeGuids = project.SelectSingleNode("//default:Project/default:PropertyGroup/default:ProjectTypeGuids", namespace_manager);
+            // remove the extender guid from the list
             if (projectTypeGuids != null)
                 projectTypeGuids.InnerText =
                     projectTypeGuids.InnerText.Replace('{' + Constants.guidProjectExtenderFactoryString + "};", "");

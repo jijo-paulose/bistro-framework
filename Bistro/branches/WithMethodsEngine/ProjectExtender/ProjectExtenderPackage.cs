@@ -89,10 +89,20 @@ namespace FSharp.ProjectExtender
             mcs.AddCommand(projectExtenderCommand);
         }
 
+        static IVsTrackSelectionEx selectionTracker;
+        IVsSolution solution;
+
+        #endregion
+
+        string enable_extender_text = "Enable F# project extender";
+        string disable_extender_text = "Disable F# project extender";
 
         void projectExtenderCommand_BeforeQueryStatus(object sender, EventArgs e)
         {
-            ((OleMenuCommand)sender).Enabled = !(get_current_project() is IProjectManager);
+            if (get_current_project() is IProjectManager)
+                ((OleMenuCommand)sender).Text = disable_extender_text;
+            else
+                ((OleMenuCommand)sender).Text = enable_extender_text;
         }
 
         private static IVsProject get_current_project()
@@ -112,43 +122,26 @@ namespace FSharp.ProjectExtender
             }
         }
 
-        static IVsTrackSelectionEx selectionTracker;
-        IVsSolution solution;
-
-        #endregion
-
         private void ProjectExtenderCommand(object sender, EventArgs e)
         {
-            ModifyProject(get_current_project(), enable_extender);
+            var project = get_current_project();
+            if (project is IProjectManager)
+                ModifyProject(project, disable_extender);
+            else
+                ModifyProject(project, enable_extender);
         }
 
         private void ModifyProject(IVsProject vsProject, Action<XmlDocument> effector)
         {
             var project = ProjectManager.getFSharpProjectNode(vsProject);
             var MSBuildProject = project.BuildProject;
-            var minfo = typeof(Microsoft.Build.BuildEngine.Project).GetMethod("get_XmlDocument", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
-            var projFile = project.GetMkDocument();
+            var minfo = typeof(Microsoft.Build.BuildEngine.Project).GetMethod("get_XmlDocument", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
             effector((XmlDocument)minfo.Invoke(MSBuildProject, new object[] { }));
             project.SetProjectFileDirty(true);
             
-            ErrorHandler.ThrowOnFailure(solution.CloseSolutionElement(0/*(uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject*/, project, 0));
-
-            var rguidProjectType = Guid.Empty;
-            var iidProject = Guid.Empty;
-            IntPtr ppProject;
-            IVsProjectFactory ppProjectFactory;
-            solution.GetProjectFactory(0, null, projFile, out ppProjectFactory);
-
-            IVsUIShell shell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            IVsWindowFrame frame = null;
-            Guid persistenceSlot = new Guid(EnvDTE.Constants.vsWindowKindSolutionExplorer);
-            ErrorHandler.ThrowOnFailure(shell.FindToolWindow(0, ref persistenceSlot, out frame));
-            
-            Guid guidProj = typeof(IVsProject).GUID;
-            ErrorHandler.ThrowOnFailure(solution.CreateProject(ref rguidProjectType, projFile, null, null,
-                (uint)(__VSCREATEPROJFLAGS.CPF_OPENFILE) + 2048 + 4096,
-                ref iidProject, out ppProject));
+            ErrorHandler.ThrowOnFailure(solution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, project, 0));
+            ((EnvDTE.DTE)GetService(typeof(SDTE))).ExecuteCommand("Project.ReloadProject", "");
         }
 
         private const string msBuildNamespace = "http://schemas.microsoft.com/developer/msbuild/2003";
@@ -184,6 +177,14 @@ namespace FSharp.ProjectExtender
                     projectTypeGuids.InnerText = typestring.Substring(1);
                 }
             }
+        }
+
+        private static void disable_extender(XmlDocument project)
+        {
+            var projectTypeGuids = project.SelectSingleNode("//default:Project/default:PropertyGroup/default:ProjectTypeGuids", namespace_manager);
+            if (projectTypeGuids != null)
+                projectTypeGuids.InnerText =
+                    projectTypeGuids.InnerText.Replace('{' + Constants.guidProjectExtenderFactoryString + "};", "");
         }
     }
 }

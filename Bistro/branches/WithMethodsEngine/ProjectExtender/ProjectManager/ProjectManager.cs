@@ -46,8 +46,19 @@ namespace FSharp.ProjectExtender
         {
             base.OnAggregationComplete();
 
+            FSProjectManager = getFSharpProjectNode(innerProject);
+            BuildManager = new MSBuildManager(FSProjectManager.BuildProject);
+
+            itemList = new ItemList(this);
+            hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
+            IVsTrackProjectDocuments2 documentTracker = (IVsTrackProjectDocuments2)Package.GetGlobalService(typeof(SVsTrackProjectDocuments));
+            ErrorHandler.ThrowOnFailure(documentTracker.AdviseTrackProjectDocumentsEvents(this, out document_tracker_cookie));
+        }
+
+        internal static Microsoft.VisualStudio.FSharp.ProjectSystem.ProjectNode getFSharpProjectNode(IVsProject root)
+        {
             IOLEServiceProvider sp;
-            ErrorHandler.ThrowOnFailure(innerProject.GetItemContext(VSConstants.VSITEMID_ROOT, out sp));
+            ErrorHandler.ThrowOnFailure(root.GetItemContext(VSConstants.VSITEMID_ROOT, out sp));
 
             IntPtr objPtr;
             Guid hierGuid = typeof(VSLangProj.VSProject).GUID;
@@ -56,16 +67,9 @@ namespace FSharp.ProjectExtender
 
             var OAVSProject = (VSLangProj.VSProject)Marshal.GetObjectForIUnknown(objPtr);
             var OAProject = (Microsoft.VisualStudio.FSharp.ProjectSystem.Automation.OAProject)OAVSProject.Project;
-            FSProjectManager = OAProject.Project;
-
-            BuildManager = new MSBuildManager(FSProjectManager.BuildProject);
-
-            itemList = new ItemList(this);
-            hierarchy_event_cookie = AdviseHierarchyEvents(itemList);
-            IVsTrackProjectDocuments2 documentTracker = (IVsTrackProjectDocuments2)Package.GetGlobalService(typeof(SVsTrackProjectDocuments));
-            ErrorHandler.ThrowOnFailure(documentTracker.AdviseTrackProjectDocumentsEvents(this, out document_tracker_cookie));
+            return OAProject.Project;
         }
-        
+
         bool renaimng_in_progress = false;
         protected override int GetProperty(uint itemId, int propId, out object property)
         {

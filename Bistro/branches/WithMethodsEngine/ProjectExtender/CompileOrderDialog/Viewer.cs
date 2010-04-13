@@ -32,7 +32,7 @@ namespace FSharp.ProjectExtender
             {
                         TreeNode compileItem = new TreeNode(element.Path);
                         compileItem.Tag = element;
-                        compileItem.ContextMenuStrip = compileItemMenu;
+                        //compileItem.ContextMenuStrip = compileItemMenu;
                         BuildDependencies(compileItem);
                         CompileItems.Nodes.Add(compileItem);
             }           
@@ -41,7 +41,7 @@ namespace FSharp.ProjectExtender
         private void BuildDependencies(TreeNode node)
         {
             node.Nodes.Clear();
-            string dependencies = ((BuildElement)node.Tag).GetDependencies();
+            string dependencies = ((BuildElement)node.Tag).GetDependencies(); 
             if (dependencies != null)
                 foreach (var d in dependencies.Split(','))
                     if (d != "")

@@ -144,14 +144,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <!-- Templates -->
-  <ItemGroup>
-    <ZipProject Include="Templates\Project\FSharpProject.fsproj" />
-    <ZipProject Include="Templates\Project\FSharpProject.ico" />
-    <ZipProject Include="Templates\Project\FSharpProject.vstemplate" />
-  </ItemGroup>
-  <ItemGroup>
-    <ZipProject Include="Templates\Project\app.fs" />
-  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

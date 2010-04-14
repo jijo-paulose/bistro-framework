@@ -1,10 +1,16 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VsSDK.IntegrationTestLibrary;
+using Microsoft.VsSDK.UnitTestLibrary;
 using Microsoft.VSSDK.Tools.VsIdeTesting;
-
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.OLE.Interop;
+using FSharp.ProjectExtender;
+using System.Threading;
 namespace IntegrationTests
 {
     [TestClass]
@@ -56,33 +62,62 @@ namespace IntegrationTests
         #endregion
 
         [TestMethod]
+        [Ignore]
         [HostType("VS IDE")]
-        public void FSharpExApplication()
+        public void CreateApplication()
         {
             UIThreadInvoker.Invoke((ThreadInvoker)delegate()
             {
                 TestUtils testUtils = new TestUtils();
-
-                testUtils.CreateEmptySolution(TestContext.TestDir, "CreateWinformsApplication");
+                testUtils.CreateEmptySolution(TestContext.TestDir, "Test1");
                 //Assert.AreEqual<int>(0, testUtils.ProjectCount());
                 //Create FSharpEx application project
-                string projName = "FSharpExApp";
-                string projfullName = testUtils.CreateProjectFromTemplate(projName, "F# Application Extender", "FSharp", false);
-                projfullName += projName;
-                
+                string projName = "FSharpExApp1";
+                string projfullName = testUtils.CreateProjectFromTemplate(projName, "F# Application", "FSharp", false);
+                projfullName += "\\" + projName + ".fsproj";
                 Assert.AreEqual<int>(1, testUtils.ProjectCount());
-
-                //TODO Verify that we can debug launch the application
-
-                //TODO Set Break point and verify that will hit
-
-                //TODO Verify Adding new project item to project
-                EnvDTE.Project proj = testUtils.GetProjectByName(projfullName);
-                testUtils.AddNewItemFromVsTemplate(proj.ProjectItems, "F# Source File", "FSharp", "item1");
-                Assert.AreEqual<int>(1, proj.ProjectItems.Count);
+            });
+        }
+        [TestMethod]
+        [HostType("VS IDE")]
+        public void CompilerOrderCheck()
+        {
+            UIThreadInvoker.Invoke((ThreadInvoker)delegate()
+            {
+                string path = TestContext.TestDir.Substring(0,
+                    TestContext.TestDir.IndexOf("TestResults"));
+                string slnfile = path + "ConsoleApplication3\\ConsoleApplication3.sln";
+                string projFile = path + "ConsoleApplication3\\ConsoleApplication3\\ConsoleApplication3.fsproj";
+                //TestContext.Properties.Add("testSolutionPath", slnfile);
+                IVsHierarchy hier;
+                IVsSolution sln = VsIdeTestHostContext.ServiceProvider.GetService(typeof(IVsSolution)) as IVsSolution;
+                sln.OpenSolutionFile((uint)__VSSLNOPENOPTIONS.SLNOPENOPT_Silent,slnfile);
+                sln.GetProjectOfUniqueName(projFile, out hier);
+                TestContext.BeginTimer("timer1");
+                CompileOrderViewer viewer = new CompileOrderViewer((IProjectManager)hier);
+                Assert.IsNotNull(viewer,"Fail to create Viewer");
+                TestContext.EndTimer("timer1");               
 
             });
         }
+        [TestMethod]
+        [Ignore]
+        [HostType("VS IDE")]
+        public void ShowPageTest()
+        {
+            IVsWindowFrame frame;
+            IVsUIShell shell = VsIdeTestHostContext.ServiceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;
+            Guid guidPropertyBrowser = new Guid(ToolWindowGuids.PropertyBrowser);
+            shell.FindToolWindow((uint)__VSFINDTOOLWIN.FTW_fForceCreate, ref guidPropertyBrowser, out frame);
+            frame.Show();
+            IVsRunningDocumentTable rdt = (IVsRunningDocumentTable)VsIdeTestHostContext.ServiceProvider.GetService(typeof(SVsRunningDocumentTable));
+            IVsHierarchy hier;
+            uint itemId;
+            IntPtr docData;
+            //rdt.FindAndLockDocument(_VSRDTFLAGS.RDT_NoLock, projfile, out hier, out itemId, out docData); 
+            //IPropertyPage page = (IPropertyPage)Marshal.GetObjectForIUnknown(docData);
+            //Assert.IsNotNull(page, "Property page is null");
 
+        }
     }
 }

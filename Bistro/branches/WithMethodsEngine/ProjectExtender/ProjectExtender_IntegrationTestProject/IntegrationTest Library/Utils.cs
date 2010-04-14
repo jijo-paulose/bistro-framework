@@ -252,12 +252,12 @@ namespace Microsoft.VsSDK.IntegrationTestLibrary
             solutionService.GetProperty((int)__VSPROPID.VSPROPID_ProjectCount, out projectCount);
             return (int)projectCount;
         }
-        public Project GetProjectByName(string uniquename)
+        public IVsProject GetProjectByName(string uniquename)
         {
            IVsSolution solutionService = (IVsSolution)VsIdeTestHostContext.ServiceProvider.GetService(typeof(IVsSolution));
            IVsHierarchy hier;
            solutionService.GetProjectOfUniqueName(uniquename, out hier);
-           return hier as Project;
+           return hier as IVsProject;
 
         }
         #endregion
@@ -280,7 +280,6 @@ namespace Microsoft.VsSDK.IntegrationTestLibrary
             // - project name and directory
             string solutionDirectory = Directory.GetParent(dte.Solution.FullName).FullName;
             string projectDirectory = GetNewDirectoryName(solutionDirectory, projectName);
-
             Project p = dte.Solution.AddFromTemplate(projectTemplate, projectDirectory, projectName, false);
             return projectDirectory;
         }

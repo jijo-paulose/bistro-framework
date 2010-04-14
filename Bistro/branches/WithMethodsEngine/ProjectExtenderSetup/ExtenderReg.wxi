@@ -11,7 +11,7 @@
     <Registry Name="InprocServer32" Value="[SystemFolder]mscoree.dll" Type="string" />
     <Registry Name="Class" Value="FSharp.ProjectExtender.ProjectExtenderPackage" Type="string" />
     <Registry Name="Assembly" Value="ProjectExtender, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Type="string" />
-    <Registry Name="CodeBase" Value="[INSTALLDIR]Bistro.Designer.dll" Type="string" />
+    <Registry Name="CodeBase" Value="[INSTALLDIR]ProjectExtender.dll" Type="string" />
   </Registry>
 
   <Registry Root="HKLM" Key="Software\Microsoft\VisualStudio\9.0\Menus">
@@ -21,7 +21,7 @@
   <Registry Root="HKLM" Key="Software\Microsoft\VisualStudio\9.0\CLSID\{a5fc3bbd-8795-42d0-aa55-e65fe992378e}" Value="FSharp.ProjectExtender.Page" Type="string">
     <Registry Name="InprocServer32" Value="[SystemFolder]mscoree.dll" Type="string" />
     <Registry Name="Class" Value="FSharp.ProjectExtender.Page" Type="string" />
-    <Registry Name="CodeBase" Value="[INSTALLDIR]Bistro.Designer.dll" Type="string" />
+    <Registry Name="CodeBase" Value="[INSTALLDIR]ProjectExtender.dll" Type="string" />
     <Registry Name="ThreadingModel" Value="Both" Type="string" />
   </Registry>
 

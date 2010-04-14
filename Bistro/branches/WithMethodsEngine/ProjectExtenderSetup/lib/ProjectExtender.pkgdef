@@ -17,17 +17,17 @@ Windows Registry Editor Version 5.00
 @="FSharp.ProjectExtender.Page"
 "InprocServer32"="%windir%\\system32\\mscoree.dll"
 "Class"="FSharp.ProjectExtender.Page"
-"CodeBase"="c:\\Hill30\\Bistro\\WithMethodsEngine\\ProjectExtender\\bin\\Debug\\ProjectExtender.dll"
+"CodeBase"="[EXTENDERDIR]ProjectExtender.dll"
 "ThreadingModel"="Both"
 [$RootKey$\Projects\{5b89fcc2-c9f6-49a8-8f8d-eddcc3fdc9e9}]
 @="Factory"
 "DisplayName"="ProjectExtender"
 "Package"="{5a8f5a4d-d1eb-403e-85b3-63df607fa07c}"
 "DefaultProjectExtension"="fsproj"
-"ProjectTemplatesDir"="c:\\Hill30\\Bistro\\WithMethodsEngine\\ProjectExtender\\bin\\Debug\\.\\NullPath"
+"ProjectTemplatesDir"="[EXTENDERDIR].\\NullPath"
 "Language(VsTemplate)"="FSharp"
 [$RootKey$\NewProjectTemplates\TemplateDirs\{5a8f5a4d-d1eb-403e-85b3-63df607fa07c}\/1]
 @="ProjectExtender"
 "SortPriority"=dword:00000064
-"TemplatesDir"="c:\\Hill30\\Bistro\\WithMethodsEngine\\ProjectExtender\\bin\\Debug\\.\\NullPath"
+"TemplatesDir"="[EXTENDERDIR].\\NullPath"
 

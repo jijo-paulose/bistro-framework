@@ -79,11 +79,13 @@
   </Commands>
   <VisibilityConstraints>
     <VisibilityItem guid="guidProjectExtender_DesignerCmdSet" id="cmdidProjectExtender" context="guidFSharp_Project"></VisibilityItem>
+    <VisibilityItem guid="guidVSStd2K" id="ECMD_SLNREFRESH" context="guidProjectExtenderProject"></VisibilityItem>
   </VisibilityConstraints>
 
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidProjectExtender_DesignerPkg" value="{5a8f5a4d-d1eb-403e-85b3-63df607fa07c}" />
+    <GuidSymbol name="guidProjectExtenderProject" value="{5B89FCC2-C9F6-49a8-8F8D-EDDCC3FDC9E9}" />
 
     <!-- The F# Project Type -->
     <GuidSymbol name="guidFSharp_Project" value="{f2a71f9b-5d33-465a-a702-920d77279786}" />

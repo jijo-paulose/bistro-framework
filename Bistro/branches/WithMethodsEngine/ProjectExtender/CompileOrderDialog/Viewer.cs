@@ -7,7 +7,7 @@ namespace FSharp.ProjectExtender
 {
     public partial class CompileOrderViewer : UserControl
     {
-        internal IProjectManager project;
+        IProjectManager project;
 
         public CompileOrderViewer(IProjectManager project)
         {
@@ -107,7 +107,7 @@ namespace FSharp.ProjectExtender
         /// </summary>
         /// <param name="n">item to move</param>
         /// <param name="dir">direction</param>
-        internal void MoveElement(TreeNode n, Direction dir)
+        private void MoveElement(TreeNode n, Direction dir)
         {
             if (!CompileItems.Nodes.Contains(n))
                 return;

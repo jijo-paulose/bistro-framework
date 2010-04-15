@@ -7,7 +7,7 @@ namespace FSharp.ProjectExtender
 {
     public partial class CompileOrderViewer : UserControl
     {
-        IProjectManager project;
+        internal IProjectManager project;
 
         public CompileOrderViewer(IProjectManager project)
         {
@@ -23,7 +23,10 @@ namespace FSharp.ProjectExtender
         {
             refresh_file_list();
         }
-
+        public TreeView CompileItemsTree
+        {
+            get { return CompileItems; }
+        }
         public void refresh_file_list()
         {
             CompileItems.Nodes.Clear();
@@ -97,14 +100,14 @@ namespace FSharp.ProjectExtender
                 MoveElement(CompileItems.SelectedNode, Direction.Down);
         }
 
-        enum Direction { Up, Down }
+        internal enum Direction { Up, Down }
 
         /// <summary>
         /// Moves a compile item in the compilation order list one position up or down
         /// </summary>
         /// <param name="n">item to move</param>
         /// <param name="dir">direction</param>
-        private void MoveElement(TreeNode n, Direction dir)
+        internal void MoveElement(TreeNode n, Direction dir)
         {
             if (!CompileItems.Nodes.Contains(n))
                 return;

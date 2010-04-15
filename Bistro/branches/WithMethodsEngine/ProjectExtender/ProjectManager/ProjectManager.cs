@@ -261,14 +261,6 @@ namespace FSharp.ProjectExtender
             if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet97) && prgCmds[0].cmdID == (uint)VSConstants.VSStd97CmdID.NewFolder)
                 prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
 
-            // show the Add new folder command on the project node
-            if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet2K) && prgCmds[0].cmdID == (uint)VSConstants.VSStd2KCmdID.SHOWALLFILES)
-                prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
-
-            // show the Add new folder command on the project node
-            //if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet97) && prgCmds[0].cmdID == (uint)VSConstants.VSStd97CmdID.Refresh)
-            //    prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
-
             return VSConstants.S_OK;
         }
 

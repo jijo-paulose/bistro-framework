@@ -51,7 +51,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="editBistroTemplates.exe" />
+    <Content Include="lib\Bistro.Core.dll" />
+    <Content Include="lib\Bistro.Designer.dll" />
+    <Content Include="lib\Bistro.Designer.pkgdef" />
+    <Content Include="lib\extension.vsixmanifest" />
+    <Content Include="lib\NDjangoSetupExtended.msi" />
+    <Content Include="RegpkgBistroDesigner2008.wxi" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="lib\" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

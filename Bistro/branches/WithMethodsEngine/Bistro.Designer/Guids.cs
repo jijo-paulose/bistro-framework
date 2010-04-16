@@ -10,5 +10,8 @@ namespace Bistro.Designer
         public static readonly Guid guidBistro_DesignerCmdSet = new Guid(guidBistro_DesignerCmdSetString);
         public const string guidFSharpProjectFactoryString = "94887830-9110-3f61-84ae-beea7891c7e6";
         public const string guidCSharpProjectFactoryString = "72EE107E-1FDC-452A-B692-39D2A9A3E093";
+        public const string guidProjectExtenderCmdSetString = "7bc39d92-dded-46ae-b491-075f3ded76aa";
+        public static readonly Guid guidProjectExtenderCmdSet = new Guid(guidProjectExtenderCmdSetString);
+
     };
 }

@@ -29,7 +29,7 @@ namespace FSharp.ProjectExtender.Commands
             ErrorHandler.ThrowOnFailure(((IVsMonitorSelection2)Package.GetGlobalService(typeof(IVsMonitorSelection))).GetEmptySelectionContext(out result));
             return result;
         }
-
+         
         private const string enable_extender_text = "Enable F# project extender";
         private const string disable_extender_text = "Disable F# project extender";
 

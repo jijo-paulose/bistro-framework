@@ -221,9 +221,6 @@ namespace FSharp.ProjectExtender
 
         int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            if (pguidCmdGroup.Equals(Constants.guidStandardCommandSet2K) && nCmdID == (uint)VSConstants.VSStd2KCmdID.SHOWALLFILES)
-                return VSConstants.S_OK;
-
             int result = innerTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
             // In certain situations the F# project manager throws an exception while adding files
             // to subdirectories. We are lucky that this is happening after all the job of adding the file
@@ -248,6 +245,12 @@ namespace FSharp.ProjectExtender
 
         int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
         {
+
+            if (pguidCmdGroup.Equals(Constants.guidProjectExtenderCmdSet) && prgCmds[0].cmdID == (uint)Constants.cmdidProjectShowAll)
+            {
+                prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_ENABLED;
+                return VSConstants.S_OK;
+            }
 
             int result = innerTarget.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
             if (result != VSConstants.S_OK)

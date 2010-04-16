@@ -23,6 +23,8 @@
   <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
   <Extern href="msobtnid.h"/>
 
+  <!--#include "sharedids.h" -->
+  <Extern href="sharedids.h"/>
 
 
 
@@ -43,9 +45,15 @@
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
+    
       <Group guid="guidProjectExtender_DesignerCmdSet" id="cmdidProjectExtenderGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE"/>
       </Group>
+
+      <Group guid="guidProjectExtender_DesignerCmdSet" id="cmdidSolutionExplorerButtons" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_TOOL_PROJWIN"/>
+      </Group>
+
     </Groups>
     
     <!--Buttons section. -->
@@ -73,13 +81,31 @@
         <CommandFlag>TextChanges</CommandFlag>
       </Button>
 
+      <!-- Button guid="guidProjectExtender_DesignerCmdSet" id="cmdidProjectRefresh" priority="0x0200" type="Button">
+        <Parent guid="guidProjectExtender_DesignerCmdSet" id="cmdidSolutionExplorerButtons"/>
+        <Icon guid="guidSHLMainMenu" id="6"/>
+        <Strings>
+          <ButtonText>Refresh</ButtonText>
+        </Strings>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+      </Button>
+
+      <Button guid="guidProjectExtender_DesignerCmdSet" id="cmdidProjectShowAll" priority="0x0100" type="Button">
+        <Parent guid="guidProjectExtender_DesignerCmdSet" id="cmdidSolutionExplorerButtons"/>
+        <Icon guid="guidSharedBmps" id="bmpidShowAllFiles"/>
+        <Strings>
+          <ButtonText>Show All</ButtonText>
+        </Strings>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+      </Button-->
 
     </Buttons>
    
   </Commands>
   <VisibilityConstraints>
     <VisibilityItem guid="guidProjectExtender_DesignerCmdSet" id="cmdidProjectExtender" context="guidFSharp_Project"></VisibilityItem>
-    <VisibilityItem guid="guidVSStd2K" id="ECMD_SLNREFRESH" context="guidProjectExtenderProject"></VisibilityItem>
   </VisibilityConstraints>
 
   <Symbols>
@@ -93,7 +119,10 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidProjectExtender_DesignerCmdSet" value="{7bc39d92-dded-46ae-b491-075f3ded76aa}">
       <IDSymbol name="cmdidProjectExtenderGroup" value="0x1001" />
+      <IDSymbol name="cmdidSolutionExplorerButtons" value="0x1002"/>
       <IDSymbol name="cmdidProjectExtender" value="0x2001" />
+      <IDSymbol name="cmdidProjectRefresh" value="0x2002" />
+      <IDSymbol name="cmdidProjectShowAll" value="0x2003" />
     </GuidSymbol>
     
   </Symbols>

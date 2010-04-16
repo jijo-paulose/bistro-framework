@@ -11,8 +11,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
-using Bistro.Designer.Explorer;
-using Bistro.Designer.ProjectBase;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 
@@ -44,14 +42,7 @@ namespace Bistro.Designer
     // http://msdn.microsoft.com/vstudio/extend/). This attributes tells the shell that this 
     // package has a load key embedded in its resources.
     [ProvideLoadKey("Standard", "0.9", "Bistro Designer", "Hill30 Inc", 1)]
-    // This attribute is needed to let the shell know that this package exposes some menus.
-    //[ProvideMenuResource(1000, 1)]
-    // This attribute registers a tool window exposed by this package.
-    //[ProvideToolWindow(typeof(ExplorerWindow),Transient = false, Style = VsDockStyle.Tabbed, Orientation = ToolWindowOrientation.Right, 
-    //    Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
-    //[ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidFSharpProjectFactoryString)]
-    //[ProvideToolWindowVisibility(typeof(ExplorerWindow), Guids.guidCSharpProjectFactoryString)]
-    //[ProvideToolWindow(typeof(ExplorerWindow))]
+
     [ProvideProjectFactory(
         typeof(Projects.FSharp.Factory), 
         null,
@@ -65,11 +56,8 @@ namespace Bistro.Designer
         LanguageVsTemplate = "Bistro")]                 // the value of the template registration key. This value 
                                                         // will also be used as the name of the node grouping
                                                         // projects in the AddNewProject dialog
-    [ProvideProjectFactory(typeof(FSharp.ProjectExtender.Factory), null, null, null, null, @".\NullPath")]
     [WAProvideProjectFactory(typeof(Projects.FSharp.DummyWebFactory), "Web Bistro Factory", "Bistro", false, "Web", null)]
     [WAProvideProjectFactoryTemplateMapping("{" + "f2a71f9b-5d33-465a-a702-920d77279786" + "}", typeof(Projects.FSharp.DummyWebFactory))]
- 
-    //[ProvideObject(typeof(FSharp.ProjectExtender.Page),RegisterUsing=RegistrationMethod.CodeBase)]
 
     [Guid(Guids.guidBistro_DesignerPkgString)]
     public sealed class DesignerPackage : Package
@@ -82,37 +70,11 @@ namespace Bistro.Designer
         /// initialization is the Initialize method.
         /// </summary>
         public DesignerPackage()
-        {
-            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
-        }
-
-        /// <summary>
-        /// This function is called when the user clicks the menu item that shows the 
-        /// tool window. See the Initialize method to see how the menu item is associated to 
-        /// this function using the OleMenuCommandService service and the MenuCommand class.
-        /// </summary>
-        private void ShowToolWindow(object sender, EventArgs e)
-        {
-            // Get the instance number 0 of this tool window. This window is single instance so this instance
-            // is actually the only one.
-            // The last flag is set to true so that if the tool window does not exists it will be created.
-            /*ToolWindowPane _window = this.FindToolWindow(typeof(ExplorerWindow), 0, true);
-            if ((null == _window) || (null == _window.Frame))
-            {
-                throw new NotSupportedException(Resources.CanNotCreateWindow);
-            }
-            IVsWindowFrame windowFrame = (IVsWindowFrame)_window.Frame;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());*/
-            IVsWindowFrame windowFrame = (IVsWindowFrame)explorer.Frame;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
-        }
-
+        { }
 
         /////////////////////////////////////////////////////////////////////////////
         // Overriden Package Implementation
         #region Package Members
-        internal Explorer.ExplorerWindow explorer;
-
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -120,27 +82,8 @@ namespace Bistro.Designer
         /// </summary>
         protected override void Initialize()
         {
-            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
-
-            // Add our command handlers for menu (commands must exist in the .vsct file)
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if ( null != mcs )
-            {
-                // Create the command for the tool window
-                CommandID toolwndCommandID = new CommandID(Guids.guidBistro_DesignerCmdSet, (int)PkgCmdIDList.cmdidBistroExplorer);
-                MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
-                mcs.AddCommand( menuToolWin );
-            }
             RegisterProjectFactory(new Projects.FSharp.Factory(this));
-            RegisterProjectFactory(new FSharp.ProjectExtender.Factory(this));
-            //explorer = (ExplorerWindow)this.FindToolWindow(typeof(ExplorerWindow), 0, true);
-            ///This is an alternative way to handle solution events.Decided to use ProjectManager for each project instead
-            /*ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)this);
-            IVsMonitorSelection monitorSelectionService = GetGlobalService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
-            uint cookie = 0;
-            monitorSelectionService.AdviseSelectionEvents(new SelectionEventsHandler(), out cookie);*/
-
         }
         #endregion
 

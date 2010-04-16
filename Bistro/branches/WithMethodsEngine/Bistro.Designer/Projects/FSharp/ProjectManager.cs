@@ -13,11 +13,12 @@ using Microsoft.Build.BuildEngine;
 using Bistro.Configuration;
 
 using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
+using Microsoft.VisualStudio.OLE.Interop;
 
 namespace Bistro.Designer.Projects.FSharp
 {
     [ComVisible(true)]
-    public class ProjectManager : FlavoredProjectBase
+    public class ProjectManager : FlavoredProjectBase, IOleCommandTarget
     {
         
          private DesignerPackage package;
@@ -64,5 +65,30 @@ namespace Bistro.Designer.Projects.FSharp
             return result;
         }
 
+        protected override void SetInnerProject(IntPtr innerIUnknown)
+        {
+            base.SetInnerProject(innerIUnknown);
+            innerTarget = (IOleCommandTarget)Marshal.GetObjectForIUnknown(innerIUnknown);
+        }
+        IOleCommandTarget innerTarget;
+
+        #region IOleCommandTarget Members
+
+        int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            return innerTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
+        {
+            if (pguidCmdGroup.Equals(Guids.guidProjectExtenderCmdSet) && prgCmds[0].cmdID == (uint)PkgCmdIDList.cmdidProjectExtender)
+            {
+                prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED | (uint)OLECMDF.OLECMDF_INVISIBLE;
+                return VSConstants.S_OK;
+            }
+            return innerTarget.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
+        }
+
+        #endregion
     }
 }

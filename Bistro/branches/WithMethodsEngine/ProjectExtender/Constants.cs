@@ -12,6 +12,8 @@ namespace FSharp.ProjectExtender
         public static readonly Guid guidProjectExtenderCmdSet = new Guid(guidProjectExtenderCmdSetString);
 
         public const uint cmdidProjectExtender = 0x2001;
+        public const uint cmdidProjectRefresh = 0x2002;
+        public const uint cmdidProjectShowAll = 0x2003;
 
         public const string guidProjectExtenderFactoryString = "5B89FCC2-C9F6-49a8-8F8D-EDDCC3FDC9E9";
         public const string guidCompilerOrderPageString = "A5FC3BBD-8795-42d0-AA55-E65FE992378E";

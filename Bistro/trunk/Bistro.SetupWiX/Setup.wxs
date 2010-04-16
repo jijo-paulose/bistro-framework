@@ -53,16 +53,6 @@
     <WixVariable Id="WixUIBannerBmp" Value="bitmaps\bannrbmp.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="bitmaps\dlgbmp.bmp" />
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="EXTENSIONSHILL30FILES" >
-        <Directory Id="BistroDesigner" Name="BistroDesigner">
-          <Component Id="BistroDesignerFiles" Guid="FA80C8A8-63BE-4D5E-BACB-9FA941CD0C7C">
-            <File Id="Bistro.Core_ForDesigner_.dll" Name="Bistro.Core.dll" Source="lib\Bistro.Core.dll" DiskId="1" />
-            <File Id="Bistro.Designer.dll" Name="Bistro.Designer.dll" Source="lib\Bistro.Designer.dll" DiskId="1" />
-            <File Id="Bistro.Designer.pkgdef" Name="Bistro.Designer.pkgdef" Source="lib\Bistro.Designer.pkgdef" DiskId="1" />
-            <File Id="extensionDesigner.vsixmanifest" Name="extension.vsixmanifest" Source="lib\extensionDesigner.vsixmanifest" DiskId="1" />
-          </Component>
-        </Directory>
-      </Directory>
       <Directory Id="ProgramFilesFolder" Name="PFiles">
         <Directory Id="HILL30FILES" Name="Hill30">
           <Directory Id="INSTALLDIR" Name="Bistro">
@@ -77,6 +67,10 @@
             </Component>
             <Component Id="ReadmeBistro" Guid="2F2DC3B8-A256-4AF2-B1D9-20C89AF5645A">
               <File Id="ReadmeBistro" Name="Readme.txt" ShortName="README.TXT" Source="Readme.txt" />
+            </Component>
+            <Component Id="ProjectExtender" Guid="AA80C8A8-63BE-4D5E-BACB-9FA941CD0C7C">
+              <File Id="ProjectExtender.dll" Name="ProjectExtender.dll" Source="lib\ProjectExtender.dll" DiskId="1" />
+              <RegistryValue Root="HKLM" Key="Software\Hill30\ProjectExtender" Name="InstallDir" Type="string" Value="[INSTALLDIR]" KeyPath="yes" />
             </Component>
           </Directory>
         </Directory>
@@ -112,36 +106,6 @@
         </Directory>
       </Directory>
 
-      <Directory Id="ENVDIR_2010" Name="EnvDir">
-        <Directory Id="ProjectTemplates2010" Name="ProjectTemplates">
-          <Directory Id="ProjectTemplatesBistro2010" Name="Bistro">
-            <Component Id="ProjectTemplates2010" Guid="8F1095EE-D392-4596-B931-21CB35374251">
-              <RemoveFolder Id="ProjectTemplatesBistro2010" Directory="ProjectTemplatesBistro2010" On="uninstall" />
-              <RegistryValue Root="HKCU" Key="Software\Hill30\Bistro Designer\[ProductVersion]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
-              <File Id="FSharp2010.zip" Name="FSharp2010.zip" Source="Templates\FSharp.zip" />
-              <File Id="BistroProject2010.zip" Name="BistroProject2010.zip" Source="Templates\VS2010\BistroProject.zip" />
-              <File Id="BistroNHibernate2010.zip" Name="BistroNHibernate2010.zip" Source="Templates\VS2010\BistroNHibernate.zip" />
-            </Component>
-          </Directory>
-        </Directory>
-        <Directory Id="ItemTemplates2010" Name="ItemTemplates">
-          <Directory Id="ItemTemplatesBistro2010" Name="Bistro">
-            <Component Id="InstalledItemTemplates2010" Guid="C67DD6E5-F6A5-49E8-853D-BE4D05CA8005">
-              <RemoveFolder Id="ItemTemplatesBistro2010" Directory="ItemTemplatesBistro2010" On="uninstall" />
-              <RegistryValue Root="HKCU" Key="Software\Hill30\Bistro Designer\[ProductVersion]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
-              <File Id="BrowserFile2010.zip" Name="BrowserFile2010.zip" Source="Templates\ItemTemplates\Bistro\BrowserFile.zip" />
-              <File Id="FSharpControllers2010.zip" Name="FSharpControllers2010.zip" Source="Templates\ItemTemplates\Bistro\FSharpControllers.zip" />
-              <File Id="JScript2010.zip" Name="JScript2010.zip" Source="Templates\ItemTemplates\Bistro\JScript.zip" />
-              <File Id="NDjango2010.zip" Name="NDjango2010.zip" Source="Templates\ItemTemplates\Bistro\NDjango.zip" />
-              <File Id="StyleSheet2010.zip" Name="StyleSheet2010.zip" Source="Templates\ItemTemplates\Bistro\StyleSheet.zip" />
-              <File Id="Text2010.zip" Name="Text2010.zip" Source="Templates\ItemTemplates\Bistro\Text.zip" />
-              <File Id="WebConfig2010.zip" Name="WebConfig2010.zip" Source="Templates\ItemTemplates\Bistro\WebConfig.zip" />
-              <File Id="WebHTMLPage2010.zip" Name="WebHTMLPage2010.zip" Source="Templates\ItemTemplates\Bistro\WebHTMLPage.zip" />
-            </Component>
-          </Directory>
-        </Directory>
-      </Directory>
-
       <Directory Id="VS2008ITEMTEMPLATESLOCATION">
         <Directory Id="vs2008Web1" Name="Web">
           <Component Id="CustomItemTemplates2008" Guid="8EDB5431-75F6-4BF9-A183-BC6ACCBC90BD">
@@ -151,28 +115,21 @@
           </Component>
         </Directory>
       </Directory>
-      <Directory Id="VS2010ITEMTEMPLATESLOCATION">
-        <Directory Id="vs2010Web1" Name="Web">
-          <Component Id="CustomItemTemplates2010" Guid="FE2D2905-533C-492F-84E5-3CE4E10AE06C">
-            <RemoveFolder Id="vs2010Web1" Directory="vs2010Web1" On="uninstall" />
-            <RegistryValue Root="HKCU" Key="Software\Hill30\Bistro\[ProductVersion]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
-            <File Id="BistroController2010" Name="BistroController2010.zip" Source="Templates\BistroController.zip" />
-          </Component>
-        </Directory>
-      </Directory>
 
       <Component Id="RegistryDesignerVSX2008" DiskId="1" Guid="5F720FC6-EC7C-44E2-BEE4-8130CE1B3F09">
-        <?include RegpkgBistroDesigner2008.wxi?>
+        <?include BistroDesigner2008Reg.wxi?>
+      </Component>
+
+      <Component Id="RegistryProjectExtender" DiskId="1" Guid="6F720FC6-EC7C-44E2-BEE4-8130CE1B3F09">
+        <?include ExtenderReg.wxi?>
       </Component>
 
     </Directory>
 
-    
-    
     <Feature Id="ProductFeature" Level="1">
+      <ComponentRef Id="ProjectExtender" />
       <ComponentRef Id="BistroAssemblies" />
       <ComponentRef Id="ReadmeBistro" />
-      <ComponentRef Id="BistroDesignerFiles"/>
     </Feature>
 
     <Feature Id="Registry2008" Title="Visual Studio 2008 integration" Level="1">
@@ -180,13 +137,7 @@
       <ComponentRef Id="InstalledItemTemplates2008" />
       <ComponentRef Id="CustomItemTemplates2008" />
       <ComponentRef Id="RegistryDesignerVSX2008" />
-    </Feature>
-
-    <Feature Id="Registry2010" Title="Visual Studio 2010 integration" Level="1">
-      <ComponentRef Id="ProjectTemplates2010" />
-      <ComponentRef Id="InstalledItemTemplates2010" />
-      <ComponentRef Id="CustomItemTemplates2010" />
-      <Condition Level="0"><![CDATA[VS2010FOUND = NULL]]></Condition>
+      <ComponentRef Id="RegistryProjectExtender" />
     </Feature>
 
     <Binary Id="EditTemplates" SourceFile="versionWriterFull.exe" />
@@ -194,13 +145,11 @@
     <Property Id="NDJANGONEEDED" Value="Yes"/>
     <CustomAction Id="InstallNDjango" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
     <CustomAction Id="CA_DevenvSetup2008" Property="DEVENV_EXE_PATH2008" ExeCommand="/setup" Impersonate="no" Execute="deferred" />
-    <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[BistroDesigner]Bistro.Designer.pkgdef&quot;" Id="EditBistroDesignerPkgdef" Return="ignore" />
     <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2008]BistroProject2008.zip&quot;" Id="EditBistroProject2008CustomAction" Return="ignore" />
     <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2008]BistroNHibernate2008.zip&quot;" Id="EditBistroNHibernate2008CustomAction" Return="ignore" />
     <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2010]BistroProject2010.zip&quot;" Id="EditBistroProject2010CustomAction" Return="ignore" />
     <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2010]BistroNHibernate2010.zip&quot;" Id="EditBistroNHibernate2010CustomAction" Return="ignore" />
     <InstallExecuteSequence>
-      <Custom Action="EditBistroDesignerPkgdef" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>
       <Custom Action="EditBistroProject2008CustomAction" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>
       <Custom Action="EditBistroNHibernate2008CustomAction" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>
       <Custom Action="EditBistroProject2010CustomAction" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>

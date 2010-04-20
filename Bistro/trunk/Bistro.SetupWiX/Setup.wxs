@@ -147,13 +147,11 @@
     <CustomAction Id="CA_DevenvSetup2008" Property="DEVENV_EXE_PATH2008" ExeCommand="/setup" Impersonate="no" Execute="deferred" />
     <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2008]BistroProject2008.zip&quot;" Id="EditBistroProject2008CustomAction" Return="ignore" />
     <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2008]BistroNHibernate2008.zip&quot;" Id="EditBistroNHibernate2008CustomAction" Return="ignore" />
-    <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2010]BistroProject2010.zip&quot;" Id="EditBistroProject2010CustomAction" Return="ignore" />
-    <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2010]BistroNHibernate2010.zip&quot;" Id="EditBistroNHibernate2010CustomAction" Return="ignore" />
+    <CustomAction BinaryKey="EditTemplates" ExeCommand="&quot;[ProjectTemplatesBistro2008]FSharp2008.zip&quot;" Id="EditFSharp2008CustomAction" Return="ignore" />
     <InstallExecuteSequence>
       <Custom Action="EditBistroProject2008CustomAction" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>
       <Custom Action="EditBistroNHibernate2008CustomAction" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>
-      <Custom Action="EditBistroProject2010CustomAction" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>
-      <Custom Action="EditBistroNHibernate2010CustomAction" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>
+      <Custom Action="EditFSharp2008CustomAction" After="InstallFinalize"><![CDATA[Not Installed OR (Installer AND REMOVE <> "ALL")]]></Custom>
       <Custom Action="InstallNDjango" After="InstallFinalize"><![CDATA[(Not Installed OR (Installer AND REMOVE <> "ALL")) AND NDJANGONEEDED]]></Custom>
       <!--devenv /setup will be called later during ProjectExtender installation-->
       <Custom Action="CA_DevenvSetup2008" Before="InstallFinalize" />

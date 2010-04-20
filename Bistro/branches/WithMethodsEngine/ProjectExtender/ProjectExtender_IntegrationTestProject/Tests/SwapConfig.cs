@@ -16,11 +16,17 @@ namespace IntegrationTests
         ISwapConfig SetMoves(params MoveOp[] moves);
         List<string> FileOrder { get; }
         List<MoveOp> Moves { get; }
+        string ConfigName { get;}
     }
     internal class SwapConfig : ISwapConfig
     {
         List<string> fileList = new List<string>();
         List<MoveOp> actions = new List<MoveOp>();
+        string name;
+        internal SwapConfig(string configName)
+        {
+            this.name = configName;
+        }
         public ISwapConfig SetOrder(params string[] filenames)
         {
             foreach (string item in filenames)
@@ -36,6 +42,6 @@ namespace IntegrationTests
         }
         public List<string> FileOrder { get { return fileList; } }
         public List<MoveOp> Moves { get { return actions; } }
-
+        public string ConfigName { get { return name; } }
     }
 }
